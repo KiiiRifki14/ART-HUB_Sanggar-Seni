@@ -101,7 +101,7 @@
                         <div style="width: 30px; height: 30px; border-radius: 50%; background: #555; border: 2px solid var(--bg-card); display: flex; align-items: center; justify-content: center; font-size: 0.7rem; font-weight: bold; position: relative; left: -20px;">+9</div>
                     </div>
                     <div>
-                        <a href="{{ url('admin/events/1/plotting') }}" class="btn btn-outline" style="padding: 0.4rem 1rem; font-size: 0.8rem;">Cek Plotting</a>
+                        <a href="{{ url('admin/events/1/plotting') }}" class="btn btn-outline trigger-loader" style="padding: 0.4rem 1rem; font-size: 0.8rem;">Cek Plotting</a>
                     </div>
                 </div>
             </div>

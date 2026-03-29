@@ -21,10 +21,12 @@ Route::middleware('auth')->group(function () {
 // ══════════════════════════════════════════════════════════════════════════
 // 👑 1. ADMIN ROUTES (Gudang Logika Pak Yat)
 // ══════════════════════════════════════════════════════════════════════════
-Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->group(function() {
-    
+Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->group(function () {
+
     // Dasar
-    Route::get('/dashboard', function() { return view('admin.dashboard'); })->name('dashboard');
+    Route::get('/dashboard', function () {
+        return view('admin.dashboard');
+    })->name('dashboard');
 
     // Module: BOOKINGS & PROFIT LOCKING
     Route::get('/bookings', [BookingController::class, 'index'])->name('bookings.index');
@@ -55,27 +57,30 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
 // ══════════════════════════════════════════════════════════════════════════
 // 🎭 2. PERSONNEL ROUTES (Kru & Penari)
 // ══════════════════════════════════════════════════════════════════════════
-Route::middleware(['auth', 'role:personel'])->prefix('personnel')->name('personnel.')->group(function() {
-    
-    Route::get('/dashboard', function() { return view('personnel.dashboard'); })->name('dashboard');
-    
+Route::middleware(['auth', 'role:personel'])->prefix('personnel')->name('personnel.')->group(function () {
+
+    Route::get('/dashboard', function () {
+        return view('personnel.dashboard');
+    })->name('dashboard');
+
     // Module: GHOSTING GUARD (Live Check-In Absensi)
     Route::post('/events/{event}/check-in', [AttendanceController::class, 'checkIn'])->name('attendance.check_in');
-
 });
 
 
 // ══════════════════════════════════════════════════════════════════════════
 // 🤝 3. KLIEN ROUTES (Penyewa Event)
 // ══════════════════════════════════════════════════════════════════════════
-Route::middleware(['auth', 'role:klien'])->prefix('klien')->name('klien.')->group(function() {
-    
-    Route::get('/dashboard', function() { return view('klien.dashboard'); })->name('dashboard');
+Route::middleware(['auth', 'role:klien'])->prefix('klien')->name('klien.')->group(function () {
+
+    Route::get('/dashboard', function () {
+        return view('klien.dashboard');
+    })->name('dashboard');
     // Create Bookings, View History, Send Rating/Feedback...
 
 });
 
 // Load auth.php milik Breeze (Abaikan error jika belum ada, akan di-_scaffold_ user nanti)
-if (file_exists(__DIR__.'/auth.php')) {
-    require __DIR__.'/auth.php';
+if (file_exists(__DIR__ . '/auth.php')) {
+    require __DIR__ . '/auth.php';
 }

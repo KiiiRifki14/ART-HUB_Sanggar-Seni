@@ -13,9 +13,16 @@
 </head>
 <body>
 
+    <!-- Overlay Desktop & Mobile Loader -->
+    <div class="mobile-overlay" id="mobileOverlay" onclick="toggleSidebar()"></div>
+    <div class="page-loader" id="pageLoader">
+        <div class="spinner-gold"></div>
+        <p style="margin-top: 1.5rem; color: var(--gold-primary); font-size: 0.9rem; letter-spacing: 2px; text-transform: uppercase;">Menyinkronisasi Basis Data 2...</p>
+    </div>
+
     <div class="wrapper">
         <!-- ════════ SIDEBAR ════════ -->
-        <aside class="sidebar glass-panel animate-fade-in">
+        <aside class="sidebar glass-panel animate-fade-in" id="clientSidebar">
             <div class="sidebar-header" style="text-align: center; border-bottom: 1px solid var(--border-color); padding-bottom: 1.5rem;">
                 <h2 class="title-gold" style="font-size: 1.5rem; margin-bottom: 0.5rem;">ART-HUB</h2>
                 <span class="badge badge-gold">Control Panel</span>
@@ -53,9 +60,12 @@
         <main class="main-content">
             <!-- Header Notification / Welcome -->
             <header style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 3rem;" class="animate-fade-up">
-                <div>
-                    <h1 style="margin-bottom: 0.2rem;">@yield('page_title')</h1>
-                    <p class="text-muted">@yield('page_subtitle')</p>
+                <div style="display: flex; align-items: center; gap: 1rem;">
+                    <button class="hamburger" onclick="toggleSidebar()"><i class="ph ph-list"></i></button>
+                    <div>
+                        <h1 style="margin-bottom: 0.2rem;">@yield('page_title')</h1>
+                        <p class="text-muted">@yield('page_subtitle')</p>
+                    </div>
                 </div>
                 <div class="user-profile" style="display: flex; align-items: center; gap: 1rem; background: var(--glass-bg); padding: 0.6rem 1.2rem; border-radius: 50px; border: 1px solid var(--glass-border);">
                     <div style="width: 40px; height: 40px; border-radius: 50%; background: var(--gold-dark); display: flex; align-items: center; justify-content: center; font-weight: bold; color: #fff;">
@@ -98,11 +108,34 @@
 
     <!-- JavaScript Interaktif -->
     <script>
-        // Animasi cascade saat scroll
+        // Toggle Sidebar Mobile
+        function toggleSidebar() {
+            document.getElementById('clientSidebar').classList.toggle('show');
+            document.getElementById('mobileOverlay').classList.toggle('show');
+        }
+
+        // Global Page Loader Logic
+        function showLoader() {
+            document.getElementById('pageLoader').classList.add('is-loading');
+        }
+
         document.addEventListener('DOMContentLoaded', () => {
+            // Animasi cascade saat scroll
             const panels = document.querySelectorAll('.glass-panel');
             panels.forEach((panel, index) => {
                 panel.style.animationDelay = `${index * 0.1}s`;
+            });
+
+            // Memicu Spinner ketika form disubmit ATAU tombol dengan kelas trigger-loader diklik
+            document.querySelectorAll('form').forEach(form => {
+                form.addEventListener('submit', () => {
+                    // Cek agar tidak muncul error jika validasi browser gagal
+                    if(form.checkValidity()) showLoader();
+                });
+            });
+
+            document.querySelectorAll('.trigger-loader').forEach(btn => {
+                btn.addEventListener('click', showLoader);
             });
         });
     </script>

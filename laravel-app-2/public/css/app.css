@@ -262,10 +262,49 @@ h2 { font-size: 1.8rem; }
 .grid-3 { grid-template-columns: repeat(3, 1fr); }
 .grid-4 { grid-template-columns: repeat(4, 1fr); }
 
-/* RESPONSIVE */
+/* ════════════════════════════════════════════════════════
+   GOLD SPINNER & PAGE LOADER
+   ════════════════════════════════════════════════════════ */
+.page-loader {
+    position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(10, 11, 13, 0.95); backdrop-filter: blur(10px);
+    z-index: 9999; display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    opacity: 0; pointer-events: none; transition: opacity 0.4s ease;
+}
+.page-loader.is-loading { opacity: 1; pointer-events: auto; }
+.spinner-gold {
+    width: 55px; height: 55px;
+    border: 3px solid rgba(212, 175, 55, 0.15);
+    border-top-color: var(--gold-primary);
+    border-radius: 50%;
+    animation: spin 1s cubic-bezier(0.55, 0.085, 0.68, 0.53) infinite;
+    box-shadow: 0 0 20px var(--gold-glow);
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* ════════════════════════════════════════════════════════
+   RESPONSIVE & HAMBURGER
+   ════════════════════════════════════════════════════════ */
+.mobile-overlay {
+    position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(0,0,0,0.6); backdrop-filter: blur(4px);
+    z-index: 40; opacity: 0; pointer-events: none; transition: 0.3s ease;
+}
+.mobile-overlay.show { opacity: 1; pointer-events: auto; }
+
+.hamburger { 
+    display: none; cursor: pointer; background: transparent; 
+    border: none; font-size: 1.8rem; color: var(--gold-primary); 
+    transition: 0.2s;
+}
+.hamburger:hover { color: var(--gold-light); transform: scale(1.1); }
+
 @media (max-width: 1024px) {
-    .sidebar { transform: translateX(-100%); transition: 0.3s; }
+    .sidebar { transform: translateX(-100%); transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1); box-shadow: 5px 0 25px rgba(0,0,0,0.5); }
+    .sidebar.show { transform: translateX(0); }
     .main-content { margin-left: 0; padding: 1.5rem; }
+    .hamburger { display: inline-block; }
     .grid-3, .grid-4 { grid-template-columns: repeat(2, 1fr); }
 }
 @media (max-width: 768px) {
