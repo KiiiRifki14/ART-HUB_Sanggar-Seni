@@ -12,7 +12,7 @@ use App\Http\Controllers\Personnel\AttendanceController;
 use App\Http\Controllers\ProfileController;
 
 Route::get('/', function () {
-    return redirect()->route('login');
+    return view('welcome');
 });
 
 // 👇 PENGATUR LALU LINTAS ROLE
