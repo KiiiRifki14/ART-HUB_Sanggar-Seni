@@ -19,6 +19,8 @@
     /* UI States */
     --danger: #ef4444;       /* Merah elegan untuk Collision/Warning */
     --danger-glow: rgba(239, 68, 68, 0.2);
+    --warning: #F59E0B;      /* Kuning/Amber elegan untuk Safety Buffer */
+    --warning-glow: rgba(245, 158, 11, 0.15);
     --success: #10b981;      /* Hijau elegan untuk Check-in On-Time */
     --success-glow: rgba(16, 185, 129, 0.2);
 
@@ -117,6 +119,7 @@ body {
 
 .text-muted { color: var(--text-muted); }
 .text-danger { color: var(--danger); }
+.text-warning { color: var(--warning); }
 .text-success { color: var(--success); }
 
 h1, h2, h3 { font-weight: 700; line-height: 1.2; margin-bottom: 1rem; }
@@ -205,6 +208,7 @@ h2 { font-size: 1.8rem; }
 }
 .badge-gold { background: var(--gold-glow); color: var(--gold-primary); border: 1px solid var(--gold-primary); }
 .badge-danger { background: var(--danger-glow); color: var(--danger); border: 1px solid var(--danger); }
+.badge-warning { background: var(--warning-glow); color: var(--warning); border: 1px solid var(--warning); }
 .badge-success { background: var(--success-glow); color: var(--success); border: 1px solid var(--success); }
 
 /* ════════════════════════════════════════════════════════

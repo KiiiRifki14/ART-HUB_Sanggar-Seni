@@ -133,14 +133,14 @@
             </h2>
 
             <!-- Warning 1 -->
-            <div style="display: flex; gap: 1rem; margin-bottom: 1.5rem; padding: 1rem; background: rgba(255,255,255,0.03); border-radius: 12px; border-left: 4px solid var(--danger);">
-                <div style="background: var(--danger-glow); width: 40px; height: 40px; border-radius: 8px; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
-                    <i class="ph-fill ph-warning" style="color: var(--danger); font-size: 1.3rem;"></i>
+            <div style="display: flex; gap: 1rem; margin-bottom: 1.5rem; padding: 1rem; background: rgba(255,255,255,0.03); border-radius: 12px; border-left: 4px solid var(--warning);">
+                <div style="background: var(--warning-glow); width: 40px; height: 40px; border-radius: 8px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; box-shadow: 0 0 10px var(--warning-glow);">
+                    <i class="ph-fill ph-warning-circle" style="color: var(--warning); font-size: 1.3rem;"></i>
                 </div>
                 <div>
                     <h4 style="margin: 0 0 0.2rem 0; font-size: 1rem; color: var(--text-main);">Dana Operasional Kritis!</h4>
-                    <p class="text-muted" style="font-size: 0.85rem; margin: 0;">EVT-2026-045: Sisa biaya bersih setelah potongan Profit & Buffer hanya Rp 1.500.000 (Warning Active).</p>
-                    <small style="color: var(--danger); font-weight: 600; margin-top: 0.5rem; display: block;">Tindakan Diperlukan: Kurangi Biaya Bensin</small>
+                    <p class="text-muted" style="font-size: 0.85rem; margin: 0;">EVT-2026-045: Sisa biaya bersih setelah potongan Profit & Buffer hanya Rp 1.500.000 (Safety Buffer Active).</p>
+                    <small style="color: var(--warning); font-weight: 600; margin-top: 0.5rem; display: block;">Tindakan Diperlukan: Kurangi Biaya Bensin</small>
                 </div>
             </div>
 
