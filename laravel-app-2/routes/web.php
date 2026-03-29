@@ -10,8 +10,15 @@ use App\Http\Controllers\Admin\FinancialController;
 use App\Http\Controllers\Personnel\AttendanceController;
 
 Route::get('/', function () {
-    return view('welcome'); // Landing Page Homepage
+    return redirect()->route('login');
 });
+
+Route::get('/dashboard', function () {
+    $role = auth()->user()->role;
+    if ($role === 'admin') return redirect()->route('admin.dashboard');
+    if ($role === 'personel') return redirect()->route('personnel.dashboard');
+    return redirect()->route('klien.dashboard');
+})->middleware(['auth'])->name('dashboard');
 
 // Middleware autentikasi standar (Profil, dll)
 Route::middleware('auth')->group(function () {
