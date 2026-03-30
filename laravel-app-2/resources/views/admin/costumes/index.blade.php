@@ -12,7 +12,10 @@
     </h2>
     <div class="grid grid-4" style="gap: 1rem;">
         @foreach($sanggarCostumes as $c)
-        <div style="padding: 1.5rem; background: rgba(0,0,0,0.2); border-radius: 12px; border: 1px solid {{ $c->condition === 'damaged' ? 'var(--danger)' : 'var(--border-color)' }};">
+        @php
+            $isDamaged = $c->condition === 'damaged';
+        @endphp
+        <div class="costume-card{{ $isDamaged ? ' costume-damaged' : '' }}" style="padding: 1.5rem; background: rgba(0,0,0,0.2); border-radius: 12px; border-width: 1px; border-style: solid;">
             <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 0.8rem;">
                 <h4 style="margin: 0; font-size: 0.95rem;">{{ $c->name }}</h4>
                 @if($c->condition === 'good') <span class="badge badge-success" style="font-size: 0.65rem;">BAIK</span>
@@ -77,5 +80,9 @@
         </table>
     </div>
 </div>
-<style>@keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.5} }</style>
+<style>
+    @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.5} }
+    .costume-card { border-color: var(--border-color); }
+    .costume-damaged { border-color: var(--danger) !important; }
+</style>
 @endsection

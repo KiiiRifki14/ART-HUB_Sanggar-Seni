@@ -17,7 +17,9 @@ class BookingController extends Controller
      */
     public function index()
     {
-        $bookings = Booking::with('client')->latest()->get();
+        $bookings = Booking::with('client')
+            ->latest()
+            ->get();
         return view('admin.bookings.index', compact('bookings'));
     }
 
@@ -42,10 +44,11 @@ class BookingController extends Controller
         }
 
         try {
-            // ═══ MULAI SQL TRANSACTION ═══
-            // Semua query di dalam closure ini dibungkus START TRANSACTION dan COMMIT otomatis.
-            // Jika ada Exception, otomatis di-ROLLBACK.
-            DB::transaction(function () use ($booking, $request) {
+            // Variabel yang perlu dibaca di luar closure transaction
+            $profitStatus = 'locked';
+            $targetProfit = 0;
+
+            DB::transaction(function () use ($booking, $request, &$profitStatus, &$targetProfit) {
                 
                 // 1. UPDATE STATUS BOOKING & BUKTI TRANSFER
                 // (Dalam skenario nyata, upload file diproses di sini dan path-nya disimpan)
@@ -72,39 +75,64 @@ class BookingController extends Controller
                     'personnel_count' => 12, // Standar 11+1
                 ]);
 
-                // 3. HITUNG DAN KUNCI FIXED PROFIT (Laba Pak Yat)
-                // Cek apakah ada override % profit dari form, jika tidak pakai default 30%
-                $profitPct = $request->input('override_profit_pct', 30.00);
+                // 3. HITUNG DAN KUNCI FIXED PROFIT (Laba Pak Yat) — CELAH #1 FIX
+                // ══════════════════════════════════════════════════════════════
+                // ATURAN "PROFIT FIRST — DP CICIL LABA":
+                //   - Laba 30 % dihitung dari TOTAL, BUKAN dari DP.
+                //   - Jika DP ≥ target laba  → potong laba di muka, sisa DP → modal operasional.
+                //   - Jika DP < target laba  → SELURUH DP dikunci sebagai cicilan laba,
+                //     modal operasional = 0, sistem mencatat ini sebagai "partial_lock".
+                //     Operasional HANYA cair setelah pelunasan masuk.
+                // ══════════════════════════════════════════════════════════════
+                $profitPct   = $request->input('override_profit_pct', 30.00);
                 $isOverridden = $request->has('override_profit_pct');
-                
-                $fixedProfit = $booking->total_price * ($profitPct / 100);
-                $operationalBudget = $booking->dp_amount - $fixedProfit;
-                
-                // Kalkulasi Safety Buffer (10% dari operasional)
-                $safetyBufferAmt = $operationalBudget * 0.10;
-                $usableBudget = $operationalBudget - $safetyBufferAmt;
 
-                // Logika Peringatan Dana Darurat (Misal: operasional murni < Rp 2 Juta → beri warning)
-                $budgetWarning = $usableBudget < 2000000;
-                $warningMessage = $budgetWarning 
-                    ? "Warning: Dana operasional bersih (setelah profit & buffer) hanya Rp " . number_format($usableBudget, 0, ',', '.') . ". Sangat mepet untuk biaya lapangan!" 
-                    : null;
+                $targetProfit = $booking->total_price * ($profitPct / 100); // Rp 3 Jt dari Rp 10 Jt
+                $dpMasuk      = $booking->dp_amount;                         // e.g. Rp 1.5 Jt (DP VIP kecil)
 
-                // Insert into financial_records
+                if ($dpMasuk >= $targetProfit) {
+                    // SKENARIO NORMAL: DP cukup besar — potong laba di depan
+                    $fixedProfit       = $targetProfit;
+                    $operationalBudget = $dpMasuk - $fixedProfit;
+                    $profitStatus      = 'locked';          // Laba penuh terkunci
+                    $profitNote        = null;
+                } else {
+                    // SKENARIO DP VIP / NEGOSIASI: DP lebih kecil dari target laba
+                    // → Seluruh DP menjadi cicilan laba. Operasional TUNGGU PELUNASAN.
+                    $fixedProfit       = $dpMasuk;          // 100% DP dikunci sebagai laba
+                    $operationalBudget = 0;                 // Operasional = nol (belum ada dana)
+                    $profitStatus      = 'partial_lock';    // Status khusus: laba baru sebagian
+                    $profitNote        = "DP ({$dpMasuk}) lebih kecil dari target laba ({$targetProfit}). "
+                                       . "Seluruh DP dikunci sebagai cicilan. Dana operasional menunggu pelunasan.";
+                }
+
+                // Safety Buffer HANYA dihitung jika ada operasional budget
+                $safetyBufferAmt = $operationalBudget > 0 ? $operationalBudget * 0.10 : 0;
+                $usableBudget    = $operationalBudget - $safetyBufferAmt;
+
+                // Peringatan anggaran mepet
+                $budgetWarning  = $operationalBudget > 0 && $usableBudget < 2000000;
+                $warningMessage = $profitNote;
+                if (!$warningMessage && $budgetWarning) {
+                    $warningMessage = "Warning: Dana operasional bersih hanya Rp "
+                                    . number_format($usableBudget, 0, ',', '.')
+                                    . ". Sangat mepet untuk biaya lapangan!";
+                }
+
                 FinancialRecord::create([
                     'event_id'             => $event->id,
                     'total_revenue'        => $booking->total_price,
                     'fixed_profit_pct'     => $profitPct,
                     'is_profit_overridden' => $isOverridden,
                     'fixed_profit'         => $fixedProfit,
-                    'dp_received'          => $booking->dp_amount,
+                    'dp_received'          => $dpMasuk,
                     'operational_budget'   => $operationalBudget,
                     'safety_buffer_pct'    => 10.00,
                     'safety_buffer_amt'    => $safetyBufferAmt,
-                    'budget_warning'       => $budgetWarning,
+                    'budget_warning'       => $budgetWarning || ($profitStatus === 'partial_lock'),
                     'warning_message'      => $warningMessage,
-                    'profit_locked'        => true, // MENGUNCI LABA
-                    'status'               => 'locked',
+                    'profit_locked'        => true,
+                    'status'               => $profitStatus === 'partial_lock' ? 'draft' : 'locked',
                 ]);
 
                 // Catatan: Function 'fn_estimate_total_honor' akan ditarik terpisah 
@@ -112,7 +140,12 @@ class BookingController extends Controller
             });
             // ═══ COMMIT TRANSACTION ═══
 
-            return redirect()->back()->with('success', 'DP Berhasil Dikonfirmasi. Laba Pimpinan Telah Dikunci & Event Telah Dibuat!');
+            // Pesan disesuaikan dengan kondisi profit lock
+            $successMsg = $profitStatus === 'partial_lock'
+                ? '⚠️ DP Dikonfirmasi (Mode Cicil Laba). DP lebih kecil dari target laba — seluruh DP dikunci. Dana operasional menunggu pelunasan!'
+                : '✅ DP Berhasil Dikonfirmasi. Laba Pimpinan '  . number_format($targetProfit, 0, ',', '.') . ' Telah Dikunci & Event Telah Dibuat!';
+
+            return redirect()->back()->with('success', $successMsg);
 
         } catch (\Exception $e) {
             // ═══ ROLLBACK TRANSACTION otomatis terjadi di dalam DB::transaction ═══

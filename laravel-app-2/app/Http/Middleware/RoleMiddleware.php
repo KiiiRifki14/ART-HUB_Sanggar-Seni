@@ -18,7 +18,11 @@ class RoleMiddleware
     public function handle(Request $request, Closure $next, ...$roles): Response
     {
         if (!Auth::check()) {
-            return redirect('login');
+            // CELAH #2 FIX: Guest yang belum login akan diarahkan ke halaman Login
+            // dengan pesan informatif, bukan halaman 403 mentah.
+            return redirect()->route('login')
+                ->with('info', 'Silakan login terlebih dahulu untuk mengakses halaman tersebut.')
+                ->withInput(['intended' => $request->fullUrl()]);
         }
 
         // Cek apakah role user saat ini ada di dalam array roles yang diizinkan route

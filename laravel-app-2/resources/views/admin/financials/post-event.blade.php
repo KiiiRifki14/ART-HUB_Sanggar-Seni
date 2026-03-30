@@ -15,7 +15,10 @@
     </div>
     <div class="glass-panel" style="text-align: center;">
         <small class="text-muted">Realisasi</small>
-        <h2 style="margin: 0.3rem 0 0 0; color: {{ $fr->actual_operational_cost > $fr->operational_budget ? 'var(--danger)' : 'var(--text-main)' }};">Rp {{ number_format($fr->actual_operational_cost, 0, ',', '.') }}</h2>
+        @php
+            $overBudget = $fr->actual_operational_cost > $fr->operational_budget;
+        @endphp
+        <h2 style="margin: 0.3rem 0 0 0;" class="{{ $overBudget ? 'text-danger' : '' }}">Rp {{ number_format($fr->actual_operational_cost, 0, ',', '.') }}</h2>
     </div>
     <div class="glass-panel" style="text-align: center;">
         <small class="text-muted">Safety Buffer</small>
