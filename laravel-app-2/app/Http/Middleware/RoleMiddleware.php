@@ -23,7 +23,14 @@ class RoleMiddleware
 
         // Cek apakah role user saat ini ada di dalam array roles yang diizinkan route
         if (!in_array(Auth::user()->role, $roles)) {
-            abort(403, 'Akses Terlarang! Peran akun Anda (' . strtoupper(Auth::user()->role) . ') tidak diizinkan masuk ke halaman operasional ini.');
+            $userRole = Auth::user()->role;
+            $redirectPath = match ($userRole) {
+                'personnel' => '/personnel/dashboard',
+                'klien' => '/klien/dashboard',
+                default => '/dashboard',
+            };
+
+            return redirect($redirectPath)->with('error', 'Akses Ditolak: Anda tidak memiliki wewenang untuk memasuki area tersebut.');
         }
 
         return $next($request);

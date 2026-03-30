@@ -4,18 +4,23 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login | ART-HUB</title>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <title>Login | ART-HUB Sanggar Cahaya Gumilang</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 
     <style>
         :root {
-            --primary: #d97706;
-            --primary-hover: #b45309;
-            --dark: #1f2937;
-            --light: #f9fafb;
-            --gray: #e5e7eb;
-            --text-main: #374151;
-            --text-light: #6b7280;
+            --bg-dark: #0a0b0d;
+            --bg-card: #15171a;
+            --bg-hover: #1e2126;
+            --text-main: #f3f4f6;
+            --text-muted: #9ca3af;
+            --border-color: #272a30;
+            --gold-primary: #D4AF37;
+            --gold-light: #F3E5AB;
+            --gold-dark: #AA8C2C;
+            --gold-glow: rgba(212, 175, 55, 0.3);
+            --glass-bg: rgba(21, 23, 26, 0.7);
+            --glass-border: rgba(255, 255, 255, 0.05);
             --error: #ef4444;
         }
 
@@ -23,98 +28,157 @@
             box-sizing: border-box;
             margin: 0;
             padding: 0;
-            font-family: 'Poppins', sans-serif;
+            font-family: 'Outfit', sans-serif;
         }
 
         body {
-            background-color: var(--light);
+            background-color: var(--bg-dark);
             display: flex;
             align-items: center;
             justify-content: center;
             min-height: 100vh;
             padding: 20px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Ambient glow */
+        body::before {
+            content: '';
+            position: absolute;
+            width: 400px; height: 400px;
+            background: var(--gold-glow);
+            border-radius: 50%;
+            filter: blur(120px);
+            top: -100px; left: -100px;
+            animation: floatGlow 8s ease-in-out infinite alternate;
+        }
+        body::after {
+            content: '';
+            position: absolute;
+            width: 300px; height: 300px;
+            background: rgba(212, 175, 55, 0.15);
+            border-radius: 50%;
+            filter: blur(100px);
+            bottom: -80px; right: -80px;
+            animation: floatGlow 10s ease-in-out infinite alternate-reverse;
+        }
+        @keyframes floatGlow {
+            0% { transform: translate(0, 0) scale(1); }
+            100% { transform: translate(30px, 20px) scale(1.1); }
         }
 
         .login-container {
             display: flex;
-            background: #fff;
-            border-radius: 16px;
+            background: var(--bg-card);
+            border-radius: 20px;
             overflow: hidden;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+            border: 1px solid var(--glass-border);
             width: 100%;
             max-width: 1000px;
+            position: relative;
+            z-index: 1;
+            animation: slideUp 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
         }
 
         .login-visual {
             flex: 1;
-            /* GANTI URL INI DENGAN GAMBAR PENARIMU */
-            background-image: url('https://images.unsplash.com/photo-1543160350-c75c889f0ea8?q=80&w=800&auto=format&fit=crop');
-            background-size: cover;
-            background-position: center;
+            background: linear-gradient(135deg, var(--bg-dark), #1a1a2e, #16213e);
             position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 400px;
         }
 
-        .login-visual::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.3);
+        .login-visual-content {
+            text-align: center;
+            padding: 3rem;
+            z-index: 1;
+        }
+
+        .login-visual-content h1 {
+            font-size: 3rem;
+            color: var(--gold-primary);
+            font-weight: 800;
+            text-shadow: 0 0 30px var(--gold-glow);
+            margin-bottom: 0.5rem;
+            letter-spacing: 3px;
+        }
+
+        .login-visual-content p {
+            color: var(--text-muted);
+            font-size: 1rem;
+            line-height: 1.6;
+        }
+
+        .visual-badge {
+            display: inline-block;
+            padding: 0.4rem 1.2rem;
+            background: var(--gold-glow);
+            border: 1px solid var(--gold-primary);
+            border-radius: 50px;
+            color: var(--gold-primary);
+            font-weight: 600;
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-top: 1.5rem;
         }
 
         .login-form-panel {
             flex: 1;
-            padding: 60px 50px;
+            padding: 50px 45px;
         }
 
         .logo {
-            font-weight: 700;
-            font-size: 32px;
-            color: var(--dark);
+            font-weight: 800;
+            font-size: 28px;
+            color: var(--text-main);
             text-align: center;
-            margin-bottom: 10px;
+            margin-bottom: 8px;
+            letter-spacing: 2px;
         }
-
-        .logo span {
-            color: var(--primary);
-        }
+        .logo span { color: var(--gold-primary); }
 
         .form-header {
             text-align: center;
             margin-bottom: 30px;
         }
+        .form-header p { color: var(--text-muted); font-size: 0.9rem; }
 
-        .form-header p {
-            color: var(--text-light);
-        }
-
-        .form-group {
-            margin-bottom: 20px;
-        }
+        .form-group { margin-bottom: 20px; }
 
         .form-label {
             display: block;
             margin-bottom: 8px;
             font-weight: 600;
-            color: var(--dark);
-            font-size: 14px;
+            color: var(--gold-light);
+            font-size: 13px;
+            letter-spacing: 0.5px;
         }
 
         .form-input {
             width: 100%;
             padding: 12px 15px;
-            border: 2px solid var(--gray);
-            border-radius: 8px;
-            transition: all 0.3s ease;
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            background: rgba(0,0,0,0.3);
+            color: var(--text-main);
             font-size: 14px;
+            transition: all 0.3s ease;
         }
-
         .form-input:focus {
             outline: none;
-            border-color: var(--primary);
+            border-color: var(--gold-primary);
+            box-shadow: 0 0 0 3px var(--gold-glow);
         }
+        .form-input::placeholder { color: var(--text-muted); }
 
         .error-msg {
             color: var(--error);
@@ -129,43 +193,44 @@
             gap: 8px;
             margin-bottom: 20px;
         }
-
         .checkbox-input {
             width: 16px;
             height: 16px;
             cursor: pointer;
-            accent-color: var(--primary);
+            accent-color: var(--gold-primary);
         }
 
         .btn-primary {
             display: block;
             width: 100%;
             padding: 14px;
-            border-radius: 8px;
+            border-radius: 10px;
             border: none;
-            background-color: var(--primary);
-            color: #fff;
-            font-weight: 600;
+            background: linear-gradient(135deg, var(--gold-primary), var(--gold-dark));
+            color: var(--bg-dark);
+            font-weight: 700;
+            font-size: 0.95rem;
             cursor: pointer;
-            transition: 0.3s;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             text-align: center;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            box-shadow: 0 4px 15px var(--gold-glow);
         }
-
         .btn-primary:hover {
-            background-color: var(--primary-hover);
-            transform: translateY(-2px);
+            transform: translateY(-2px) scale(1.01);
+            box-shadow: 0 6px 25px rgba(212, 175, 55, 0.5);
+            filter: brightness(1.1);
         }
 
         .link {
-            color: var(--primary);
+            color: var(--gold-primary);
             text-decoration: none;
             font-weight: 600;
             font-size: 14px;
+            transition: 0.2s;
         }
-
-        .link:hover {
-            color: var(--primary-hover);
-        }
+        .link:hover { color: var(--gold-light); }
 
         .flex-between {
             display: flex;
@@ -174,17 +239,10 @@
         }
 
         @media (max-width: 768px) {
-            .login-container {
-                flex-direction: column;
-            }
-
-            .login-visual {
-                min-height: 250px;
-            }
-
-            .login-form-panel {
-                padding: 40px 20px;
-            }
+            .login-container { flex-direction: column; }
+            .login-visual { min-height: 200px; }
+            .login-visual-content h1 { font-size: 2rem; }
+            .login-form-panel { padding: 35px 25px; }
         }
     </style>
 </head>
@@ -192,7 +250,13 @@
 <body>
 
     <div class="login-container">
-        <div class="login-visual"></div>
+        <div class="login-visual">
+            <div class="login-visual-content">
+                <h1>ART-HUB</h1>
+                <p>Sanggar Cahaya Gumilang<br>Management & Financial Security System</p>
+                <div class="visual-badge">Est. Subang — Sejak 1985</div>
+            </div>
+        </div>
         <div class="login-form-panel">
             <div class="logo">ART<span>HUB</span></div>
             <div class="form-header">
@@ -200,7 +264,7 @@
             </div>
 
             @if (session('status'))
-            <div style="color: green; margin-bottom: 15px; text-align: center; font-size: 14px;">
+            <div style="color: var(--gold-primary); margin-bottom: 15px; text-align: center; font-size: 14px; background: var(--gold-glow); padding: 0.8rem; border-radius: 8px;">
                 {{ session('status') }}
             </div>
             @endif
@@ -227,17 +291,17 @@
                 <div class="form-group flex-between">
                     <div class="checkbox-group" style="margin-bottom: 0;">
                         <input id="remember_me" type="checkbox" class="checkbox-input" name="remember">
-                        <label for="remember_me" style="font-size: 14px; color: var(--text-light); cursor: pointer;">Remember me</label>
+                        <label for="remember_me" style="font-size: 13px; color: var(--text-muted); cursor: pointer;">Remember me</label>
                     </div>
 
                     @if (Route::has('password.request'))
-                    <a class="link" href="{{ route('password.request') }}">Forgot Password?</a>
+                    <a class="link" href="{{ route('password.request') }}">Lupa Password?</a>
                     @endif
                 </div>
 
                 <button type="submit" class="btn-primary">LOGIN</button>
 
-                <div style="text-align: center; margin-top: 25px; font-size: 14px; color: var(--text-light);">
+                <div style="text-align: center; margin-top: 25px; font-size: 14px; color: var(--text-muted);">
                     Belum punya akun? <a href="{{ route('register') }}" class="link">Register di sini</a>
                 </div>
             </form>

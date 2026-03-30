@@ -9,6 +9,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 class Personnel extends Model
 {
+    protected $table = 'personnel';
     protected $guarded = ['id'];
 
     protected $casts = [

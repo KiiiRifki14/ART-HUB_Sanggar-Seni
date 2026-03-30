@@ -28,39 +28,40 @@
                 <span class="badge badge-gold">Control Panel</span>
             </div>
 
+            @php $currentUrl = url()->current(); @endphp
             <nav class="sidebar-nav" style="display: flex; flex-direction: column; gap: 0.5rem; margin-top: 1rem; flex: 1; overflow-y: auto; padding-right: 5px;">
-                <a href="/dashboard" class="btn btn-outline" style="justify-content: flex-start; border: 1px solid var(--gold-primary); padding: 0.8rem 1rem; border-radius: 8px; background: var(--gold-primary); color: #000; font-weight: bold;">
-                    <i class="ph ph-squares-four" style="font-size: 1.2rem;"></i> Dashboard
+                <a href="{{ route('admin.dashboard') }}" class="btn btn-outline" style="justify-content: flex-start; padding: 0.8rem 1rem; border-radius: 8px; {{ request()->routeIs('admin.dashboard') ? 'border: 1px solid var(--gold-primary); background: var(--gold-primary); color: #000; font-weight: bold;' : 'border: 1px solid var(--border-color); background: var(--glass-bg);' }}">
+                    <i class="ph ph-squares-four" style="font-size: 1.2rem; {{ request()->routeIs('admin.dashboard') ? '' : 'color: var(--gold-primary);' }}"></i> Dashboard
                 </a>
-                <a href="#" class="btn btn-outline" style="justify-content: flex-start; border: 1px solid var(--border-color); padding: 0.8rem 1rem; background: var(--glass-bg);">
-                    <i class="ph ph-calendar-check" style="color: var(--gold-primary); font-size: 1.2rem;"></i> Event Management
+                <a href="{{ route('admin.events.index') }}" class="btn btn-outline" style="justify-content: flex-start; padding: 0.8rem 1rem; border-radius: 8px; {{ request()->routeIs('admin.events.*') ? 'border: 1px solid var(--gold-primary); background: var(--gold-primary); color: #000; font-weight: bold;' : 'border: 1px solid var(--border-color); background: var(--glass-bg);' }}">
+                    <i class="ph ph-calendar-check" style="font-size: 1.2rem; {{ request()->routeIs('admin.events.*') ? '' : 'color: var(--gold-primary);' }}"></i> Event Management
                 </a>
-                <a href="#" class="btn btn-outline" style="justify-content: flex-start; border: 1px solid var(--border-color); padding: 0.8rem 1rem; background: var(--glass-bg);">
-                    <i class="ph ph-users" style="color: var(--gold-primary); font-size: 1.2rem;"></i> Personnel Management
+                <a href="{{ route('admin.personnel.index') }}" class="btn btn-outline" style="justify-content: flex-start; padding: 0.8rem 1rem; border-radius: 8px; {{ request()->routeIs('admin.personnel.*') ? 'border: 1px solid var(--gold-primary); background: var(--gold-primary); color: #000; font-weight: bold;' : 'border: 1px solid var(--border-color); background: var(--glass-bg);' }}">
+                    <i class="ph ph-users" style="font-size: 1.2rem; {{ request()->routeIs('admin.personnel.*') ? '' : 'color: var(--gold-primary);' }}"></i> Personnel Management
                 </a>
-                <a href="#" class="btn btn-outline" style="justify-content: flex-start; border: 1px solid var(--border-color); padding: 0.8rem 1rem; background: var(--glass-bg);">
-                    <i class="ph ph-wallet" style="color: var(--gold-primary); font-size: 1.2rem;"></i> Payment Tracking
+                <a href="{{ route('admin.payments.index') }}" class="btn btn-outline" style="justify-content: flex-start; padding: 0.8rem 1rem; border-radius: 8px; {{ request()->routeIs('admin.payments.*') ? 'border: 1px solid var(--gold-primary); background: var(--gold-primary); color: #000; font-weight: bold;' : 'border: 1px solid var(--border-color); background: var(--glass-bg);' }}">
+                    <i class="ph ph-wallet" style="font-size: 1.2rem; {{ request()->routeIs('admin.payments.*') ? '' : 'color: var(--gold-primary);' }}"></i> Payment Tracking
                 </a>
-                <a href="#" class="btn btn-outline" style="justify-content: flex-start; border: 1px solid var(--border-color); padding: 0.8rem 1rem; background: var(--glass-bg);">
-                    <i class="ph ph-t-shirt" style="color: var(--gold-primary); font-size: 1.2rem;"></i> Costume Rental
+                <a href="{{ route('admin.costumes.index') }}" class="btn btn-outline" style="justify-content: flex-start; padding: 0.8rem 1rem; border-radius: 8px; {{ request()->routeIs('admin.costumes.*') ? 'border: 1px solid var(--gold-primary); background: var(--gold-primary); color: #000; font-weight: bold;' : 'border: 1px solid var(--border-color); background: var(--glass-bg);' }}">
+                    <i class="ph ph-t-shirt" style="font-size: 1.2rem; {{ request()->routeIs('admin.costumes.*') ? '' : 'color: var(--gold-primary);' }}"></i> Costume Rental
                 </a>
-                <a href="#" class="btn btn-outline" style="justify-content: flex-start; border: 1px solid var(--border-color); padding: 0.8rem 1rem; background: var(--glass-bg);">
-                    <i class="ph ph-chart-line-up" style="color: var(--gold-primary); font-size: 1.2rem;"></i> Financial Report
+                <a href="{{ route('admin.financials.index') }}" class="btn btn-outline" style="justify-content: flex-start; padding: 0.8rem 1rem; border-radius: 8px; {{ request()->routeIs('admin.financials.*') ? 'border: 1px solid var(--gold-primary); background: var(--gold-primary); color: #000; font-weight: bold;' : 'border: 1px solid var(--border-color); background: var(--glass-bg);' }}">
+                    <i class="ph ph-chart-line-up" style="font-size: 1.2rem; {{ request()->routeIs('admin.financials.*') ? '' : 'color: var(--gold-primary);' }}"></i> Financial Report
                 </a>
-                <a href="#" class="btn btn-outline" style="justify-content: flex-start; border: 1px solid var(--border-color); padding: 0.8rem 1rem; background: var(--glass-bg);">
-                    <i class="ph ph-receipt" style="color: var(--gold-primary); font-size: 1.2rem;"></i> DP Verification
+                <a href="{{ route('admin.bookings.index') }}" class="btn btn-outline" style="justify-content: flex-start; padding: 0.8rem 1rem; border-radius: 8px; {{ request()->routeIs('admin.bookings.*') ? 'border: 1px solid var(--gold-primary); background: var(--gold-primary); color: #000; font-weight: bold;' : 'border: 1px solid var(--border-color); background: var(--glass-bg);' }}">
+                    <i class="ph ph-receipt" style="font-size: 1.2rem; {{ request()->routeIs('admin.bookings.*') ? '' : 'color: var(--gold-primary);' }}"></i> DP Verification
                 </a>
-                <a href="#" class="btn btn-outline" style="justify-content: flex-start; border: 1px solid var(--border-color); padding: 0.8rem 1rem; background: var(--glass-bg);">
-                    <i class="ph ph-plus-circle" style="color: var(--gold-primary); font-size: 1.2rem;"></i> New Booking Entry
+                <a href="{{ route('admin.bookings.create') }}" class="btn btn-outline" style="justify-content: flex-start; padding: 0.8rem 1rem; border-radius: 8px; {{ request()->routeIs('admin.bookings.create') ? 'border: 1px solid var(--gold-primary); background: var(--gold-primary); color: #000; font-weight: bold;' : 'border: 1px solid var(--border-color); background: var(--glass-bg);' }}">
+                    <i class="ph ph-plus-circle" style="font-size: 1.2rem; {{ request()->routeIs('admin.bookings.create') ? '' : 'color: var(--gold-primary);' }}"></i> New Booking Entry
                 </a>
-                <a href="#" class="btn btn-outline" style="justify-content: flex-start; border: 1px solid var(--border-color); padding: 0.8rem 1rem; background: var(--glass-bg);">
+                <a href="{{ route('admin.events.index') }}" class="btn btn-outline" style="justify-content: flex-start; padding: 0.8rem 1rem; border-radius: 8px; border: 1px solid var(--border-color); background: var(--glass-bg);">
                     <i class="ph ph-clipboard-text" style="color: var(--gold-primary); font-size: 1.2rem;"></i> Post-Event Update
                 </a>
-                <a href="#" class="btn btn-outline" style="justify-content: flex-start; border: 1px solid var(--border-color); padding: 0.8rem 1rem; background: var(--glass-bg);">
+                <a href="{{ route('admin.events.index') }}" class="btn btn-outline" style="justify-content: flex-start; padding: 0.8rem 1rem; border-radius: 8px; border: 1px solid var(--border-color); background: var(--glass-bg);">
                     <i class="ph ph-activity" style="color: var(--gold-primary); font-size: 1.2rem;"></i> Event Monitoring
                 </a>
-                <a href="#" class="btn btn-outline" style="justify-content: flex-start; border: 1px solid var(--border-color); padding: 0.8rem 1rem; background: var(--glass-bg);">
-                    <i class="ph ph-shield-warning" style="color: var(--gold-primary); font-size: 1.2rem;"></i> Cancellation Handler
+                <a href="{{ route('admin.cancellations.index') }}" class="btn btn-outline" style="justify-content: flex-start; padding: 0.8rem 1rem; border-radius: 8px; {{ request()->routeIs('admin.cancellations.*') ? 'border: 1px solid var(--gold-primary); background: var(--gold-primary); color: #000; font-weight: bold;' : 'border: 1px solid var(--border-color); background: var(--glass-bg);' }}">
+                    <i class="ph ph-shield-warning" style="font-size: 1.2rem; {{ request()->routeIs('admin.cancellations.*') ? '' : 'color: var(--gold-primary);' }}"></i> Cancellation Handler
                 </a>
             </nav>
 

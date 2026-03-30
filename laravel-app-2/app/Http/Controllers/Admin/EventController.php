@@ -12,6 +12,24 @@ use Illuminate\Support\Facades\DB;
 class EventController extends Controller
 {
     /**
+     * Daftar Semua Event
+     */
+    public function index()
+    {
+        $events = Event::with('booking')->latest('event_date')->get();
+        return view('admin.events.index', compact('events'));
+    }
+
+    /**
+     * Detail Event + Monitoring
+     */
+    public function show(Event $event)
+    {
+        $event->load(['booking', 'personnel.user', 'financialRecord']);
+        return view('admin.events.show', compact('event'));
+    }
+
+    /**
      * TAMPILKAN HALAMAN PLOTTING (Smart Plotting)
      * Akan memanggil Stored Procedure MySQL yang menggunakan CURSOR
      * untuk mengecek tabrakan jadwal dengan event lain, latihan, atau pekerjaan utama.
@@ -63,10 +81,35 @@ class EventController extends Controller
 
         try {
             DB::transaction(function () use ($request, $event) {
-                // 1. Bersihkan Data Plotting Lama (jika Pak Yat sedang Re-Plotting)
+                // 1. Validasi Bentrok Jadwal via Stored Procedure sebelum menyetujui plot
+                $date = $event->event_date->format('Y-m-d');
+                $start = is_string($event->event_start) ? $event->event_start : $event->event_start->format('H:i:s');
+                $end = is_string($event->event_end) ? $event->event_end : $event->event_end->format('H:i:s');
+
+                DB::statement('CALL sp_check_personnel_availability(?, ?, ?, @p_avail_count, @p_col_count, @p_col_details, @p_avail_details)', 
+                    [$date, $start, $end]
+                );
+                $spResult = DB::select('SELECT @p_col_details as collision_details');
+                $collisionString = $spResult[0]->collision_details ?? '';
+                
+                // Ekstrak ID yang bentrok dari string detail (contoh format: "ID:2 - Event Lain, ID:5 - PNS")
+                // Kita akan cegah personel yang ID-nya ada di string tersebut.
+                $collidingIds = [];
+                if (!empty($collisionString)) {
+                    preg_match_all('/ID:(\d+)/', $collisionString, $matches);
+                    $collidingIds = $matches[1] ?? [];
+                }
+
+                foreach ($request->personnel as $p) {
+                    if (in_array((string)$p['id'], $collidingIds)) {
+                        throw new \Exception("Personel dengan ID {$p['id']} memiliki jadwal bentrok (Pekerjaan/Event) pada waktu tersebut. Plotting digagalkan oleh sistem SQL.");
+                    }
+                }
+
+                // 2. Bersihkan Data Plotting Lama (jika Pak Yat sedang Re-Plotting)
                 $event->personnel()->detach();
 
-                // 2. Insert Plotting Baru dari Loop Input
+                // 3. Insert Plotting Baru dari Loop Input
                 foreach ($request->personnel as $p) {
                     $feeRef = FeeReference::findOrFail($p['fee_reference_id']);
                     
@@ -81,19 +124,17 @@ class EventController extends Controller
                     ]);
                 }
 
-                // 3. GUNAKAN SQL FUNCTION (Basis Data 2) "fn_estimate_total_honor"
-                // Sengaja mendelegasikan beban SUM/Kalkulasi ke server MySQL
+                // 4. GUNAKAN SQL FUNCTION "fn_estimate_total_honor"
                 $query = DB::select('SELECT fn_estimate_total_honor(?) as estimated_total', [$event->id]);
                 $estimatedHonor = $query[0]->estimated_total ?? 0;
 
-                // 4. Update tabel Events
+                // 5. Update tabel Events
                 $event->update([
                     'estimated_total_honor' => $estimatedHonor,
-                    'status' => 'ready' // Berubah dari 'planning' -> 'ready'
+                    'status' => 'ready' 
                 ]);
 
-                // 5. Update bagian Keuangan (Financial Records) 
-                // Agar Budget Operasional & Evaluasi Net Profit bisa disesuaikan
+                // 6. Update bagian Keuangan (Financial Records) 
                 if ($event->financialRecord) {
                     $event->financialRecord->update([
                         'total_personnel_honor' => $estimatedHonor

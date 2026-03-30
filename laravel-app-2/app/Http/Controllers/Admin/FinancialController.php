@@ -12,6 +12,24 @@ use Illuminate\Support\Facades\Auth;
 class FinancialController extends Controller
 {
     /**
+     * Financial Report Overview
+     */
+    public function index()
+    {
+        $records = FinancialRecord::with('event.booking')->get();
+        return view('admin.financials.index', compact('records'));
+    }
+
+    /**
+     * Post-Event Update (detail biaya operasional per event)
+     */
+    public function postEvent(\App\Models\Event $event)
+    {
+        $event->load('financialRecord.operationalCosts');
+        return view('admin.financials.post-event', compact('event'));
+    }
+
+    /**
      * Mengupdate / Merubah Biaya Operasional.
      * Memicu TRIGGER: "trg_operational_cost_audit" (Pencegahan Biaya Siluman)
      */

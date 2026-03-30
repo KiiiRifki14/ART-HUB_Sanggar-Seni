@@ -11,6 +11,16 @@ use Carbon\Carbon;
 class CostumeController extends Controller
 {
     /**
+     * Costume Rental Overview
+     */
+    public function index()
+    {
+        $sanggarCostumes = \App\Models\SanggarCostume::all();
+        $vendorRentals = \App\Models\CostumeRental::with(['event', 'vendor'])->latest()->get();
+        return view('admin.costumes.index', compact('sanggarCostumes', 'vendorRentals'));
+    }
+
+    /**
      * MENGEMBALIKAN KOSTUM ASET SANGGAR
      * Controller ini akan memicu DUA TRIGGERS SECARA BERANTAI di MySQL:
      * 1. trg_sanggar_costume_return : Menentukan apakah 'returned' / 'damaged' berdasarkan tanggal telat.

@@ -1,66 +1,81 @@
 @extends('layouts.admin')
 
-@section('title', 'Verifikasi Booking - EVT-2026-045')
-@section('page_title', 'Verifikasi DP & Booking')
-@section('page_subtitle', 'Tinjau bukti transfer dan kunci Fixed Profit Pimpinan.')
+@section('title', 'DP Verification - ART-HUB')
+@section('page_title', 'DP Verification')
+@section('page_subtitle', 'Verifikasi pembayaran & kunci laba pimpinan.')
 
 @section('content')
-
-    <div class="grid grid-2 animate-fade-up stagger-1">
-        <!-- Rincian Acara -->
-        <div class="glass-panel">
-            <h3 style="margin-bottom: 1.5rem; color: var(--text-main); display: flex; align-items: center; gap: 0.5rem;">
-                <i class="ph ph-calendar-check" style="color: var(--gold-primary);"></i> Rincian Booking
-            </h3>
-            
-            <div style="display: flex; justify-content: space-between; margin-bottom: 1rem; border-bottom: 1px dashed var(--border-color); padding-bottom: 0.5rem;">
-                <span class="text-muted">Nama Klien</span>
-                <span style="font-weight: 600;">Sinta Aryanti</span>
-            </div>
-            <div style="display: flex; justify-content: space-between; margin-bottom: 1rem; border-bottom: 1px dashed var(--border-color); padding-bottom: 0.5rem;">
-                <span class="text-muted">Jenis Acara</span>
-                <span style="font-weight: 600;">Resepsi Pernikahan (Jaipong)</span>
-            </div>
-            <div style="display: flex; justify-content: space-between; margin-bottom: 1rem; border-bottom: 1px dashed var(--border-color); padding-bottom: 0.5rem;">
-                <span class="text-muted">Jadwal</span>
-                <span style="font-weight: 600; color: var(--gold-light);">Min, 12 Apr 2026 | 19:00</span>
-            </div>
-            <div style="display: flex; justify-content: space-between; margin-bottom: 1rem;">
-                <span class="text-muted">Total Tagihan</span>
-                <span style="font-weight: 700; font-size: 1.1rem;">Rp 15.000.000</span>
-            </div>
-        </div>
-
-        <!-- Bukti Transfer & Konfirmasi -->
-        <div class="glass-panel" style="border-color: var(--gold-primary);">
-            <h3 style="margin-bottom: 1.5rem; color: var(--gold-light); display: flex; align-items: center; gap: 0.5rem;">
-                <i class="ph ph-receipt"></i> Verifikasi Transfer DP
-            </h3>
-
-            <!-- Simulasi Bukti Transfer -->
-            <div style="background: rgba(0,0,0,0.3); border: 1px solid var(--border-color); border-radius: 12px; padding: 2rem; text-align: center; margin-bottom: 1.5rem;">
-                <i class="ph ph-image" style="font-size: 3rem; color: var(--text-muted); margin-bottom: 1rem;"></i>
-                <p class="text-muted" style="margin-bottom: 0;">resi_transfer_bca_sinta.jpg</p>
-                <div style="margin-top: 1rem;">
-                    <span class="badge badge-success">Dana DP Tercatat Masuk: Rp 5.000.000</span>
-                </div>
-            </div>
-
-            <!-- Tombol Pemicu Modal -->
-            <button type="button" class="btn btn-gold" style="width: 100%; padding: 1.2rem; font-size: 1.05rem;" onclick="openModal('modalLockProfit')">
-                <i class="ph ph-shield-check"></i> Konfirmasi Pembayaran & Kunci Laba
-            </button>
+<div class="grid grid-2 animate-fade-up">
+    <!-- INFO BOOKING -->
+    <div class="glass-panel card-gold">
+        <h3 style="color: var(--gold-light); margin-bottom: 1.5rem;">
+            <i class="ph ph-receipt" style="margin-right: 0.5rem;"></i> Detail Booking #{{ $booking->id }}
+        </h3>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem;">
+            <div><small class="text-muted">Klien</small><div style="font-weight: 600;">{{ $booking->client_name ?? $booking->client->name ?? '-' }}</div></div>
+            <div><small class="text-muted">Telepon</small><div>{{ $booking->client_phone ?? '-' }}</div></div>
+            <div><small class="text-muted">Jenis Event</small><div style="text-transform: capitalize;">{{ $booking->event_type }}</div></div>
+            <div><small class="text-muted">Tanggal</small><div>{{ \Carbon\Carbon::parse($booking->event_date)->format('d M Y') }}</div></div>
+            <div><small class="text-muted">Waktu</small><div>{{ \Carbon\Carbon::parse($booking->event_start)->format('H:i') }} - {{ \Carbon\Carbon::parse($booking->event_end)->format('H:i') }}</div></div>
+            <div><small class="text-muted">Venue</small><div>{{ $booking->venue }}</div></div>
+            <div><small class="text-muted">Sumber Booking</small><div><span class="badge {{ $booking->booking_source === 'web' ? 'badge-gold' : 'badge-success' }}">{{ strtoupper($booking->booking_source) }}</span></div></div>
+            <div><small class="text-muted">Status</small><div>
+                @if($booking->status === 'pending') <span class="badge badge-warning">PENDING</span>
+                @elseif($booking->status === 'dp_paid') <span class="badge badge-gold">DP PAID</span>
+                @elseif($booking->status === 'confirmed') <span class="badge badge-success">CONFIRMED</span>
+                @elseif($booking->status === 'completed') <span class="badge badge-success">COMPLETED</span>
+                @else <span class="badge badge-danger">CANCELLED</span>
+                @endif
+            </div></div>
         </div>
     </div>
 
-    <!-- MENGGUNAKAN KOMPONEN MODAL YANG BARU SAJA DIBUAT (Kritik Bu Sari Passed!) -->
-    <x-gold-modal 
-        id="modalLockProfit"
-        title="Konfirmasi Pembayaran DP"
-        amountLabel="Nilai Laba Tetap (Fixed Profit 30%) yang akan dikunci:"
-        amountValue="Rp 4.500.000"
-        actionUrl="{{ route('admin.bookings.confirm', 1) }}"
-        actionText="Kunci Profit & Buat Event"
-    />
+    <!-- PANEL KEUANGAN -->
+    <div class="glass-panel">
+        <h3 style="margin-bottom: 1.5rem;"><i class="ph ph-lock-key" style="color: var(--gold-primary); margin-right: 0.5rem;"></i> Kalkulasi Laba</h3>
 
+        <div style="background: rgba(0,0,0,0.2); border-radius: 12px; padding: 1.5rem; margin-bottom: 1.5rem;">
+            <div style="display: flex; justify-content: space-between; margin-bottom: 1rem;">
+                <span class="text-muted">Total Harga</span>
+                <span style="font-weight: 700; font-size: 1.2rem;">Rp {{ number_format($booking->total_price, 0, ',', '.') }}</span>
+            </div>
+            <div style="display: flex; justify-content: space-between; margin-bottom: 1rem;">
+                <span class="text-muted">DP (50%)</span>
+                <span style="font-weight: 700; font-size: 1.2rem; color: var(--gold-primary);">Rp {{ number_format($booking->dp_amount, 0, ',', '.') }}</span>
+            </div>
+            <hr style="border: none; border-top: 1px dashed var(--border-color); margin: 1rem 0;">
+            <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
+                <span class="text-muted">Fixed Profit (30%)</span>
+                <span class="title-gold" style="font-size: 1.1rem;">Rp {{ number_format($booking->total_price * 0.30, 0, ',', '.') }}</span>
+            </div>
+            <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
+                <span class="text-muted">Budget Operasional</span>
+                <span>Rp {{ number_format($booking->dp_amount - ($booking->total_price * 0.30), 0, ',', '.') }}</span>
+            </div>
+            <div style="display: flex; justify-content: space-between;">
+                <span class="text-muted">Safety Buffer (10%)</span>
+                <span style="color: var(--success);">Rp {{ number_format(($booking->dp_amount - ($booking->total_price * 0.30)) * 0.10, 0, ',', '.') }}</span>
+            </div>
+        </div>
+
+        @if($booking->status === 'pending')
+        <form method="POST" action="{{ route('admin.bookings.confirm', $booking->id) }}">
+            @csrf
+            <button type="submit" class="btn btn-gold" style="width: 100%;" onclick="return confirm('Yakin ingin mengonfirmasi DP dan MENGUNCI LABA? Aksi ini TIDAK BISA DIBATALKAN.')">
+                <i class="ph ph-lock-key"></i> Konfirmasi DP & Kunci Laba Pimpinan
+            </button>
+        </form>
+        @elseif($booking->status === 'dp_paid' || $booking->status === 'confirmed')
+        <div style="padding: 1rem; background: var(--success-glow); border-radius: 12px; border: 1px solid var(--success); text-align: center;">
+            <i class="ph-fill ph-check-circle" style="color: var(--success); font-size: 1.5rem;"></i>
+            <p style="margin: 0.5rem 0 0 0; font-weight: 600;">Laba Sudah Terkunci</p>
+            <small class="text-muted">{{ $booking->dp_paid_at ? \Carbon\Carbon::parse($booking->dp_paid_at)->format('d M Y H:i') : '-' }}</small>
+        </div>
+        @endif
+    </div>
+</div>
+
+<div style="margin-top: 2rem;">
+    <a href="{{ route('admin.bookings.index') }}" class="btn btn-outline"><i class="ph ph-arrow-left"></i> Kembali ke Bookings</a>
+</div>
 @endsection

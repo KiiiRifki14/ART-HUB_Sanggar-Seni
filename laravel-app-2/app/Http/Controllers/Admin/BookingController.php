@@ -121,6 +121,14 @@ class BookingController extends Controller
     }
     
     /**
+     * Form Booking Entry Manual
+     */
+    public function create()
+    {
+        return view('admin.bookings.create');
+    }
+
+    /**
      * ADMIN QUICK ENTRY: Simpan booking manual (Klien tanpa akun)
      */
     public function storeManual(Request $request)

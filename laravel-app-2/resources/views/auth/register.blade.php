@@ -4,18 +4,22 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Register | ART-HUB</title>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <title>Register | ART-HUB Sanggar Cahaya Gumilang</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 
     <style>
         :root {
-            --primary: #d97706;
-            --primary-hover: #b45309;
-            --dark: #1f2937;
-            --light: #f9fafb;
-            --gray: #e5e7eb;
-            --text-main: #374151;
-            --text-light: #6b7280;
+            --bg-dark: #0a0b0d;
+            --bg-card: #15171a;
+            --bg-hover: #1e2126;
+            --text-main: #f3f4f6;
+            --text-muted: #9ca3af;
+            --border-color: #272a30;
+            --gold-primary: #D4AF37;
+            --gold-light: #F3E5AB;
+            --gold-dark: #AA8C2C;
+            --gold-glow: rgba(212, 175, 55, 0.3);
+            --glass-border: rgba(255, 255, 255, 0.05);
             --error: #ef4444;
         }
 
@@ -23,81 +27,114 @@
             box-sizing: border-box;
             margin: 0;
             padding: 0;
-            font-family: 'Poppins', sans-serif;
+            font-family: 'Outfit', sans-serif;
         }
 
         body {
-            background-color: var(--light);
+            background-color: var(--bg-dark);
             display: flex;
             align-items: center;
             justify-content: center;
             min-height: 100vh;
             padding: 20px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        body::before {
+            content: '';
+            position: absolute;
+            width: 350px; height: 350px;
+            background: var(--gold-glow);
+            border-radius: 50%;
+            filter: blur(120px);
+            top: -80px; right: -80px;
+            animation: floatGlow 8s ease-in-out infinite alternate;
+        }
+        body::after {
+            content: '';
+            position: absolute;
+            width: 250px; height: 250px;
+            background: rgba(212, 175, 55, 0.12);
+            border-radius: 50%;
+            filter: blur(100px);
+            bottom: -60px; left: -60px;
+            animation: floatGlow 10s ease-in-out infinite alternate-reverse;
+        }
+        @keyframes floatGlow {
+            0% { transform: translate(0, 0) scale(1); }
+            100% { transform: translate(20px, 15px) scale(1.1); }
         }
 
         .register-container {
-            background: #fff;
-            border-radius: 16px;
+            background: var(--bg-card);
+            border-radius: 20px;
             overflow: hidden;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+            border: 1px solid var(--glass-border);
             width: 100%;
             max-width: 550px;
-            padding: 50px 40px;
+            padding: 45px 40px;
+            position: relative;
+            z-index: 1;
+            animation: slideUp 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
         }
 
         .logo {
-            font-weight: 700;
-            font-size: 32px;
-            color: var(--dark);
+            font-weight: 800;
+            font-size: 28px;
+            color: var(--text-main);
             text-align: center;
             margin-bottom: 5px;
+            letter-spacing: 2px;
         }
-
-        .logo span {
-            color: var(--primary);
-        }
+        .logo span { color: var(--gold-primary); }
 
         .form-header {
             text-align: center;
             margin-bottom: 30px;
         }
-
         .form-header h2 {
-            font-size: 24px;
-            color: var(--dark);
+            font-size: 22px;
+            color: var(--text-main);
             margin-bottom: 5px;
         }
-
         .form-header p {
-            color: var(--text-light);
-            font-size: 14px;
+            color: var(--text-muted);
+            font-size: 0.9rem;
         }
 
-        .form-group {
-            margin-bottom: 20px;
-        }
+        .form-group { margin-bottom: 18px; }
 
         .form-label {
             display: block;
             margin-bottom: 8px;
             font-weight: 600;
-            color: var(--dark);
-            font-size: 14px;
+            color: var(--gold-light);
+            font-size: 13px;
+            letter-spacing: 0.5px;
         }
 
         .form-input {
             width: 100%;
             padding: 12px 15px;
-            border: 2px solid var(--gray);
-            border-radius: 8px;
-            transition: all 0.3s ease;
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            background: rgba(0,0,0,0.3);
+            color: var(--text-main);
             font-size: 14px;
+            transition: all 0.3s ease;
         }
-
         .form-input:focus {
             outline: none;
-            border-color: var(--primary);
+            border-color: var(--gold-primary);
+            box-shadow: 0 0 0 3px var(--gold-glow);
         }
+        .form-input::placeholder { color: var(--text-muted); }
 
         .error-msg {
             color: var(--error);
@@ -110,37 +147,37 @@
             display: block;
             width: 100%;
             padding: 14px;
-            border-radius: 8px;
+            border-radius: 10px;
             border: none;
-            background-color: var(--primary);
-            color: #fff;
-            font-weight: 600;
+            background: linear-gradient(135deg, var(--gold-primary), var(--gold-dark));
+            color: var(--bg-dark);
+            font-weight: 700;
             cursor: pointer;
-            transition: 0.3s;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             text-align: center;
-            margin-top: 30px;
+            margin-top: 28px;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            font-size: 0.95rem;
+            box-shadow: 0 4px 15px var(--gold-glow);
         }
-
         .btn-primary:hover {
-            background-color: var(--primary-hover);
-            transform: translateY(-2px);
+            transform: translateY(-2px) scale(1.01);
+            box-shadow: 0 6px 25px rgba(212, 175, 55, 0.5);
+            filter: brightness(1.1);
         }
 
         .link {
-            color: var(--primary);
+            color: var(--gold-primary);
             text-decoration: none;
             font-weight: 600;
             font-size: 14px;
+            transition: 0.2s;
         }
-
-        .link:hover {
-            color: var(--primary-hover);
-        }
+        .link:hover { color: var(--gold-light); }
 
         @media (max-width: 480px) {
-            .register-container {
-                padding: 40px 20px;
-            }
+            .register-container { padding: 35px 22px; }
         }
     </style>
 </head>
@@ -191,7 +228,7 @@
 
             <button type="submit" class="btn-primary">REGISTER</button>
 
-            <div style="text-align: center; margin-top: 25px; font-size: 14px; color: var(--text-light);">
+            <div style="text-align: center; margin-top: 25px; font-size: 14px; color: var(--text-muted);">
                 Sudah punya akun? <a href="{{ route('login') }}" class="link">Login di sini</a>
             </div>
         </form>

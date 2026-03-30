@@ -12,6 +12,15 @@ use Carbon\Carbon;
 class CancellationController extends Controller
 {
     /**
+     * Daftar seluruh pembatalan
+     */
+    public function index()
+    {
+        $cancellations = Cancellation::with('booking')->latest()->get();
+        return view('admin.cancellations.index', compact('cancellations'));
+    }
+
+    /**
      * Memproses Pembatalan Event oleh Klien
      * MENGGUNAKAN SQL FUNCTION: fn_calculate_cancellation_penalty
      */
