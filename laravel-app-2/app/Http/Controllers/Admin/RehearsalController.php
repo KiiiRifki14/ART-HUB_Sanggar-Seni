@@ -10,6 +10,12 @@ use Illuminate\Support\Facades\DB;
 
 class RehearsalController extends Controller
 {
+    public function index()
+    {
+        $rehearsals = Rehearsal::with('event.booking')->orderBy('rehearsal_date', 'asc')->get();
+        return view('admin.rehearsals.index', compact('rehearsals'));
+    }
+
     /**
      * Menjadwalkan Latihan (3-Stage Logic)
      */

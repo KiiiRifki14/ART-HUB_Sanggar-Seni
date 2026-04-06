@@ -54,8 +54,14 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
     Route::get('/events/{event}/plotting', [EventController::class, 'plotting'])->name('events.plotting');
     Route::post('/events/{event}/plotting', [EventController::class, 'storePlotting'])->name('events.plotting.store');
 
-    // PERSONNEL MANAGEMENT
+    // PERSONNEL MANAGEMENT (CRUD lengkap)
     Route::get('/personnel', [PersonnelController::class, 'index'])->name('personnel.index');
+    Route::get('/personnel/create', [PersonnelController::class, 'create'])->name('personnel.create');
+    Route::post('/personnel', [PersonnelController::class, 'store'])->name('personnel.store');
+    Route::get('/personnel/{personnel}/edit', [PersonnelController::class, 'edit'])->name('personnel.edit');
+    Route::put('/personnel/{personnel}', [PersonnelController::class, 'update'])->name('personnel.update');
+    Route::delete('/personnel/{personnel}', [PersonnelController::class, 'destroy'])->name('personnel.destroy');
+
 
     // PAYMENT TRACKING
     Route::get('/payments', [PaymentController::class, 'index'])->name('payments.index');
@@ -75,6 +81,7 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
     Route::post('/bookings/{booking}/cancel', [CancellationController::class, 'store'])->name('bookings.cancel');
 
     // REHEARSALS
+    Route::get('/rehearsals', [RehearsalController::class, 'index'])->name('rehearsals.index');
     Route::post('/events/{event}/rehearsals', [RehearsalController::class, 'store'])->name('rehearsals.store');
 });
 

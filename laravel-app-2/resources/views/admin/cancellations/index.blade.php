@@ -1,89 +1,90 @@
 @extends('layouts.admin')
 
-@section('title', 'Cancellation Handler - ART-HUB')
+@section('title', 'Cancellation Handler – ART-HUB')
 @section('page_title', 'Cancellation Handler')
-@section('page_subtitle', 'Riwayat pembatalan & pengembalian dana.')
+@section('page_subtitle', 'Riwayat pembatalan & pengembalian dana klien.')
 
 @section('content')
-<div class="glass-panel animate-fade-up">
-    <h2 style="margin-bottom: 2rem; display: flex; align-items: center; gap: 0.8rem;">
-        <i class="ph ph-shield-warning" style="color: var(--danger);"></i> Daftar Pembatalan
-    </h2>
+<div class="arh-card p-4 animate-fade-up mb-4">
+    <h5 class="fw-bold mb-4 d-flex align-items-center gap-2">
+        <i class="bi bi-shield-exclamation text-danger"></i> Daftar Pembatalan
+    </h5>
 
-    <div style="overflow-x: auto;">
-        <table style="width: 100%; border-collapse: collapse;">
+    <div class="table-responsive">
+        <table class="table arh-table table-hover align-middle mb-0">
             <thead>
-                <tr style="border-bottom: 2px solid var(--border-color);">
-                    <th style="padding: 1rem; text-align: left; color: var(--gold-primary); font-size: 0.75rem; text-transform: uppercase;">Booking</th>
-                    <th style="padding: 1rem; text-align: left; color: var(--gold-primary); font-size: 0.75rem; text-transform: uppercase;">Klien</th>
-                    <th style="padding: 1rem; text-align: left; color: var(--gold-primary); font-size: 0.75rem; text-transform: uppercase;">Tgl Batal</th>
-                    <th style="padding: 1rem; text-align: left; color: var(--gold-primary); font-size: 0.75rem; text-transform: uppercase;">H- Event</th>
-                    <th style="padding: 1rem; text-align: left; color: var(--gold-primary); font-size: 0.75rem; text-transform: uppercase;">Penalti</th>
-                    <th style="padding: 1rem; text-align: left; color: var(--gold-primary); font-size: 0.75rem; text-transform: uppercase;">Refund</th>
-                    <th style="padding: 1rem; text-align: left; color: var(--gold-primary); font-size: 0.75rem; text-transform: uppercase;">Alasan</th>
-                    <th style="padding: 1rem; text-align: left; color: var(--gold-primary); font-size: 0.75rem; text-transform: uppercase;">Status</th>
+                <tr>
+                    <th>Booking</th>
+                    <th>Klien</th>
+                    <th>Tgl Batal</th>
+                    <th>H- Event</th>
+                    <th>Penalti</th>
+                    <th>Refund</th>
+                    <th>Alasan</th>
+                    <th>Status</th>
                 </tr>
             </thead>
             <tbody>
                 @forelse($cancellations as $c)
-                <tr style="border-bottom: 1px solid var(--border-color);" onmouseover="this.style.background='var(--bg-hover)'" onmouseout="this.style.background='transparent'">
-                    <td style="padding: 1rem;">#{{ $c->booking_id }}</td>
-                    <td style="padding: 1rem; font-weight: 600;">{{ $c->booking->client_name ?? '-' }}</td>
-                    <td style="padding: 1rem;">{{ \Carbon\Carbon::parse($c->cancellation_date)->format('d M Y') }}</td>
-                    <td style="padding: 1rem;">
-                        <span class="badge {{ $c->days_before_event <= 3 ? 'badge-danger' : ($c->days_before_event <= 7 ? 'badge-warning' : 'badge-gold') }}">
-                            H-{{ $c->days_before_event }}
+                <tr>
+                    <td><span class="badge arh-badge-gold">#{{ $c->booking_id }}</span></td>
+                    <td class="fw-semibold">{{ $c->booking->client_name ?? '-' }}</td>
+                    <td>{{ \Carbon\Carbon::parse($c->cancellation_date)->format('d M Y') }}</td>
+                    <td>
+                        @php $days = $c->days_before_event; @endphp
+                        <span class="badge bg-{{ $days <= 3 ? 'danger' : ($days <= 7 ? 'warning' : 'secondary') }}">
+                            H-{{ $days }}
                         </span>
                     </td>
-                    <td style="padding: 1rem;">
-                        <div style="color: var(--danger); font-weight: 700;">Rp {{ number_format($c->penalty_amount, 0, ',', '.') }}</div>
-                        <small class="text-muted">{{ number_format($c->penalty_percentage, 0) }}% dari total</small>
+                    <td>
+                        <div class="text-danger fw-bold">Rp {{ number_format($c->penalty_amount, 0, ',', '.') }}</div>
+                        <small class="text-secondary">{{ number_format($c->penalty_percentage, 0) }}% dari total</small>
                     </td>
-                    <td style="padding: 1rem;">
+                    <td>
                         @if($c->refund_amount > 0)
-                            <span style="color: var(--success); font-weight: 700;">Rp {{ number_format($c->refund_amount, 0, ',', '.') }}</span>
+                            <span class="text-success fw-bold">Rp {{ number_format($c->refund_amount, 0, ',', '.') }}</span>
                         @else
-                            <span class="text-muted">Rp 0 (Hangus)</span>
+                            <span class="text-secondary">Rp 0 (Hangus)</span>
                         @endif
                     </td>
-                    <td style="padding: 1rem; max-width: 200px;">
-                        <small>{{ Str::limit($c->reason, 60) }}</small>
-                    </td>
-                    <td style="padding: 1rem;">
-                        @if($c->status === 'pending') <span class="badge badge-warning">PENDING</span>
-                        @elseif($c->status === 'processed') <span class="badge badge-gold">DIPROSES</span>
-                        @else <span class="badge badge-success">REFUNDED</span>
+                    <td style="max-width: 180px;"><small class="text-secondary">{{ Str::limit($c->reason, 60) }}</small></td>
+                    <td>
+                        @if($c->status === 'pending')
+                            <span class="badge bg-warning text-dark">PENDING</span>
+                        @elseif($c->status === 'processed')
+                            <span class="badge arh-badge-gold">DIPROSES</span>
+                        @else
+                            <span class="badge bg-success">REFUNDED</span>
                         @endif
                     </td>
                 </tr>
                 @empty
-                <tr><td colspan="8" style="padding: 3rem; text-align: center;" class="text-muted">Belum ada data pembatalan. Semoga tidak ada. 🙏</td></tr>
+                <tr>
+                    <td colspan="8" class="text-center py-5 text-secondary">
+                        <i class="bi bi-emoji-smile fs-1 d-block mb-3"></i>
+                        Belum ada data pembatalan. Semoga tidak ada! 🙏
+                    </td>
+                </tr>
                 @endforelse
             </tbody>
         </table>
     </div>
+</div>
 
-    <!-- FORMULA PENALTI INFO -->
-    <div style="margin-top: 2rem; padding: 1.5rem; background: rgba(0,0,0,0.2); border-radius: 12px; border: 1px solid var(--border-color);">
-        <h4 style="margin-bottom: 1rem; color: var(--gold-light);"><i class="ph ph-function" style="color: var(--gold-primary);"></i> Formula Penalti SQL Function</h4>
-        <div class="grid grid-4" style="gap: 1rem;">
-            <div style="text-align: center; padding: 1rem; background: rgba(255,255,255,0.03); border-radius: 8px;">
-                <div class="title-gold" style="font-size: 1.2rem;">10%</div>
-                <small class="text-muted">H-14+</small>
-            </div>
-            <div style="text-align: center; padding: 1rem; background: rgba(255,255,255,0.03); border-radius: 8px;">
-                <div style="color: var(--warning); font-size: 1.2rem; font-weight: 700;">30%</div>
-                <small class="text-muted">H-7 s/d H-13</small>
-            </div>
-            <div style="text-align: center; padding: 1rem; background: rgba(255,255,255,0.03); border-radius: 8px;">
-                <div style="color: var(--danger); font-size: 1.2rem; font-weight: 700;">50%</div>
-                <small class="text-muted">H-3 s/d H-6</small>
-            </div>
-            <div style="text-align: center; padding: 1rem; background: rgba(255,255,255,0.03); border-radius: 8px; border: 1px solid var(--danger);">
-                <div style="color: var(--danger); font-size: 1.2rem; font-weight: 700;">75%</div>
-                <small class="text-muted">H-2 atau kurang</small>
+{{-- ── FORMULA PENALTI ── --}}
+<div class="arh-card p-4">
+    <h6 class="arh-gold fw-bold mb-3">
+        <i class="bi bi-calculator me-2"></i>Formula Penalti SQL Function
+    </h6>
+    <div class="row g-3">
+        @foreach([['H-14+','10%','secondary'],['H-7 s/d H-13','30%','warning'],['H-3 s/d H-6','50%','danger'],['H-2 atau kurang','75%','danger']] as [$period, $pct, $color])
+        <div class="col-6 col-md-3">
+            <div class="text-center p-3 rounded-3 border border-secondary">
+                <div class="fs-4 fw-bold text-{{ $color }}">{{ $pct }}</div>
+                <small class="text-secondary">{{ $period }}</small>
             </div>
         </div>
+        @endforeach
     </div>
 </div>
 @endsection

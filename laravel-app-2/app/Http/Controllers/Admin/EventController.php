@@ -36,32 +36,34 @@ class EventController extends Controller
      */
     public function plotting(Event $event)
     {
-        // Format tanggal dan waktu ke SQL format
-        $date = $event->event_date->format('Y-m-d');
-        // Jika cast ditarik sebagai string (biasanya H:i:s), kita langsung ambil substring jika perlu
-        $start = is_string($event->event_start) ? $event->event_start : $event->event_start->format('H:i:s');
-        $end = is_string($event->event_end) ? $event->event_end : $event->event_end->format('H:i:s');
+        $event->load(['booking', 'personnel.user', 'financialRecord']);
 
-        // EKSEKUSI STORED PROCEDURE (Basis Data 2)
-        // sp_check_personnel_availability menggunakan Cursor mengiterasi 12 personel untuk mendeteksi *Collision*
-        DB::statement('CALL sp_check_personnel_availability(?, ?, ?, @p_avail_count, @p_col_count, @p_col_details, @p_avail_details)', 
-            [$date, $start, $end]
-        );
-        
-        // Tarik variabel OUT dari MySQL
-        $spResult = DB::select('SELECT 
-            @p_avail_count as available_count, 
-            @p_col_count as collision_count, 
-            @p_col_details as collision_details, 
-            @p_avail_details as available_details
-        ');
-        
-        $spData = $spResult[0];
+        $date  = \Carbon\Carbon::parse($event->event_date)->format('Y-m-d');
+        $start = is_string($event->event_start) ? $event->event_start : \Carbon\Carbon::parse($event->event_start)->format('H:i:s');
+        $end   = is_string($event->event_end)   ? $event->event_end   : \Carbon\Carbon::parse($event->event_end)->format('H:i:s');
 
-        // Ambil data dari tabel untuk ditampilkan di Dropdown mapping
+        // Jalankan Stored Procedure untuk deteksi konflik jadwal.
+        // Dibungkus try-catch agar halaman tetap tampil walau SP belum ada di DB.
+        $spData = null;
+        try {
+            DB::statement(
+                'CALL sp_check_personnel_availability(?, ?, ?, @p_avail_count, @p_col_count, @p_col_details, @p_avail_details)',
+                [$date, $start, $end]
+            );
+            $spResult = DB::select('SELECT
+                @p_avail_count   as available_count,
+                @p_col_count     as collision_count,
+                @p_col_details   as collision_details,
+                @p_avail_details as available_details
+            ');
+            $spData = $spResult[0] ?? null;
+        } catch (\Exception $e) {
+            // SP belum terdaftar / DB error: $spData tetap null, form tetap tampil
+        }
+
         $personnel = Personnel::with('user')->where('is_active', true)->get();
-        $fees = FeeReference::where('is_active', true)->get();
-        
+        $fees      = FeeReference::where('is_active', true)->get();
+
         return view('admin.events.plotting', compact('event', 'personnel', 'fees', 'spData'));
     }
 
@@ -82,9 +84,9 @@ class EventController extends Controller
         try {
             DB::transaction(function () use ($request, $event) {
                 // 1. Validasi Bentrok Jadwal via Stored Procedure sebelum menyetujui plot
-                $date = $event->event_date->format('Y-m-d');
-                $start = is_string($event->event_start) ? $event->event_start : $event->event_start->format('H:i:s');
-                $end = is_string($event->event_end) ? $event->event_end : $event->event_end->format('H:i:s');
+                $date = \Carbon\Carbon::parse($event->event_date)->format('Y-m-d');
+                $start = is_string($event->event_start) ? $event->event_start : \Carbon\Carbon::parse($event->event_start)->format('H:i:s');
+                $end = is_string($event->event_end) ? $event->event_end : \Carbon\Carbon::parse($event->event_end)->format('H:i:s');
 
                 DB::statement('CALL sp_check_personnel_availability(?, ?, ?, @p_avail_count, @p_col_count, @p_col_details, @p_avail_details)', 
                     [$date, $start, $end]

@@ -1,157 +1,215 @@
 @extends('layouts.admin')
 
-@section('title', 'Smart Plotting - EVT-2026-045')
-@section('page_title', 'Smart Plotting: EVT-2026-045')
-@section('page_subtitle', 'Sistem Deteksi Konflik Otomatis dari MySQL Basis Data 2.')
+@section('title', 'Smart Plotting — ' . ($event->event_code ?? 'Event') . ' | ART-HUB')
+@section('page_title', 'Smart Plotting: ' . ($event->event_code ?? 'Event'))
+@section('page_subtitle', 'Assign formasi personel dengan deteksi konflik otomatis dari SQL Stored Procedure.')
 
 @section('content')
 
-    <!-- STATUS BAR EVENT & SP OUT -->
-    <div class="glass-panel" style="margin-bottom: 2rem; border-color: var(--gold-primary); display: flex; justify-content: space-between; align-items: center;">
-        <div>
-            <h3 style="margin: 0; display: flex; align-items: center; gap: 0.5rem;">
-                <i class="ph-fill ph-check-circle" style="color: var(--success);"></i> 
-                12 Personnel Dibutuhkan (11 Inti + 1 Cadangan)
-            </h3>
-            <p class="text-muted" style="margin: 0;">Jadwal: Minggu, 12 Apr 2026 | 19:00 - 22:00 WIB</p>
-        </div>
-        
-        <!-- Peringatan dari MySQL Cursor -->
-        @if($spData->collision_count > 0)
-        <div style="background: var(--danger-glow); border: 1px solid var(--danger); padding: 0.8rem 1.5rem; border-radius: 12px; display: flex; align-items: center; gap: 1rem;">
-            <i class="ph-fill ph-warning-octagon" style="color: var(--danger); font-size: 2rem;"></i>
-            <div>
-                <h4 style="margin: 0; color: #fff;">Peringatan Tabrakan Jawal ({{ $spData->collision_count }} Orang)</h4>
-                <p style="margin: 0; font-size: 0.8rem; color: var(--danger);">Ada personel yang belum pulang kerja day-job/latihan.</p>
+{{-- ── STATUS BAR: INFO EVENT + RESULT SP ── --}}
+<div class="arh-card-gold p-4 mb-4 animate-fade-up">
+    <div class="row align-items-center g-3">
+        <div class="col-12 col-md-6">
+            <h5 class="fw-bold mb-2 d-flex align-items-center gap-2 arh-gold">
+                <i class="bi bi-people-fill"></i> Formasi {{ $event->personnel_count ?? 12 }} Personel
+            </h5>
+            <div class="text-secondary small">
+                <i class="bi bi-calendar-event me-1"></i> {{ $event->event_date->format('l, d M Y') }} &nbsp;|&nbsp;
+                <i class="bi bi-clock me-1"></i> {{ \Carbon\Carbon::parse($event->event_start)->format('H:i') }} – {{ \Carbon\Carbon::parse($event->event_end)->format('H:i') }} WIB &nbsp;|&nbsp;
+                <i class="bi bi-geo-alt me-1"></i> {{ $event->venue }}
             </div>
         </div>
-        @else
-        <div style="background: var(--success-glow); border: 1px solid var(--success); padding: 0.8rem 1.5rem; border-radius: 12px; display: flex; align-items: center; gap: 1rem;">
-            <i class="ph-fill ph-check-circle" style="color: var(--success); font-size: 2rem;"></i>
-            <div>
-                <h4 style="margin: 0; color: #fff;">Clear! Semua Personel Available.</h4>
-                <p style="margin: 0; font-size: 0.8rem; color: var(--success);">Silakan assign formasi tanpa khawatir bentrok.</p>
+
+        {{-- Hasil Stored Procedure (jika tersedia) --}}
+        <div class="col-12 col-md-6">
+            @if(isset($spData) && $spData)
+                @if($spData->collision_count > 0)
+                <div class="p-3 rounded-3 border border-danger d-flex align-items-center gap-3" style="background: rgba(220,53,69,0.15);">
+                    <i class="bi bi-exclamation-octagon-fill text-danger fs-1"></i>
+                    <div>
+                        <h6 class="fw-bold mb-1 text-danger">{{ $spData->collision_count }} Personel Konflik Jadwal</h6>
+                        <small class="text-secondary">Ada yang sedang di pekerjaan utama/latihan.</small>
+                    </div>
+                </div>
+                @else
+                <div class="p-3 rounded-3 border border-success d-flex align-items-center gap-3" style="background: rgba(25,135,84,0.15);">
+                    <i class="bi bi-check-circle-fill text-success fs-1"></i>
+                    <div>
+                        <h6 class="fw-bold mb-1 text-success">Semua Personel Tersedia!</h6>
+                        <small class="text-secondary">Tidak ada konflik jadwal. Silakan assign formasi.</small>
+                    </div>
+                </div>
+                @endif
+            @else
+            <div class="p-3 rounded-3 border d-flex align-items-center gap-3 bg-black bg-opacity-25" style="border-color: var(--arh-gold);">
+                <i class="bi bi-database-fill-check fs-1 arh-gold"></i>
+                <div>
+                    <h6 class="fw-bold mb-1 col-gold">Deteksi Konflik SQL Siap</h6>
+                    <small class="text-secondary">Klik "Validasi & Kunci Plotting" untuk menjalankan Stored Procedure.</small>
+                </div>
             </div>
+            @endif
         </div>
-        @endif
     </div>
+</div>
 
-    <form action="{{ route('admin.events.plotting.store', 1) }}" method="POST">
-        @csrf
+{{-- ── MAIN GRID: FORM PLOTTING + PREVIEW KALKULASI ── --}}
+<form action="{{ route('admin.events.plotting.store', $event->id) }}" method="POST" id="plotting-form">
+    @csrf
 
-        <div class="grid grid-2 animate-fade-up stagger-1">
-            
-            <!-- PANEL KIRI: LOGIKA ASSIGNMENT -->
-            <div class="glass-panel">
-                <h3 style="margin-bottom: 1.5rem;">Pilih 6 Penari Inti + 6 Pemusik/Cadangan</h3>
+    <div class="row g-4 animate-fade-up">
 
-                <!-- Baris Input 1: Penari Utama -->
-                <div style="margin-bottom: 1.5rem; padding: 1rem; background: rgba(0,0,0,0.2); border-radius: 12px; border: 1px solid var(--border-color);">
-                    <div style="display: flex; gap: 1rem; align-items: flex-end;">
-                        <div style="flex: 2;">
-                            <label class="text-muted" style="font-size: 0.8rem; display: block; margin-bottom: 0.5rem;">Siti Nurhaliza (Penari)</label>
-                            <select name="personnel[0][role_in_event]" class="form-select" style="width: 100%; padding: 0.8rem; border-radius: 8px; background: var(--bg-dark); color: #fff; border: 1px solid var(--border-color);">
-                                <option value="penari_utama" selected>Penari Utama</option>
-                                <option value="penari_latar">Penari Latar</option>
-                            </select>
-                        </div>
-                        <div style="flex: 2;">
-                            <label class="text-muted" style="font-size: 0.8rem; display: block; margin-bottom: 0.5rem;">Standar Fee (Otomatis)</label>
-                            <input type="text" value="Rp 500.000" disabled style="width: 100%; padding: 0.8rem; border-radius: 8px; background: var(--bg-dark); color: var(--gold-light); border: 1px solid var(--gold-dark); text-align: right; font-weight: bold;">
-                        </div>
-                        <div style="flex: 1; text-align: center;">
-                            <span class="badge badge-success"><i class="ph ph-check"></i> Available</span>
-                        </div>
-                    </div>
-                    
-                    <input type="hidden" name="personnel[0][id]" value="1">
-                    <input type="hidden" name="personnel[0][fee_reference_id]" value="1">
-                </div>
+        {{-- ── PANEL KIRI: TABEL ASSIGNMENT PERSONEL ── --}}
+        <div class="col-12 col-xl-8">
+            <div class="arh-card p-4 h-100">
+                <h5 class="fw-bold mb-4 d-flex align-items-center gap-2">
+                    <i class="bi bi-person-lines-fill arh-gold"></i> Pilih & Assign Formasi Personel
+                </h5>
 
-                <!-- Baris Input 2: Bapak Ujang (Tertabrak Day-Job) -->
-                <div class="has-tooltip" data-tooltip="[SISTEM DETEKSI MYSQL]&#xa;Ada event/pekerjaan (PNS Kecamatan) dari jam 08:00 - 16:00.&#xa;Terdapat risiko waktu perjalanan jika acara dimulai jam 19:00!" style="margin-bottom: 1.5rem; padding: 1rem; background: var(--danger-glow); border-radius: 12px; border: 1px solid var(--danger);">
-                    <div style="display: flex; gap: 1rem; align-items: flex-end;">
-                        <div style="flex: 2;">
-                            <label class="text-muted" style="font-size: 0.8rem; display: block; margin-bottom: 0.5rem; color: #fff;">Bpk Ujang (Pemusik)</label>
-                            <select name="personnel[1][role_in_event]" class="form-select" disabled style="width: 100%; padding: 0.8rem; border-radius: 8px; background: var(--bg-dark); color: #fff; border: 1px solid var(--border-color); opacity: 0.5;">
-                                <option value="pemusik">Pemusik Gamelan</option>
-                            </select>
-                        </div>
-                        <div style="flex: 2;">
-                            <label class="text-muted" style="font-size: 0.8rem; display: block; margin-bottom: 0.5rem; color: #fff;">Status Deteksi MySQL</label>
-                            <span style="display: block; font-size: 0.85rem; color: #ff8a8a; line-height: 1.2;">
-                                <i class="ph ph-suitcase"></i> PNS Kecamatan <br>
-                                (Check-Out: 16:00)
-                            </span>
-                        </div>
-                        <div style="flex: 1; text-align: center;">
-                            <span class="badge badge-danger" style="font-size: 0.7rem;">BLOCK_ASSIGN</span>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Baris Input 3: Indra Gunawan (Cadangan) -->
-                <div style="margin-bottom: 1.5rem; padding: 1rem; background: rgba(0,0,0,0.2); border-radius: 12px; border: 1px solid var(--border-color);">
-                    <div style="display: flex; gap: 1rem; align-items: flex-end;">
-                        <div style="flex: 2;">
-                            <label class="text-muted" style="font-size: 0.8rem; display: block; margin-bottom: 0.5rem;">Indra Gunawan (Multi-Talent)</label>
-                            <select name="personnel[2][role_in_event]" class="form-select" style="width: 100%; padding: 0.8rem; border-radius: 8px; background: var(--bg-dark); color: #fff; border: 1px solid var(--border-color);">
-                                <option value="cadangan" selected>Replaces Bpk Ujang (Pemusik)</option>
-                                <option value="penari_latar">Replaces Penari Latar</option>
-                            </select>
-                        </div>
-                        <div style="flex: 2;">
-                            <label class="text-muted" style="font-size: 0.8rem; display: block; margin-bottom: 0.5rem;">Fee Cadangan Menyesuaikan</label>
-                            <input type="text" value="Rp 400.000" disabled style="width: 100%; padding: 0.8rem; border-radius: 8px; background: var(--bg-dark); color: var(--gold-light); border: 1px solid var(--gold-dark); text-align: right; font-weight: bold;">
-                        </div>
-                        <div style="flex: 1; text-align: center;">
-                            <span class="badge badge-success"><i class="ph ph-check"></i> Available</span>
-                        </div>
-                    </div>
-                    
-                    <input type="hidden" name="personnel[2][id]" value="12">
-                    <input type="hidden" name="personnel[2][fee_reference_id]" value="3">
-                </div>
-
-                <div style="margin-top: 2rem;">
-                    <button type="button" class="btn btn-outline" style="width: 100%; border: 1px dashed var(--border-color); color: var(--text-muted);">
-                        <i class="ph ph-plus"></i> Tambah Field Personel (+9 Sisa Ruang)
-                    </button>
+                <div class="table-responsive">
+                    <table class="table arh-table table-hover align-middle mb-0" id="plotting-table">
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>Personel</th>
+                                <th>Spesialisasi</th>
+                                <th>Role di Event</th>
+                                <th>Fee</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach($personnel as $idx => $p)
+                            @php
+                                $pivotData = $event->personnel->firstWhere('id', $p->id)?->pivot;
+                                $alreadyPlotted = !is_null($pivotData);
+                                $collidingIds = [];
+                                if (isset($spData) && $spData && !empty($spData->collision_details)) {
+                                    preg_match_all('/ID:(\d+)/', $spData->collision_details, $m);
+                                    $collidingIds = $m[1] ?? [];
+                                }
+                                $isColliding = in_array((string)$p->id, $collidingIds);
+                            @endphp
+                            <tr class="{{ $isColliding ? 'bg-danger bg-opacity-10 border-danger' : '' }}">
+                                <td>
+                                    <input class="form-check-input border-secondary" type="checkbox" name="personnel[{{ $idx }}][selected]"
+                                           value="1" id="chk-{{ $p->id }}"
+                                           {{ $alreadyPlotted ? 'checked' : '' }}
+                                           {{ $isColliding ? 'disabled' : '' }}
+                                           onchange="updatePreview()">
+                                    <input type="hidden" name="personnel[{{ $idx }}][id]" value="{{ $p->id }}">
+                                    <input type="hidden" name="personnel[{{ $idx }}][fee_reference_id]" value="{{ $fees->first()?->id ?? 1 }}">
+                                </td>
+                                <td>
+                                    <div class="d-flex align-items-center gap-2">
+                                        <div class="arh-avatar-sm">{{ strtoupper(substr($p->user->name ?? 'P', 0, 2)) }}</div>
+                                        <div>
+                                            <div class="fw-semibold">{{ $p->user->name ?? 'Personel' }}</div>
+                                            @if($p->day_job_name)
+                                            <small class="text-warning"><i class="bi bi-briefcase-fill me-1"></i>{{ $p->day_job_name }}</small>
+                                            @endif
+                                        </div>
+                                    </div>
+                                </td>
+                                <td><span class="badge bg-secondary">{{ $p->specialty }}</span></td>
+                                <td>
+                                    <select class="form-select form-select-sm" name="personnel[{{ $idx }}][role_in_event]" {{ $isColliding ? 'disabled' : '' }}>
+                                        <option value="penari_utama" {{ str_contains($p->specialty ?? '', 'Tari') ? 'selected' : '' }}>Penari Utama</option>
+                                        <option value="penari_latar">Penari Latar</option>
+                                        <option value="pemusik" {{ str_contains($p->specialty ?? '', 'Musik') ? 'selected' : '' }}>Pemusik</option>
+                                        <option value="cadangan">Cadangan</option>
+                                        <option value="MC">MC / Pembawa Acara</option>
+                                    </select>
+                                </td>
+                                <td>
+                                    <span class="fw-bold arh-gold">Rp {{ number_format($fees->first()?->base_fee ?? 500000, 0, ',', '.') }}</span>
+                                </td>
+                                <td>
+                                    @if($isColliding)
+                                        <span class="badge bg-danger">KONFLIK</span>
+                                    @elseif($alreadyPlotted)
+                                        <span class="badge arh-badge-gold">ASSIGNED</span>
+                                    @else
+                                        <span class="badge bg-success bg-opacity-25 text-success">AVAILABLE</span>
+                                    @endif
+                                </td>
+                            </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
                 </div>
             </div>
-
-            <!-- PANEL KANAN: PREVIEW CALCULATOR PROFIT SQL -->
-            <div class="glass-panel" style="position: sticky; top: 2rem;">
-                <h3 style="margin-bottom: 1.5rem;">Estimasi Tagihan Honor (Estimasi SQL)</h3>
-                
-                <div style="background: var(--bg-dark); padding: 1.5rem; border-radius: 12px; border: 1px solid var(--border-color); margin-bottom: 2rem;">
-                    <div style="display: flex; justify-content: space-between; margin-bottom: 1rem; font-size: 0.9rem;">
-                        <span class="text-muted">Total Alokasi Honor:</span>
-                        <span style="font-weight: 600;">Menggunakan "fn_estimate_total_honor"</span>
-                    </div>
-
-                    <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem; padding-bottom: 1rem; border-bottom: 1px dashed var(--border-color);">
-                        <span class="text-muted">Proyeksi Anggaran (12 Kru):</span>
-                        <span style="color: var(--gold-light); font-weight: 700;">Rp 4.700.000</span>
-                    </div>
-
-                    <div style="display: flex; justify-content: space-between; margin-top: 1rem; font-size: 0.8rem;">
-                        <span class="text-muted">Dana Operasional Sisa:</span>
-                        <span style="color: var(--success); font-weight: 700;">Aman (Lebih dari Rp 2 Jt)</span>
-                    </div>
-                </div>
-
-                <div style="background: rgba(212, 175, 55, 0.1); padding: 1.5rem; border-radius: 12px; border-left: 4px solid var(--gold-primary); margin-bottom: 2rem;">
-                    <h4 style="color: var(--gold-light); margin-bottom: 0.5rem; font-size: 1rem;"><i class="ph-fill ph-check-circle"></i> Info Keselarasan Database</h4>
-                    <p class="text-muted" style="font-size: 0.85rem; margin: 0;">Jika Anda klik Kunci Plotting di bawah, MySQL akan mendedikasikan anggaran Rp 4.7 Juta ini secara otomatis ke Field 'total_personnel_honor' di tabel Keuangan.</p>
-                </div>
-
-                <button type="submit" class="btn btn-gold" style="width: 100%; padding: 1.2rem; font-size: 1rem;">
-                    <i class="ph ph-floppy-disk"></i> Validasi Sistem & Kunci Plotting
-                </button>
-            </div>
-
         </div>
-    </form>
-    
+
+        {{-- ── PANEL KANAN: PREVIEW HONOR + SUBMIT ── --}}
+        <div class="col-12 col-xl-4">
+            {{-- Summary Card --}}
+            <div class="arh-card-gold p-4 mb-4">
+                <h5 class="fw-bold mb-4 d-flex align-items-center gap-2 arh-gold">
+                    <i class="bi bi-calculator"></i> Estimasi Anggaran Honor
+                </h5>
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <span class="text-secondary">Personel Dipilih</span>
+                    <span class="fw-bold fs-4" id="preview-count">{{ $event->personnel->count() }}</span>
+                </div>
+                <hr class="border-secondary border-dashed">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <span class="text-secondary">Estimasi Total</span>
+                    <span class="fw-bold fs-4 arh-gold" id="preview-total">
+                        Rp {{ number_format($event->estimated_total_honor > 0 ? $event->estimated_total_honor : ($fees->first()?->base_fee ?? 500000) * $event->personnel->count(), 0, ',', '.') }}
+                    </span>
+                </div>
+
+                @if($event->financialRecord)
+                <div class="bg-black bg-opacity-25 p-3 rounded-3 text-sm">
+                    <div class="d-flex justify-content-between mb-2">
+                        <span class="text-secondary">Budget Operasional</span>
+                        <span class="fw-semibold">Rp {{ number_format($event->financialRecord->operational_budget, 0, ',', '.') }}</span>
+                    </div>
+                    @php $sisa = $event->financialRecord->operational_budget - $event->estimated_total_honor; @endphp
+                    <div class="d-flex justify-content-between">
+                        <span class="text-secondary">Sisa Budget Ops</span>
+                        <span class="fw-bold {{ $sisa >= 0 ? 'text-success' : 'text-danger' }}">
+                            {{ $sisa >= 0 ? '+' : '-' }}Rp {{ number_format(abs($sisa), 0, ',', '.') }}
+                        </span>
+                    </div>
+                </div>
+                @endif
+            </div>
+
+            {{-- Info SQL Function --}}
+            <div class="arh-card border-start border-3 p-3 mb-4" style="border-color: var(--arh-gold) !important; background: rgba(255,255,255,0.03);">
+                <div class="fw-bold mb-2 arh-gold"><i class="bi bi-database-fill me-1"></i> Mekanisme SQL</div>
+                <small class="text-secondary d-block lh-base">
+                    Saat "Kunci Plotting" diklik, sistem memanggil:<br>
+                    <code class="text-info bg-dark px-1 rounded">CALL sp_check_personnel_availability()</code><br>
+                    Jika lolos, estimasi honor otomatis dihitung SQL.
+                </small>
+            </div>
+
+            {{-- Tombol Submit --}}
+            <button type="submit" class="btn btn-arh-gold w-100 py-3 fw-bold mb-2">
+                <i class="bi bi-lock-fill me-1"></i> Validasi SQL & Kunci Plotting
+            </button>
+            <a href="{{ route('admin.events.show', $event->id) }}" class="btn btn-outline-secondary w-100">
+                <i class="bi bi-arrow-left me-1"></i> Kembali ke Detail Event
+            </a>
+        </div>
+
+    </div>
+</form>
+
+@endsection
+
+@section('scripts')
+<script>
+    const baseFee = Number("{{ $fees->first()?->base_fee ?? 500000 }}");
+    function updatePreview() {
+        const checked = document.querySelectorAll('#plotting-table input[type="checkbox"]:checked:not(:disabled)');
+        const count = checked.length;
+        const total = count * baseFee;
+        document.getElementById('preview-count').textContent = count;
+        document.getElementById('preview-total').textContent = 'Rp ' + total.toLocaleString('id-ID');
+    }
+</script>
 @endsection

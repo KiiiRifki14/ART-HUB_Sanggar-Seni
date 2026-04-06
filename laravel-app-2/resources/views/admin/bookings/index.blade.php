@@ -1,191 +1,145 @@
 @extends('layouts.admin')
 
-@section('title', 'Daftar Booking - ART-HUB')
-@section('page_title', 'Daftar Booking & DP Verification')
-@section('page_subtitle', 'Kelola semua permintaan pementasan masuk dan status pembayaran DP.')
+@section('title', 'Payment & DP – ART-HUB')
+@section('page_title', 'Payment & DP Verification')
+@section('page_subtitle', 'Verifikasi pembayaran DP dan kunci laba pimpinan.')
 
 @section('content')
 
-{{-- FLASH MESSAGES --}}
-@if(session('success'))
-<div class="glass-panel animate-fade-up" style="border-color: var(--success); background: var(--success-glow); margin-bottom: 1.5rem; display: flex; align-items: center; gap: 1rem; padding: 1rem 1.5rem;">
-    <i class="ph-fill ph-check-circle" style="color: var(--success); font-size: 1.5rem; flex-shrink: 0;"></i>
-    <span style="font-weight: 500;">{{ session('success') }}</span>
-</div>
-@endif
-@if(session('error'))
-<div class="glass-panel animate-fade-up" style="border-color: var(--danger); background: var(--danger-glow); margin-bottom: 1.5rem; display: flex; align-items: center; gap: 1rem; padding: 1rem 1.5rem;">
-    <i class="ph-fill ph-warning-octagon" style="color: var(--danger); font-size: 1.5rem; flex-shrink: 0;"></i>
-    <span style="font-weight: 500;">{{ session('error') }}</span>
-</div>
-@endif
-
-{{-- STATS CARDS --}}
+{{-- STAT CARDS --}}
 @php
     $total    = $bookings->count();
-    $pending  = $bookings->where('status', 'pending')->count();
-    $dpPaid   = $bookings->where('status', 'dp_paid')->count();
-    $done     = $bookings->whereIn('status', ['confirmed', 'completed'])->count();
-    $canceled = $bookings->where('status', 'cancelled')->count();
+    $pending  = $bookings->where('status','pending')->count();
+    $dpPaid   = $bookings->where('status','dp_paid')->count();
+    $done     = $bookings->whereIn('status',['confirmed','completed'])->count();
+    $canceled = $bookings->where('status','cancelled')->count();
 @endphp
-<div class="grid grid-4 animate-fade-up" style="margin-bottom: 2rem; gap: 1rem;">
-    <div class="glass-panel" style="text-align: center; padding: 1.2rem;">
-        <i class="ph-fill ph-notepad" style="color: var(--gold-primary); font-size: 2rem;"></i>
-        <h3 style="font-size: 1.8rem; margin: 0.3rem 0 0;">{{ $total }}</h3>
-        <small class="text-muted">Total Booking</small>
+
+<div class="row g-3 mb-4 animate-fade-up">
+    <div class="col-6 col-xl-3">
+        <div class="arh-card p-3 text-center">
+            <i class="bi bi-receipt-cutoff arh-gold fs-3"></i>
+            <div class="fw-bold fs-4 mt-1">{{ $total }}</div>
+            <small class="text-secondary">Total Booking</small>
+        </div>
     </div>
-    <div class="glass-panel" style="text-align: center; padding: 1.2rem; border-color: var(--warning);">
-        <i class="ph-fill ph-clock-countdown" style="color: var(--warning); font-size: 2rem;"></i>
-        <h3 style="font-size: 1.8rem; margin: 0.3rem 0 0; color: var(--warning);">{{ $pending }}</h3>
-        <small class="text-muted">Menunggu DP</small>
+    <div class="col-6 col-xl-3">
+        <div class="arh-card p-3 text-center" style="border-color: rgba(255,193,7,0.4);">
+            <i class="bi bi-hourglass-split text-warning fs-3"></i>
+            <div class="fw-bold fs-4 mt-1 text-warning">{{ $pending }}</div>
+            <small class="text-secondary">Menunggu DP</small>
+        </div>
     </div>
-    <div class="glass-panel" style="text-align: center; padding: 1.2rem; border-color: var(--gold-primary);">
-        <i class="ph-fill ph-lock-key" style="color: var(--gold-primary); font-size: 2rem;"></i>
-        <h3 class="title-gold" style="font-size: 1.8rem; margin: 0.3rem 0 0;">{{ $dpPaid }}</h3>
-        <small class="text-muted">Laba Terkunci</small>
+    <div class="col-6 col-xl-3">
+        <div class="arh-card-gold p-3 text-center">
+            <i class="bi bi-lock-fill arh-gold fs-3"></i>
+            <div class="fw-bold fs-4 mt-1 arh-gold">{{ $dpPaid }}</div>
+            <small class="text-secondary">Laba Terkunci</small>
+        </div>
     </div>
-    <div class="glass-panel" style="text-align: center; padding: 1.2rem; border-color: var(--success);">
-        <i class="ph-fill ph-check-circle" style="color: var(--success); font-size: 2rem;"></i>
-        <h3 style="font-size: 1.8rem; margin: 0.3rem 0 0; color: var(--success);">{{ $done }}</h3>
-        <small class="text-muted">Selesai</small>
+    <div class="col-6 col-xl-3">
+        <div class="arh-card p-3 text-center" style="border-color: rgba(25,135,84,0.4);">
+            <i class="bi bi-check-circle-fill text-success fs-3"></i>
+            <div class="fw-bold fs-4 mt-1 text-success">{{ $done }}</div>
+            <small class="text-secondary">Selesai</small>
+        </div>
     </div>
 </div>
 
 {{-- TABLE PANEL --}}
-<div class="glass-panel animate-fade-up stagger-1">
-    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; flex-wrap: wrap; gap: 1rem;">
-        <h2 style="margin: 0; display: flex; align-items: center; gap: 0.8rem;">
-            <i class="ph ph-receipt" style="color: var(--gold-primary);"></i>
-            Semua Permintaan Masuk
-        </h2>
-        <a href="{{ route('admin.bookings.create') }}" class="btn btn-gold" style="padding: 0.7rem 1.5rem;">
-            <i class="ph ph-plus-circle"></i> &nbsp;Tambah Manual
+<div class="arh-card p-4 animate-fade-up">
+    <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
+        <h5 class="fw-bold mb-0 d-flex align-items-center gap-2">
+            <i class="bi bi-receipt arh-gold"></i> Semua Permintaan Masuk
+        </h5>
+        <a href="{{ route('admin.bookings.create') }}" class="btn btn-arh-gold btn-sm">
+            <i class="bi bi-plus-circle me-1"></i> Tambah Manual
         </a>
     </div>
 
-    {{-- FILTER STATUS TABS --}}
-    <div style="display: flex; gap: 0.5rem; margin-bottom: 1.5rem; flex-wrap: wrap;">
-        @php
-            $statuses = [
-                'all'       => ['label' => 'Semua',     'count' => $total,    'class' => 'badge-gold'],
-                'pending'   => ['label' => 'Pending',   'count' => $pending,  'class' => 'badge-warning'],
-                'dp_paid'   => ['label' => 'DP Paid',   'count' => $dpPaid,   'class' => ''],
-                'completed' => ['label' => 'Selesai',   'count' => $done,     'class' => 'badge-success'],
-                'cancelled' => ['label' => 'Batal',     'count' => $canceled, 'class' => 'badge-danger'],
-            ];
-        @endphp
-        @foreach($statuses as $key => $s)
-        <span class="badge {{ $s['class'] }}" style="padding: 0.4rem 0.9rem; font-size: 0.78rem; cursor: pointer;"
-              onclick="filterTable('{{ $key }}')" id="tab-{{ $key }}">
-            {{ $s['label'] }} ({{ $s['count'] }})
-        </span>
+    {{-- Filter Tabs --}}
+    <div class="d-flex gap-2 flex-wrap mb-3" id="filter-tabs">
+        @php $tabs = ['all'=>"Semua ($total)",'pending'=>"Pending ($pending)",'dp_paid'=>"DP Paid ($dpPaid)",'completed'=>"Selesai ($done)",'cancelled'=>"Batal ($canceled)"] @endphp
+        @foreach($tabs as $key => $label)
+        <button class="btn btn-sm {{ $key === 'all' ? 'btn-arh-gold' : 'btn-outline-secondary' }}"
+                onclick="filterBooking('{{ $key }}', this)">
+            {{ $label }}
+        </button>
         @endforeach
     </div>
 
-    <div style="overflow-x: auto;">
-        <table style="width: 100%; border-collapse: collapse;" id="booking-table">
+    <div class="table-responsive">
+        <table class="table arh-table table-hover align-middle mb-0">
             <thead>
-                <tr style="border-bottom: 2px solid var(--border-color);">
-                    <th style="padding: 1rem; text-align: left; color: var(--gold-primary); font-size: 0.75rem; text-transform: uppercase; white-space: nowrap;">#Booking</th>
-                    <th style="padding: 1rem; text-align: left; color: var(--gold-primary); font-size: 0.75rem; text-transform: uppercase; white-space: nowrap;">Klien</th>
-                    <th style="padding: 1rem; text-align: left; color: var(--gold-primary); font-size: 0.75rem; text-transform: uppercase; white-space: nowrap;">Jenis & Tanggal Event</th>
-                    <th style="padding: 1rem; text-align: left; color: var(--gold-primary); font-size: 0.75rem; text-transform: uppercase; white-space: nowrap;">Nilai Kontrak</th>
-                    <th style="padding: 1rem; text-align: left; color: var(--gold-primary); font-size: 0.75rem; text-transform: uppercase; white-space: nowrap;">DP</th>
-                    <th style="padding: 1rem; text-align: left; color: var(--gold-primary); font-size: 0.75rem; text-transform: uppercase; white-space: nowrap;">Status</th>
-                    <th style="padding: 1rem; text-align: left; color: var(--gold-primary); font-size: 0.75rem; text-transform: uppercase; white-space: nowrap;">Aksi</th>
+                <tr>
+                    <th>#Booking</th>
+                    <th>Klien</th>
+                    <th>Event</th>
+                    <th>Nilai Kontrak</th>
+                    <th>DP</th>
+                    <th>Status</th>
+                    <th>Aksi</th>
                 </tr>
             </thead>
-            <tbody>
+            <tbody id="booking-tbody">
                 @forelse($bookings as $booking)
                 @php
                     $statusMap = [
-                        'pending'   => ['label' => 'PENDING',   'cls' => 'badge-warning'],
-                        'dp_paid'   => ['label' => 'DP PAID',   'cls' => 'badge-gold'],
-                        'confirmed' => ['label' => 'CONFIRMED', 'cls' => 'badge-success'],
-                        'completed' => ['label' => 'SELESAI',   'cls' => 'badge-success'],
-                        'cancelled' => ['label' => 'BATAL',     'cls' => 'badge-danger'],
+                        'pending'   => ['label'=>'PENDING',   'cls'=>'badge-status-pending'],
+                        'dp_paid'   => ['label'=>'DP PAID',   'cls'=>'badge-status-dp_paid'],
+                        'confirmed' => ['label'=>'CONFIRMED', 'cls'=>'badge-status-confirmed'],
+                        'completed' => ['label'=>'SELESAI',   'cls'=>'badge-status-completed'],
+                        'cancelled' => ['label'=>'BATAL',     'cls'=>'badge-status-cancelled'],
                     ];
-                    $st = $statusMap[$booking->status] ?? ['label' => strtoupper($booking->status), 'cls' => ''];
+                    $st = $statusMap[$booking->status] ?? ['label'=>strtoupper($booking->status),'cls'=>'bg-secondary'];
                 @endphp
-                <tr class="booking-row" data-status="{{ $booking->status }}"
-                    style="border-bottom: 1px solid var(--border-color); transition: background 0.2s;"
-                    onmouseover="this.style.background='var(--bg-hover)'"
-                    onmouseout="this.style.background='transparent'">
-
-                    {{-- ID --}}
-                    <td style="padding: 1rem;">
-                        <span class="badge badge-gold" style="font-size: 0.75rem;">#{{ str_pad($booking->id, 4, '0', STR_PAD_LEFT) }}</span>
-                        <div><small class="text-muted" style="font-size: 0.7rem;">{{ $booking->created_at->format('d M Y') }}</small></div>
+                <tr data-status="{{ $booking->status }}">
+                    <td>
+                        <span class="badge arh-badge-gold">#{{ str_pad($booking->id, 4,'0',STR_PAD_LEFT) }}</span>
+                        <div><small class="text-secondary">{{ $booking->created_at->format('d M Y') }}</small></div>
                     </td>
-
-                    {{-- KLIEN --}}
-                    <td style="padding: 1rem;">
-                        <div style="font-weight: 600;">{{ $booking->client_name ?? ($booking->client->name ?? 'Klien Manual') }}</div>
-                        <small class="text-muted">{{ $booking->client_phone ?? '-' }}</small>
+                    <td>
+                        <div class="fw-semibold">{{ $booking->client_name ?? ($booking->client->name ?? 'Klien Manual') }}</div>
+                        <small class="text-secondary">{{ $booking->client_phone ?? '-' }}</small>
                     </td>
-
-                    {{-- JENIS & TANGGAL --}}
-                    <td style="padding: 1rem;">
-                        <div style="text-transform: capitalize; font-weight: 500;">{{ $booking->event_type }}</div>
-                        <small class="text-muted">
-                            <i class="ph ph-calendar-blank"></i>
-                            {{ \Carbon\Carbon::parse($booking->event_date)->format('d M Y') }}
-                        </small>
-                        <div>
-                            <small class="text-muted">
-                                <i class="ph ph-clock"></i>
-                                {{ \Carbon\Carbon::parse($booking->event_start)->format('H:i') }} – {{ \Carbon\Carbon::parse($booking->event_end)->format('H:i') }}
-                            </small>
-                        </div>
-                    </td>
-
-                    {{-- NILAI KONTRAK --}}
-                    <td style="padding: 1rem;">
-                        <div style="font-weight: 700; font-size: 1rem;">Rp {{ number_format($booking->total_price, 0, ',', '.') }}</div>
-                        <small class="text-muted" style="color: var(--gold-primary);">
-                            Laba: Rp {{ number_format($booking->total_price * 0.30, 0, ',', '.') }}
+                    <td>
+                        <div class="fw-medium text-capitalize">{{ $booking->event_type }}</div>
+                        <small class="text-secondary">
+                            <i class="bi bi-calendar3 me-1"></i>{{ \Carbon\Carbon::parse($booking->event_date)->format('d M Y') }}
                         </small>
                     </td>
-
-                    {{-- DP --}}
-                    <td style="padding: 1rem;">
-                        <div style="font-weight: 600; color: var(--gold-light);">Rp {{ number_format($booking->dp_amount, 0, ',', '.') }}</div>
+                    <td>
+                        <div class="fw-bold">Rp {{ number_format($booking->total_price, 0, ',', '.') }}</div>
+                        <small class="arh-gold">Laba: Rp {{ number_format($booking->total_price * 0.30, 0, ',', '.') }}</small>
+                    </td>
+                    <td>
+                        <div class="fw-semibold arh-gold-light">Rp {{ number_format($booking->dp_amount, 0, ',', '.') }}</div>
                         @if($booking->dp_paid_at)
-                            <small class="text-muted">{{ \Carbon\Carbon::parse($booking->dp_paid_at)->format('d M Y') }}</small>
+                            <small class="text-secondary">{{ \Carbon\Carbon::parse($booking->dp_paid_at)->format('d M Y') }}</small>
                         @else
-                            <small style="color: var(--warning);">Belum dibayar</small>
+                            <small class="text-warning">Belum bayar</small>
                         @endif
                     </td>
-
-                    {{-- STATUS --}}
-                    <td style="padding: 1rem;">
+                    <td>
                         <span class="badge {{ $st['cls'] }}">{{ $st['label'] }}</span>
-                        @if($booking->status === 'dp_paid')
-                            <div><small style="color: var(--success); font-size: 0.7rem;"><i class="ph ph-lock-key"></i> Laba Terkunci</small></div>
-                        @endif
                         @if($booking->status === 'pending')
-                            @php
-                                $daysLeft = \Carbon\Carbon::now()->diffInDays(\Carbon\Carbon::parse($booking->event_date), false);
-                            @endphp
-                            @if($daysLeft <= 7 && $daysLeft >= 0)
-                                <div><small style="color: var(--danger); font-size: 0.7rem; animation: pulse-text 1.5s infinite;">⚠️ H-{{ $daysLeft }} belum bayar!</small></div>
-                            @endif
+                        @php $daysLeft = now()->diffInDays(\Carbon\Carbon::parse($booking->event_date), false); @endphp
+                        @if($daysLeft <= 7 && $daysLeft >= 0)
+                        <div><small class="text-danger small">⚠️ H-{{ $daysLeft }}</small></div>
+                        @endif
                         @endif
                     </td>
-
-                    {{-- AKSI --}}
-                    <td style="padding: 1rem;">
-                        <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
-                            <a href="{{ route('admin.bookings.show', $booking->id) }}"
-                               class="btn btn-outline" style="padding: 0.4rem 0.9rem; font-size: 0.78rem; white-space: nowrap;">
-                                <i class="ph ph-eye"></i> Detail
+                    <td>
+                        <div class="d-flex gap-1 flex-wrap">
+                            <a href="{{ route('admin.bookings.show', $booking->id) }}" class="btn btn-outline-secondary btn-sm">
+                                <i class="bi bi-eye"></i>
                             </a>
                             @if($booking->status === 'pending')
                             <form method="POST" action="{{ route('admin.bookings.confirm', $booking->id) }}"
-                                  onsubmit="return confirm('Konfirmasi DP & KUNCI LABA untuk booking #{{ $booking->id }}? Aksi TIDAK BISA DIBATALKAN.')">
+                                  onsubmit="return confirm('Kunci laba untuk booking #{{ $booking->id }}? Aksi ini TIDAK BISA DIBATALKAN.')">
                                 @csrf
-                                <button type="submit" class="btn btn-gold" style="padding: 0.4rem 0.9rem; font-size: 0.78rem; border: none; white-space: nowrap;">
-                                    <i class="ph ph-lock-key"></i> Kunci Laba
+                                <button type="submit" class="btn btn-arh-gold btn-sm">
+                                    <i class="bi bi-lock-fill"></i>
                                 </button>
                             </form>
                             @endif
@@ -194,12 +148,14 @@
                 </tr>
                 @empty
                 <tr>
-                    <td colspan="7" style="padding: 4rem; text-align: center;">
-                        <i class="ph ph-notepad" style="font-size: 3.5rem; color: var(--text-muted); display: block; margin-bottom: 1rem;"></i>
-                        <p class="text-muted">Belum ada data booking masuk.</p>
-                        <a href="{{ route('admin.bookings.create') }}" class="btn btn-gold" style="margin-top: 1rem;">
-                            <i class="ph ph-plus-circle"></i> Buat Booking Manual
-                        </a>
+                    <td colspan="7" class="text-center py-5 text-secondary">
+                        <i class="bi bi-inbox fs-1 d-block mb-3"></i>
+                        Belum ada data booking masuk.
+                        <div class="mt-3">
+                            <a href="{{ route('admin.bookings.create') }}" class="btn btn-arh-gold btn-sm">
+                                <i class="bi bi-plus-circle me-1"></i>Buat Booking Manual
+                            </a>
+                        </div>
                     </td>
                 </tr>
                 @endforelse
@@ -208,35 +164,27 @@
     </div>
 </div>
 
-<style>
-    @keyframes pulse-text { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }
-</style>
+@endsection
 
+@section('scripts')
 <script>
-    function filterTable(status) {
-        const rows = document.querySelectorAll('.booking-row');
-        rows.forEach(row => {
-            if (status === 'all') {
-                row.style.display = '';
-            } else if (status === 'completed') {
-                const s = row.dataset.status;
-                row.style.display = (s === 'confirmed' || s === 'completed') ? '' : 'none';
-            } else {
-                row.style.display = row.dataset.status === status ? '' : 'none';
-            }
-        });
-        // Highlight active tab
-        document.querySelectorAll('[id^="tab-"]').forEach(t => {
-            t.style.opacity = '0.5';
-            t.style.transform = 'scale(0.95)';
-        });
-        const active = document.getElementById('tab-' + status);
-        if (active) {
-            active.style.opacity = '1';
-            active.style.transform = 'scale(1)';
+function filterBooking(status, btn) {
+    document.querySelectorAll('#filter-tabs button').forEach(b => {
+        b.classList.remove('btn-arh-gold');
+        b.classList.add('btn-outline-secondary');
+    });
+    btn.classList.remove('btn-outline-secondary');
+    btn.classList.add('btn-arh-gold');
+
+    document.querySelectorAll('#booking-tbody tr[data-status]').forEach(row => {
+        if (status === 'all' || row.dataset.status === status) {
+            row.style.display = '';
+        } else if (status === 'completed' && (row.dataset.status === 'confirmed' || row.dataset.status === 'completed')) {
+            row.style.display = '';
+        } else {
+            row.style.display = 'none';
         }
-    }
-    // Default: semua tab aktif
-    filterTable('all');
+    });
+}
 </script>
 @endsection

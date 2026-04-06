@@ -1,6 +1,6 @@
 @extends('layouts.admin')
 
-@section('title', 'Financial Report - ART-HUB')
+@section('title', 'Financial Report – ART-HUB')
 @section('page_title', 'Financial Report')
 @section('page_subtitle', 'Ringkasan laba, anggaran, dan audit keuangan sanggar.')
 
@@ -13,77 +13,108 @@
 @endphp
 
 @can('view-financials')
-<div class="grid grid-4 animate-fade-up" style="margin-bottom: 2rem;">
-    <div class="glass-panel card-gold" style="text-align: center;">
-        <i class="ph-fill ph-vault" style="color: var(--gold-primary); font-size: 2rem;"></i>
-        <h3 class="title-gold" style="font-size: 1.5rem; margin: 0.5rem 0 0 0;">Rp {{ number_format($totalProfit, 0, ',', '.') }}</h3>
-        <small class="text-muted">Fixed Profit Total</small>
+{{-- ── STAT CARDS ── --}}
+<div class="row g-3 mb-5 animate-fade-up">
+    <div class="col-6 col-xl-3">
+        <div class="arh-card-gold p-4 text-center h-100">
+            <i class="bi bi-safe2-fill arh-gold fs-1 mb-2 d-inline-block"></i>
+            <h3 class="fw-bold fs-4 arh-gold mb-1">Rp {{ number_format($totalProfit, 0, ',', '.') }}</h3>
+            <small class="text-secondary fw-semibold">Fixed Profit Total</small>
+        </div>
     </div>
-    <div class="glass-panel" style="text-align: center;">
-        <i class="ph-fill ph-shield-check" style="color: var(--success); font-size: 2rem;"></i>
-        <h3 style="font-size: 1.5rem; margin: 0.5rem 0 0 0;">Rp {{ number_format($totalBuffer, 0, ',', '.') }}</h3>
-        <small class="text-muted">Safety Buffer</small>
+    <div class="col-6 col-xl-3">
+        <div class="arh-card p-4 text-center h-100" style="border-color: rgba(25,135,84,0.3);">
+            <i class="bi bi-shield-check text-success fs-1 mb-2 d-inline-block"></i>
+            <h3 class="fw-bold fs-4 text-success mb-1">Rp {{ number_format($totalBuffer, 0, ',', '.') }}</h3>
+            <small class="text-secondary fw-semibold">Safety Buffer Area</small>
+        </div>
     </div>
-    <div class="glass-panel" style="text-align: center;">
-        <i class="ph-fill ph-chart-line-up" style="color: var(--text-main); font-size: 2rem;"></i>
-        <h3 style="font-size: 1.5rem; margin: 0.5rem 0 0 0;">Rp {{ number_format($totalRevenue, 0, ',', '.') }}</h3>
-        <small class="text-muted">Total Revenue</small>
+    <div class="col-6 col-xl-3">
+        <div class="arh-card p-4 text-center h-100">
+            <i class="bi bi-graph-up-arrow text-white fs-1 mb-2 d-inline-block"></i>
+            <h3 class="fw-bold fs-4 text-white mb-1">Rp {{ number_format($totalRevenue, 0, ',', '.') }}</h3>
+            <small class="text-secondary fw-semibold">Total Nilai Kontrak</small>
+        </div>
     </div>
-    <div class="glass-panel" style="text-align: center;">
-        <i class="ph-fill ph-money" style="color: var(--warning); font-size: 2rem;"></i>
-        <h3 style="font-size: 1.5rem; margin: 0.5rem 0 0 0;">Rp {{ number_format($totalOps, 0, ',', '.') }}</h3>
-        <small class="text-muted">Realisasi Operasional</small>
+    <div class="col-6 col-xl-3">
+        <div class="arh-card p-4 text-center h-100" style="border-color: rgba(255,193,7,0.3);">
+            <i class="bi bi-cash-stack text-warning fs-1 mb-2 d-inline-block"></i>
+            <h3 class="fw-bold fs-4 text-warning mb-1">Rp {{ number_format($totalOps, 0, ',', '.') }}</h3>
+            <small class="text-secondary fw-semibold">Realisasi Operasional</small>
+        </div>
     </div>
 </div>
 
-<div class="glass-panel animate-fade-up stagger-1">
-    <h2 style="margin-bottom: 2rem;"><i class="ph ph-chart-line-up" style="color: var(--gold-primary);"></i> Detail Per Event</h2>
-    <div style="overflow-x: auto;">
-        <table style="width: 100%; border-collapse: collapse;">
+{{-- ── DETAIL PER EVENT ── --}}
+<div class="arh-card p-4 animate-fade-up">
+    <h5 class="fw-bold mb-4 d-flex align-items-center gap-2 arh-gold">
+        <i class="bi bi-activity"></i> Laporan Keuangan per Event
+    </h5>
+    
+    <div class="table-responsive">
+        <table class="table arh-table table-hover align-middle mb-0">
             <thead>
-                <tr style="border-bottom: 2px solid var(--border-color);">
-                    <th style="padding: 1rem; text-align: left; color: var(--gold-primary); font-size: 0.75rem; text-transform: uppercase;">Event</th>
-                    <th style="padding: 1rem; text-align: left; color: var(--gold-primary); font-size: 0.75rem; text-transform: uppercase;">Revenue</th>
-                    <th style="padding: 1rem; text-align: left; color: var(--gold-primary); font-size: 0.75rem; text-transform: uppercase;">Fixed Profit</th>
-                    <th style="padding: 1rem; text-align: left; color: var(--gold-primary); font-size: 0.75rem; text-transform: uppercase;">Honor Kru</th>
-                    <th style="padding: 1rem; text-align: left; color: var(--gold-primary); font-size: 0.75rem; text-transform: uppercase;">Budget Ops</th>
-                    <th style="padding: 1rem; text-align: left; color: var(--gold-primary); font-size: 0.75rem; text-transform: uppercase;">Realisasi</th>
-                    <th style="padding: 1rem; text-align: left; color: var(--gold-primary); font-size: 0.75rem; text-transform: uppercase;">Selisih</th>
-                    <th style="padding: 1rem; text-align: left; color: var(--gold-primary); font-size: 0.75rem; text-transform: uppercase;">Aksi</th>
+                <tr>
+                    <th>Event</th>
+                    <th>Revenue</th>
+                    <th>Laba Pimpinan (Fixed)</th>
+                    <th>Honor Kru</th>
+                    <th>Budget Ops</th>
+                    <th>Realisasi Ops</th>
+                    <th>Selisih Ops</th>
+                    <th>Aksi</th>
                 </tr>
             </thead>
             <tbody>
                 @foreach($records as $r)
                 @php $selisih = $r->operational_budget - $r->actual_operational_cost; @endphp
-                <tr style="border-bottom: 1px solid var(--border-color);" onmouseover="this.style.background='var(--bg-hover)'" onmouseout="this.style.background='transparent'">
-                    <td style="padding: 1rem;">
-                        <span class="badge badge-gold">{{ $r->event->event_code ?? '-' }}</span>
-                        <div><small class="text-muted">{{ $r->event->booking->event_type ?? '' }}</small></div>
+                <tr>
+                    <td>
+                        <span class="badge arh-badge-gold d-block mb-1">{{ $r->event->event_code ?? '-' }}</span>
+                        <small class="text-secondary">{{ $r->event->booking->event_type ?? '' }}</small>
                     </td>
-                    <td style="padding: 1rem; font-weight: 600;">Rp {{ number_format($r->total_revenue, 0, ',', '.') }}</td>
-                    <td style="padding: 1rem;"><span class="title-gold">Rp {{ number_format($r->fixed_profit, 0, ',', '.') }}</span><br><small class="text-muted">{{ $r->fixed_profit_pct }}%</small></td>
-                    <td style="padding: 1rem;">Rp {{ number_format($r->total_personnel_honor, 0, ',', '.') }}</td>
-                    <td style="padding: 1rem;">Rp {{ number_format($r->operational_budget, 0, ',', '.') }}</td>
-                    <td style="padding: 1rem;">Rp {{ number_format($r->actual_operational_cost, 0, ',', '.') }}</td>
-                    <td style="padding: 1rem;">
-                        @if($selisih >= 0) <span style="color: var(--success); font-weight: 700;">+Rp {{ number_format($selisih, 0, ',', '.') }}</span>
-                        @else <span style="color: var(--danger); font-weight: 700;">-Rp {{ number_format(abs($selisih), 0, ',', '.') }}</span>
+                    <td class="fw-semibold">Rp {{ number_format($r->total_revenue, 0, ',', '.') }}</td>
+                    <td>
+                        <div class="fw-bold arh-gold">Rp {{ number_format($r->fixed_profit, 0, ',', '.') }}</div>
+                        <small class="text-secondary">{{ $r->fixed_profit_pct }}% dr Kontrak</small>
+                    </td>
+                    <td>Rp {{ number_format($r->total_personnel_honor, 0, ',', '.') }}</td>
+                    <td>Rp {{ number_format($r->operational_budget, 0, ',', '.') }}</td>
+                    <td>Rp {{ number_format($r->actual_operational_cost, 0, ',', '.') }}</td>
+                    <td>
+                        @if($selisih >= 0) 
+                            <span class="text-success fw-bold">+Rp {{ number_format($selisih, 0, ',', '.') }}</span>
+                        @else 
+                            <span class="text-danger fw-bold">-Rp {{ number_format(abs($selisih), 0, ',', '.') }}</span>
                         @endif
                     </td>
-                    <td style="padding: 1rem;">
-                        <a href="{{ route('admin.financials.post_event', $r->event->id) }}" class="btn btn-outline" style="padding: 0.4rem 1rem; font-size: 0.8rem;">Detail</a>
+                    <td>
+                        <a href="{{ route('admin.financials.post_event', $r->event->id ?? 0) }}" class="btn btn-outline-secondary btn-sm">
+                            <i class="bi bi-eye"></i> Post-Event
+                        </a>
                     </td>
                 </tr>
                 @endforeach
+                @if($records->isEmpty())
+                <tr>
+                    <td colspan="8" class="text-center py-4 text-secondary">Belum ada data keuangan yang terbentuk.</td>
+                </tr>
+                @endif
             </tbody>
         </table>
     </div>
 </div>
+
 @else
-<div class="glass-panel" style="text-align: center; border-color: var(--danger); background: var(--danger-glow); padding: 3rem;">
-    <i class="ph-fill ph-warning-octagon" style="color: var(--danger); font-size: 4rem; margin-bottom: 1rem;"></i>
-    <h3 style="color: #fff; margin-bottom: 1rem;">Akses Ditolak (Level VVIP)</h3>
-    <p class="text-muted" style="max-width: 500px; margin: 0 auto;">Laporan finansial, fixed profit, dan buffer budget adalah area khusus Pimpinan Sanggar. Akun Anda tidak memiliki otoritas untuk melihat halaman ini.</p>
+{{-- JIKA BUKAN VVIP --}}
+<div class="p-5 text-center rounded-3 bg-danger bg-opacity-10 border border-danger mb-4 animate-fade-up">
+    <i class="bi bi-shield-lock-fill text-danger" style="font-size: 4rem;"></i>
+    <h3 class="text-danger fw-bold mt-3 mb-2">Akses Ditolak (Requires Pimpinan)</h3>
+    <p class="text-secondary max-w-50 mx-auto">
+        Laporan finansial, fixed profit, dan buffer budget adalah area khusus Pimpinan Sanggar. 
+        Akun Anda tidak memiliki otoritas untuk melihat data sensitif ini.
+    </p>
 </div>
 @endcan
+
 @endsection

@@ -1,174 +1,191 @@
 @extends('layouts.admin')
 
-@section('title', 'Cahaya Gumilang - Executive Dashboard')
+@section('title', 'Dashboard – ART-HUB')
 @section('page_title', 'Executive Dashboard')
-@section('page_subtitle', 'Ringkasan finansial dan penjadwalan sanggar secara real-time.')
+@section('page_subtitle', 'Ringkasan finansial & penjadwalan Sanggar Cahaya Gumilang.')
 
 @section('content')
 
-    <!-- STATISTIK KEUANGAN & AUDIT (Baris 1) -->
-    <div class="grid grid-3 animate-fade-up">
+{{-- ── STAT CARDS ── --}}
+<div class="row g-3 animate-fade-up mb-4">
 
-        <!-- KOTAK 1: Kunci Laba Pimpinan -->
-        <div class="glass-panel card-gold" style="position: relative;">
-            <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1.5rem;">
+    {{-- Kunci Laba --}}
+    <div class="col-12 col-sm-6 col-xl-3">
+        <div class="arh-card-gold p-4 h-100">
+            <div class="d-flex justify-content-between align-items-start mb-3">
                 <div>
-                    <h3 style="color: var(--gold-light); margin-bottom: 0;">Fixed Profit (Bulan Ini)</h3>
-                    <p class="text-muted" style="font-size: 0.9rem;">Terkunci via Basis Data 2</p>
+                    <div class="text-secondary small mb-1">Fixed Profit (Bulan Ini)</div>
+                    <h3 class="arh-gold fw-bold mb-0 fs-4">Rp 18.500.000</h3>
                 </div>
-                <div style="background: var(--gold-glow); padding: 0.8rem; border-radius: 12px;">
-                    <i class="ph-fill ph-vault" style="color: var(--gold-primary); font-size: 1.8rem;"></i>
+                <div class="arh-stat-icon bg-black bg-opacity-25">
+                    <i class="bi bi-safe2-fill arh-gold fs-4"></i>
                 </div>
             </div>
-            <!-- Data Dummy: Nantinya pakai variabel $totalProfit -->
-            <h1 class="title-gold" style="font-size: 2.5rem; margin-bottom: 0;">Rp 18.500.000</h1>
-            <div style="margin-top: 1rem; display: flex; align-items: center; gap: 0.5rem; font-size: 0.85rem;">
-                <span class="badge badge-gold" style="font-size: 0.7rem;"><i class="ph ph-lock-key"></i> Laba Diamankan</span>
-                <span class="text-muted">Dari 5 Event Dikonfirmasi</span>
+            <div class="d-flex align-items-center gap-2 mt-2">
+                <span class="badge arh-badge-gold fs-xs"><i class="bi bi-lock-fill me-1"></i>Laba Diamankan</span>
+                <small class="text-secondary">5 Event Aktif</small>
             </div>
         </div>
-
-        <!-- KOTAK 2: Safety Buffer (Dana Darurat) -->
-        <div class="glass-panel">
-            <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1.5rem;">
-                <div>
-                    <h3 style="color: var(--text-main); margin-bottom: 0;">Safety Buffer Standby</h3>
-                    <p class="text-muted" style="font-size: 0.9rem;">10% Potongan Operasional</p>
-                </div>
-                <div style="background: rgba(255,255,255,0.05); padding: 0.8rem; border-radius: 12px; border: 1px solid var(--border-color);">
-                    <i class="ph-fill ph-shield-check" style="color: var(--success); font-size: 1.8rem;"></i>
-                </div>
-            </div>
-            <h1 style="font-size: 2.5rem; margin-bottom: 0;">Rp 2.140.000</h1>
-            <div style="margin-top: 1rem; display: flex; align-items: center; gap: 0.5rem; font-size: 0.85rem;">
-                <span class="badge badge-success" style="font-size: 0.7rem;">Siap Menutup Ghosting</span>
-            </div>
-        </div>
-
-        <!-- KOTAK 3: Insiden & Denda Lapangan -->
-        <div class="glass-panel" style="border-color: var(--danger-glow);">
-            <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1.5rem;">
-                <div>
-                    <h3 style="color: var(--text-main); margin-bottom: 0;">Denda Kru Masuk</h3>
-                    <p class="text-muted" style="font-size: 0.9rem;">Dari Event Logs MySQL</p>
-                </div>
-                <div style="background: var(--danger-glow); padding: 0.8rem; border-radius: 12px;">
-                    <i class="ph-fill ph-warning-octagon" style="color: var(--danger); font-size: 1.8rem;"></i>
-                </div>
-            </div>
-            <h1 style="color: var(--danger); font-size: 2.5rem; margin-bottom: 0;">Rp 120.000</h1>
-            <div style="margin-top: 1rem; display: flex; align-items: center; gap: 0.5rem; font-size: 0.85rem;">
-                <span class="badge badge-danger" style="font-size: 0.7rem;">2 Insiden Terlambat</span>
-            </div>
-        </div>
-
     </div>
 
-    <!-- JADWAL EVENT MINGGU INI (Baris 2) -->
-    <div class="grid grid-2 animate-fade-up stagger-1" style="margin-top: 2rem;">
-        
-        <!-- KOLOM KIRI: EVENT AKTIF -->
-        <div class="glass-panel">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
-                <h2 style="margin: 0; display: flex; align-items: center; gap: 0.8rem;">
-                    <i class="ph ph-calendar-star" style="color: var(--gold-primary);"></i> Smart Event Radar
-                </h2>
-                <a href="#" class="btn btn-outline" style="padding: 0.4rem 1rem; font-size: 0.8rem;">Lihat Semua</a>
-            </div>
-
-            <!-- List Item Event 1 -->
-            <div style="padding: 1.5rem; background: rgba(0,0,0,0.2); border-radius: 12px; border: 1px solid var(--border-color); margin-bottom: 1rem; transition: 0.3s;" onmouseover="this.style.borderColor='var(--gold-primary)'" onmouseout="this.style.borderColor='var(--border-color)'">
-                <div style="display: flex; justify-content: space-between; align-items: flex-start;">
-                    <div>
-                        <div style="display: flex; gap: 0.5rem; align-items: center; margin-bottom: 0.5rem;">
-                            <span class="badge badge-gold">EVT-2026-045</span>
-                            <span class="badge badge-success">READY</span>
-                        </div>
-                        <h3 style="margin-bottom: 0.2rem;">Pernikahan Klien A (Jaipong)</h3>
-                        <p class="text-muted" style="font-size: 0.9rem; margin-bottom: 0;"><i class="ph ph-map-pin"></i> Gedung Serbaguna Karawaci</p>
-                    </div>
-                    <div style="text-align: right;">
-                        <div class="text-gold" style="font-weight: 700; color: var(--gold-primary); font-size: 1.1rem;">Min, 12 Apr</div>
-                        <div class="text-muted" style="font-size: 0.8rem;">19:00 - 22:00</div>
-                    </div>
+    {{-- Safety Buffer --}}
+    <div class="col-12 col-sm-6 col-xl-3">
+        <div class="arh-card p-4 h-100">
+            <div class="d-flex justify-content-between align-items-start mb-3">
+                <div>
+                    <div class="text-secondary small mb-1">Safety Buffer Standby</div>
+                    <h3 class="text-success fw-bold mb-0 fs-4">Rp 2.140.000</h3>
                 </div>
-                
-                <div style="margin-top: 1.5rem; padding-top: 1rem; border-top: 1px dashed var(--border-color); display: flex; justify-content: space-between; align-items: center;">
-                    <div style="display: flex; gap: -10px;">
-                        <!-- Avatar Personil Dummy -->
-                        <div style="width: 30px; height: 30px; border-radius: 50%; background: #333; border: 2px solid var(--bg-card); display: flex; align-items: center; justify-content: center; font-size: 0.7rem; font-weight: bold; position: relative;">SN</div>
-                        <div style="width: 30px; height: 30px; border-radius: 50%; background: #444; border: 2px solid var(--bg-card); display: flex; align-items: center; justify-content: center; font-size: 0.7rem; font-weight: bold; position: relative; left: -10px;">DA</div>
-                        <div style="width: 30px; height: 30px; border-radius: 50%; background: #555; border: 2px solid var(--bg-card); display: flex; align-items: center; justify-content: center; font-size: 0.7rem; font-weight: bold; position: relative; left: -20px;">+9</div>
-                    </div>
-                    <div>
-                        <a href="{{ url('admin/events/1/plotting') }}" class="btn btn-outline trigger-loader" style="padding: 0.4rem 1rem; font-size: 0.8rem;">Cek Plotting</a>
-                    </div>
+                <div class="arh-stat-icon" style="background: rgba(25,135,84,0.15);">
+                    <i class="bi bi-shield-check-fill text-success fs-4"></i>
                 </div>
             </div>
-
-            <!-- List Item Event 2 -->
-            <div style="padding: 1.5rem; background: rgba(0,0,0,0.2); border-radius: 12px; border: 1px solid var(--border-color); margin-bottom: 1rem;">
-                <div style="display: flex; justify-content: space-between; align-items: flex-start;">
-                    <div>
-                        <div style="display: flex; gap: 0.5rem; align-items: center; margin-bottom: 0.5rem;">
-                            <span class="badge" style="background: rgba(255,255,255,0.1); border: 1px solid var(--text-muted);">EVT-2026-046</span>
-                            <span class="badge" style="background: rgba(255,255,255,0.1); border: 1px solid var(--text-muted);">PLANNING</span>
-                        </div>
-                        <h3 style="margin-bottom: 0.2rem;">Gathering Kantor (Degung)</h3>
-                        <p class="text-muted" style="font-size: 0.9rem; margin-bottom: 0;"><i class="ph ph-map-pin"></i> Hotel Aston BSD</p>
-                    </div>
-                    <div style="text-align: right;">
-                        <div class="text-gold" style="font-weight: 700; color: var(--gold-primary); font-size: 1.1rem;">Kam, 16 Apr</div>
-                        <div class="text-muted" style="font-size: 0.8rem;">10:00 - 13:00</div>
-                    </div>
-                </div>
-            </div>
-
+            <span class="badge bg-success bg-opacity-25 text-success small">Siap Menutup Ghosting</span>
         </div>
-
-        <!-- KOLOM KANAN: NOTIFIKASI & WARNING SYSTEM -->
-        <div class="glass-panel" style="display: flex; flex-direction: column;">
-            <h2 style="margin: 0 0 2rem 0; display: flex; align-items: center; gap: 0.8rem;">
-                <i class="ph ph-bell-ringing" style="color: var(--text-main);"></i> Sistem Deteksi MySQL
-            </h2>
-
-            <!-- Warning 1 -->
-            <div style="display: flex; gap: 1rem; margin-bottom: 1.5rem; padding: 1rem; background: rgba(255,255,255,0.03); border-radius: 12px; border-left: 4px solid var(--warning);">
-                <div style="background: var(--warning-glow); width: 40px; height: 40px; border-radius: 8px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; box-shadow: 0 0 10px var(--warning-glow);">
-                    <i class="ph-fill ph-warning-circle" style="color: var(--warning); font-size: 1.3rem;"></i>
-                </div>
-                <div>
-                    <h4 style="margin: 0 0 0.2rem 0; font-size: 1rem; color: var(--text-main);">Dana Operasional Kritis!</h4>
-                    <p class="text-muted" style="font-size: 0.85rem; margin: 0;">EVT-2026-045: Sisa biaya bersih setelah potongan Profit & Buffer hanya Rp 1.500.000 (Safety Buffer Active).</p>
-                    <small style="color: var(--warning); font-weight: 600; margin-top: 0.5rem; display: block;">Tindakan Diperlukan: Kurangi Biaya Bensin</small>
-                </div>
-            </div>
-
-            <!-- Warning 2 -->
-            <div style="display: flex; gap: 1rem; margin-bottom: 1.5rem; padding: 1rem; background: rgba(255,255,255,0.03); border-radius: 12px; border-left: 4px solid var(--gold-primary);">
-                <div style="background: rgba(212, 175, 55, 0.2); width: 40px; height: 40px; border-radius: 8px; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
-                    <i class="ph-fill ph-t-shirt" style="color: var(--gold-primary); font-size: 1.3rem;"></i>
-                </div>
-                <div>
-                    <h4 style="margin: 0 0 0.2rem 0; font-size: 1rem; color: var(--gold-light);">Kostum Telat (Overdue)</h4>
-                    <p class="text-muted" style="font-size: 0.85rem; margin: 0;">Vendor: Rumah Kostum Bandung.</p>
-                    <small style="color: var(--gold-primary); font-weight: 600; margin-top: 0.5rem; display: block;">Denda MySQL Bertambah: Rp 50.000/hari</small>
-                </div>
-            </div>
-
-            <!-- Warning 3 -->
-            <div style="display: flex; gap: 1rem; margin-bottom: 1.5rem; padding: 1rem; background: rgba(255,255,255,0.03); border-radius: 12px; border-left: 4px solid var(--border-color);">
-                <div style="background: rgba(255,255,255,0.05); width: 40px; height: 40px; border-radius: 8px; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
-                    <i class="ph-fill ph-clock-countdown" style="color: var(--text-muted); font-size: 1.3rem;"></i>
-                </div>
-                <div>
-                    <h4 style="margin: 0 0 0.2rem 0; font-size: 1rem; color: var(--text-main);">Latihan Musik Berlangsung</h4>
-                    <p class="text-muted" style="font-size: 0.85rem; margin: 0;">Studio B - Ada 1 pemusik belum check-in.</p>
-                </div>
-            </div>
-
-        </div>
-
     </div>
+
+    {{-- Denda Kru --}}
+    <div class="col-12 col-sm-6 col-xl-3">
+        <div class="arh-card p-4 h-100" style="border-color: rgba(220,53,69,0.4);">
+            <div class="d-flex justify-content-between align-items-start mb-3">
+                <div>
+                    <div class="text-secondary small mb-1">Denda Kru Masuk</div>
+                    <h3 class="text-danger fw-bold mb-0 fs-4">Rp 120.000</h3>
+                </div>
+                <div class="arh-stat-icon" style="background: rgba(220,53,69,0.15);">
+                    <i class="bi bi-exclamation-octagon-fill text-danger fs-4"></i>
+                </div>
+            </div>
+            <span class="badge bg-danger bg-opacity-25 text-danger small">2 Insiden Terlambat</span>
+        </div>
+    </div>
+
+    {{-- Event Bulan Ini --}}
+    <div class="col-12 col-sm-6 col-xl-3">
+        <div class="arh-card p-4 h-100">
+            <div class="d-flex justify-content-between align-items-start mb-3">
+                <div>
+                    <div class="text-secondary small mb-1">Event Bulan Ini</div>
+                    <h3 class="text-white fw-bold mb-0 fs-4">7 Event</h3>
+                </div>
+                <div class="arh-stat-icon" style="background: rgba(13,110,253,0.15);">
+                    <i class="bi bi-calendar-event-fill text-primary fs-4"></i>
+                </div>
+            </div>
+            <span class="badge bg-primary bg-opacity-25 text-primary small">2 Butuh Plotting</span>
+        </div>
+    </div>
+</div>
+
+{{-- ── GRID UTAMA ── --}}
+<div class="row g-4 animate-fade-up">
+
+    {{-- KOLOM KIRI: Event Radar --}}
+    <div class="col-12 col-lg-7">
+        <div class="arh-card p-4 h-100">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h5 class="fw-bold mb-0 d-flex align-items-center gap-2">
+                    <i class="bi bi-radar arh-gold"></i> Smart Event Radar
+                </h5>
+                <a href="{{ route('admin.events.index') }}" class="btn btn-outline-secondary btn-sm">Lihat Semua</a>
+            </div>
+
+            {{-- Event Card 1 --}}
+            <div class="p-3 rounded-3 mb-3" style="background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08);">
+                <div class="d-flex justify-content-between align-items-start">
+                    <div>
+                        <div class="d-flex gap-2 align-items-center mb-2">
+                            <span class="badge arh-badge-gold">EVT-2026-045</span>
+                            <span class="badge bg-success">READY</span>
+                        </div>
+                        <h6 class="fw-semibold mb-1">Pernikahan Klien A (Jaipong)</h6>
+                        <small class="text-secondary"><i class="bi bi-geo-alt-fill me-1"></i>Gedung Serbaguna Karawaci</small>
+                    </div>
+                    <div class="text-end">
+                        <div class="arh-gold fw-bold">Min, 12 Apr</div>
+                        <small class="text-secondary">19:00 – 22:00</small>
+                    </div>
+                </div>
+                <div class="d-flex justify-content-between align-items-center mt-3 pt-3 border-top border-secondary">
+                    <div class="d-flex">
+                        @foreach(['SN','DA','RH','+9'] as $i => $ava)
+                        @php $ml = $i > 0 ? '-8px' : '0'; $zi = 4 - $i; @endphp
+                        <div class="arh-avatar-sm border border-dark" @style([
+                            "margin-left: {$ml}", 
+                            "z-index: {$zi}", 
+                            "font-size: 0.65rem"
+                        ])>{{ $ava }}</div>
+                        @endforeach
+                    </div>
+                    <a href="{{ url('admin/events/1/plotting') }}" class="btn btn-outline-warning btn-sm">
+                        <i class="bi bi-diagram-3 me-1"></i>Cek Plotting
+                    </a>
+                </div>
+            </div>
+
+            {{-- Event Card 2 --}}
+            <div class="p-3 rounded-3" style="background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08);">
+                <div class="d-flex justify-content-between align-items-start">
+                    <div>
+                        <div class="d-flex gap-2 align-items-center mb-2">
+                            <span class="badge bg-secondary">EVT-2026-046</span>
+                            <span class="badge bg-secondary">PLANNING</span>
+                        </div>
+                        <h6 class="fw-semibold mb-1">Gathering Kantor (Degung)</h6>
+                        <small class="text-secondary"><i class="bi bi-geo-alt-fill me-1"></i>Hotel Aston BSD</small>
+                    </div>
+                    <div class="text-end">
+                        <div class="arh-gold fw-bold">Kam, 16 Apr</div>
+                        <small class="text-secondary">10:00 – 13:00</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {{-- KOLOM KANAN: Sistem Alert --}}
+    <div class="col-12 col-lg-5">
+        <div class="arh-card p-4 h-100">
+            <h5 class="fw-bold mb-4 d-flex align-items-center gap-2">
+                <i class="bi bi-bell-fill text-warning"></i> Sistem Alert MySQL
+            </h5>
+
+            {{-- Alert 1 --}}
+            <div class="d-flex gap-3 mb-3 p-3 rounded-3 border-start border-warning border-3" style="background: rgba(255,193,7,0.06);">
+                <i class="bi bi-exclamation-circle-fill text-warning fs-4 flex-shrink-0 mt-1"></i>
+                <div>
+                    <div class="fw-semibold small">Dana Operasional Kritis!</div>
+                    <div class="text-secondary small">EVT-2026-045: Sisa hanya Rp 1.500.000 setelah potongan Profit & Buffer.</div>
+                    <div class="text-warning small fw-bold mt-1">⚡ Kurangi Biaya Bensin</div>
+                </div>
+            </div>
+
+            {{-- Alert 2 --}}
+            <div class="d-flex gap-3 mb-3 p-3 rounded-3 border-start border-3" style="border-color: var(--arh-gold) !important; background: rgba(212,175,55,0.06);">
+                <i class="bi bi-bag-x-fill fs-4 flex-shrink-0 mt-1" style="color: var(--arh-gold);"></i>
+                <div>
+                    <div class="fw-semibold small arh-gold">Kostum Telat (Overdue)</div>
+                    <div class="text-secondary small">Vendor: Rumah Kostum Bandung.</div>
+                    <div class="small fw-bold mt-1" style="color: var(--arh-gold);">Denda MySQL +Rp 50.000/hari</div>
+                </div>
+            </div>
+
+            {{-- Alert 3 --}}
+            <div class="d-flex gap-3 p-3 rounded-3 border-start border-secondary border-3" style="background: rgba(255,255,255,0.03);">
+                <i class="bi bi-clock-history text-secondary fs-4 flex-shrink-0 mt-1"></i>
+                <div>
+                    <div class="fw-semibold small">Latihan Musik Berlangsung</div>
+                    <div class="text-secondary small">Studio B – 1 pemusik belum check-in.</div>
+                </div>
+            </div>
+
+            <div class="mt-4">
+                <a href="{{ route('admin.events.index') }}" class="btn btn-arh-gold w-100">
+                    <i class="bi bi-arrow-right-circle me-2"></i>Buka Event Management
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
 
 @endsection

@@ -1,162 +1,173 @@
 <!DOCTYPE html>
-<html lang="id">
+<html lang="id" data-bs-theme="dark">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>@yield('title', 'ART-HUB Sanggar Cahaya Gumilang')</title>
-    
-    <!-- Link Vanilla CSS Core -->
-    <link rel="stylesheet" href="{{ asset('css/app.css') }}">
-    
-    <!-- Phosphor Icons (Aesthetic Minimalist Icons) -->
-    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    <title>@yield('title', 'ART-HUB | Sanggar Cahaya Gumilang')</title>
+
+    {{-- Bootstrap 5.3 CSS --}}
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    {{-- Bootstrap Icons --}}
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+    {{-- Google Fonts --}}
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    {{-- Custom ART-HUB Overrides --}}
+    <link rel="stylesheet" href="{{ asset('css/admin.css') }}">
+
+    @yield('styles')
 </head>
 <body>
 
-    <!-- Overlay Desktop & Mobile Loader -->
-    <div class="mobile-overlay" id="mobileOverlay" onclick="toggleSidebar()"></div>
-    <div class="page-loader" id="pageLoader">
-        <div class="spinner-gold"></div>
-        <p style="margin-top: 1.5rem; color: var(--gold-primary); font-size: 0.9rem; letter-spacing: 2px; text-transform: uppercase;">Menyinkronisasi Basis Data 2...</p>
-    </div>
+{{-- ════════ SIDEBAR ════════ --}}
+<div class="d-flex" id="wrapper">
 
-    <div class="wrapper">
-        <!-- ════════ SIDEBAR ════════ -->
-        <aside class="sidebar glass-panel animate-fade-in" id="clientSidebar">
-            <div class="sidebar-header" style="text-align: center; border-bottom: 1px solid var(--border-color); padding-bottom: 1.5rem;">
-                <h2 class="title-gold" style="font-size: 1.5rem; margin-bottom: 0.5rem;">ART-HUB</h2>
-                <span class="badge badge-gold">Control Panel</span>
-            </div>
-
-            @php $currentUrl = url()->current(); @endphp
-            <nav class="sidebar-nav" style="display: flex; flex-direction: column; gap: 0.5rem; margin-top: 1rem; flex: 1; overflow-y: auto; padding-right: 5px;">
-                <a href="{{ route('admin.dashboard') }}" class="btn btn-outline" style="justify-content: flex-start; padding: 0.8rem 1rem; border-radius: 8px; {{ request()->routeIs('admin.dashboard') ? 'border: 1px solid var(--gold-primary); background: var(--gold-primary); color: #000; font-weight: bold;' : 'border: 1px solid var(--border-color); background: var(--glass-bg);' }}">
-                    <i class="ph ph-squares-four" style="font-size: 1.2rem; {{ request()->routeIs('admin.dashboard') ? '' : 'color: var(--gold-primary);' }}"></i> Dashboard
-                </a>
-                <a href="{{ route('admin.events.index') }}" class="btn btn-outline" style="justify-content: flex-start; padding: 0.8rem 1rem; border-radius: 8px; {{ request()->routeIs('admin.events.*') ? 'border: 1px solid var(--gold-primary); background: var(--gold-primary); color: #000; font-weight: bold;' : 'border: 1px solid var(--border-color); background: var(--glass-bg);' }}">
-                    <i class="ph ph-calendar-check" style="font-size: 1.2rem; {{ request()->routeIs('admin.events.*') ? '' : 'color: var(--gold-primary);' }}"></i> Event Management
-                </a>
-                <a href="{{ route('admin.personnel.index') }}" class="btn btn-outline" style="justify-content: flex-start; padding: 0.8rem 1rem; border-radius: 8px; {{ request()->routeIs('admin.personnel.*') ? 'border: 1px solid var(--gold-primary); background: var(--gold-primary); color: #000; font-weight: bold;' : 'border: 1px solid var(--border-color); background: var(--glass-bg);' }}">
-                    <i class="ph ph-users" style="font-size: 1.2rem; {{ request()->routeIs('admin.personnel.*') ? '' : 'color: var(--gold-primary);' }}"></i> Personnel Management
-                </a>
-                <a href="{{ route('admin.payments.index') }}" class="btn btn-outline" style="justify-content: flex-start; padding: 0.8rem 1rem; border-radius: 8px; {{ request()->routeIs('admin.payments.*') ? 'border: 1px solid var(--gold-primary); background: var(--gold-primary); color: #000; font-weight: bold;' : 'border: 1px solid var(--border-color); background: var(--glass-bg);' }}">
-                    <i class="ph ph-wallet" style="font-size: 1.2rem; {{ request()->routeIs('admin.payments.*') ? '' : 'color: var(--gold-primary);' }}"></i> Payment Tracking
-                </a>
-                <a href="{{ route('admin.costumes.index') }}" class="btn btn-outline" style="justify-content: flex-start; padding: 0.8rem 1rem; border-radius: 8px; {{ request()->routeIs('admin.costumes.*') ? 'border: 1px solid var(--gold-primary); background: var(--gold-primary); color: #000; font-weight: bold;' : 'border: 1px solid var(--border-color); background: var(--glass-bg);' }}">
-                    <i class="ph ph-t-shirt" style="font-size: 1.2rem; {{ request()->routeIs('admin.costumes.*') ? '' : 'color: var(--gold-primary);' }}"></i> Costume Rental
-                </a>
-                <a href="{{ route('admin.financials.index') }}" class="btn btn-outline" style="justify-content: flex-start; padding: 0.8rem 1rem; border-radius: 8px; {{ request()->routeIs('admin.financials.*') ? 'border: 1px solid var(--gold-primary); background: var(--gold-primary); color: #000; font-weight: bold;' : 'border: 1px solid var(--border-color); background: var(--glass-bg);' }}">
-                    <i class="ph ph-chart-line-up" style="font-size: 1.2rem; {{ request()->routeIs('admin.financials.*') ? '' : 'color: var(--gold-primary);' }}"></i> Financial Report
-                </a>
-                <a href="{{ route('admin.bookings.index') }}" class="btn btn-outline" style="justify-content: flex-start; padding: 0.8rem 1rem; border-radius: 8px; {{ request()->routeIs('admin.bookings.*') ? 'border: 1px solid var(--gold-primary); background: var(--gold-primary); color: #000; font-weight: bold;' : 'border: 1px solid var(--border-color); background: var(--glass-bg);' }}">
-                    <i class="ph ph-receipt" style="font-size: 1.2rem; {{ request()->routeIs('admin.bookings.*') ? '' : 'color: var(--gold-primary);' }}"></i> DP Verification
-                </a>
-                <a href="{{ route('admin.bookings.create') }}" class="btn btn-outline" style="justify-content: flex-start; padding: 0.8rem 1rem; border-radius: 8px; {{ request()->routeIs('admin.bookings.create') ? 'border: 1px solid var(--gold-primary); background: var(--gold-primary); color: #000; font-weight: bold;' : 'border: 1px solid var(--border-color); background: var(--glass-bg);' }}">
-                    <i class="ph ph-plus-circle" style="font-size: 1.2rem; {{ request()->routeIs('admin.bookings.create') ? '' : 'color: var(--gold-primary);' }}"></i> New Booking Entry
-                </a>
-                <a href="{{ route('admin.events.index') }}" class="btn btn-outline" style="justify-content: flex-start; padding: 0.8rem 1rem; border-radius: 8px; border: 1px solid var(--border-color); background: var(--glass-bg);">
-                    <i class="ph ph-clipboard-text" style="color: var(--gold-primary); font-size: 1.2rem;"></i> Post-Event Update
-                </a>
-                <a href="{{ route('admin.events.index') }}" class="btn btn-outline" style="justify-content: flex-start; padding: 0.8rem 1rem; border-radius: 8px; border: 1px solid var(--border-color); background: var(--glass-bg);">
-                    <i class="ph ph-activity" style="color: var(--gold-primary); font-size: 1.2rem;"></i> Event Monitoring
-                </a>
-                <a href="{{ route('admin.cancellations.index') }}" class="btn btn-outline" style="justify-content: flex-start; padding: 0.8rem 1rem; border-radius: 8px; {{ request()->routeIs('admin.cancellations.*') ? 'border: 1px solid var(--gold-primary); background: var(--gold-primary); color: #000; font-weight: bold;' : 'border: 1px solid var(--border-color); background: var(--glass-bg);' }}">
-                    <i class="ph ph-shield-warning" style="font-size: 1.2rem; {{ request()->routeIs('admin.cancellations.*') ? '' : 'color: var(--gold-primary);' }}"></i> Cancellation Handler
-                </a>
-            </nav>
-
-            <div style="margin-top: auto;">
-                <form method="POST" action="/logout">
-                    @csrf
-                    <button type="submit" class="btn btn-danger" style="width: 100%; border: none; justify-content: flex-start;">
-                        <i class="ph ph-sign-out"></i> Logout
-                    </button>
-                </form>
-            </div>
-        </aside>
-
-        <!-- ════════ MAIN CONTENT ════════ -->
-        <main class="main-content">
-            <!-- Header Notification / Welcome -->
-            <header style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 3rem;" class="animate-fade-up">
-                <div style="display: flex; align-items: center; gap: 1rem;">
-                    <button class="hamburger" onclick="toggleSidebar()"><i class="ph ph-list"></i></button>
-                    <div>
-                        <h1 style="margin-bottom: 0.2rem;">@yield('page_title')</h1>
-                        <p class="text-muted">@yield('page_subtitle')</p>
+    <nav id="sidebar" class="arh-sidebar d-flex flex-column">
+        {{-- Brand --}}
+        <div class="arh-sidebar-brand text-center py-4 mb-2">
+            <h4 class="arh-gold fw-bold mb-0 ls-2">ART-HUB</h4>
+            <small class="badge arh-badge-gold mt-1">Control Panel</small>
+            @auth
+            <div class="mt-2 pt-2 border-top border-secondary">
+                <div class="d-flex align-items-center justify-content-center gap-2">
+                    <div class="arh-avatar-sm">{{ strtoupper(substr(Auth::user()->name, 0, 1)) }}</div>
+                    <div class="text-start">
+                        <div class="fw-semibold small text-white">{{ Auth::user()->name }}</div>
+                        <div class="arh-gold" style="font-size: 0.7rem;">Pimpinan Sanggar</div>
                     </div>
                 </div>
-                <div class="user-profile" style="display: flex; align-items: center; gap: 1rem; background: var(--glass-bg); padding: 0.6rem 1.2rem; border-radius: 50px; border: 1px solid var(--glass-border);">
-                    <div style="width: 40px; height: 40px; border-radius: 50%; background: var(--gold-dark); display: flex; align-items: center; justify-content: center; font-weight: bold; color: #fff;">
-                        Y
-                    </div>
-                    <div>
-                        <div style="font-weight: 600; line-height: 1;">Pak Yat</div>
-                        <small class="text-gold" style="color: var(--gold-primary);">Pimpinan Sanggar</small>
-                    </div>
-                </div>
-            </header>
+            </div>
+            @endauth
+        </div>
 
-            <!-- Alerts (Success / Warning / Error) -->
+        {{-- Navigation --}}
+        @php
+            $r = request();
+            $menus = [
+                ['Dashboard',        'bi-grid-1x2-fill',    'admin.dashboard',          $r->routeIs('admin.dashboard')],
+                ['Event Management', 'bi-calendar-check-fill','admin.events.index',      $r->routeIs('admin.events.*') && !$r->routeIs('admin.events.plotting')],
+                ['Personnel',        'bi-people-fill',       'admin.personnel.index',   $r->routeIs('admin.personnel.*')],
+                ['Payment & DP',     'bi-receipt-cutoff',    'admin.bookings.index',    $r->routeIs('admin.bookings.*') && !$r->routeIs('admin.bookings.create')],
+                ['New Booking',      'bi-plus-circle-fill',  'admin.bookings.create',   $r->routeIs('admin.bookings.create')],
+                ['Costume & Logistik','bi-bag-fill',         'admin.costumes.index',    $r->routeIs('admin.costumes.*')],
+                ['Financial Report', 'bi-graph-up-arrow',    'admin.financials.index',  $r->routeIs('admin.financials.*')],
+                ['Cancellation',     'bi-shield-exclamation','admin.cancellations.index',$r->routeIs('admin.cancellations.*')],
+            ];
+        @endphp
+
+        <ul class="nav flex-column px-3 flex-grow-1 overflow-auto">
+            @foreach($menus as [$label, $icon, $routeName, $isActive])
+            <li class="nav-item mb-1">
+                <a href="{{ route($routeName) }}"
+                   class="nav-link arh-nav-link {{ $isActive ? 'arh-nav-link--active' : '' }}">
+                    <i class="bi {{ $icon }} me-2"></i>
+                    <span>{{ $label }}</span>
+                </a>
+            </li>
+            @endforeach
+        </ul>
+
+        {{-- Logout --}}
+        <div class="px-3 pb-4 mt-2 border-top border-secondary pt-3">
+            <form method="POST" action="{{ route('logout') }}">
+                @csrf
+                <button type="submit" class="btn btn-outline-danger btn-sm w-100 d-flex align-items-center gap-2">
+                    <i class="bi bi-box-arrow-left"></i> Logout
+                </button>
+            </form>
+        </div>
+    </nav>
+
+    {{-- ════════ MAIN CONTENT ════════ --}}
+    <div id="page-content" class="flex-grow-1 overflow-auto">
+
+        {{-- Topbar --}}
+        <nav class="navbar arh-topbar px-4 border-bottom border-secondary sticky-top">
+            <div class="d-flex align-items-center gap-3">
+                <button class="btn btn-sm btn-outline-secondary" id="sidebarToggle">
+                    <i class="bi bi-list fs-5"></i>
+                </button>
+                <div>
+                    <h5 class="mb-0 fw-bold">@yield('page_title', 'Admin Panel')</h5>
+                    <small class="text-secondary">@yield('page_subtitle')</small>
+                </div>
+            </div>
+            <div class="d-flex align-items-center gap-2">
+                <span class="badge arh-badge-gold">
+                    <i class="bi bi-shield-lock-fill me-1"></i>Admin
+                </span>
+                <small class="text-secondary d-none d-md-block">{{ now()->format('d M Y') }}</small>
+            </div>
+        </nav>
+
+        {{-- Content Area --}}
+        <main class="p-4">
+
+            {{-- Flash: Success --}}
             @if(session('success'))
-                <div class="glass-panel" style="border-color: var(--success); background: var(--success-glow); margin-bottom: 2rem; padding: 1rem 1.5rem; display: flex; align-items: center; gap: 1rem;">
-                    <i class="ph-fill ph-check-circle" style="color: var(--success); font-size: 1.5rem;"></i>
-                    <span style="color: var(--text-main); font-weight: 500;">{{ session('success') }}</span>
-                </div>
+            <div class="alert alert-success alert-dismissible border-0 d-flex align-items-center gap-2 mb-4" role="alert">
+                <i class="bi bi-check-circle-fill fs-5"></i>
+                <span>{{ session('success') }}</span>
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
             @endif
 
+            {{-- Flash: Warning --}}
             @if(session('warning'))
-                <div class="glass-panel" style="border-color: var(--gold-primary); background: rgba(212, 175, 55, 0.1); margin-bottom: 2rem; padding: 1rem 1.5rem; display: flex; align-items: center; gap: 1rem;">
-                    <i class="ph-fill ph-warning" style="color: var(--gold-primary); font-size: 1.5rem;"></i>
-                    <span style="color: var(--gold-light); font-weight: 500;">{{ session('warning') }}</span>
-                </div>
-            @endif
-            
-            @if(session('error'))
-                <div class="glass-panel" style="border-color: var(--danger); background: var(--danger-glow); margin-bottom: 2rem; padding: 1rem 1.5rem; display: flex; align-items: center; gap: 1rem;">
-                    <i class="ph-fill ph-warning-octagon" style="color: var(--danger); font-size: 1.5rem;"></i>
-                    <span style="color: #fff; font-weight: 500;">{{ session('error') }}</span>
-                </div>
+            <div class="alert alert-warning alert-dismissible border-0 d-flex align-items-center gap-2 mb-4" role="alert">
+                <i class="bi bi-exclamation-triangle-fill fs-5"></i>
+                <span>{{ session('warning') }}</span>
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
             @endif
 
-            <!-- Inject View Content -->
+            {{-- Flash: Error --}}
+            @if(session('error'))
+            <div class="alert alert-danger alert-dismissible border-0 d-flex align-items-center gap-2 mb-4" role="alert">
+                <i class="bi bi-x-octagon-fill fs-5"></i>
+                <span>{{ session('error') }}</span>
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+            @endif
+
             @yield('content')
-            
+
         </main>
     </div>
+</div>
 
-    <!-- JavaScript Interaktif -->
-    <script>
-        // Toggle Sidebar Mobile
-        function toggleSidebar() {
-            document.getElementById('clientSidebar').classList.toggle('show');
-            document.getElementById('mobileOverlay').classList.toggle('show');
-        }
-
-        // Global Page Loader Logic
-        function showLoader() {
-            document.getElementById('pageLoader').classList.add('is-loading');
-        }
-
-        document.addEventListener('DOMContentLoaded', () => {
-            // Animasi cascade saat scroll
-            const panels = document.querySelectorAll('.glass-panel');
-            panels.forEach((panel, index) => {
-                panel.style.animationDelay = `${index * 0.1}s`;
-            });
-
-            // Memicu Spinner ketika form disubmit ATAU tombol dengan kelas trigger-loader diklik
-            document.querySelectorAll('form').forEach(form => {
-                form.addEventListener('submit', () => {
-                    // Cek agar tidak muncul error jika validasi browser gagal
-                    if(form.checkValidity()) showLoader();
-                });
-            });
-
-            document.querySelectorAll('.trigger-loader').forEach(btn => {
-                btn.addEventListener('click', showLoader);
-            });
+{{-- Bootstrap 5 JS Bundle --}}
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    // Sidebar toggle
+    const sidebarToggle = document.getElementById('sidebarToggle');
+    const sidebar       = document.getElementById('sidebar');
+    if (sidebarToggle && sidebar) {
+        sidebarToggle.addEventListener('click', () => {
+            sidebar.classList.toggle('arh-sidebar--collapsed');
+            document.getElementById('page-content').classList.toggle('arh-content--expanded');
         });
-    </script>
+    }
+
+    // Auto-dismiss alerts after 5 seconds
+    document.querySelectorAll('.alert').forEach(el => {
+        setTimeout(() => {
+            const bsAlert = bootstrap.Alert.getOrCreateInstance(el);
+            if (bsAlert) bsAlert.close();
+        }, 5000);
+    });
+
+    // Page loader on form submit
+    document.querySelectorAll('form').forEach(form => {
+        form.addEventListener('submit', function () {
+            if (this.checkValidity()) {
+                document.querySelectorAll('button[type="submit"]').forEach(btn => {
+                    btn.disabled = true;
+                    btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Memproses...';
+                });
+            }
+        });
+    });
+</script>
+@yield('scripts')
 </body>
 </html>

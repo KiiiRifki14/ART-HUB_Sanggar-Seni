@@ -1,92 +1,156 @@
 @extends('layouts.admin')
 
-@section('title', 'Personnel Management - ART-HUB')
+@section('title', 'Personnel Management – ART-HUB')
 @section('page_title', 'Personnel Management')
-@section('page_subtitle', 'Profil & status 12 personel sanggar.')
+@section('page_subtitle', 'Kelola 12 kru dan personel Sanggar Cahaya Gumilang.')
 
 @section('content')
-<div class="grid grid-4 animate-fade-up" style="margin-bottom: 2rem;">
-    <div class="glass-panel" style="text-align: center;">
-        <h1 class="title-gold" style="font-size: 2.5rem; margin-bottom: 0;">{{ $personnel->count() }}</h1>
-        <small class="text-muted">Total Personel</small>
+
+{{-- STAT BAR --}}
+@php
+    $total   = $personnel->count();
+    $active  = $personnel->where('is_active', true)->count();
+    $backup  = $personnel->where('is_backup', true)->count();
+    $dayJob  = $personnel->where('has_day_job', true)->count();
+@endphp
+<div class="row g-3 mb-4 animate-fade-up">
+    <div class="col-6 col-md-3">
+        <div class="arh-card p-3 text-center">
+            <i class="bi bi-people-fill arh-gold fs-3"></i>
+            <div class="fw-bold fs-4 mt-1">{{ $total }}</div>
+            <small class="text-secondary">Total Personel</small>
+        </div>
     </div>
-    <div class="glass-panel" style="text-align: center;">
-        <h1 style="font-size: 2.5rem; margin-bottom: 0;">{{ $personnel->where('specialty', 'penari')->count() }}</h1>
-        <small class="text-muted">Penari</small>
+    <div class="col-6 col-md-3">
+        <div class="arh-card p-3 text-center" style="border-color: rgba(25,135,84,0.4);">
+            <i class="bi bi-person-check-fill text-success fs-3"></i>
+            <div class="fw-bold fs-4 mt-1 text-success">{{ $active }}</div>
+            <small class="text-secondary">Aktif</small>
+        </div>
     </div>
-    <div class="glass-panel" style="text-align: center;">
-        <h1 style="font-size: 2.5rem; margin-bottom: 0;">{{ $personnel->where('specialty', 'pemusik')->count() }}</h1>
-        <small class="text-muted">Pemusik</small>
+    <div class="col-6 col-md-3">
+        <div class="arh-card p-3 text-center">
+            <i class="bi bi-person-badge-fill text-info fs-3"></i>
+            <div class="fw-bold fs-4 mt-1 text-info">{{ $backup }}</div>
+            <small class="text-secondary">Cadangan</small>
+        </div>
     </div>
-    <div class="glass-panel" style="text-align: center;">
-        <h1 style="font-size: 2.5rem; margin-bottom: 0;">{{ $personnel->where('has_day_job', true)->count() }}</h1>
-        <small class="text-muted">Punya Kerja Utama</small>
+    <div class="col-6 col-md-3">
+        <div class="arh-card p-3 text-center" style="border-color: rgba(255,193,7,0.4);">
+            <i class="bi bi-briefcase-fill text-warning fs-3"></i>
+            <div class="fw-bold fs-4 mt-1 text-warning">{{ $dayJob }}</div>
+            <small class="text-secondary">Punya Day-Job</small>
+        </div>
     </div>
 </div>
 
-<div class="glass-panel animate-fade-up stagger-1">
-    <h2 style="margin-bottom: 2rem; display: flex; align-items: center; gap: 0.8rem;">
-        <i class="ph ph-users" style="color: var(--gold-primary);"></i> Roster Personel
-    </h2>
-    <div style="overflow-x: auto;">
-        <table style="width: 100%; border-collapse: collapse;">
+{{-- TABEL PERSONEL --}}
+<div class="arh-card p-4 animate-fade-up">
+    <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
+        <h5 class="fw-bold mb-0 d-flex align-items-center gap-2">
+            <i class="bi bi-person-lines-fill arh-gold"></i> Daftar Personel
+        </h5>
+        <a href="{{ route('admin.personnel.create') }}" class="btn btn-arh-gold btn-sm">
+            <i class="bi bi-person-plus-fill me-1"></i> Tambah Personel
+        </a>
+    </div>
+
+    <div class="table-responsive">
+        <table class="table arh-table table-hover align-middle mb-0">
             <thead>
-                <tr style="border-bottom: 2px solid var(--border-color);">
-                    <th style="padding: 1rem; text-align: left; color: var(--gold-primary); font-size: 0.75rem; text-transform: uppercase;">No</th>
-                    <th style="padding: 1rem; text-align: left; color: var(--gold-primary); font-size: 0.75rem; text-transform: uppercase;">Nama</th>
-                    <th style="padding: 1rem; text-align: left; color: var(--gold-primary); font-size: 0.75rem; text-transform: uppercase;">Spesialisasi</th>
-                    <th style="padding: 1rem; text-align: left; color: var(--gold-primary); font-size: 0.75rem; text-transform: uppercase;">Pekerjaan Utama</th>
-                    <th style="padding: 1rem; text-align: left; color: var(--gold-primary); font-size: 0.75rem; text-transform: uppercase;">Jam Kerja</th>
-                    <th style="padding: 1rem; text-align: left; color: var(--gold-primary); font-size: 0.75rem; text-transform: uppercase;">Status</th>
+                <tr>
+                    <th>#</th>
+                    <th>Personel</th>
+                    <th>Spesialisasi</th>
+                    <th>Kontak</th>
+                    <th>Day-Job</th>
+                    <th>Status</th>
+                    <th>Aksi</th>
                 </tr>
             </thead>
             <tbody>
-                @foreach($personnel as $i => $p)
-                <tr style="border-bottom: 1px solid var(--border-color); transition: 0.2s;" onmouseover="this.style.background='var(--bg-hover)'" onmouseout="this.style.background='transparent'">
-                    <td style="padding: 1rem; color: var(--text-muted);">{{ $i + 1 }}</td>
-                    <td style="padding: 1rem;">
-                        <div style="display: flex; align-items: center; gap: 0.8rem;">
-                            <div style="width: 40px; height: 40px; border-radius: 50%; background: var(--bg-hover); display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 0.8rem; border: 1px solid var(--border-color);">{{ strtoupper(substr($p->user->name, 0, 2)) }}</div>
+                @forelse($personnel as $idx => $p)
+                <tr>
+                    <td><small class="text-secondary">{{ $idx + 1 }}</small></td>
+                    <td>
+                        <div class="d-flex align-items-center gap-2">
+                            <div class="arh-avatar">
+                                {{ strtoupper(substr($p->user->name ?? 'P', 0, 2)) }}
+                            </div>
                             <div>
-                                <div style="font-weight: 600;">{{ $p->user->name }}</div>
-                                <small class="text-muted">{{ $p->user->email }}</small>
+                                <div class="fw-semibold">{{ $p->user->name ?? 'Tanpa Akun' }}</div>
+                                <small class="text-secondary">{{ $p->user->email ?? '-' }}</small>
                             </div>
                         </div>
                     </td>
-                    <td style="padding: 1rem; text-transform: capitalize;">
-                        @if($p->specialty === 'multi_talent') <span class="badge badge-gold">Multi-Talent</span>
-                        @elseif($p->specialty === 'pemusik') <span class="badge" style="background: rgba(255,255,255,0.05); border: 1px solid var(--text-muted);">Pemusik</span>
-                        @else <span class="badge" style="background: rgba(255,255,255,0.05); border: 1px solid var(--text-muted);">Penari</span>
-                        @endif
-                    </td>
-                    <td style="padding: 1rem;">
-                        @if($p->has_day_job)
-                            <div style="display: flex; align-items: center; gap: 0.5rem;">
-                                <i class="ph-fill ph-warning-circle" style="color: var(--warning);"></i>
-                                <span>{{ $p->day_job_desc }}</span>
-                            </div>
-                        @else
-                            <span class="text-muted">— Freelance</span>
-                        @endif
-                    </td>
-                    <td style="padding: 1rem;">
-                        @if($p->has_day_job)
-                            <span class="badge badge-warning" style="font-size: 0.7rem;">{{ $p->day_job_start ? \Carbon\Carbon::parse($p->day_job_start)->format('H:i') : '08:00' }} - {{ $p->day_job_end ? \Carbon\Carbon::parse($p->day_job_end)->format('H:i') : '16:00' }}</span>
-                        @else
-                            <span class="text-muted">Fleksibel</span>
-                        @endif
-                    </td>
-                    <td style="padding: 1rem;">
+                    <td>
+                        <span class="badge bg-secondary bg-opacity-50">{{ $p->specialty }}</span>
                         @if($p->is_backup)
-                            <span class="badge badge-gold"><i class="ph ph-swap"></i> Cadangan</span>
-                        @elseif($p->is_active)
-                            <span class="badge badge-success">Aktif</span>
-                        @else
-                            <span class="badge badge-danger">Non-Aktif</span>
+                        <span class="badge bg-info bg-opacity-25 text-info ms-1">Cadangan</span>
                         @endif
+                    </td>
+                    <td>
+                        <small>
+                            @if($p->phone)
+                            <a href="tel:{{ $p->phone }}" class="text-secondary text-decoration-none">
+                                <i class="bi bi-telephone-fill me-1"></i>{{ $p->phone }}
+                            </a>
+                            @else
+                            <span class="text-secondary">-</span>
+                            @endif
+                        </small>
+                    </td>
+                    <td>
+                        @if($p->has_day_job)
+                        <div class="d-flex align-items-center gap-1">
+                            <i class="bi bi-briefcase-fill text-warning small"></i>
+                            <small>{{ $p->day_job_name ?? 'Ada' }}</small>
+                        </div>
+                        <small class="text-secondary">
+                            {{ \Carbon\Carbon::parse($p->day_job_start)->format('H:i') ?? '' }} –
+                            {{ \Carbon\Carbon::parse($p->day_job_end)->format('H:i') ?? '' }}
+                        </small>
+                        @else
+                        <span class="text-secondary small">Tidak ada</span>
+                        @endif
+                    </td>
+                    <td>
+                        @if($p->is_active)
+                            <span class="badge bg-success">AKTIF</span>
+                        @else
+                            <span class="badge bg-secondary">NON-AKTIF</span>
+                        @endif
+                    </td>
+                    <td>
+                        <div class="d-flex gap-1">
+                            <a href="{{ route('admin.personnel.edit', $p->id) }}"
+                               class="btn btn-outline-warning btn-sm" title="Edit">
+                                <i class="bi bi-pencil-fill"></i>
+                            </a>
+                            <form method="POST" action="{{ route('admin.personnel.destroy', $p->id) }}"
+                                  @php $nameAlert = $p->user->name ?? 'ini'; @endphp
+                                  onsubmit="return confirm('Hapus personel {{ $nameAlert }}? Data akan hilang permanen!')">
+                                @csrf @method('DELETE')
+                                <button type="submit" class="btn btn-outline-danger btn-sm" title="Hapus">
+                                    <i class="bi bi-trash3-fill"></i>
+                                </button>
+                            </form>
+                        </div>
                     </td>
                 </tr>
-                @endforeach
+                @empty
+                <tr>
+                    <td colspan="7" class="text-center py-5 text-secondary">
+                        <i class="bi bi-person-x fs-1 d-block mb-3"></i>
+                        Belum ada personel terdaftar.
+                        <div class="mt-3">
+                            <a href="{{ route('admin.personnel.create') }}" class="btn btn-arh-gold btn-sm">
+                                <i class="bi bi-person-plus-fill me-1"></i>Tambah Personel Pertama
+                            </a>
+                        </div>
+                    </td>
+                </tr>
+                @endforelse
             </tbody>
         </table>
     </div>

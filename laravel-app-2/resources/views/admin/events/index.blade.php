@@ -1,56 +1,72 @@
 @extends('layouts.admin')
 
-@section('title', 'Event Management - ART-HUB')
+@section('title', 'Event Management – ART-HUB')
 @section('page_title', 'Event Management')
 @section('page_subtitle', 'Kelola seluruh event pementasan sanggar.')
 
 @section('content')
-<div class="glass-panel animate-fade-up">
-    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
-        <h2 style="margin: 0; display: flex; align-items: center; gap: 0.8rem;">
-            <i class="ph ph-calendar-check" style="color: var(--gold-primary);"></i> Daftar Event
-        </h2>
-        <span class="badge badge-gold">{{ $events->count() }} Total</span>
+<div class="arh-card p-4 animate-fade-up">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h5 class="fw-bold mb-0 d-flex align-items-center gap-2">
+            <i class="bi bi-calendar-check-fill arh-gold"></i> Daftar Event
+        </h5>
+        <span class="badge arh-badge-gold">{{ $events->count() }} Total</span>
     </div>
 
-    <div style="overflow-x: auto;">
-        <table style="width: 100%; border-collapse: collapse;">
+    <div class="table-responsive">
+        <table class="table arh-table table-hover align-middle mb-0">
             <thead>
-                <tr style="border-bottom: 2px solid var(--border-color);">
-                    <th style="padding: 1rem; text-align: left; color: var(--gold-primary); font-size: 0.8rem; text-transform: uppercase; letter-spacing: 1px;">Kode</th>
-                    <th style="padding: 1rem; text-align: left; color: var(--gold-primary); font-size: 0.8rem; text-transform: uppercase; letter-spacing: 1px;">Jenis</th>
-                    <th style="padding: 1rem; text-align: left; color: var(--gold-primary); font-size: 0.8rem; text-transform: uppercase; letter-spacing: 1px;">Tanggal</th>
-                    <th style="padding: 1rem; text-align: left; color: var(--gold-primary); font-size: 0.8rem; text-transform: uppercase; letter-spacing: 1px;">Venue</th>
-                    <th style="padding: 1rem; text-align: left; color: var(--gold-primary); font-size: 0.8rem; text-transform: uppercase; letter-spacing: 1px;">Status</th>
-                    <th style="padding: 1rem; text-align: left; color: var(--gold-primary); font-size: 0.8rem; text-transform: uppercase; letter-spacing: 1px;">Aksi</th>
+                <tr>
+                    <th>Kode</th>
+                    <th>Jenis</th>
+                    <th>Tanggal & Waktu</th>
+                    <th>Venue</th>
+                    <th>Personel</th>
+                    <th>Status</th>
+                    <th>Aksi</th>
                 </tr>
             </thead>
             <tbody>
                 @forelse($events as $event)
-                <tr style="border-bottom: 1px solid var(--border-color); transition: 0.2s;" onmouseover="this.style.background='var(--bg-hover)'" onmouseout="this.style.background='transparent'">
-                    <td style="padding: 1rem;"><span class="badge badge-gold">{{ $event->event_code }}</span></td>
-                    <td style="padding: 1rem; text-transform: capitalize;">{{ $event->booking->event_type ?? '-' }}</td>
-                    <td style="padding: 1rem;">
-                        <div style="font-weight: 600;">{{ $event->event_date->format('d M Y') }}</div>
-                        <small class="text-muted">{{ \Carbon\Carbon::parse($event->event_start)->format('H:i') }} - {{ \Carbon\Carbon::parse($event->event_end)->format('H:i') }}</small>
+                @php
+                    $sc = ['planning'=>'warning','rehearsal'=>'warning','ready'=>'success','ongoing'=>'warning','completed'=>'success','cancelled'=>'danger'];
+                    $bc = $sc[$event->status] ?? 'secondary';
+                @endphp
+                <tr>
+                    <td><span class="badge arh-badge-gold">{{ $event->event_code }}</span></td>
+                    <td class="text-capitalize">{{ $event->booking->event_type ?? '-' }}</td>
+                    <td>
+                        <div class="fw-semibold">{{ $event->event_date->format('d M Y') }}</div>
+                        <small class="text-secondary">
+                            {{ \Carbon\Carbon::parse($event->event_start)->format('H:i') }} –
+                            {{ \Carbon\Carbon::parse($event->event_end)->format('H:i') }}
+                        </small>
                     </td>
-                    <td style="padding: 1rem;">{{ $event->venue }}</td>
-                    <td style="padding: 1rem;">
-                        @php
-                            $statusColors = ['planning' => 'warning', 'rehearsal' => 'warning', 'ready' => 'success', 'ongoing' => 'gold', 'completed' => 'success', 'cancelled' => 'danger'];
-                            $badgeClass = 'badge-' . ($statusColors[$event->status] ?? 'gold');
-                        @endphp
-                        <span class="badge {{ $badgeClass }}">{{ strtoupper($event->status) }}</span>
+                    <td><small>{{ $event->venue }}</small></td>
+                    <td>
+                        <span class="badge bg-secondary">
+                            {{ $event->personnel->count() }}/{{ $event->personnel_count }}
+                        </span>
                     </td>
-                    <td style="padding: 1rem;">
-                        <div style="display: flex; gap: 0.5rem;">
-                            <a href="{{ route('admin.events.show', $event->id) }}" class="btn btn-outline" style="padding: 0.4rem 1rem; font-size: 0.8rem;">Detail</a>
-                            <a href="{{ route('admin.events.plotting', $event->id) }}" class="btn btn-gold" style="padding: 0.4rem 1rem; font-size: 0.8rem;">Plotting</a>
+                    <td><span class="badge bg-{{ $bc }}">{{ strtoupper($event->status) }}</span></td>
+                    <td>
+                        <div class="d-flex gap-1">
+                            <a href="{{ route('admin.events.show', $event->id) }}" class="btn btn-outline-secondary btn-sm">
+                                <i class="bi bi-eye"></i>
+                            </a>
+                            <a href="{{ route('admin.events.plotting', $event->id) }}" class="btn btn-arh-gold btn-sm">
+                                <i class="bi bi-diagram-3"></i>
+                            </a>
                         </div>
                     </td>
                 </tr>
                 @empty
-                <tr><td colspan="6" style="padding: 3rem; text-align: center;" class="text-muted">Belum ada event terdaftar.</td></tr>
+                <tr>
+                    <td colspan="7" class="text-center py-5 text-secondary">
+                        <i class="bi bi-calendar-x fs-1 d-block mb-3"></i>
+                        Belum ada event terdaftar.
+                    </td>
+                </tr>
                 @endforelse
             </tbody>
         </table>
