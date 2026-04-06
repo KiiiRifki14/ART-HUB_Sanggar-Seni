@@ -30,6 +30,18 @@
                 <small class="text-secondary d-block mb-1">Venue</small>
                 <div class="fw-semibold">{{ $event->venue }}</div>
             </div>
+            
+            <div class="mt-3 border-top border-secondary pt-2">
+                <small class="text-secondary d-block mb-1">Koordinat GPS (Geofencing)</small>
+                @if($event->latitude && $event->longitude)
+                    <div class="fw-semibold text-info">{{ $event->latitude }}, {{ $event->longitude }}</div>
+                @else
+                    <div class="text-danger small fw-bold"><i class="bi bi-exclamation-triangle-fill"></i> Belum Di-set! (Wajib untuk Absensi)</div>
+                @endif
+                <button type="button" class="btn btn-sm btn-outline-secondary mt-2" data-bs-toggle="modal" data-bs-target="#modalKoordinat">
+                    <i class="bi bi-geo-alt"></i> Set Koordinat Acara
+                </button>
+            </div>
         </div>
     </div>
 
@@ -157,4 +169,35 @@
         <i class="bi bi-arrow-left me-1"></i> Kembali
     </a>
 </div>
+{{-- Modal Update Koordinat --}}
+<div class="modal fade" id="modalKoordinat" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content bg-dark border-secondary">
+            <div class="modal-header border-secondary">
+                <h5 class="modal-title arh-gold"><i class="bi bi-geo-alt-fill me-2"></i>Set Koordinat Geofencing</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form action="{{ route('admin.events.update_coordinates', $event->id) }}" method="POST">
+                @csrf
+                @method('PATCH')
+                <div class="modal-body">
+                    <p class="text-secondary small mb-3">Masukkan koordinat acara untuk keperluan absensi Geofencing kru (Radius 100m - 200m).</p>
+                    <div class="mb-3">
+                        <label class="form-label">Latitude</label>
+                        <input type="text" name="latitude" class="form-control" value="{{ $event->latitude }}" placeholder="Contoh: -6.561567" required>
+                    </div>
+                    <div>
+                        <label class="form-label">Longitude</label>
+                        <input type="text" name="longitude" class="form-control" value="{{ $event->longitude }}" placeholder="Contoh: 107.766724" required>
+                    </div>
+                </div>
+                <div class="modal-footer border-secondary">
+                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Batal</button>
+                    <button type="submit" class="btn btn-arh-gold">Simpan Koordinat</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
 @endsection

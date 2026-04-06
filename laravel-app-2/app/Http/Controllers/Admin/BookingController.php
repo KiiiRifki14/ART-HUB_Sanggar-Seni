@@ -33,6 +33,28 @@ class BookingController extends Controller
     }
 
     /**
+     * Update harga total saat negosiasi
+     */
+    public function updatePrice(Request $request, Booking $booking)
+    {
+        $request->validate([
+            'total_price' => 'required|numeric|min:0',
+        ]);
+
+        if ($booking->status !== 'pending') {
+            return redirect()->back()->with('error', 'Hanya booking dengan status pending yang bisa diubah harganya.');
+        }
+
+        $booking->update([
+            'total_price' => $request->total_price,
+            // Re-adjust DP minimum based on new total
+            'dp_amount' => $request->total_price * 0.50,
+        ]);
+
+        return redirect()->back()->with('success', 'Harga akhir kontrak (Nego) berhasil diupdate menjadi Rp ' . number_format($request->total_price, 0, ',', '.'));
+    }
+
+    /**
      * MENGONFIRMASI PEMBAYARAN DP DAN MENGUNCI LABA
      * Sesuai standar materi Basis Data 2 (SQL Transaction).
      */

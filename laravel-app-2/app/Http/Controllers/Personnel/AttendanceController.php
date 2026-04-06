@@ -38,6 +38,32 @@ class AttendanceController extends Controller
             return redirect()->back()->with('info', 'Anda sudah melakukan Check-in sebelumnya.');
         }
 
+        // Logic Radius Haversine
+        $lat = $request->input('latitude');
+        $lon = $request->input('longitude');
+
+        if ($event->latitude && $event->longitude && $lat && $lon) {
+            $eLat = $event->latitude;
+            $eLon = $event->longitude;
+            $earthRadius = 6371000; // Radius bumi dalam meter
+            
+            $latDelta = deg2rad($lat - $eLat);
+            $lonDelta = deg2rad($lon - $eLon);
+            
+            $a = sin($latDelta / 2) * sin($latDelta / 2) +
+                 cos(deg2rad($eLat)) * cos(deg2rad($lat)) *
+                 sin($lonDelta / 2) * sin($lonDelta / 2);
+            $c = 2 * atan2(sqrt($a), sqrt(1 - $a));
+            
+            $distance = $earthRadius * $c;
+            
+            if ($distance > 200) {
+                return redirect()->back()->with('error', "Gagal Check-In: Jarak Anda " . round($distance) . "m dari area pementasan (Maks: 200m).");
+            }
+        } elseif ($event->latitude && $event->longitude) {
+            return redirect()->back()->with('error', 'Sistem tidak mendeteksi lokasi (GPS) perangkat Anda.');
+        }
+
         $now = Carbon::now();
         // Target kehadiran adalah 30 menit sebelum acara dimulai (Call Time)
         $callTime = Carbon::parse($event->event_date->format('Y-m-d') . ' ' . $event->event_start->format('H:i:s'))->subMinutes(30);

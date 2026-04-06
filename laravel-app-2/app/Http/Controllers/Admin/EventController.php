@@ -30,6 +30,24 @@ class EventController extends Controller
     }
 
     /**
+     * Update Koordinat Geolocation untuk Event
+     */
+    public function updateCoordinates(Request $request, Event $event)
+    {
+        $request->validate([
+            'latitude'  => 'required|numeric',
+            'longitude' => 'required|numeric',
+        ]);
+
+        $event->update([
+            'latitude'  => $request->latitude,
+            'longitude' => $request->longitude,
+        ]);
+
+        return redirect()->back()->with('success', 'Koordinat GPS untuk event berhasil di-set!');
+    }
+
+    /**
      * TAMPILKAN HALAMAN PLOTTING (Smart Plotting)
      * Akan memanggil Stored Procedure MySQL yang menggunakan CURSOR
      * untuk mengecek tabrakan jadwal dengan event lain, latihan, atau pekerjaan utama.

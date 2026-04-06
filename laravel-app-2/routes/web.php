@@ -47,12 +47,14 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
     Route::get('/bookings/{booking}', [BookingController::class, 'show'])->name('bookings.show');
     Route::post('/bookings/manual', [BookingController::class, 'storeManual'])->name('bookings.manual.store');
     Route::post('/bookings/{booking}/confirm', [BookingController::class, 'confirmPayment'])->name('bookings.confirm');
+    Route::patch('/bookings/{booking}/price', [BookingController::class, 'updatePrice'])->name('bookings.update_price');
 
     // EVENTS
     Route::get('/events', [EventController::class, 'index'])->name('events.index');
     Route::get('/events/{event}', [EventController::class, 'show'])->name('events.show');
     Route::get('/events/{event}/plotting', [EventController::class, 'plotting'])->name('events.plotting');
     Route::post('/events/{event}/plotting', [EventController::class, 'storePlotting'])->name('events.plotting.store');
+    Route::patch('/events/{event}/coordinates', [EventController::class, 'updateCoordinates'])->name('events.update_coordinates');
 
     // PERSONNEL MANAGEMENT (CRUD lengkap)
     Route::get('/personnel', [PersonnelController::class, 'index'])->name('personnel.index');
@@ -100,9 +102,11 @@ Route::middleware(['auth', 'role:personel'])->prefix('personnel')->name('personn
 // 🤝 3. KLIEN ROUTES (Penyewa Event)
 // ══════════════════════════════════════════════════════════════════════════
 Route::middleware(['auth', 'role:klien'])->prefix('klien')->name('klien.')->group(function () {
-    Route::get('/dashboard', function () {
-        return view('klien.dashboard');
-    })->name('dashboard');
+    Route::get('/dashboard', [\App\Http\Controllers\Klien\BookingController::class, 'index'])->name('dashboard');
+    Route::get('/bookings/create', [\App\Http\Controllers\Klien\BookingController::class, 'create'])->name('bookings.create');
+    Route::post('/bookings', [\App\Http\Controllers\Klien\BookingController::class, 'store'])->name('bookings.store');
+    Route::get('/bookings/{id}', [\App\Http\Controllers\Klien\BookingController::class, 'show'])->name('bookings.show');
+    Route::post('/bookings/{id}/proof', [\App\Http\Controllers\Klien\BookingController::class, 'uploadProof'])->name('bookings.upload_proof');
 });
 
 // Memuat Rute Login/Register yang dibuat oleh Breeze

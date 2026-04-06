@@ -86,7 +86,12 @@
             <div class="p-4 rounded-3 mb-4" style="background: rgba(0,0,0,0.25);">
                 <div class="d-flex justify-content-between align-items-center mb-3">
                     <span class="text-secondary">Total Harga (Kontrak)</span>
-                    <span class="fw-bold fs-5">Rp {{ number_format($booking->total_price, 0, ',', '.') }}</span>
+                    <div class="text-end">
+                        <span class="fw-bold fs-5">Rp {{ number_format($booking->total_price, 0, ',', '.') }}</span>
+                        @if($booking->status === 'pending')
+                            <button type="button" class="btn btn-sm btn-outline-warning d-block mt-1 ms-auto" data-bs-toggle="modal" data-bs-target="#modalUpdateHarga"><i class="bi bi-pencil me-1"></i>Update Harga Nego</button>
+                        @endif
+                    </div>
                 </div>
                 <div class="d-flex justify-content-between align-items-center mb-3">
                     <span class="text-secondary">DP Masuk (50%)</span>
@@ -134,4 +139,34 @@
         <i class="bi bi-arrow-left me-2"></i>Kembali ke Booking List
     </a>
 </div>
+
+{{-- Modal Update Harga Nego --}}
+@if($booking->status === 'pending')
+<div class="modal fade" id="modalUpdateHarga" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content bg-dark border-secondary">
+            <div class="modal-header border-secondary">
+                <h5 class="modal-title arh-gold"><i class="bi bi-pencil-square me-2"></i>Update Harga Nego (Kontrak)</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form action="{{ route('admin.bookings.update_price', $booking->id) }}" method="POST">
+                @csrf
+                @method('PATCH')
+                <div class="modal-body">
+                    <p class="text-secondary small mb-3">Tentukan harga akhir (Deal Price) dengan Klien sebelum DP dikonfirmasi. Ini akan menjadi acuan total tagihan klien di Portal mereka.</p>
+                    <div class="mb-3">
+                        <label class="form-label">Total Harga Akhir (Rp)</label>
+                        <input type="number" name="total_price" class="form-control" value="{{ $booking->total_price }}" required>
+                    </div>
+                </div>
+                <div class="modal-footer border-secondary">
+                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Batal</button>
+                    <button type="submit" class="btn btn-arh-gold">Simpan Harga Nego</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+@endif
+
 @endsection
