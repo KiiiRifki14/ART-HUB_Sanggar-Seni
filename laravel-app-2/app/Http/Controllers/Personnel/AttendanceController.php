@@ -66,7 +66,7 @@ class AttendanceController extends Controller
 
         $now = Carbon::now();
         // Target kehadiran adalah 30 menit sebelum acara dimulai (Call Time)
-        $callTime = Carbon::parse($event->event_date->format('Y-m-d') . ' ' . $event->event_start->format('H:i:s'))->subMinutes(30);
+        $callTime = Carbon::parse(Carbon::parse($event->event_date)->format('Y-m-d') . ' ' . Carbon::parse($event->event_start)->format('H:i:s'))->subMinutes(30);
         
         $status = 'on_time';
         $lateMinutes = 0;
