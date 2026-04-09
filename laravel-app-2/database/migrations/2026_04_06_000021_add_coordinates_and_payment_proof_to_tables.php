@@ -8,14 +8,18 @@ return new class extends Migration
 {
     public function up(): void
     {
-        Schema::table('events', function (Blueprint $table) {
-            $table->decimal('latitude', 10, 8)->nullable()->after('venue');
-            $table->decimal('longitude', 11, 8)->nullable()->after('latitude');
-        });
+        if (!Schema::hasColumn('events', 'latitude')) {
+            Schema::table('events', function (Blueprint $table) {
+                $table->decimal('latitude', 10, 8)->nullable()->after('venue');
+                $table->decimal('longitude', 11, 8)->nullable()->after('latitude');
+            });
+        }
 
-        Schema::table('bookings', function (Blueprint $table) {
-            $table->string('payment_proof')->nullable()->after('pelunasan_at');
-        });
+        if (!Schema::hasColumn('bookings', 'payment_proof')) {
+            Schema::table('bookings', function (Blueprint $table) {
+                $table->string('payment_proof')->nullable()->after('dp_paid_at');
+            });
+        }
     }
 
     public function down(): void

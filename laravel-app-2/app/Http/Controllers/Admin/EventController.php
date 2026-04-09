@@ -21,6 +21,43 @@ class EventController extends Controller
     }
 
     /**
+     * EVENT MONITORING: Dashboard operasional lapangan
+     */
+    public function monitoring(Request $request)
+    {
+        $query = Event::with(['booking', 'personnel'])
+            ->orderBy('event_date', 'asc');
+
+        // Filter by status if provided
+        $filter = $request->input('filter', 'all');
+        if ($filter !== 'all') {
+            $query->whereHas('booking', fn($q) => $q->where('status', $filter));
+        }
+
+        $events = $query->get();
+
+        // Summary counts
+        $summary = [
+            'total'     => $events->count(),
+            'negotiation' => Event::whereHas('booking', fn($q) => $q->where('status', 'pending'))->count(),
+            'pending_dp'  => Event::whereHas('booking', fn($q) => $q->where('status', 'confirmed'))->count(),
+            'confirmed'   => Event::whereHas('booking', fn($q) => $q->whereIn('status', ['dp_paid', 'paid_full']))->count(),
+            'completed'   => Event::whereHas('booking', fn($q) => $q->where('status', 'completed'))->count(),
+        ];
+
+        return view('admin.events.monitoring', compact('events', 'summary', 'filter'));
+    }
+
+    /**
+     * EVENT MONITORING DETAIL: Detail operasional lapangan per event
+     */
+    public function monitoringDetail(Event $event)
+    {
+        $event->load(['booking', 'personnel.user', 'financialRecord', 'costumeRentals.vendor']);
+        return view('admin.events.monitoring-detail', compact('event'));
+    }
+
+    /**
      * Detail Event + Monitoring
      */
     public function show(Event $event)

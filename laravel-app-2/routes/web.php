@@ -38,7 +38,77 @@ Route::middleware('auth')->group(function () {
 // ══════════════════════════════════════════════════════════════════════════
 Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->group(function () {
     Route::get('/dashboard', function () {
-        return view('admin.dashboard');
+        // ── STAT CARDS (data nyata)
+        $lockedProfit  = \App\Models\FinancialRecord::where('profit_locked', true)->sum('fixed_profit');
+        $safetyBuffer  = \App\Models\FinancialRecord::sum('safety_buffer_amt');
+        $totalPenalty  = \Illuminate\Support\Facades\DB::table('event_personnel')
+                            ->where('attendance_status', 'late')
+                            ->where('late_minutes', '>', 0)
+                            ->selectRaw('SUM(late_minutes / 10 * 15000) as total')
+                            ->value('total') ?? 0;
+        $lateCount     = \Illuminate\Support\Facades\DB::table('event_personnel')
+                            ->where('attendance_status', 'late')->count();
+        $eventCount    = \App\Models\Event::whereMonth('event_date', now()->month)->count();
+        $needPlotting  = \App\Models\Event::where('status', 'planning')->count();
+
+        // ── UPCOMING EVENTS (max 3)
+        $upcomingEvents = \App\Models\Event::with('booking')
+            ->where('event_date', '>=', now()->toDateString())
+            ->orderBy('event_date')
+            ->limit(3)
+            ->get();
+
+        // ── CHART 1: Revenue per bulan (6 bulan terakhir)
+        $revenueChart = collect(range(5, 0))->map(function ($monthsAgo) {
+            $month = now()->subMonths($monthsAgo);
+            $revenue = \App\Models\FinancialRecord::whereHas('event', function ($q) use ($month) {
+                $q->whereMonth('event_date', $month->month)
+                  ->whereYear('event_date', $month->year);
+            })->sum('total_revenue');
+            $profit = \App\Models\FinancialRecord::whereHas('event', function ($q) use ($month) {
+                $q->whereMonth('event_date', $month->month)
+                  ->whereYear('event_date', $month->year);
+            })->sum('fixed_profit');
+            return [
+                'label'   => $month->translatedFormat('M Y'),
+                'revenue' => (int) $revenue,
+                'profit'  => (int) $profit,
+            ];
+        });
+
+        // ── CHART 2: Distribusi status booking
+        $statusChart = \App\Models\Booking::selectRaw('status, COUNT(*) as total')
+            ->groupBy('status')
+            ->pluck('total', 'status');
+
+        // ── FORMAT CHART JSON payload
+        $statusInfo = [
+            'pending'   => ['Negotiation', '#fbbf24'],
+            'dp_paid'   => ['Locked',      '#f97316'],
+            'confirmed' => ['DP 50%',      '#60a5fa'],
+            'paid_full' => ['Lunas',       '#4ade80'],
+            'completed' => ['Completed',   '#86efac'],
+            'cancelled' => ['Cancelled',   '#555'],
+        ];
+        $stLabels = []; $stData = []; $stColors = [];
+        foreach($statusChart as $st => $cnt) {
+            $info = $statusInfo[$st] ?? [$st, '#888'];
+            $stLabels[] = $info[0];
+            $stData[]   = (int) $cnt;
+            $stColors[] = $info[1];
+        }
+        $chartPayload = json_encode([
+            'revenue' => $revenueChart->values()->all(),
+            'stLabels' => $stLabels,
+            'stData'   => $stData,
+            'stColors' => $stColors,
+        ]);
+
+        return view('admin.dashboard', compact(
+            'lockedProfit', 'safetyBuffer', 'totalPenalty', 'lateCount',
+            'eventCount', 'needPlotting', 'upcomingEvents',
+            'revenueChart', 'statusChart', 'statusInfo', 'chartPayload'
+        ));
     })->name('dashboard');
 
     // BOOKINGS
@@ -85,6 +155,19 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
     // REHEARSALS
     Route::get('/rehearsals', [RehearsalController::class, 'index'])->name('rehearsals.index');
     Route::post('/events/{event}/rehearsals', [RehearsalController::class, 'store'])->name('rehearsals.store');
+
+    // EVENT MONITORING (halaman baru)
+    Route::get('/monitoring', [EventController::class, 'monitoring'])->name('events.monitoring');
+    Route::get('/monitoring/{event}', [EventController::class, 'monitoringDetail'])->name('events.monitoring.show');
+
+    // DP VERIFICATION (halaman mandiri)
+    Route::get('/dp-verification', [BookingController::class, 'dpVerification'])->name('bookings.dp_verification');
+
+    // FULL PAYMENT CONFIRM
+    Route::patch('/bookings/{booking}/full-payment', [BookingController::class, 'confirmFullPayment'])->name('bookings.full_payment');
+
+    // POST-EVENT LIST (menu mandiri)
+    Route::get('/post-event', [FinancialController::class, 'postEventList'])->name('financials.post_event_list');
 });
 
 // ══════════════════════════════════════════════════════════════════════════

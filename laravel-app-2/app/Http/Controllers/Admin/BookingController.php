@@ -33,6 +33,50 @@ class BookingController extends Controller
     }
 
     /**
+     * DP VERIFICATION: Inbox mandiri untuk validasi bukti DP
+     */
+    public function dpVerification()
+    {
+        // Booking pending dengan bukti bayar sudah di-upload (menunggu konfirmasi Admin)
+        $pendingWithProof = Booking::with('client')
+            ->where('status', 'pending')
+            ->whereNotNull('payment_proof')
+            ->latest()
+            ->get();
+
+        // Booking pending yang belum ada bukti bayar (menunggu Klien)
+        $pendingNoProof = Booking::with('client')
+            ->where('status', 'pending')
+            ->whereNull('payment_proof')
+            ->latest()
+            ->get();
+
+        return view('admin.bookings.dp-verification', compact('pendingWithProof', 'pendingNoProof'));
+    }
+
+    /**
+     * Konfirmasi Pelunasan Penuh (100%)
+     */
+    public function confirmFullPayment(Request $request, Booking $booking)
+    {
+        if (!in_array($booking->status, ['dp_paid', 'confirmed'])) {
+            return redirect()->back()->with('error', 'Status booking tidak valid untuk pelunasan.');
+        }
+
+        $booking->update([
+            'status'       => 'paid_full',
+            'full_paid_at' => now(),
+        ]);
+
+        // Update status event terkait jika ada
+        if ($booking->event) {
+            $booking->event->update(['status' => 'ready']);
+        }
+
+        return redirect()->back()->with('success', 'Pelunasan 100% berhasil dikonfirmasi! Status booking: PAID (Lunas).');
+    }
+
+    /**
      * Update harga total saat negosiasi
      */
     public function updatePrice(Request $request, Booking $booking)
