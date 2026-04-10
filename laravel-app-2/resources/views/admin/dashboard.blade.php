@@ -102,10 +102,11 @@
     </div>
 </div>
 
-{{-- ── ROW 2: CHARTS ── --}}
+{{--
+── ROW 2: CHARTS (Dihide sementara untuk presentasi awal) ──
 <div class="row g-4 mb-4">
 
-    {{-- Chart 1: Revenue Line Chart (6 bulan) --}}
+    [Chart 1: Revenue Line Chart (6 bulan)]
     <div class="col-12 col-lg-8">
         <div class="chart-card">
             <div class="d-flex justify-content-between align-items-center mb-3">
@@ -122,7 +123,7 @@
         </div>
     </div>
 
-    {{-- Chart 2: Status Donut --}}
+    [Chart 2: Status Donut]
     <div class="col-12 col-lg-4">
         <div class="chart-card d-flex flex-column">
             <div class="mb-3">
@@ -132,32 +133,14 @@
             <div class="flex-grow-1 d-flex align-items-center justify-content-center">
                 <canvas id="chartStatus" style="max-height:200px;"></canvas>
             </div>
-            {{-- Legend --}}
+            [Legend]
             <div class="mt-3 d-flex flex-wrap gap-2 justify-content-center" style="font-size:0.72rem;">
-                @php
-                    $statusLabels = [
-                        'pending'   => ['Negotiation', '#fbbf24'],
-                        'dp_paid'   => ['Locked',      '#f97316'],
-                        'confirmed' => ['DP 50%',      '#60a5fa'],
-                        'paid_full' => ['Lunas',       '#4ade80'],
-                        'completed' => ['Completed',   '#86efac'],
-                        'cancelled' => ['Cancelled',   '#888'],
-                    ];
-                @endphp
-                @foreach($statusChart as $st => $cnt)
-                @php
-                    $info    = $statusLabels[$st] ?? [$st, '#666'];
-                    $dotStyle = "display:inline-block;width:8px;height:8px;border-radius:50%;background:{$info[1]};margin-right:4px;";
-                @endphp
-                <span>
-                    <span @style([$dotStyle])></span>
-                    {{ $info[0] }} ({{ $cnt }})
-                </span>
-                @endforeach
+                <!-- Legend Content Disembunyikan -->
             </div>
         </div>
     </div>
 </div>
+--}}
 
 {{-- ── ROW 3: UPCOMING EVENTS + ALERTS ── --}}
 <div class="row g-4">
@@ -303,6 +286,7 @@
 
 @section('scripts')
 {{-- @php logic is in Route now to prevent IDE linting errors --}}
+{{-- ChartJS Scripts (Dihide sementara untuk presentasi awal) 
 <script type="application/json" id="arhChartData">{{ $chartPayload }}</script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 <script>
@@ -374,4 +358,5 @@
         }
     });
 </script>
+--}}
 @endsection

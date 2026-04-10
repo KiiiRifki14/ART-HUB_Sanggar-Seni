@@ -293,12 +293,13 @@
             'UTAMA' => [
                 ['Dashboard',         'bi-grid-1x2-fill',         'admin.dashboard',                  $r->routeIs('admin.dashboard')],
                 ['Event Management',  'bi-calendar-check-fill',   'admin.events.index',               $r->routeIs('admin.events.*') && !$r->routeIs('admin.events.monitoring*')],
-                ['Event Monitoring',  'bi-binoculars-fill',       'admin.events.monitoring',          $r->routeIs('admin.events.monitoring*')],
+                // ['Event Monitoring',  'bi-binoculars-fill',       'admin.events.monitoring',          $r->routeIs('admin.events.monitoring*')],
             ],
             'SDM & PRODUKSI' => [
                 ['Personnel',         'bi-people-fill',           'admin.personnel.index',            $r->routeIs('admin.personnel.*')],
-                ['Costume & Logistik','bi-bag-fill',              'admin.costumes.index',             $r->routeIs('admin.costumes.*')],
+                // ['Costume & Logistik','bi-bag-fill',              'admin.costumes.index',             $r->routeIs('admin.costumes.*')],
             ],
+            /*
             'KEUANGAN' => [
                 ['New Booking',       'bi-plus-circle-fill',      'admin.bookings.create',            $r->routeIs('admin.bookings.create')],
                 ['DP Verification',   'bi-patch-check-fill',      'admin.bookings.dp_verification',   $r->routeIs('admin.bookings.dp_verification')],
@@ -309,6 +310,7 @@
             'MANAJEMEN' => [
                 ['Cancellation',      'bi-shield-exclamation',    'admin.cancellations.index',        $r->routeIs('admin.cancellations.*')],
             ],
+            */
         ];
     @endphp
 
