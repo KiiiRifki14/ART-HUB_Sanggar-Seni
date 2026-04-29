@@ -1,4 +1,4 @@
-@extends('layouts.admin')
+﻿@extends('layouts.admin')
 
 @section('title', 'Financial Report – ART-HUB')
 @section('page_title', 'Financial Report')
@@ -31,8 +31,8 @@
     </div>
     <div class="col-6 col-xl-3">
         <div class="arh-card p-4 text-center h-100">
-            <i class="bi bi-graph-up-arrow text-white fs-1 mb-2 d-inline-block"></i>
-            <h3 class="fw-bold fs-4 text-white mb-1">Rp {{ number_format($totalRevenue, 0, ',', '.') }}</h3>
+            <i class="bi bi-graph-up-arrow  fs-1 mb-2 d-inline-block"></i>
+            <h3 class="fw-bold fs-4  mb-1">Rp {{ number_format($totalRevenue, 0, ',', '.') }}</h3>
             <small class="text-secondary fw-semibold">Total Nilai Kontrak</small>
         </div>
     </div>
@@ -118,3 +118,4 @@
 @endcan
 
 @endsection
+

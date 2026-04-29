@@ -1,4 +1,4 @@
-@extends('layouts.admin')
+﻿@extends('layouts.admin')
 
 @section('title', 'Jadwal Latihan – ART-HUB')
 @section('page_title', 'Jadwal Latihan (Rehearsals)')
@@ -23,7 +23,7 @@
     <div class="col-12 col-md-4">
         <div class="arh-card p-4 text-center h-100">
             <i class="bi bi-clock-history text-secondary fs-1 d-inline-block mb-2"></i>
-            <h3 class="fw-bold mb-0 text-white fs-3">{{ $past }} Sesi</h3>
+            <h3 class="fw-bold mb-0  fs-3">{{ $past }} Sesi</h3>
             <small class="fw-semibold text-secondary">Selesai / Berlalu</small>
         </div>
     </div>
@@ -100,3 +100,4 @@
 </div>
 
 @endsection
+

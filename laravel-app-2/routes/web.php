@@ -30,7 +30,7 @@ Route::get('/dashboard', function () {
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
-    Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+    Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destro');
 });
 
 // ══════════════════════════════════════════════════════════════════════════
@@ -58,8 +58,8 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
             ->limit(3)
             ->get();
 
-        // ── CHART 1: Revenue per bulan (6 bulan terakhir)
-        $revenueChart = collect(range(5, 0))->map(function ($monthsAgo) {
+        // ── CHART 1: Revenue per bulan (Dari 2 bulan lalu hingga 3 bulan ke depan, agar testing masuk)
+        $revenueChart = collect(range(2, -3))->map(function ($monthsAgo) {
             $month = now()->subMonths($monthsAgo);
             $revenue = \App\Models\FinancialRecord::whereHas('event', function ($q) use ($month) {
                 $q->whereMonth('event_date', $month->month)
@@ -162,9 +162,14 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
 
     // DP VERIFICATION (halaman mandiri)
     Route::get('/dp-verification', [BookingController::class, 'dpVerification'])->name('bookings.dp_verification');
+    Route::post('/bookings/{booking}/reject-proof', [BookingController::class, 'rejectProof'])->name('bookings.reject_proof');
+
+    // UPDATE PRICE (NEGO VIA WA)
+    Route::patch('/bookings/{booking}/update-price', [BookingController::class, 'updatePrice'])->name('bookings.update_price');
 
     // FULL PAYMENT CONFIRM
     Route::patch('/bookings/{booking}/full-payment', [BookingController::class, 'confirmFullPayment'])->name('bookings.full_payment');
+
 
     // POST-EVENT LIST (menu mandiri)
     Route::get('/post-event', [FinancialController::class, 'postEventList'])->name('financials.post_event_list');
@@ -174,11 +179,20 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
 // 🎭 2. PERSONNEL ROUTES (Kru & Penari)
 // ══════════════════════════════════════════════════════════════════════════
 Route::middleware(['auth', 'role:personel'])->prefix('personnel')->name('personnel.')->group(function () {
-    Route::get('/dashboard', function () {
-        return view('personnel.dashboard');
-    })->name('dashboard');
+    
+    // Rute Bebas Akses (Hanya Untuk Menunggu)
+    Route::get('/pending', function () {
+        return view('personnel.pending');
+    })->name('pending');
 
-    Route::post('/events/{event}/check-in', [AttendanceController::class, 'checkIn'])->name('attendance.check_in');
+    // Rute khusus Personel Aktif
+    Route::middleware([\App\Http\Middleware\EnsurePersonnelIsActive::class])->group(function () {
+        Route::get('/dashboard', function () {
+            return view('personnel.dashboard');
+        })->name('dashboard');
+
+        Route::post('/events/{event}/check-in', [AttendanceController::class, 'checkIn'])->name('attendance.check_in');
+    });
 });
 
 // ══════════════════════════════════════════════════════════════════════════

@@ -91,9 +91,9 @@
                     </td>
                     <td>
                         <small>
-                            @if($p->phone)
-                            <a href="tel:{{ $p->phone }}" class="text-secondary text-decoration-none">
-                                <i class="bi bi-telephone-fill me-1"></i>{{ $p->phone }}
+                            @if($p->user && $p->user->phone)
+                            <a href="tel:{{ $p->user->phone }}" class="text-secondary text-decoration-none">
+                                <i class="bi bi-telephone-fill me-1"></i>{{ $p->user->phone }}
                             </a>
                             @else
                             <span class="text-secondary">-</span>
@@ -104,7 +104,7 @@
                         @if($p->has_day_job)
                         <div class="d-flex align-items-center gap-1">
                             <i class="bi bi-briefcase-fill text-warning small"></i>
-                            <small>{{ $p->day_job_name ?? 'Ada' }}</small>
+                            <small>{{ $p->day_job_desc ?? 'Ada' }}</small>
                         </div>
                         <small class="text-secondary">
                             {{ \Carbon\Carbon::parse($p->day_job_start)->format('H:i') ?? '' }} –
@@ -116,22 +116,23 @@
                     </td>
                     <td>
                         @if($p->is_active)
-                            <span class="badge bg-success">AKTIF</span>
+                            <span class="badge bg-success"><i class="bi bi-check-circle-fill me-1"></i> AKTIF</span>
                         @else
-                            <span class="badge bg-secondary">NON-AKTIF</span>
+                            <span class="badge bg-warning text-dark border border-warning" title="Klik tombol Edit (Pensil) untuk mengaktifkan akun ini">
+                                <i class="bi bi-hourglass-split"></i> MENUNGGU APPROVAL
+                            </span>
                         @endif
                     </td>
                     <td>
-                        <div class="d-flex gap-1">
+                        <div class="btn-action-group">
                             <a href="{{ route('admin.personnel.edit', $p->id) }}"
-                               class="btn btn-outline-warning btn-sm" title="Edit">
+                               class="btn-action btn-action-edit" title="Edit">
                                 <i class="bi bi-pencil-fill"></i>
                             </a>
-                            <form method="POST" action="{{ route('admin.personnel.destroy', $p->id) }}"
-                                  @php $nameAlert = $p->user->name ?? 'ini'; @endphp
+                            <form method="POST" action="{{ route('admin.personnel.destroy', $p->id) }}" class="m-0 p-0" @php $nameAlert = $p->user->name ?? 'ini'; @endphp
                                   onsubmit="return confirm('Hapus personel {{ $nameAlert }}? Data akan hilang permanen!')">
                                 @csrf @method('DELETE')
-                                <button type="submit" class="btn btn-outline-danger btn-sm" title="Hapus">
+                                <button type="submit" class="btn-action btn-action-delete" title="Hapus">
                                     <i class="bi bi-trash3-fill"></i>
                                 </button>
                             </form>
@@ -156,3 +157,4 @@
     </div>
 </div>
 @endsection
+

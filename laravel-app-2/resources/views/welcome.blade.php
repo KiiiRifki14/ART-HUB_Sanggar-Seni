@@ -10,14 +10,14 @@
     <style>
         /* === PENGATURAN DASAR & TEMA WARNA === */
         :root {
-            --primary: #D4AF37;       /* Emas ART-HUB */
-            --primary-hover: #b8962c;
-            --dark: #050505;          /* Base Paling Gelap */
-            --light: #0a0b0d;         /* Background Gelap Utama */
-            --gray: #272a30;          /* Batas dan Komponen Halus */
-            --text-main: #f3f4f6;     /* Teks Utama Terang */
-            --text-light: #9ca3af;    /* Teks Pudar / Muted */
-            --card-bg: #15171a;       /* Latar Belakang Kotak (Card) */
+            --primary: #8B1A2A;       /* Maroon Utama ART-HUB */
+            --primary-hover: #6B1020;
+            --dark: #FFFFFF;          /* Base Paling Terang (dahulu Gelap) */
+            --light: #F7F2F2;         /* Background Putih Hangat Utama */
+            --gray: #E0D0D2;          /* Batas dan Komponen Halus */
+            --text-main: #1A0808;     /* Teks Utama Gelap */
+            --text-light: #7A5A5E;    /* Teks Pudar / Muted */
+            --card-bg: #FFFFFF;       /* Latar Belakang Kotak (Card) Putih */
         }
 
         * {
@@ -45,7 +45,8 @@
             justify-content: space-between;
             align-items: center;
             padding: 20px 0;
-            background-color: rgba(21, 23, 26, 0.95);
+            background-color: rgba(255, 250, 250, 0.97);
+            box-shadow: 0 2px 12px rgba(139, 26, 42, 0.08);
             backdrop-filter: blur(10px);
             border-bottom: 1px solid var(--gray);
             position: sticky;
@@ -166,12 +167,12 @@
 
         /* === BAGIAN UMUM (SECTION) === */
         section {
-            padding: 60px 0;
+            padding: 80px 0;
         }
 
         .section-header {
             text-align: center;
-            margin-bottom: 40px;
+            margin-bottom: 56px;
         }
 
         .section-title {
@@ -180,7 +181,8 @@
             font-weight: 700;
             position: relative;
             display: inline-block;
-            margin-bottom: 10px;
+            margin-bottom: 16px;
+            padding-bottom: 6px;
         }
 
         /* Garis bawah estetis di judul section */
@@ -196,10 +198,14 @@
         }
 
         /* === STATISTIK SECTION === */
+        .stats-section {
+            padding: 40px 0;
+        }
+
         .stats-grid {
             display: grid;
             grid-template-columns: repeat(4, 1fr);
-            gap: 20px;
+            gap: 24px;
         }
 
         .stat-card {
@@ -207,7 +213,7 @@
             border: 1px solid var(--gray);
             border-radius: 12px;
             text-align: center;
-            padding: 30px 20px;
+            padding: 40px 24px;
             transition: transform 0.3s ease;
         }
 
@@ -217,46 +223,58 @@
         }
 
         .stat-card h3 {
-            font-size: 36px;
+            font-size: 40px;
             color: var(--primary);
-            margin-bottom: 5px;
+            margin-bottom: 10px;
+        }
+
+        .stat-card p {
+            font-size: 14px;
+            color: var(--text-light);
+            letter-spacing: 0.5px;
         }
 
         /* === LAYANAN KAMI === */
         .services-grid {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
-            gap: 30px;
+            gap: 32px;
         }
 
         .service-card {
             background: var(--card-bg);
             border: 1px solid var(--gray);
-            border-radius: 12px;
-            padding: 30px;
+            border-radius: 16px;
+            padding: 40px 36px;
             border-top: 4px solid var(--primary);
-            transition: border-color 0.3s ease, box-shadow 0.3s ease;
+            transition: border-color 0.3s ease, box-shadow 0.3s ease, transform 0.3s ease;
         }
 
         .service-card:hover {
             border-color: var(--primary);
-            box-shadow: 0 0 15px rgba(212, 175, 55, 0.1);
+            box-shadow: 0 8px 24px rgba(212, 175, 55, 0.1);
+            transform: translateY(-4px);
         }
 
         .service-card h4 {
             font-size: 20px;
             color: var(--text-main);
-            margin-bottom: 15px;
+            margin-bottom: 16px;
+        }
+
+        .service-card p {
+            line-height: 1.8;
+            color: var(--text-light);
         }
 
         /* === WARISAN PENDIRI === */
         .founder-content {
             display: flex;
-            gap: 40px;
+            gap: 56px;
             background: var(--card-bg);
             border: 1px solid var(--gray);
-            padding: 40px;
-            border-radius: 16px;
+            padding: 56px;
+            border-radius: 20px;
             align-items: center;
         }
 
@@ -281,16 +299,17 @@
             font-size: 28px;
             color: var(--text-main);
             font-weight: 700;
+            margin-bottom: 8px;
         }
 
         .year-badge {
             background: var(--primary);
             color: var(--dark);
             display: inline-block;
-            padding: 4px 12px;
+            padding: 5px 16px;
             border-radius: 20px;
-            margin: 10px 0 20px 0;
-            font-size: 14px;
+            margin: 12px 0 24px 0;
+            font-size: 13px;
             font-weight: 600;
         }
 
@@ -298,25 +317,27 @@
             font-size: 16px;
             font-style: italic;
             border-left: 4px solid var(--primary);
-            padding-left: 15px;
+            padding-left: 20px;
             color: var(--text-light);
-            margin-bottom: 25px;
+            margin-bottom: 32px;
+            line-height: 1.9;
         }
 
         .founder-achievements {
-            background: var(--dark);
+            background: #F7F2F2;
             border: 1px solid var(--gray);
             padding: 20px;
             border-radius: 8px;
             font-size: 14px;
+            color: var(--text-main);
         }
 
         /* === PORTOFOLIO PENARI === */
         .portfolio-grid {
             display: grid;
             grid-template-columns: repeat(4, 1fr);
-            gap: 20px;
-            margin-bottom: 40px;
+            gap: 24px;
+            margin-bottom: 48px;
         }
 
         .portfolio-item {
@@ -337,62 +358,77 @@
         }
 
         .portfolio-item span {
-            background: rgba(0, 0, 0, 0.8);
-            border: 1px solid var(--primary);
+            background: rgba(255, 255, 255, 0.92);
+            border: 1.5px solid var(--primary);
             color: var(--primary);
             padding: 5px 15px;
             border-radius: 20px;
-            font-size: 14px;
-            font-weight: 600;
+            font-size: 13px;
+            font-weight: 700;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
         }
 
         /* === TESTIMONI KLIEN === */
         .testi-grid {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
-            gap: 30px;
+            gap: 32px;
+        }
+
+        .testi-section {
+            padding-bottom: 100px;
         }
 
         .testi-card {
             background: var(--card-bg);
             border: 1px solid var(--gray);
-            padding: 30px;
-            border-radius: 12px;
+            padding: 40px;
+            border-radius: 16px;
             position: relative;
+            line-height: 1.9;
+        }
+
+        .testi-card p {
+            color: var(--text-light);
+            margin-bottom: 16px;
         }
 
         .stars-testi {
             color: var(--primary);
-            font-size: 24px;
-            margin-bottom: 15px;
+            font-size: 22px;
+            margin-bottom: 20px;
+            letter-spacing: 3px;
         }
 
         /* === FOOTER === */
         footer {
-            background-color: var(--dark);
-            border-top: 1px solid var(--gray);
-            color: var(--text-main);
-            padding: 60px 20px 20px;
+            background-color: #8B1A2A;
+            border-top: none;
+            color: #FFFFFF;
+            padding: 48px 20px 24px;
             text-align: center;
         }
 
         .footer-title {
-            font-size: 28px;
+            font-size: 30px;
             font-weight: 700;
-            margin-bottom: 10px;
-            color: var(--primary);
+            margin-bottom: 14px;
+            color: #FFFFFF;
         }
 
         .footer-subtitle {
-            color: var(--text-light);
-            margin-bottom: 40px;
+            color: rgba(255,255,255,0.75);
+            margin-bottom: 48px;
+            font-size: 15px;
+            line-height: 1.7;
         }
 
         .footer-buttons {
             display: flex;
             justify-content: center;
-            gap: 15px;
-            margin-bottom: 50px;
+            gap: 16px;
+            margin-bottom: 56px;
+            flex-wrap: wrap;
         }
 
         .footer-blocks {
@@ -404,17 +440,22 @@
         }
 
         .footer-block {
-            background: rgba(255, 255, 255, 0.03);
-            border: 1px solid var(--gray);
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255,255,255,0.2);
             padding: 20px 40px;
             border-radius: 8px;
             min-width: 250px;
+            color: #fff;
+        }
+
+        .footer-block h4 {
+            color: #fff;
         }
 
         .copyright {
-            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            border-top: 1px solid rgba(255, 255, 255, 0.2);
             padding-top: 20px;
-            color: var(--text-light);
+            color: rgba(255,255,255,0.6);
             font-size: 14px;
         }
 
@@ -552,13 +593,31 @@
                 <div class="portfolio-item"><span>Penari 6</span></div>
                 <div class="portfolio-item"><span>Penari 7</span></div>
                 <div class="portfolio-item"><span>Penari 8</span></div>
+                <!-- Sisa personel tersembunyi -->
+                <div class="portfolio-item hidden-penari" style="display: none;"><span>Penari 9</span></div>
+                <div class="portfolio-item hidden-penari" style="display: none;"><span>Penari 10</span></div>
+                <div class="portfolio-item hidden-penari" style="display: none;"><span>Penari 11</span></div>
+                <div class="portfolio-item hidden-penari" style="display: none;"><span>Penari 12</span></div>
             </div>
-            <div style="text-align: center;">
-                <a href="#" class="btn btn-outline">Lihat Detail Semua Penari</a>
+            <div style="text-align: center; margin-top: 20px;">
+                <button type="button" class="btn btn-outline" id="btn-show-more-penari">Lihat Detail Semua Penari</button>
             </div>
+
+            <script>
+                document.getElementById('btn-show-more-penari').addEventListener('click', function() {
+                    const hiddenItems = document.querySelectorAll('.hidden-penari');
+                    hiddenItems.forEach(item => {
+                        item.style.display = 'flex'; // menyesuaikan dengan layout CSS biasanya
+                    });
+                    this.textContent = 'Semua Penari Ditampilkan';
+                    this.style.opacity = '0.5';
+                    this.style.cursor = 'default';
+                    this.disabled = true;
+                });
+            </script>
         </section>
 
-        <section class="container">
+        <section class="container testi-section">
             <div class="section-header">
                 <h2 class="section-title">Apa Kata Mereka</h2>
             </div>
@@ -584,18 +643,18 @@
 
             <div class="footer-buttons">
                 <button class="btn btn-primary">Hubungi Kami</button>
-                <button class="btn btn-outline" style="border-color: #fff; color: #fff;">WhatsApp</button>
-                <button class="btn btn-outline" style="border-color: #fff; color: #fff;">Email</button>
+                <button class="btn btn-outline" style="border-color: rgba(255,255,255,0.8); color: #fff;">WhatsApp</button>
+                <button class="btn btn-outline" style="border-color: rgba(255,255,255,0.8); color: #fff;">Email</button>
             </div>
 
             <div class="footer-blocks">
                 <div class="footer-block">
                     <h4>Lokasi Kami</h4>
-                    <p style="font-size: 14px; margin-top: 10px; color: #9ca3af;">Jl. Seni Budaya No. 123<br>Jawa Barat, Indonesia</p>
+                    <p style="font-size: 14px; margin-top: 10px; color: rgba(255,255,255,0.7);">Jl. Seni Budaya No. 123<br>Jawa Barat, Indonesia</p>
                 </div>
                 <div class="footer-block">
                     <h4>Jam Operasional</h4>
-                    <p style="font-size: 14px; margin-top: 10px; color: #9ca3af;">Senin - Jumat: 08.00 - 17.00<br>Sabtu: 09.00 - 15.00</p>
+                    <p style="font-size: 14px; margin-top: 10px; color: rgba(255,255,255,0.7);">Senin - Jumat: 08.00 - 17.00<br>Sabtu: 09.00 - 15.00</p>
                 </div>
             </div>
 

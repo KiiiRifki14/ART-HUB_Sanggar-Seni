@@ -21,29 +21,37 @@ class EventController extends Controller
     }
 
     /**
-     * EVENT MONITORING: Dashboard operasional lapangan
+     * EVENT MONITORING: Dashboard operasional lapangan (Tarik Berdasarkan Booking)
      */
     public function monitoring(Request $request)
     {
-        $query = Event::with(['booking', 'personnel'])
+        // Gunakan Booking sebagai base query agar status 'pending'/'negotiation' ikut terbaca
+        // Karena Event record baru di-generate setelah DP divalidasi.
+        $query = \App\Models\Booking::with(['event.personnel', 'client'])
             ->orderBy('event_date', 'asc');
 
         // Filter by status if provided
         $filter = $request->input('filter', 'all');
         if ($filter !== 'all') {
-            $query->whereHas('booking', fn($q) => $q->where('status', $filter));
+            $query->where('status', $filter);
         }
 
-        $events = $query->get();
+        $bookings = $query->get();
 
-        // Summary counts
+        // Summary counts (Sekarang logis karena menggunakan base Booking)
         $summary = [
-            'total'     => $events->count(),
-            'negotiation' => Event::whereHas('booking', fn($q) => $q->where('status', 'pending'))->count(),
-            'pending_dp'  => Event::whereHas('booking', fn($q) => $q->where('status', 'confirmed'))->count(),
-            'confirmed'   => Event::whereHas('booking', fn($q) => $q->whereIn('status', ['dp_paid', 'paid_full']))->count(),
-            'completed'   => Event::whereHas('booking', fn($q) => $q->where('status', 'completed'))->count(),
+            'total'       => \App\Models\Booking::count(),
+            'negotiation' => \App\Models\Booking::where('status', 'pending')->count(),
+            // Pending DP di flow ini adalah booking yang buktinya sudah di-upload atau sedang direview (opsional, kita asumsikan 'pending' juga bagian 'locked' jika di sisi lain)
+            // Sistem lama map "confirmed" to pending_dp. Tapi di flow art-hub status yang ada 'pending', 'dp_paid', 'paid_full', 'completed'
+            // Kita petakan secara praktis:
+            'pending_dp'  => \App\Models\Booking::where('status', 'pending')->whereNotNull('payment_proof')->count(),
+            'confirmed'   => \App\Models\Booking::whereIn('status', ['dp_paid', 'paid_full'])->count(),
+            'completed'   => \App\Models\Booking::where('status', 'completed')->count(),
         ];
+
+        // Pass 'bookings' as 'events' to the view to maintain view structure compatibility
+        $events = $bookings;
 
         return view('admin.events.monitoring', compact('events', 'summary', 'filter'));
     }
@@ -53,7 +61,7 @@ class EventController extends Controller
      */
     public function monitoringDetail(Event $event)
     {
-        $event->load(['booking', 'personnel.user', 'financialRecord', 'costumeRentals.vendor']);
+        $event->load(['booking', 'personnel.user', 'financialRecord']);
         return view('admin.events.monitoring-detail', compact('event'));
     }
 
@@ -158,6 +166,8 @@ class EventController extends Controller
                 }
 
                 foreach ($request->personnel as $p) {
+                    if (empty($p['selected'])) continue; // Hanya yang dicentang!
+
                     if (in_array((string)$p['id'], $collidingIds)) {
                         throw new \Exception("Personel dengan ID {$p['id']} memiliki jadwal bentrok (Pekerjaan/Event) pada waktu tersebut. Plotting digagalkan oleh sistem SQL.");
                     }
@@ -168,6 +178,8 @@ class EventController extends Controller
 
                 // 3. Insert Plotting Baru dari Loop Input
                 foreach ($request->personnel as $p) {
+                    if (empty($p['selected'])) continue; // Hanya yang dicentang!
+
                     $feeRef = FeeReference::findOrFail($p['fee_reference_id']);
                     
                     // Fee bawaan dari FeeReference, atau ambil dari input jika ada override manual

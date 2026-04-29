@@ -1,4 +1,4 @@
-@extends('layouts.admin')
+﻿@extends('layouts.admin')
 @section('title', 'Event Monitoring – ART-HUB')
 @section('page_title', 'Event Monitoring')
 @section('page_subtitle', 'Pantau status & operasional lapangan seluruh pementasan')
@@ -32,7 +32,7 @@
     .arh-badge-status { display:inline-flex; align-items:center; gap:5px; padding: 5px 12px; border-radius:20px; font-size:0.78rem; font-weight:600; }
 
     .mon-card { background:#1a1a1a; border:1px solid #2a2a2a; border-radius:12px; transition: border-color 0.2s; }
-    .mon-card:hover { border-color: rgba(197,160,89,0.4); }
+    .mon-card:hover { border-color: rgba(139,26,42,0.4); }
 
     .filter-tabs { display:flex; gap:8px; flex-wrap:wrap; margin-bottom:24px; }
     .filter-tab {
@@ -40,8 +40,8 @@
         background: #1a1a1a; color: #aaa; text-decoration:none; font-size:0.82rem;
         font-weight:500; display:flex; align-items:center; gap:6px; transition: all 0.2s;
     }
-    .filter-tab:hover { border-color: #c5a059; color: #c5a059; }
-    .filter-tab.active { background: rgba(197,160,89,0.2); border-color: #c5a059; color: #c5a059; }
+    .filter-tab:hover { border-color: #8B1A2A; color: #8B1A2A; }
+    .filter-tab.active { background: rgba(139,26,42,0.2); border-color: #8B1A2A; color: #8B1A2A; }
 
     .star-badge { color: #fbbf24; font-size: 0.9rem; }
 
@@ -75,20 +75,21 @@
                 </tr>
             </thead>
             <tbody>
-                @forelse($events as $event)
+                @forelse($events as $booking)
                 @php
-                    $booking    = $event->booking;
+                    $eventModel = $booking->event; // Bisa null kalau masih nego
                     $bStatus    = $booking->status ?? 'pending';
                     $statusInfo = $statusMap[$bStatus] ?? $statusMap['pending'];
-                    $eventDate  = \Carbon\Carbon::parse($event->event_date);
+                    $eventDate  = \Carbon\Carbon::parse($booking->event_date);
                     $daysUntil  = now()->startOfDay()->diffInDays($eventDate->startOfDay(), false);
                     $isPriority = ($daysUntil >= 0 && $daysUntil <= 3);
+                    
                     // Deal price display
-                    if ($bStatus === 'pending' && $booking && ($booking->price_min || $booking->price_max)) {
+                    if ($bStatus === 'pending' && ($booking->price_min || $booking->price_max)) {
                         $minFmt = $booking->price_min ? 'Rp ' . number_format($booking->price_min/1000000, 0) . 'jt' : '?';
                         $maxFmt = $booking->price_max ? number_format($booking->price_max/1000000, 0) . 'jt' : '?';
                         $priceDisplay = $minFmt . ' – ' . $maxFmt;
-                    } elseif ($booking && $booking->total_price) {
+                    } elseif ($booking->total_price) {
                         $priceDisplay = 'Rp ' . number_format($booking->total_price, 0, ',', '.');
                     } else {
                         $priceDisplay = '<span class="text-secondary">–</span>';
@@ -98,10 +99,11 @@
                     <td class="px-4 py-3">
                         <div class="d-flex align-items-center gap-2">
                             <div>
-                                <div class="fw-semibold text-white">{{ $eventDate->format('d M Y') }}</div>
+                                <div class="fw-semibold ">{{ $eventDate->format('d M Y') }}</div>
                                 <div class="text-secondary" style="font-size:0.75rem;">
-                                    {{ \Carbon\Carbon::parse($event->event_start)->format('H:i') }} WIB
+                                    {{ \Carbon\Carbon::parse($booking->event_start)->format('H:i') }} WIB
                                 </div>
+
                             </div>
                             @if($isPriority)
                                 <span class="star-badge" title="Upcoming Priority – H-{{ $daysUntil }}">
@@ -111,14 +113,14 @@
                         </div>
                     </td>
                     <td class="px-3 py-3">
-                        <div class="fw-semibold text-white">{{ $booking->client_name ?? '–' }}</div>
-                        <div class="text-secondary" style="font-size:0.75rem;">{{ $event->venue }}</div>
+                        <div class="fw-semibold ">{{ $booking->client_name ?? '–' }}</div>
+                        <div class="text-secondary" style="font-size:0.75rem;">{{ $booking->venue }}</div>
                     </td>
                     <td class="px-3 py-3">
-                        <span class="text-white text-capitalize">{{ str_replace('_', ' ', $booking->event_type ?? '–') }}</span>
+                        <span class=" text-capitalize">{{ str_replace('_', ' ', $booking->event_type ?? '–') }}</span>
                     </td>
                     <td class="px-3 py-3">
-                        <span class="fw-semibold" style="color:#c5a059;">{!! $priceDisplay !!}</span>
+                        <span class="fw-semibold" style="color:#8B1A2A;">{!! $priceDisplay !!}</span>
                     </td>
                     <td class="px-3 py-3">
                         <span class="arh-badge-status {{ $statusInfo['class'] }}">
@@ -127,17 +129,24 @@
                         </span>
                     </td>
                     <td class="px-3 py-3 text-center">
-                        <a href="{{ route('admin.events.monitoring.show', $event->id) }}"
-                           class="btn btn-sm btn-outline-light rounded-pill px-3" style="font-size:0.8rem;">
-                            <i class="bi bi-eye me-1"></i>View
-                        </a>
+                        @if($eventModel)
+                            <a href="{{ route('admin.events.monitoring.show', $eventModel->id) }}"
+                               class="btn btn-sm btn-outline-light rounded-pill px-3" style="font-size:0.8rem;">
+                                <i class="bi bi-eye me-1"></i>View Event
+                            </a>
+                        @else
+                            <a href="{{ route('admin.bookings.show', $booking->id) }}"
+                               class="btn btn-sm btn-outline-warning rounded-pill px-3" style="font-size:0.8rem;">
+                                <i class="bi bi-ui-checks me-1"></i>Nego / DP
+                            </a>
+                        @endif
                     </td>
                 </tr>
                 @empty
                 <tr>
                     <td colspan="6" class="text-center py-5 text-secondary">
                         <i class="bi bi-calendar-x fs-1 d-block mb-2"></i>
-                        Tidak ada event untuk filter ini
+                        Tidak ada booking/event untuk filter ini
                     </td>
                 </tr>
                 @endforelse
@@ -150,7 +159,7 @@
 <div class="row g-3">
     <div class="col-6 col-md-2-4">
         <div class="summary-card">
-            <div class="summary-num text-white">{{ $summary['total'] }}</div>
+            <div class="summary-num ">{{ $summary['total'] }}</div>
             <div class="summary-label">Total Events</div>
         </div>
     </div>
@@ -181,3 +190,6 @@
 </div>
 
 @endsection
+
+
+

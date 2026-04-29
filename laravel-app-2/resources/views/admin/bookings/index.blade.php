@@ -1,4 +1,4 @@
-@extends('layouts.admin')
+﻿@extends('layouts.admin')
 
 @section('title', 'Payment & DP – ART-HUB')
 @section('page_title', 'Payment & DP Verification')
@@ -123,22 +123,21 @@
                     <td>
                         <span class="badge {{ $st['cls'] }}">{{ $st['label'] }}</span>
                         @if($booking->status === 'pending')
-                        @php $daysLeft = now()->diffInDays(\Carbon\Carbon::parse($booking->event_date), false); @endphp
+                        @php $daysLeft = (int) now()->startOfDay()->diffInDays(\Carbon\Carbon::parse($booking->event_date)->startOfDay(), false); @endphp
                         @if($daysLeft <= 7 && $daysLeft >= 0)
                         <div><small class="text-danger small">⚠️ H-{{ $daysLeft }}</small></div>
                         @endif
                         @endif
                     </td>
                     <td>
-                        <div class="d-flex gap-1 flex-wrap">
-                            <a href="{{ route('admin.bookings.show', $booking->id) }}" class="btn btn-outline-secondary btn-sm">
+                    <div class="btn-action-group">
+                            <a href="{{ route('admin.bookings.show', $booking->id) }}" class="btn-action btn-action-view" title="Lihat Detail">
                                 <i class="bi bi-eye"></i>
                             </a>
                             @if($booking->status === 'pending')
-                            <form method="POST" action="{{ route('admin.bookings.confirm', $booking->id) }}"
-                                  onsubmit="return confirm('Kunci laba untuk booking #{{ $booking->id }}? Aksi ini TIDAK BISA DIBATALKAN.')">
+                            <form method="POST" action="{{ route('admin.bookings.confirm', $booking->id) }}" class="m-0 p-0" onsubmit="return confirm('Kunci laba untuk booking #{{ $booking->id }}? Aksi ini TIDAK BISA DIBATALKAN.')">
                                 @csrf
-                                <button type="submit" class="btn btn-arh-gold btn-sm">
+                                <button type="submit" class="btn-action btn-action-lock" title="Kunci Laba">
                                     <i class="bi bi-lock-fill"></i>
                                 </button>
                             </form>
@@ -188,3 +187,4 @@ function filterBooking(status, btn) {
 }
 </script>
 @endsection
+

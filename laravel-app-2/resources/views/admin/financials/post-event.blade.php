@@ -1,4 +1,4 @@
-@extends('layouts.admin')
+﻿@extends('layouts.admin')
 
 @section('title', 'Post-Event Update – ART-HUB')
 @section('page_title', 'Post-Event Update')
@@ -20,7 +20,7 @@
             @php $overBudget = $fr->actual_operational_cost > $fr->operational_budget; @endphp
             <div class="arh-card p-4 text-center h-100 {{ $overBudget ? 'border-danger bg-danger bg-opacity-10' : '' }}">
                 <small class="text-secondary d-block fw-semibold mb-1">Realisasi Lapangan</small>
-                <h3 class="fw-bold mb-0 fs-4 {{ $overBudget ? 'text-danger' : 'text-white' }}">
+                <h3 class="fw-bold mb-0 fs-4 {{ $overBudget ? 'text-danger' : '' }}">
                     Rp {{ number_format($fr->actual_operational_cost, 0, ',', '.') }}
                 </h3>
             </div>
@@ -125,3 +125,4 @@
     </a>
 </div>
 @endsection
+

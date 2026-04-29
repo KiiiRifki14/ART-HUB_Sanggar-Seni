@@ -41,6 +41,7 @@ class PersonnelController extends Controller
                 $user = User::create([
                     'name'     => $request->name,
                     'email'    => $request->email,
+                    'phone'    => $request->phone,
                     'password' => Hash::make($request->input('password', 'sanggar123')),
                     'role'     => 'personel',
                 ]);
@@ -49,9 +50,8 @@ class PersonnelController extends Controller
                 Personnel::create([
                     'user_id'       => $user->id,
                     'specialty'     => $request->specialty,
-                    'phone'         => $request->phone,
                     'has_day_job'   => $request->boolean('has_day_job'),
-                    'day_job_name'  => $request->has_day_job ? $request->day_job_name : null,
+                    'day_job_desc'  => $request->has_day_job ? $request->day_job_name : null,
                     'day_job_start' => $request->has_day_job ? $request->day_job_start : null,
                     'day_job_end'   => $request->has_day_job ? $request->day_job_end : null,
                     'is_active'     => true,
@@ -90,12 +90,17 @@ class PersonnelController extends Controller
 
         try {
             DB::transaction(function () use ($request, $personnel) {
-                $personnel->user->update(['name' => $request->name]);
+                // Update User for name and phone
+                $personnel->user->update([
+                    'name' => $request->name,
+                    'phone' => $request->phone
+                ]);
+                
+                // Update Personnel specific fields
                 $personnel->update([
                     'specialty'     => $request->specialty,
-                    'phone'         => $request->phone,
                     'has_day_job'   => $request->boolean('has_day_job'),
-                    'day_job_name'  => $request->has_day_job ? $request->day_job_name : null,
+                    'day_job_desc'  => $request->has_day_job ? $request->day_job_name : null,
                     'day_job_start' => $request->has_day_job ? $request->day_job_start : null,
                     'day_job_end'   => $request->has_day_job ? $request->day_job_end : null,
                     'is_active'     => $request->boolean('is_active', true),

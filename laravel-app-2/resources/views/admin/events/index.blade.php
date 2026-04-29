@@ -44,17 +44,17 @@
                     </td>
                     <td><small>{{ $event->venue }}</small></td>
                     <td>
-                        <span class="badge bg-secondary">
+                        <span class="badge" style="background:rgba(139,26,42,0.1); color:#8B1A2A; border:1px solid rgba(139,26,42,0.2);">
                             {{ $event->personnel->count() }}/{{ $event->personnel_count }}
                         </span>
                     </td>
                     <td><span class="badge bg-{{ $bc }}">{{ strtoupper($event->status) }}</span></td>
                     <td>
-                        <div class="d-flex gap-1">
-                            <a href="{{ route('admin.events.show', $event->id) }}" class="btn btn-outline-secondary btn-sm">
+                        <div class="btn-action-group">
+                            <a href="{{ route('admin.events.show', $event->id) }}" class="btn-action btn-action-view" title="Lihat Detail">
                                 <i class="bi bi-eye"></i>
                             </a>
-                            <a href="{{ route('admin.events.plotting', $event->id) }}" class="btn btn-arh-gold btn-sm">
+                            <a href="{{ route('admin.events.plotting', $event->id) }}" class="btn-action btn-action-lock" title="Plotting Kru">
                                 <i class="bi bi-diagram-3"></i>
                             </a>
                         </div>

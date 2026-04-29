@@ -1,4 +1,4 @@
-@extends('layouts.admin')
+﻿@extends('layouts.admin')
 @section('title', 'Detail Monitoring – ' . $event->booking->client_name)
 @section('page_title', 'Detail Operasional')
 @section('page_subtitle', $event->event_code . ' · ' . \Carbon\Carbon::parse($event->event_date)->format('d M Y'))
@@ -21,8 +21,8 @@
         'completed' => '✓✓ Completed','cancelled'=> 'Cancelled',
     ];
     $bStatus = $booking->status ?? 'pending';
-    $badgeBg    = $bStatus === 'dp_paid' ? 'rgba(249,115,22,0.15)' : 'rgba(197,160,89,0.15)';
-    $badgeColor = $statusColors[$bStatus] ?? '#c5a059';
+    $badgeBg    = $bStatus === 'dp_paid' ? 'rgba(249,115,22,0.15)' : 'rgba(139,26,42,0.15)';
+    $badgeColor = $statusColors[$bStatus] ?? '#8B1A2A';
     $badgeBorder = $badgeColor . '55';
     $badgeStyle  = "background:{$badgeBg}; color:{$badgeColor}; border:1px solid {$badgeBorder};";
 @endphp
@@ -56,40 +56,40 @@
     {{-- Kiri: Info Acara + Koordinat --}}
     <div class="col-12 col-lg-5">
         <div class="det-card mb-4">
-            <h6 class="fw-bold mb-3" style="color:#c5a059;"><i class="bi bi-info-circle-fill me-2"></i>Info Acara</h6>
+            <h6 class="fw-bold mb-3" style="color:#8B1A2A;"><i class="bi bi-info-circle-fill me-2"></i>Info Acara</h6>
             <div class="row g-3 text-sm">
                 <div class="col-6">
                     <div class="text-secondary" style="font-size:0.72rem;">KLIEN</div>
-                    <div class="text-white fw-semibold">{{ $booking->client_name }}</div>
+                    <div class=" fw-semibold">{{ $booking->client_name }}</div>
                 </div>
                 <div class="col-6">
                     <div class="text-secondary" style="font-size:0.72rem;">JENIS ACARA</div>
-                    <div class="text-white fw-semibold text-capitalize">{{ str_replace('_',' ', $booking->event_type) }}</div>
+                    <div class=" fw-semibold text-capitalize">{{ str_replace('_',' ', $booking->event_type) }}</div>
                 </div>
                 <div class="col-6">
                     <div class="text-secondary" style="font-size:0.72rem;">TANGGAL</div>
-                    <div class="text-white fw-semibold">{{ $eventDate->format('d M Y') }}</div>
+                    <div class=" fw-semibold">{{ $eventDate->format('d M Y') }}</div>
                 </div>
                 <div class="col-6">
                     <div class="text-secondary" style="font-size:0.72rem;">WAKTU</div>
-                    <div class="text-white fw-semibold">
+                    <div class=" fw-semibold">
                         {{ \Carbon\Carbon::parse($event->event_start)->format('H:i') }} –
                         {{ \Carbon\Carbon::parse($event->event_end)->format('H:i') }} WIB
                     </div>
                 </div>
                 <div class="col-12">
                     <div class="text-secondary" style="font-size:0.72rem;">VENUE</div>
-                    <div class="text-white fw-semibold">{{ $event->venue }}</div>
+                    <div class=" fw-semibold">{{ $event->venue }}</div>
                 </div>
             </div>
         </div>
 
         <div class="det-card">
-            <h6 class="fw-bold mb-3" style="color:#c5a059;"><i class="bi bi-geo-alt-fill me-2"></i>Koordinat GPS</h6>
+            <h6 class="fw-bold mb-3" style="color:#8B1A2A;"><i class="bi bi-geo-alt-fill me-2"></i>Koordinat GPS</h6>
             @if($event->latitude && $event->longitude)
                 <div class="mb-3">
                     <span class="badge bg-success-subtle text-success border border-success mb-2"><i class="bi bi-check-circle me-1"></i>Koordinat Aktif</span>
-                    <div class="d-flex gap-3 text-white" style="font-size:0.85rem;">
+                    <div class="d-flex gap-3 " style="font-size:0.85rem;">
                         <div><span class="text-secondary">Lat:</span> {{ $event->latitude }}</div>
                         <div><span class="text-secondary">Lng:</span> {{ $event->longitude }}</div>
                     </div>
@@ -114,7 +114,7 @@
     <div class="col-12 col-lg-7">
         <div class="det-card">
             <div class="d-flex justify-content-between align-items-center mb-3">
-                <h6 class="fw-bold mb-0" style="color:#c5a059;"><i class="bi bi-people-fill me-2"></i>Ghosting Guard – Status Kru</h6>
+                <h6 class="fw-bold mb-0" style="color:#8B1A2A;"><i class="bi bi-people-fill me-2"></i>Ghosting Guard – Status Kru</h6>
                 <span class="badge bg-secondary">{{ $event->personnel->count() }} / {{ $event->personnel_count ?? '–' }}</span>
             </div>
 
@@ -144,7 +144,7 @@
                     <div class="d-flex align-items-center gap-3">
                         <span class="absen-dot {{ $dotClass }}"></span>
                         <div>
-                            <div class="text-white fw-semibold" style="font-size:0.88rem;">{{ $p->user->name ?? '–' }}</div>
+                            <div class=" fw-semibold" style="font-size:0.88rem;">{{ $p->user->name ?? '–' }}</div>
                             <div class="text-secondary" style="font-size:0.75rem;">
                                 {{ str_replace('_',' ', $pivot->role_in_event) }}
                             </div>
@@ -183,7 +183,7 @@
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content bg-dark border-secondary">
             <div class="modal-header border-secondary">
-                <h6 class="modal-title text-white"><i class="bi bi-geo-fill text-warning me-2"></i>Set Koordinat GPS</h6>
+                <h6 class="modal-title "><i class="bi bi-geo-fill text-warning me-2"></i>Set Koordinat GPS</h6>
                 <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
             </div>
             <form action="{{ route('admin.events.update_coordinates', $event->id) }}" method="POST">
@@ -207,3 +207,5 @@
     </div>
 </div>
 @endsection
+
+

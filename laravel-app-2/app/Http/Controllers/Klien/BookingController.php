@@ -39,30 +39,41 @@ class BookingController extends Controller
      */
     public function store(Request $request)
     {
+        // Daftar harga paket (sumber kebenaran di server, bukan dari JS)
+        $packages = [
+            'jaipong'          => ['name' => 'Tari Jaipong',     'base_price' => 3500000],
+            'rampak_gendang'   => ['name' => 'Rampak Gendang',   'base_price' => 4500000],
+            'mapag_panganten'  => ['name' => 'Mapag Panganten',  'base_price' => 5000000],
+            'kacapi_suling'    => ['name' => 'Kacapi Suling',    'base_price' => 2500000],
+        ];
+
         $request->validate([
-            'event_type' => 'required|string',
-            'event_date' => 'required|date|after:today',
-            'event_start' => 'required',
-            'event_end' => 'required',
-            'venue' => 'required|string',
+            'event_type'   => 'required|in:' . implode(',', array_keys($packages)),
+            'event_date'   => 'required|date|after:today',
+            'event_start'  => 'required',
+            'event_end'    => 'required',
+            'venue'        => 'required|string',
             'client_phone' => 'required|string',
-            'total_price' => 'required|numeric', // Dari estimation JS calc
         ]);
 
+        // Ambil harga resmi dari server — immune terhadap manipulasi JS/form tampering
+        $basePrice = $packages[$request->event_type]['base_price'];
+        $dpAmount  = $basePrice * 0.50;
+
         $booking = Booking::create([
-            'client_id' => Auth::id(),
-            'client_name' => Auth::user()->name,
-            'client_phone' => $request->client_phone,
-            'event_type' => $request->event_type,
-            'event_date' => $request->event_date,
-            'event_start' => $request->event_start,
-            'event_end' => $request->event_end,
-            'venue' => $request->venue,
-            'booking_source' => 'web',
-            'status' => 'pending',
-            // Gunakan harga estimasi awal Klien. Admin nanti akan merubahnya jika ada nego.
-            'total_price' => $request->total_price,
-            'dp_amount' => $request->total_price * 0.50, 
+            'client_id'     => Auth::id(),
+            'client_name'   => Auth::user()->name,
+            'client_phone'  => $request->client_phone,
+            'event_type'    => $request->event_type,
+            'event_date'    => $request->event_date,
+            'event_start'   => $request->event_start,
+            'event_end'     => $request->event_end,
+            'venue'         => $request->venue,
+            'venue_address' => $request->venue_address,
+            'booking_source'=> 'web',
+            'status'        => 'pending',
+            'total_price'   => $basePrice,
+            'dp_amount'     => $dpAmount,
         ]);
 
         return redirect()->route('klien.bookings.show', $booking->id)

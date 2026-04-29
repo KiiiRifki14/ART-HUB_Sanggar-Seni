@@ -63,7 +63,7 @@
                 @forelse($bookings as $booking)
                 @php
                     $sisa = $booking->total_price - $booking->dp_amount;
-                    $isLunas = !is_null($booking->pelunasan_at) || $sisa <= 0;
+                    $isLunas = !is_null($booking->pelunasan_at) || ($booking->total_price > 0 && $sisa <= 0);
                     $isOverdue = !$isLunas && in_array($booking->status, ['completed']);
                     $stName = strtoupper($booking->status);
                 @endphp

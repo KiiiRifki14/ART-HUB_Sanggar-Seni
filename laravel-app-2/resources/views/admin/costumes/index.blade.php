@@ -1,4 +1,4 @@
-@extends('layouts.admin')
+﻿@extends('layouts.admin')
 
 @section('title', 'Costume Rental – ART-HUB')
 @section('page_title', 'Costume Rental Tracker')
@@ -32,7 +32,7 @@
                 </div>
                 <div class="text-secondary small">
                     <div>Kategori: {{ $c->category }}</div>
-                    <div>Qty Sedia: <span class="fw-bold text-white">{{ $c->quantity }}</span></div>
+                    <div>Qty Sedia: <span class="fw-bold ">{{ $c->quantity }}</span></div>
                 </div>
             </div>
         </div>
@@ -106,3 +106,4 @@
     </div>
 </div>
 @endsection
+

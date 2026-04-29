@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="id" data-bs-theme="dark">
+<html lang="id">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -15,14 +15,14 @@
             --arh-sidebar-full: 240px;
             --arh-sidebar-mini: 60px;
             --arh-topbar-h: 52px;
-            --arh-gold: #c5a059;
-            --arh-gold-dim: rgba(197,160,89,0.12);
-            --arh-bg: #0f0f0f;
-            --arh-sidebar-bg: #141414;
-            --arh-border: #242424;
+            --arh-gold: #8B1A2A;
+            --arh-gold-dim: rgba(139,26,42,0.12);
+            --arh-bg: #F4F1F1;
+            --arh-sidebar-bg: #1a0a0c;
+            --arh-border: #E0D0D2;
         }
         * { box-sizing: border-box; }
-        body { font-family: 'Inter', sans-serif; background: var(--arh-bg); margin: 0; }
+        body { font-family: 'Inter', sans-serif; background: #F4F1F1; color: #1a0808; margin: 0; }
 
         /* ━━━━━━━━━━━━━━━━ SIDEBAR ━━━━━━━━━━━━━━━━ */
         #sidebar {
@@ -53,9 +53,9 @@
         }
         .arh-brand-logo {
             width: 32px; height: 32px; border-radius: 8px; flex-shrink: 0;
-            background: linear-gradient(135deg, #c5a059, #8a6e30);
+            background: linear-gradient(135deg, #8B1A2A, #5a0e1a);
             display: flex; align-items: center; justify-content: center;
-            font-weight: 900; font-size: 0.72rem; color: #000; letter-spacing: -0.5px;
+            font-weight: 900; font-size: 0.72rem; color: #fff; letter-spacing: -0.5px;
             transition: opacity 0.2s;
         }
         .arh-brand-text {
@@ -94,9 +94,9 @@
         }
         .arh-avatar {
             width: 30px; height: 30px; border-radius: 50%; flex-shrink: 0;
-            background: linear-gradient(135deg, #c5a059, #8a6e30);
+            background: linear-gradient(135deg, #8B1A2A, #5a0e1a);
             display: flex; align-items: center; justify-content: center;
-            font-weight: 700; font-size: 0.7rem; color: #000;
+            font-weight: 700; font-size: 0.7rem; color: #fff;
         }
         .arh-user-info { overflow: hidden; white-space: nowrap; }
         .arh-user-name { font-size: 0.78rem; font-weight: 600; color: #eee; }
@@ -109,7 +109,7 @@
         .arh-nav { list-style: none; padding: 8px 8px 0; margin: 0; overflow-y: auto; flex: 1; }
 
         .arh-nav-section {
-            font-size: 0.58rem; color: #444; text-transform: uppercase;
+            font-size: 0.58rem; color: #7a3a45; text-transform: uppercase;
             letter-spacing: 1px; padding: 12px 4px 3px; font-weight: 600;
             white-space: nowrap;
         }
@@ -131,9 +131,9 @@
             white-space: nowrap; overflow: hidden;
             position: relative;
         }
-        .arh-nav-link:hover { background: var(--arh-gold-dim); color: #e0c882; }
+        .arh-nav-link:hover { background: var(--arh-gold-dim); color: #c45a6a; }
         .arh-nav-link.active {
-            background: linear-gradient(90deg, rgba(197,160,89,0.22), rgba(197,160,89,0.05));
+            background: linear-gradient(90deg, rgba(139,26,42,0.22), rgba(139,26,42,0.05));
             color: var(--arh-gold);
             border-left: 3px solid var(--arh-gold);
             padding-left: 5px;
@@ -151,7 +151,7 @@
         #sidebar.mini .arh-nav-link.active {
             border-left: none;
             padding-left: 0;
-            outline: 1px solid rgba(197,160,89,0.4);
+            outline: 1px solid rgba(139,26,42,0.4);
         }
         #sidebar.mini .arh-nav-label { display: none; }
 
@@ -203,8 +203,9 @@
         /* ━━━━━━━━━━━━━━━━ TOPBAR ━━━━━━━━━━━━━━━━ */
         #topbar {
             height: var(--arh-topbar-h);
-            background: #121212;
-            border-bottom: 1px solid var(--arh-border);
+            background: #FFFFFF;
+            border-bottom: 1px solid #E0D0D2;
+            box-shadow: 0 1px 8px rgba(139,26,42,0.07);
             display: flex; align-items: center;
             padding: 0 20px;
             position: fixed;
@@ -293,14 +294,14 @@
             'UTAMA' => [
                 ['Dashboard',         'bi-grid-1x2-fill',         'admin.dashboard',                  $r->routeIs('admin.dashboard')],
                 ['Event Management',  'bi-calendar-check-fill',   'admin.events.index',               $r->routeIs('admin.events.*') && !$r->routeIs('admin.events.monitoring*')],
-                // ['Event Monitoring',  'bi-binoculars-fill',       'admin.events.monitoring',          $r->routeIs('admin.events.monitoring*')],
+                ['Event Monitoring',  'bi-binoculars-fill',       'admin.events.monitoring',          $r->routeIs('admin.events.monitoring*')],
             ],
             'SDM & PRODUKSI' => [
                 ['Personnel',         'bi-people-fill',           'admin.personnel.index',            $r->routeIs('admin.personnel.*')],
-                // ['Costume & Logistik','bi-bag-fill',              'admin.costumes.index',             $r->routeIs('admin.costumes.*')],
+                ['Costume & Logistik','bi-bag-fill',              'admin.costumes.index',             $r->routeIs('admin.costumes.*')],
             ],
-            /*
             'KEUANGAN' => [
+                ['Daftar Booking',    'bi-journal-text',          'admin.bookings.index',             $r->routeIs('admin.bookings.index')],
                 ['New Booking',       'bi-plus-circle-fill',      'admin.bookings.create',            $r->routeIs('admin.bookings.create')],
                 ['DP Verification',   'bi-patch-check-fill',      'admin.bookings.dp_verification',   $r->routeIs('admin.bookings.dp_verification')],
                 ['Payment Tracking',  'bi-receipt-cutoff',        'admin.payments.index',             $r->routeIs('admin.payments.*')],
@@ -310,7 +311,6 @@
             'MANAJEMEN' => [
                 ['Cancellation',      'bi-shield-exclamation',    'admin.cancellations.index',        $r->routeIs('admin.cancellations.*')],
             ],
-            */
         ];
     @endphp
 
@@ -357,7 +357,7 @@
     </div>
     <div class="d-flex align-items-center gap-2">
         <span class="badge d-none d-sm-inline-flex"
-              style="background:rgba(197,160,89,0.15); color:#c5a059; border:1px solid rgba(197,160,89,0.35); font-size:0.68rem;">
+              style="background:rgba(139,26,42,0.15); color:#8B1A2A; border:1px solid rgba(197,160,89,0.35); font-size:0.68rem;">
             <i class="bi bi-shield-lock-fill me-1"></i>Admin
         </span>
         <span class="text-secondary d-none d-lg-block" style="font-size:0.72rem;">{{ now()->format('d M Y') }}</span>
@@ -454,3 +454,5 @@
 @yield('scripts')
 </body>
 </html>
+
+

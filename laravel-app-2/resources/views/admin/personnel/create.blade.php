@@ -36,9 +36,9 @@
                         <label class="form-label">Spesialisasi <span class="text-danger">*</span></label>
                         <select name="specialty" class="form-select @error('specialty') is-invalid @enderror" required>
                             <option value="">— Pilih Spesialisasi —</option>
-                            @foreach(['Tari Sunda','Tari Jawa','Tari Bali','Pemusik Gamelan','Pemusik Kecapi','Pemusik Kendang','MC / Pembawa Acara','Multi-Talent','Logistik & Tata Panggung'] as $s)
-                            <option value="{{ $s }}" {{ old('specialty') === $s ? 'selected' : '' }}>{{ $s }}</option>
-                            @endforeach
+                            <option value="penari" {{ old('specialty') === 'penari' ? 'selected' : '' }}>Penari (Dancer)</option>
+                            <option value="pemusik" {{ old('specialty') === 'pemusik' ? 'selected' : '' }}>Pemusik (Musician)</option>
+                            <option value="multi_talent" {{ old('specialty') === 'multi_talent' ? 'selected' : '' }}>Multi-Talent / Crew</option>
                         </select>
                         @error('specialty')<div class="invalid-feedback">{{ $message }}</div>@enderror
                     </div>

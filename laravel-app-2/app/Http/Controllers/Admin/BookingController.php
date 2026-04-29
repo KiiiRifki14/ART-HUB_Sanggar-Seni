@@ -7,6 +7,7 @@ use App\Models\Booking;
 use App\Models\Event;
 use App\Models\FinancialRecord;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Http\Request;
 use Carbon\Carbon;
 
@@ -34,6 +35,7 @@ class BookingController extends Controller
 
     /**
      * DP VERIFICATION: Inbox mandiri untuk validasi bukti DP
+     * Versi baru dengan Summary Stats (Antrean, Total DP Masuk, Profit Terkunci)
      */
     public function dpVerification()
     {
@@ -51,7 +53,49 @@ class BookingController extends Controller
             ->latest()
             ->get();
 
-        return view('admin.bookings.dp-verification', compact('pendingWithProof', 'pendingNoProof'));
+        // ── SUMMARY CARD 1: Jumlah antrean menunggu verifikasi
+        $antreanCount = $pendingWithProof->count();
+
+        // ── SUMMARY CARD 2: Total DP yang sudah masuk & dikonfirmasi
+        $totalDpMasuk = Booking::whereIn('status', ['dp_paid', 'paid_full', 'completed'])
+            ->sum('dp_amount');
+
+        // ── SUMMARY CARD 3: Total Profit yang sudah terkunci di financial_records
+        $totalProfitLocked = FinancialRecord::where('profit_locked', true)
+            ->sum('fixed_profit');
+
+        return view('admin.bookings.dp-verification', compact(
+            'pendingWithProof',
+            'pendingNoProof',
+            'antreanCount',
+            'totalDpMasuk',
+            'totalProfitLocked'
+        ));
+    }
+
+    /**
+     * REJECT PROOF: Menghapus bukti bayar agar klien bisa re-upload
+     * Status booking tetap 'pending', file fisik & path database dihapus
+     */
+    public function rejectProof(Request $request, Booking $booking)
+    {
+        if ($booking->status !== 'pending') {
+            return redirect()->back()->with('error', 'Hanya booking berstatus pending yang bisa ditolak buktinya.');
+        }
+
+        // Hapus file fisik dari disk storage jika ada
+        if ($booking->payment_proof && Storage::disk('public')->exists($booking->payment_proof)) {
+            Storage::disk('public')->delete($booking->payment_proof);
+        }
+
+        // Kosongkan kolom payment_proof — status tetap 'pending' agar klien bisa re-upload
+        $booking->update([
+            'payment_proof' => null,
+            'payment_receipt' => null,
+        ]);
+
+        return redirect()->back()->with('warning',
+            '⚠️ Bukti Transfer dari ' . $booking->client_name . ' telah DITOLAK dan dihapus. Klien dapat melakukan upload ulang.');
     }
 
     /**

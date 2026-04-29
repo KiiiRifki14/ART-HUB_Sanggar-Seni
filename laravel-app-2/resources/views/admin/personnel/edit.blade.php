@@ -35,16 +35,16 @@
                     <div class="col-md-6">
                         <label class="form-label">Spesialisasi <span class="text-danger">*</span></label>
                         <select name="specialty" class="form-select @error('specialty') is-invalid @enderror" required>
-                            @foreach(['Tari Sunda','Tari Jawa','Tari Bali','Pemusik Gamelan','Pemusik Kecapi','Pemusik Kendang','MC / Pembawa Acara','Multi-Talent','Logistik & Tata Panggung'] as $s)
-                            <option value="{{ $s }}" {{ old('specialty', $personnel->specialty) === $s ? 'selected' : '' }}>{{ $s }}</option>
-                            @endforeach
+                            <option value="penari" {{ old('specialty', $personnel->specialty) === 'penari' ? 'selected' : '' }}>Penari (Dancer)</option>
+                            <option value="pemusik" {{ old('specialty', $personnel->specialty) === 'pemusik' ? 'selected' : '' }}>Pemusik (Musician)</option>
+                            <option value="multi_talent" {{ old('specialty', $personnel->specialty) === 'multi_talent' ? 'selected' : '' }}>Multi-Talent / Crew</option>
                         </select>
                         @error('specialty')<div class="invalid-feedback">{{ $message }}</div>@enderror
                     </div>
                     <div class="col-md-6">
                         <label class="form-label">Nomor HP</label>
                         <input type="text" name="phone" class="form-control"
-                               value="{{ old('phone', $personnel->phone) }}">
+                               value="{{ old('phone', $personnel->user->phone ?? '') }}">
                     </div>
                 </div>
 
@@ -89,7 +89,7 @@
                     <div class="col-12">
                         <label class="form-label">Nama Instansi / Pekerjaan</label>
                         <input type="text" name="day_job_name" class="form-control"
-                               value="{{ old('day_job_name', $personnel->day_job_name) }}">
+                               value="{{ old('day_job_name', $personnel->day_job_desc) }}">
                     </div>
                     <div class="col-md-6">
                         <label class="form-label">Jam Masuk</label>

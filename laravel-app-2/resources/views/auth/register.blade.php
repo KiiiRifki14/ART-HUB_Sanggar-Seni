@@ -143,6 +143,97 @@
             display: block;
         }
 
+        /* Radio Buttons */
+        .role-selector {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        .role-option {
+            flex: 1;
+            position: relative;
+        }
+        .role-option input[type="radio"] {
+            display: none;
+        }
+        .role-label {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            padding: 12px;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            cursor: pointer;
+            color: var(--text-muted);
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.3s;
+        }
+        .role-option input[type="radio"]:checked + .role-label {
+            border-color: var(--gold-primary);
+            color: var(--gold-primary);
+            background: rgba(212, 175, 55, 0.05);
+        }
+        .radio-circle {
+            width: 14px;
+            height: 14px;
+            border: 1px solid var(--text-muted);
+            border-radius: 50%;
+            display: inline-block;
+            position: relative;
+        }
+        .role-option input[type="radio"]:checked + .role-label .radio-circle {
+            border-color: var(--gold-primary);
+        }
+        .role-option input[type="radio"]:checked + .role-label .radio-circle::after {
+            content: '';
+            width: 6px;
+            height: 6px;
+            background: var(--gold-primary);
+            border-radius: 50%;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+
+        /* Personnel Info Box */
+        .personnel-info-box {
+            display: none;
+            border: 1px solid var(--border-color);
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            background: rgba(0,0,0,0.2);
+            animation: slideDown 0.4s ease;
+        }
+        @keyframes slideDown {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .personnel-info-box h3 {
+            font-size: 14px;
+            color: var(--text-main);
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid var(--border-color);
+        }
+        .checkbox-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin-top: 10px;
+        }
+        .checkbox-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 13px;
+            color: var(--text-muted);
+            cursor: pointer;
+        }
+
         .btn-primary {
             display: block;
             width: 100%;
@@ -195,16 +286,38 @@
             @csrf
 
             <div class="form-group">
-                <label for="name" class="form-label">Nama Lengkap</label>
-                <input type="text" id="name" name="name" class="form-input" value="{{ old('name') }}" required autofocus autocomplete="name" placeholder="Masukkan nama Anda">
+                <label class="form-label mb-2">I am a:</label>
+                <div class="role-selector">
+                    <label class="role-option">
+                        <input type="radio" name="role_type" value="client" checked onchange="togglePersonnelBox()">
+                        <div class="role-label"><span class="radio-circle"></span> Client</div>
+                    </label>
+                    <label class="role-option">
+                        <input type="radio" name="role_type" value="personnel" onchange="togglePersonnelBox()">
+                        <div class="role-label"><span class="radio-circle"></span> Personnel</div>
+                    </label>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="name" class="form-label">Full Name</label>
+                <input type="text" id="name" name="name" class="form-input" value="{{ old('name') }}" required autofocus autocomplete="name" placeholder="Enter your full name">
                 @error('name')
                 <span class="error-msg">{{ $message }}</span>
                 @enderror
             </div>
 
             <div class="form-group">
+                <label for="phone" class="form-label">Phone Number</label>
+                <input type="text" id="phone" name="phone" class="form-input" value="{{ old('phone') }}" required placeholder="0812-3456-7890">
+                @error('phone')
+                <span class="error-msg">{{ $message }}</span>
+                @enderror
+            </div>
+
+            <div class="form-group">
                 <label for="email" class="form-label">Email</label>
-                <input type="email" id="email" name="email" class="form-input" value="{{ old('email') }}" required autocomplete="username" placeholder="Masukkan alamat email aktif">
+                <input type="email" id="email" name="email" class="form-input" value="{{ old('email') }}" required autocomplete="username" placeholder="Enter your email">
                 @error('email')
                 <span class="error-msg">{{ $message }}</span>
                 @enderror
@@ -212,28 +325,97 @@
 
             <div class="form-group">
                 <label for="password" class="form-label">Password</label>
-                <input type="password" id="password" name="password" class="form-input" required autocomplete="new-password" placeholder="Buat password yang kuat">
+                <div style="position: relative;">
+                    <input type="password" id="password" name="password" class="form-input" required autocomplete="new-password" placeholder="Buat password yang kuat" style="padding-right: 40px;">
+                    <span onclick="togglePassword('password', this)" style="position: absolute; right: 12px; top: 12px; cursor: pointer; color: var(--text-muted);">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" viewBox="0 0 16 16">
+                            <path d="M16 8s-3-5.5-8-5.5S0 8 0 8s3 5.5 8 5.5S16 8 16 8zM1.173 8a13.133 13.133 0 0 1 1.66-2.043C4.12 4.668 5.88 3.5 8 3.5c2.12 0 3.879 1.168 5.168 2.457A13.133 13.133 0 0 1 14.828 8c-.058.087-.122.183-.195.288-.335.48-.83 1.12-1.465 1.755C11.879 11.332 10.119 12.5 8 12.5c-2.12 0-3.879-1.168-5.168-2.457A13.134 13.134 0 0 1 1.172 8z"/>
+                            <path d="M8 5.5a2.5 2.5 0 1 0 0 5 2.5 2.5 0 0 0 0-5zM4.5 8a3.5 3.5 0 1 1 7 0 3.5 3.5 0 0 1-7 0z"/>
+                        </svg>
+                    </span>
+                </div>
                 @error('password')
                 <span class="error-msg">{{ $message }}</span>
                 @enderror
             </div>
 
             <div class="form-group">
-                <label for="password_confirmation" class="form-label">Konfirmasi Password</label>
-                <input type="password" id="password_confirmation" name="password_confirmation" class="form-input" required autocomplete="new-password" placeholder="Ulangi password Anda">
+                <label for="password_confirmation" class="form-label">Confirm Password</label>
+                <div style="position: relative;">
+                    <input type="password" id="password_confirmation" name="password_confirmation" class="form-input" required autocomplete="new-password" placeholder="Confirm your password" style="padding-right: 40px;">
+                    <span onclick="togglePassword('password_confirmation', this)" style="position: absolute; right: 12px; top: 12px; cursor: pointer; color: var(--text-muted);">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" viewBox="0 0 16 16">
+                            <path d="M16 8s-3-5.5-8-5.5S0 8 0 8s3 5.5 8 5.5S16 8 16 8zM1.173 8a13.133 13.133 0 0 1 1.66-2.043C4.12 4.668 5.88 3.5 8 3.5c2.12 0 3.879 1.168 5.168 2.457A13.133 13.133 0 0 1 14.828 8c-.058.087-.122.183-.195.288-.335.48-.83 1.12-1.465 1.755C11.879 11.332 10.119 12.5 8 12.5c-2.12 0-3.879-1.168-5.168-2.457A13.134 13.134 0 0 1 1.172 8z"/>
+                            <path d="M8 5.5a2.5 2.5 0 1 0 0 5 2.5 2.5 0 0 0 0-5zM4.5 8a3.5 3.5 0 1 1 7 0 3.5 3.5 0 0 1-7 0z"/>
+                        </svg>
+                    </span>
+                </div>
                 @error('password_confirmation')
                 <span class="error-msg">{{ $message }}</span>
                 @enderror
             </div>
 
-            <button type="submit" class="btn-primary">REGISTER</button>
+            <div id="personnelBox" class="personnel-info-box">
+                <h3>Personnel Information</h3>
+                
+                <div class="form-group">
+                    <label class="form-label">Primary Job / Occupation</label>
+                    <input type="text" name="day_job_name" class="form-input" placeholder="e.g., Office Worker, Freelancer, Student">
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Office Hours (If applicable)</label>
+                    <div style="display:flex; gap:10px;">
+                        <div style="flex:1;">
+                            <span style="font-size:11px; color:var(--text-muted); display:block; margin-bottom:4px;">From</span>
+                            <input type="time" name="day_job_start" class="form-input">
+                        </div>
+                        <div style="flex:1;">
+                            <span style="font-size:11px; color:var(--text-muted); display:block; margin-bottom:4px;">To</span>
+                            <input type="time" name="day_job_end" class="form-input">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group" style="margin-top:15px;">
+                    <label class="form-label">Dance Specialties</label>
+                    <div class="checkbox-group">
+                        <label class="checkbox-item"><input type="checkbox" name="dance_specialties[]" value="jaipong"> Jaipong / Sunda</label>
+                        <label class="checkbox-item"><input type="checkbox" name="dance_specialties[]" value="ramayana"> Ramayana / Jawa</label>
+                        <label class="checkbox-item"><input type="checkbox" name="dance_specialties[]" value="legong"> Legong / Bali</label>
+                        <label class="checkbox-item"><input type="checkbox" name="dance_specialties[]" value="other"> Other Traditional</label>
+                    </div>
+                </div>
+            </div>
+
+            <button type="submit" class="btn-primary">CREATE ACCOUNT</button>
 
             <div style="text-align: center; margin-top: 25px; font-size: 14px; color: var(--text-muted);">
-                Sudah punya akun? <a href="{{ route('login') }}" class="link">Login di sini</a>
+                Already have an account? <a href="{{ route('login') }}" class="link">Login here</a>
             </div>
         </form>
     </div>
 
+    <script>
+        function togglePersonnelBox() {
+            var isPersonnel = document.querySelector('input[name="role_type"]:checked').value === 'personnel';
+            document.getElementById('personnelBox').style.display = isPersonnel ? 'block' : 'none';
+        }
+
+        function togglePassword(inputId, iconEl) {
+            var input = document.getElementById(inputId);
+            if (input.type === "password") {
+                input.type = "text";
+                iconEl.style.color = "var(--gold-primary)"; // highlight icon
+            } else {
+                input.type = "password";
+                iconEl.style.color = "var(--text-muted)";
+            }
+        }
+        
+        // Cek onload
+        togglePersonnelBox();
+    </script>
 </body>
 
 </html>

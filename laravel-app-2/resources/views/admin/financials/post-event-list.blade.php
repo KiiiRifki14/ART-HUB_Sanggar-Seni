@@ -1,4 +1,4 @@
-@extends('layouts.admin')
+﻿@extends('layouts.admin')
 @section('title', 'Post-Event Update – ART-HUB')
 @section('page_title', 'Post-Event Update')
 @section('page_subtitle', 'Input biaya riil lapangan pasca pementasan')
@@ -35,7 +35,7 @@
         {{-- Event Info --}}
         <div class="flex-grow-1">
             <div class="d-flex align-items-center gap-2 mb-1 flex-wrap">
-                <span class="fw-bold text-white">{{ $booking->client_name ?? 'Event Sanggar' }}</span>
+                <span class="fw-bold ">{{ $booking->client_name ?? 'Event Sanggar' }}</span>
                 <span class="text-secondary" style="font-size:0.78rem;">{{ $event->event_code }}</span>
                 @if($isDone)
                     <span class="badge bg-success-subtle text-success border border-success" style="font-size:0.7rem;">
@@ -97,3 +97,4 @@
     @endforelse
 </div>
 @endsection
+

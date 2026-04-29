@@ -1,95 +1,208 @@
 @extends('layouts.klien')
 
-@section('title', 'Dashboard Klien – ART-HUB')
+@section('title', 'Portal Klien – ART-HUB Sanggar Cahaya Gumilang')
 
 @section('content')
-<div class="mb-5 animate-fade-up">
-    <h2 class="fw-bold mb-1">Selamat datang, <span class="klien-gold">{{ Auth::user()->name }}</span></h2>
-    <p class="text-secondary">Kelola pesanan pementasan seni Anda di sini.</p>
+
+{{-- ═══════ HERO GREETING ═══════ --}}
+<div class="klien-hero mb-5 animate-fade-up">
+    <div class="klien-hero-inner">
+        <div class="hero-eyebrow">
+            <span class="hero-dot"></span>
+            Portal Klien Sanggar Cahaya Gumilang
+        </div>
+        <h1 class="hero-title">
+            Selamat datang,<br>
+            <span class="klien-gold-text">{{ Auth::user()->name }}</span> 👋
+        </h1>
+        <p class="hero-sub">Pantau seluruh pesanan pementasan seni budaya Anda di sini.</p>
+    </div>
+    <a href="{{ route('klien.bookings.create') }}" class="hero-cta-btn">
+        <i class="bi bi-plus-lg me-2"></i>Pesan Pementasan Baru
+    </a>
 </div>
 
-<div class="row g-4 mb-5 animate-fade-up" style="animation-delay: 0.1s;">
-    <div class="col-12 col-md-6">
-        <div class="glass-card p-4 d-flex align-items-center justify-content-between h-100">
-            <div>
-                <h6 class="text-secondary mb-1">Booking Aktif</h6>
-                <h3 class="fw-bold mb-0">{{ $bookings->whereIn('status', ['pending', 'dp_paid', 'confirmed'])->count() }} Pesanan</h3>
-            </div>
-            <div class="rounded-circle d-flex justify-content-center align-items-center" style="width: 50px; height: 50px; background: rgba(212, 175, 55, 0.2); color: var(--klien-gold);">
-                <i class="bi bi-clock-history fs-3"></i>
-            </div>
+{{-- ═══════ STAT CARDS ═══════ --}}
+@php
+    $aktif     = $bookings->whereIn('status', ['pending', 'dp_paid', 'confirmed'])->count();
+    $selesai   = $bookings->where('status', 'completed')->count();
+    $total     = $bookings->count();
+@endphp
+<div class="klien-stats-row animate-fade-up" style="animation-delay:0.08s;">
+    <div class="kstat-card kstat-active">
+        <div class="kstat-icon"><i class="bi bi-clock-history"></i></div>
+        <div class="kstat-body">
+            <div class="kstat-num">{{ $aktif }}</div>
+            <div class="kstat-label">Booking Aktif</div>
         </div>
     </div>
-    <div class="col-12 col-md-6">
-        <div class="glass-card p-4 d-flex align-items-center justify-content-between h-100">
-            <div>
-                <h6 class="text-secondary mb-1">Pementasan Selesai</h6>
-                <h3 class="fw-bold mb-0">{{ $bookings->where('status', 'completed')->count() }} Pementasan</h3>
-            </div>
-            <div class="rounded-circle d-flex justify-content-center align-items-center" style="width: 50px; height: 50px; background: rgba(40, 167, 69, 0.2); color: #28a745;">
-                <i class="bi bi-check2-circle fs-3"></i>
-            </div>
+    <div class="kstat-card kstat-done">
+        <div class="kstat-icon"><i class="bi bi-check2-all"></i></div>
+        <div class="kstat-body">
+            <div class="kstat-num">{{ $selesai }}</div>
+            <div class="kstat-label">Pementasan Selesai</div>
+        </div>
+    </div>
+    <div class="kstat-card kstat-total">
+        <div class="kstat-icon"><i class="bi bi-receipt"></i></div>
+        <div class="kstat-body">
+            <div class="kstat-num">{{ $total }}</div>
+            <div class="kstat-label">Total Pesanan</div>
         </div>
     </div>
 </div>
 
-<div class="d-flex justify-content-between align-items-center mb-4 animate-fade-up" style="animation-delay: 0.2s;">
-    <h4 class="fw-bold m-0 text-white"><i class="bi bi-receipt me-2"></i>Riwayat Pesanan Anda</h4>
-    <a href="{{ route('klien.bookings.create') }}" class="btn btn-klien-gold btn-sm"><i class="bi bi-plus-lg me-1"></i> Pesan Baru</a>
+{{-- ═══════ RIWAYAT PESANAN ═══════ --}}
+<div class="klien-section-header animate-fade-up" style="animation-delay:0.14s;">
+    <h3 class="ksec-title"><i class="bi bi-list-ul me-2"></i>Riwayat Pesanan</h3>
 </div>
 
-<div class="glass-card p-4 animate-fade-up" style="animation-delay: 0.3s;">
-    <div class="table-responsive">
-        <table class="table table-dark table-hover mb-0 align-middle" style="background: transparent;">
-            <thead>
-                <tr class="text-secondary" style="border-bottom: 2px solid rgba(255,255,255,0.1);">
-                    <th class="fw-normal pb-3">Tanggal Event</th>
-                    <th class="fw-normal pb-3">Jenis Paket</th>
-                    <th class="fw-normal pb-3">Status</th>
-                    <th class="fw-normal pb-3">Total Harga</th>
-                    <th class="fw-normal pb-3">Aksi</th>
-                </tr>
-            </thead>
-            <tbody>
-                @forelse($bookings as $booking)
-                <tr style="border-bottom: 1px solid rgba(255,255,255,0.05);">
-                    <td class="py-3">
-                        <div class="fw-semibold">{{ \Carbon\Carbon::parse($booking->event_date)->format('d M Y') }}</div>
-                        <small class="text-secondary">{{ $booking->venue }}</small>
-                    </td>
-                    <td class="py-3 text-capitalize">{{ str_replace('_', ' ', $booking->event_type) }}</td>
-                    <td class="py-3">
-                        @php
-                            $colors = [
-                                'pending' => 'warning',
-                                'dp_paid' => 'info',
-                                'confirmed' => 'primary',
-                                'completed' => 'success',
-                                'cancelled' => 'danger',
-                            ];
-                            $color = $colors[$booking->status] ?? 'secondary';
-                        @endphp
-                        <span class="badge bg-{{ $color }} text-dark rounded-pill px-3">{{ strtoupper($booking->status) }}</span>
-                    </td>
-                    <td class="py-3 fw-bold klien-gold">Rp {{ number_format($booking->total_price, 0, ',', '.') }}</td>
-                    <td class="py-3">
-                        <a href="{{ route('klien.bookings.show', $booking->id) }}" class="btn btn-sm btn-outline-light rounded-pill px-3 text-white border-secondary">
-                            Detail Kuitansi
-                        </a>
-                    </td>
-                </tr>
-                @empty
-                <tr>
-                    <td colspan="5" class="text-center py-5">
-                        <i class="bi bi-inbox-fill text-secondary fs-1 mb-3 d-inline-block"></i>
-                        <p class="text-secondary mb-3">Anda belum pernah melakukan pemesanan.</p>
-                        <a href="{{ route('klien.bookings.create') }}" class="btn btn-klien-gold">Pesan Sekarang</a>
-                    </td>
-                </tr>
-                @endforelse
-            </tbody>
-        </table>
+@forelse($bookings as $booking)
+@php
+    $statusMap = [
+        'pending'   => ['label' => 'Menunggu Konfirmasi', 'icon' => 'bi-hourglass-split',      'cls' => 'status-pending'],
+        'dp_paid'   => ['label' => 'DP Terkonfirmasi',    'icon' => 'bi-lock-fill',             'cls' => 'status-dp'],
+        'confirmed' => ['label' => 'Jadwal Terkunci',     'icon' => 'bi-calendar2-check-fill',  'cls' => 'status-confirmed'],
+        'paid_full' => ['label' => 'Lunas',               'icon' => 'bi-wallet2',               'cls' => 'status-paid'],
+        'completed' => ['label' => 'Selesai',             'icon' => 'bi-trophy-fill',           'cls' => 'status-done'],
+        'cancelled' => ['label' => 'Dibatalkan',          'icon' => 'bi-x-circle-fill',         'cls' => 'status-cancel'],
+    ];
+    $st = $statusMap[$booking->status] ?? ['label' => $booking->status, 'icon' => 'bi-circle', 'cls' => ''];
+    $delay = number_format(0.18 + $loop->index * 0.05, 2);
+@endphp
+<div class="kbooking-card animate-fade-up" data-delay="{{ $delay }}">
+    <div class="kbooking-left">
+        <div class="kbooking-type">{{ ucwords(str_replace('_', ' ', $booking->event_type)) }}</div>
+        <div class="kbooking-meta">
+            <span><i class="bi bi-calendar3 me-1"></i>{{ \Carbon\Carbon::parse($booking->event_date)->isoFormat('D MMM Y') }}</span>
+            <span class="kbooking-sep">·</span>
+            <span><i class="bi bi-geo-alt me-1"></i>{{ Str::limit($booking->venue, 30) }}</span>
+        </div>
+    </div>
+    <div class="kbooking-center">
+        <div class="kbooking-status {{ $st['cls'] }}">
+            <i class="bi {{ $st['icon'] }} me-1"></i>{{ $st['label'] }}
+        </div>
+        @if($booking->status === 'pending' && !$booking->payment_proof)
+            <div class="kbooking-hint">⏳ Menunggu konfirmasi harga dari Admin</div>
+        @elseif($booking->status === 'pending' && $booking->payment_proof)
+            <div class="kbooking-hint">🔍 Bukti transfer sedang diverifikasi Admin</div>
+        @endif
+    </div>
+    <div class="kbooking-right">
+        <div class="kbooking-price">Rp {{ number_format($booking->total_price, 0, ',', '.') }}</div>
+        <div class="kbooking-dp-label">DP: Rp {{ number_format($booking->dp_amount, 0, ',', '.') }}</div>
+        <a href="{{ route('klien.bookings.show', $booking->id) }}" class="kbooking-detail-btn">
+            Lihat Detail <i class="bi bi-arrow-right ms-1"></i>
+        </a>
     </div>
 </div>
+@empty
+<div class="klien-empty animate-fade-up" style="animation-delay:0.2s;">
+    <div class="kempty-icon"><i class="bi bi-calendar-x"></i></div>
+    <h5 class="kempty-title">Belum Ada Pesanan</h5>
+    <p class="kempty-sub">Wujudkan pementasan seni budaya impian Anda bersama Sanggar Cahaya Gumilang.</p>
+    <a href="{{ route('klien.bookings.create') }}" class="klien-btn-gold">
+        <i class="bi bi-plus-circle me-2"></i>Mulai Pesan Sekarang
+    </a>
+</div>
+@endforelse
 
+<style>
+/* ══════════ KLIEN DASHBOARD ENHANCEMENTS ══════════ */
+.klien-hero { display:flex; justify-content:space-between; align-items:flex-end; flex-wrap:wrap; gap:20px; padding: 36px 0 20px; }
+.hero-eyebrow { font-size:0.75rem; color:#888; text-transform:uppercase; letter-spacing:0.1em; display:flex; align-items:center; gap:7px; margin-bottom:12px; }
+.hero-dot { width:6px; height:6px; border-radius:50%; background:#d4af37; display:inline-block; }
+.hero-title { font-size:2rem; font-weight:800; line-height:1.2; color:#fff; margin:0 0 8px; }
+.klien-gold-text { color:var(--klien-gold); }
+.hero-sub { color:#888; font-size:0.95rem; margin:0; }
+.hero-cta-btn {
+    background: linear-gradient(135deg, #e6c25a, #b48b25);
+    color: #000; font-weight:700; border:none;
+    border-radius: 10px; padding: 13px 26px;
+    font-size: 0.9rem; white-space: nowrap;
+    text-decoration: none; transition: all 0.2s;
+    display: inline-flex; align-items: center;
+    flex-shrink: 0;
+}
+.hero-cta-btn:hover { background: linear-gradient(135deg, #f7d165, #c59929); transform:translateY(-2px); box-shadow:0 6px 20px rgba(212,175,55,0.3); color:#000; }
+
+/* STAT CARDS */
+.klien-stats-row { display:grid; grid-template-columns: repeat(3,1fr); gap:14px; margin-bottom:32px; }
+.kstat-card { display:flex; align-items:center; gap:14px; padding:18px 20px; border-radius:14px; border:1px solid #1e1e1e; background:#111; transition:border-color 0.2s; }
+.kstat-card:hover { border-color:#333; }
+.kstat-icon { width:44px; height:44px; border-radius:10px; display:flex; align-items:center; justify-content:center; font-size:1.2rem; flex-shrink:0; }
+.kstat-active .kstat-icon { background:rgba(251,191,36,0.15); color:#fbbf24; }
+.kstat-done   .kstat-icon { background:rgba(52,211,153,0.15);  color:#34d399; }
+.kstat-total  .kstat-icon { background:rgba(96,165,250,0.15);  color:#60a5fa; }
+.kstat-num  { font-size:1.6rem; font-weight:800; color:#fff; line-height:1; }
+.kstat-label{ font-size:0.72rem; color:#666; margin-top:3px; }
+
+/* SECTION HEADER */
+.klien-section-header { margin-bottom:14px; }
+.ksec-title { font-size:1rem; font-weight:700; color:#ddd; }
+
+/* BOOKING CARD LIST */
+.kbooking-card {
+    display:flex; align-items:center; gap:0;
+    background:#0d0d0d; border:1px solid #1e1e1e;
+    border-radius:14px; padding:0; margin-bottom:10px;
+    overflow:hidden; transition:border-color 0.2s, background 0.2s;
+}
+.kbooking-card:hover { border-color:#2a2a2a; background:#111; }
+.kbooking-left { padding:18px 20px; flex:1; min-width:0; }
+.kbooking-type { font-weight:700; color:#fff; font-size:0.95rem; margin-bottom:5px; }
+.kbooking-meta { font-size:0.75rem; color:#555; display:flex; align-items:center; gap:0; flex-wrap:wrap; }
+.kbooking-sep { margin:0 6px; }
+.kbooking-center { padding:18px 16px; min-width:180px; }
+.kbooking-hint { font-size:0.68rem; color:#666; margin-top:5px; }
+.kbooking-right { padding:18px 20px; text-align:right; display:flex; flex-direction:column; align-items:flex-end; gap:4px; min-width:170px; border-left:1px solid #1a1a1a; }
+.kbooking-price { font-size:1rem; font-weight:800; color:#d4af37; }
+.kbooking-dp-label { font-size:0.68rem; color:#555; }
+.kbooking-detail-btn {
+    margin-top:6px; font-size:0.75rem; font-weight:600;
+    background:#1a1a1a; border:1px solid #2a2a2a;
+    color:#aaa; border-radius:7px; padding:5px 12px;
+    text-decoration:none; transition:all 0.2s; white-space:nowrap;
+}
+.kbooking-detail-btn:hover { border-color:#d4af37; color:#d4af37; }
+
+/* STATUS BADGES */
+.kbooking-status { display:inline-flex; align-items:center; font-size:0.73rem; font-weight:600; border-radius:6px; padding:4px 10px; }
+.status-pending  { background:#2a2000; color:#fbbf24; }
+.status-dp       { background:#0a1e2e; color:#60a5fa; }
+.status-confirmed{ background:#0a2e1a; color:#34d399; }
+.status-paid     { background:#1a2e0a; color:#86efac; }
+.status-done     { background:#1a2200; color:#a3e635; }
+.status-cancel   { background:#2a0a0a; color:#f87171; }
+
+/* EMPTY STATE */
+.klien-empty { text-align:center; padding:70px 20px; }
+.kempty-icon { font-size:4rem; color:#2a2a2a; margin-bottom:16px; }
+.kempty-title { color:#555; font-weight:700; font-size:1.1rem; margin-bottom:8px; }
+.kempty-sub { color:#444; font-size:0.85rem; max-width:340px; margin:0 auto 24px; }
+.klien-btn-gold {
+    background:linear-gradient(135deg,#e6c25a,#b48b25);
+    color:#000; font-weight:700; border:none;
+    border-radius:10px; padding:12px 28px;
+    text-decoration:none; font-size:0.88rem;
+    display:inline-flex; align-items:center; transition:all 0.2s;
+}
+.klien-btn-gold:hover { background:linear-gradient(135deg,#f7d165,#c59929); color:#000; transform:translateY(-2px); }
+
+@media (max-width:768px) {
+    .klien-stats-row { grid-template-columns: 1fr 1fr; }
+    .kstat-total { display:none; }
+    .kbooking-card { flex-direction:column; align-items:stretch; }
+    .kbooking-center, .kbooking-right { border-left:none; border-top:1px solid #1a1a1a; text-align:left; align-items:flex-start; }
+}
+</style>
+
+@push('scripts')
+<script>
+document.querySelectorAll('.kbooking-card[data-delay]').forEach(function(el) {
+    el.style.animationDelay = el.getAttribute('data-delay') + 's';
+});
+</script>
+@endpush
 @endsection
