@@ -259,12 +259,12 @@
                         </div>
                         
                         @if($booking->payment_proof)
-                            <div class="rounded-xl border border-outline-variant/30 overflow-hidden shadow-sm mb-3 group cursor-pointer relative" onclick="window.open('{{ asset('storage/' . $booking->payment_proof) }}', '_blank')">
+                            <a href="{{ asset('storage/' . $booking->payment_proof) }}" target="_blank" class="block rounded-xl border border-outline-variant/30 overflow-hidden shadow-sm mb-3 group cursor-pointer relative">
                                 <img src="{{ asset('storage/' . $booking->payment_proof) }}" class="w-full h-48 object-cover transition-transform duration-500 group-hover:scale-105" alt="Bukti Transfer">
                                 <div class="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors flex items-center justify-center">
                                     <i class="bi bi-arrows-fullscreen text-white opacity-0 group-hover:opacity-100 text-3xl drop-shadow-md transition-opacity"></i>
                                 </div>
-                            </div>
+                            </a>
                             <a href="{{ asset('storage/' . $booking->payment_proof) }}" download class="w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg border border-outline-variant/50 font-label text-xs font-bold uppercase tracking-widest text-on-surface-variant hover:bg-surface-container hover:text-primary transition-colors">
                                 <i class="bi bi-download"></i> Unduh Bukti
                             </a>

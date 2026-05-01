@@ -39,6 +39,20 @@
                         "headline": ["Noto Serif", "serif"],
                         "body":     ["Manrope", "sans-serif"],
                         "label":    ["Manrope", "sans-serif"],
+                    },
+                    keyframes: {
+                        fadeUp: {
+                            '0%': { opacity: '0', transform: 'translateY(15px)' },
+                            '100%': { opacity: '1', transform: 'translateY(0)' },
+                        },
+                        scaleUp: {
+                            '0%': { opacity: '0', transform: 'scale(0.97)' },
+                            '100%': { opacity: '1', transform: 'scale(1)' },
+                        }
+                    },
+                    animation: {
+                        'fade-up': 'fadeUp 0.5s cubic-bezier(0.2, 0.8, 0.2, 1) forwards',
+                        'scale-up': 'scaleUp 0.4s cubic-bezier(0.2, 0.8, 0.2, 1) forwards',
                     }
                 }
             }
@@ -220,6 +234,29 @@
             background: #fef2f2; border-left: 3px solid #dc2626;
             border-radius: 8px; padding: 12px 16px;
             font-family: 'Manrope', sans-serif; font-size: 0.85rem; color: #b91c1c;
+        }
+
+        /* ── AUTO-STAGGER PAGE ANIMATIONS ── */
+        /* Menyihir seluruh elemen dalam main content untuk muncul berurutan (Cascade Fade Up) */
+        #page-content main > * {
+            opacity: 0;
+            animation: fadeUp 0.5s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+        }
+        #page-content main > *:nth-child(1) { animation-delay: 0.05s; }
+        #page-content main > *:nth-child(2) { animation-delay: 0.10s; }
+        #page-content main > *:nth-child(3) { animation-delay: 0.15s; }
+        #page-content main > *:nth-child(4) { animation-delay: 0.20s; }
+        #page-content main > *:nth-child(5) { animation-delay: 0.25s; }
+        #page-content main > *:nth-child(6) { animation-delay: 0.30s; }
+        #page-content main > *:nth-child(7) { animation-delay: 0.35s; }
+        #page-content main > *:nth-child(8) { animation-delay: 0.40s; }
+        #page-content main > *:nth-child(n+9) { animation-delay: 0.45s; }
+
+        /* Pengecualian animasi membesar untuk Notifikasi */
+        #page-content main .alert-heritage-success, 
+        #page-content main .alert-heritage-warning, 
+        #page-content main .alert-heritage-danger {
+            animation-name: scaleUp;
         }
     </style>
 
