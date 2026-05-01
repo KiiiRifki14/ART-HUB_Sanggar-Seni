@@ -7,12 +7,13 @@
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;700&family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
     <style>
         :root {
-            --bg-dark: #121212;
-            --text-main: #f5f5f5;
-            --text-muted: #a0a0a0;
-            --gold-primary: #C5A059;
-            --gold-light: #E0C070;
-            --border-color: rgba(197, 160, 89, 0.2);
+            --bg-dark:      #800000;
+            --bg-card:      #FDFBF7;
+            --text-main:    #1A1A1A;
+            --text-muted:   #7A7A7A;
+            --gold-primary: #D4AF37;
+            --gold-dark:    #b5952f;
+            --border-color: #E8E3D9;
         }
 
         * {
@@ -23,7 +24,7 @@
         }
 
         body {
-            background-color: var(--bg-dark);
+            background: linear-gradient(135deg, var(--bg-dark), #4a0000);
             color: var(--text-main);
             min-height: 100vh;
             display: flex;
@@ -32,13 +33,13 @@
         }
 
         .pending-container {
-            background: rgba(26, 26, 26, 0.95);
+            background: var(--bg-card);
             padding: 50px 40px;
             border-radius: 16px;
             max-width: 500px;
             text-align: center;
             border: 1px solid var(--border-color);
-            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.4);
             animation: fadeIn 0.8s ease;
         }
 
@@ -63,7 +64,7 @@
             font-family: 'Playfair Display', serif;
             font-size: 26px;
             margin-bottom: 15px;
-            color: var(--gold-light);
+            color: var(--gold-dark);
         }
 
         p {
@@ -71,6 +72,10 @@
             color: var(--text-muted);
             line-height: 1.6;
             margin-bottom: 30px;
+        }
+
+        p strong, p b {
+            color: var(--text-main);
         }
 
         .btn-wrapper {
@@ -82,18 +87,21 @@
             padding: 12px 25px;
             border-radius: 8px;
             text-decoration: none;
-            font-weight: 500;
-            background: rgba(197, 160, 89, 0.1);
-            color: var(--gold-primary);
-            border: 1px solid var(--gold-primary);
+            font-weight: 600;
+            background: transparent;
+            color: var(--bg-dark);
+            border: 1px solid var(--bg-dark);
+            cursor: pointer;
             transition: all 0.3s;
+            font-family: 'Poppins', sans-serif;
+            font-size: 14px;
         }
 
         .btn:hover {
-            background: var(--gold-primary);
-            color: var(--bg-dark);
+            background: var(--bg-dark);
+            color: #FFFFFF;
             transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(197, 160, 89, 0.2);
+            box-shadow: 0 5px 15px rgba(128, 0, 0, 0.25);
         }
     </style>
 </head>

@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="id" data-bs-theme="dark">
+<html lang="id">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0">
@@ -11,32 +11,54 @@
     
     <style>
         :root {
-            --arh-gold: #c5a059;
-            --arh-gold-hover: #e0bc75;
-            --arh-dark: #121212;
-            --arh-darker: #0a0a0a;
-            --arh-card-bg: #1e1e1e;
+            --arh-maroon:      #800000;
+            --arh-maroon-dark: #800000;
+            --arh-gold:        #D4AF37;
+            --arh-gold-hover:  #F3CE5E;
+            --arh-body-bg:     #FDFBF7;
+            --arh-card-bg:     #FFFFFF;
+            --arh-border:      #E8E3D9;
+            --arh-text:        #1A1A1A;
+            --arh-text-muted:  #7A7A7A;
         }
 
         body {
-            background-color: var(--arh-darker);
-            color: #f8f9fa;
+            background-color: var(--arh-body-bg);
+            color: var(--arh-text);
             font-family: 'Inter', -apple-system, sans-serif;
             padding-bottom: 80px; /* Safe area for bottom nav */
         }
 
         .arh-gold { color: var(--arh-gold); }
-        .bg-arh-gold { background-color: var(--arh-gold); color: #000; }
+        .bg-arh-gold { background-color: var(--arh-gold); color: #1a0508; }
         
         .btn-arh-gold {
             background-color: var(--arh-gold);
-            color: #121212;
+            color: #1a0508;
             border: none;
             font-weight: 600;
         }
         .btn-arh-gold:hover {
             background-color: var(--arh-gold-hover);
-            color: #121212;
+            color: #1a0508;
+        }
+
+        .btn-checkin {
+            background-color: var(--arh-gold);
+            color: #1a0508;
+            border: none;
+            font-weight: 700;
+            padding: 16px;
+            border-radius: 12px;
+            width: 100%;
+            transition: all 0.3s ease;
+            font-size: 1.1rem;
+            box-shadow: 0 4px 15px rgba(212,175,55,0.4);
+        }
+        .btn-checkin.success {
+            background-color: var(--arh-maroon);
+            color: #FFFFFF;
+            box-shadow: 0 4px 15px rgba(128,0,0,0.4);
         }
 
         .offline-banner {
@@ -60,7 +82,7 @@
             left: 0;
             right: 0;
             background-color: var(--arh-card-bg);
-            border-top: 1px solid #333;
+            border-top: 1px solid var(--arh-border);
             display: flex;
             justify-content: space-around;
             padding: 10px 0;
@@ -69,7 +91,7 @@
         }
         
         .mobile-bottom-nav a {
-            color: #adb5bd;
+            color: var(--arh-text-muted);
             text-decoration: none;
             text-align: center;
             font-size: 0.75rem;
@@ -89,28 +111,42 @@
 
         /* Header */
         .mobile-header {
-            background-color: var(--arh-card-bg);
+            background-color: var(--arh-maroon-dark);
             padding: 15px 20px;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            border-bottom: 1px solid #333;
+            border-bottom: 1px solid rgba(197,160,40,0.2);
             position: sticky;
             top: 0;
             z-index: 1030;
         }
+        .mobile-header .fw-bold { color: #C5A028; }
+        .mobile-header span.small { color: #f0e0e0; }
 
         .card-personnel {
             background-color: var(--arh-card-bg);
-            border: 1px solid #333;
+            border: 1px solid var(--arh-gold);
             border-radius: 12px;
             overflow: hidden;
+            box-shadow: 0 2px 8px rgba(128,0,0,0.05);
+        }
+        
+        /* Slide-in transition for main content */
+        main.container {
+            animation: slideInRight 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+            padding-left: 16px;
+            padding-right: 16px;
+        }
+        @keyframes slideInRight {
+            from { opacity: 0; transform: translateX(30px); }
+            to { opacity: 1; transform: translateX(0); }
         }
         
         .badge-role {
-            background-color: rgba(197, 160, 89, 0.2);
-            color: var(--arh-gold);
-            border: 1px solid var(--arh-gold);
+            background-color: rgba(197,160,40,0.15);
+            color: #C5A028;
+            border: 1px solid rgba(197,160,40,0.4);
         }
     </style>
 </head>
@@ -121,10 +157,10 @@
     </div>
 
     <header class="mobile-header mt-0" id="mainHeader">
-        <div class="fw-bold fs-5 arh-gold">ART<span class="text-white">-HUB</span></div>
+        <div class="fw-bold fs-5" style="color: #D4AF37;">ART<span style="color: #fff;">-HUB</span></div>
         <div class="d-flex align-items-center gap-3">
-            <span class="small fw-semibold">{{ Auth::user()->name }}</span>
-            <div class="rounded-circle bg-secondary d-flex justify-content-center align-items-center fw-bold" style="width:35px;height:35px;font-size:0.9rem;">
+            <span class="small fw-semibold" style="color: #FDFBF7;">{{ Auth::user()->name }}</span>
+            <div class="rounded-circle d-flex justify-content-center align-items-center fw-bold" style="width:35px;height:35px;font-size:0.9rem;background:linear-gradient(135deg,#4a0000,#2d0000);color:#fff;border:1px solid rgba(212,175,55,0.4);">
                 {{ substr(Auth::user()->name, 0, 2) }}
             </div>
         </div>

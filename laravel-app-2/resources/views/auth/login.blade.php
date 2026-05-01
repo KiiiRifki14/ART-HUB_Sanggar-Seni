@@ -9,19 +9,21 @@
 
     <style>
         :root {
-            --bg-dark: #0a0b0d;
-            --bg-card: #15171a;
-            --bg-hover: #1e2126;
-            --text-main: #f3f4f6;
-            --text-muted: #9ca3af;
-            --border-color: #272a30;
-            --gold-primary: #D4AF37;
-            --gold-light: #F3E5AB;
-            --gold-dark: #AA8C2C;
-            --gold-glow: rgba(212, 175, 55, 0.3);
-            --glass-bg: rgba(21, 23, 26, 0.7);
-            --glass-border: rgba(255, 255, 255, 0.05);
-            --error: #ef4444;
+            /* ── NEW PALETTE: Deep Maroon + Clean White + Gold ── */
+            --bg-dark:      #800000;        /* Body: Deep Maroon */
+            --bg-card:      #FFFFFF;        /* Form Panel: Clean White */
+            --bg-hover:     #FDFBF7;
+            --text-main:    #1A1A1A;        /* Teks gelap di atas putih */
+            --text-muted:   #7A7A7A;
+            --border-color: #E8E3D9;
+            --gold-primary: #D4AF37;        /* Accent Gold */
+            --gold-light:   #F3CE5E;
+            --gold-dark:    #b5952f;
+            --gold-glow:    rgba(212,175,55,0.25);
+            --maroon-btn:   #800000;
+            --maroon-btn-hover: #4a0000;
+            --glass-border: rgba(255,255,255,0.2);
+            --error:        #FF0000;
         }
 
         * {
@@ -32,7 +34,7 @@
         }
 
         body {
-            background-color: var(--bg-dark);
+            background: linear-gradient(135deg, var(--bg-dark), #4a0000);
             display: flex;
             align-items: center;
             justify-content: center;
@@ -47,7 +49,7 @@
             content: '';
             position: absolute;
             width: 400px; height: 400px;
-            background: var(--gold-glow);
+            background: rgba(212,175,55,0.15); /* Gold glow */
             border-radius: 50%;
             filter: blur(120px);
             top: -100px; left: -100px;
@@ -57,7 +59,7 @@
             content: '';
             position: absolute;
             width: 300px; height: 300px;
-            background: rgba(212, 175, 55, 0.15);
+            background: rgba(212,175,55,0.2); /* Gold glow */
             border-radius: 50%;
             filter: blur(100px);
             bottom: -80px; right: -80px;
@@ -67,6 +69,7 @@
             0% { transform: translate(0, 0) scale(1); }
             100% { transform: translate(30px, 20px) scale(1.1); }
         }
+
 
         .login-container {
             display: flex;
@@ -88,7 +91,7 @@
 
         .login-visual {
             flex: 1;
-            background: linear-gradient(135deg, var(--bg-dark), #1a1a2e, #16213e);
+            background: linear-gradient(135deg, #1C0508, #4a0000);
             position: relative;
             display: flex;
             align-items: center;
@@ -134,6 +137,7 @@
         .login-form-panel {
             flex: 1;
             padding: 50px 45px;
+            background: var(--bg-card);
         }
 
         .logo {
@@ -158,7 +162,7 @@
             display: block;
             margin-bottom: 8px;
             font-weight: 600;
-            color: var(--gold-light);
+            color: var(--text-main);
             font-size: 13px;
             letter-spacing: 0.5px;
         }
@@ -168,15 +172,16 @@
             padding: 12px 15px;
             border: 1px solid var(--border-color);
             border-radius: 10px;
-            background: rgba(0,0,0,0.3);
+            background: #FFFFFF;
             color: var(--text-main);
             font-size: 14px;
             transition: all 0.3s ease;
         }
         .form-input:focus {
             outline: none;
-            border-color: var(--gold-primary);
-            box-shadow: 0 0 0 3px var(--gold-glow);
+            border-color: var(--bg-dark);
+            box-shadow: 0 0 0 3px rgba(128,0,0,0.15);
+            background: #FDFBF7;
         }
         .form-input::placeholder { color: var(--text-muted); }
 
@@ -206,8 +211,8 @@
             padding: 14px;
             border-radius: 10px;
             border: none;
-            background: linear-gradient(135deg, var(--gold-primary), var(--gold-dark));
-            color: var(--bg-dark);
+            background: var(--maroon-btn);
+            color: #FFFFFF;
             font-weight: 700;
             font-size: 0.95rem;
             cursor: pointer;
@@ -215,12 +220,12 @@
             text-align: center;
             letter-spacing: 1px;
             text-transform: uppercase;
-            box-shadow: 0 4px 15px var(--gold-glow);
+            box-shadow: 0 4px 15px rgba(128,0,0,0.25);
         }
         .btn-primary:hover {
+            background: var(--maroon-btn-hover);
             transform: translateY(-2px) scale(1.01);
-            box-shadow: 0 6px 25px rgba(212, 175, 55, 0.5);
-            filter: brightness(1.1);
+            box-shadow: 0 6px 25px rgba(128,0,0,0.35);
         }
 
         .link {

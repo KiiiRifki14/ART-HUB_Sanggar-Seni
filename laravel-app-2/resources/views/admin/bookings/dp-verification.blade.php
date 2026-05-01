@@ -1,4 +1,4 @@
-﻿@extends('layouts.admin')
+@extends('layouts.admin')
 @section('title', 'DP Verification & Payment Tracking – ART-HUB')
 @section('page_title', 'DP Verification & Payment Tracking')
 @section('page_subtitle', 'Pastikan keamanan finansial sanggar dengan verifikasi bukti transfer klien.')
@@ -15,16 +15,17 @@
         margin-bottom: 28px;
     }
     .dpv-card {
-        background: #1a1a1a;
-        border: 1px solid #2a2a2a;
+        background: #FFFFFF;
+        border: 1px solid #E0D0D2;
         border-radius: 14px;
         padding: 20px 22px;
         display: flex;
         align-items: center;
         gap: 16px;
-        transition: border-color 0.2s;
+        transition: border-color 0.2s, box-shadow 0.2s;
+        box-shadow: 0 1px 6px rgba(139,26,42,0.06);
     }
-    .dpv-card:hover { border-color: #444; }
+    .dpv-card:hover { border-color: #8B1A2A; box-shadow: 0 4px 16px rgba(139,26,42,0.1); }
     .dpv-card-icon {
         width: 48px; height: 48px;
         border-radius: 12px;
@@ -32,147 +33,152 @@
         font-size: 1.3rem;
         flex-shrink: 0;
     }
-    .dpv-card-icon.warn   { background: rgba(251,191,36,0.15); color: #fbbf24; }
-    .dpv-card-icon.success{ background: rgba(52,211,153,0.15); color: #34d399; }
-    .dpv-card-icon.info   { background: rgba(96,165,250,0.15); color: #60a5fa; }
-    .dpv-card-label { font-size: 0.72rem; color: #888; margin-bottom: 4px; text-transform: uppercase; letter-spacing: 0.05em; }
-    .dpv-card-value { font-size: 1.35rem; font-weight: 700;  line-height: 1.2; }
-    .dpv-card-value.green { color: #34d399; }
-    .dpv-card-value.blue  { color: #60a5fa; }
+    .dpv-card-icon.warn   { background: rgba(251,191,36,0.12); color: #d97706; }
+    .dpv-card-icon.success{ background: rgba(22,163,74,0.12);  color: #16a34a; }
+    .dpv-card-icon.info   { background: rgba(139,26,42,0.1);   color: #8B1A2A; }
+    .dpv-card-label { font-size: 0.72rem; color: #7a5a5e; margin-bottom: 4px; text-transform: uppercase; letter-spacing: 0.05em; }
+    .dpv-card-value { font-size: 1.35rem; font-weight: 700; line-height: 1.2; color: #1A0808; }
+    .dpv-card-value.green { color: #16a34a; }
+    .dpv-card-value.blue  { color: #8B1A2A; }
 
     /* ═══════════════════════════════════════════════════════
        MAIN TABLE PANEL
     ═══════════════════════════════════════════════════════ */
     .dpv-panel {
-        background: #111;
-        border: 1px solid #252525;
+        background: #FFFFFF;
+        border: 1px solid #E0D0D2;
         border-radius: 14px;
         overflow: hidden;
         margin-bottom: 30px;
+        box-shadow: 0 1px 6px rgba(139,26,42,0.06);
     }
     .dpv-panel-header {
         display: flex; align-items: center;
         justify-content: space-between;
         padding: 16px 22px;
-        border-bottom: 1px solid #222;
+        border-bottom: 1px solid #E0D0D2;
+        background: #fdf9f9;
     }
-    .dpv-panel-title { font-size: 0.95rem; font-weight: 600;  display: flex; align-items: center; gap: 10px; }
+    .dpv-panel-title { font-size: 0.95rem; font-weight: 600; color: #1A0808; display: flex; align-items: center; gap: 10px; }
     .dpv-search-wrap { position: relative; }
     .dpv-search-wrap input {
-        background: #1a1a1a;
-        border: 1px solid #333;
+        background: #FFFFFF;
+        border: 1px solid #E0D0D2;
         border-radius: 8px;
-        
+        color: #1A0808;
         padding: 7px 14px 7px 36px;
         font-size: 0.8rem;
         width: 220px;
         transition: border-color 0.2s;
     }
-    .dpv-search-wrap input:focus { outline: none; border-color: #8B1A2A;  }
+    .dpv-search-wrap input:focus { outline: none; border-color: #8B1A2A; box-shadow: 0 0 0 3px rgba(139,26,42,0.1); }
+    .dpv-search-wrap input::placeholder { color: #7a5a5e; }
     .dpv-search-wrap .search-icon {
         position: absolute; left: 11px; top: 50%; transform: translateY(-50%);
-        color: #555; font-size: 0.8rem;
+        color: #7a5a5e; font-size: 0.8rem;
     }
 
     /* Table */
     .dpv-table { width: 100%; border-collapse: collapse; }
-    .dpv-table thead tr { background: #0d0d0d; }
+    .dpv-table thead tr { background: #fdf9f9; }
     .dpv-table th {
         padding: 11px 16px; text-align: left;
         font-size: 0.7rem; font-weight: 700;
-        color: #555; letter-spacing: 0.08em; text-transform: uppercase;
-        border-bottom: 1px solid #222;
+        color: #8B1A2A; letter-spacing: 0.08em; text-transform: uppercase;
+        border-bottom: 1px solid #E0D0D2;
     }
     .dpv-table td {
         padding: 14px 16px;
-        border-bottom: 1px solid #1a1a1a;
+        border-bottom: 1px solid #F4EEF0;
         vertical-align: middle;
         font-size: 0.83rem;
-        
+        color: #1A0808;
     }
     .dpv-table tbody tr:last-child td { border-bottom: none; }
-    .dpv-table tbody tr:hover td { background: #151515; }
+    .dpv-table tbody tr:hover td { background: rgba(139,26,42,0.03); }
 
     .booking-code { font-family: 'Courier New', monospace; color: #8B1A2A; font-weight: 600; font-size: 0.82rem; }
-    .client-name  { font-weight: 600;  }
+    .client-name  { font-weight: 600; color: #1A0808; }
     .event-type-badge {
-        font-size: 0.68rem; color: #888;
-        background: #1e1e1e; border: 1px solid #2e2e2e;
+        font-size: 0.68rem; color: #7a5a5e;
+        background: #F9F5F5; border: 1px solid #E0D0D2;
         border-radius: 4px; padding: 2px 6px; display: inline-block; margin-top: 3px;
     }
-    .nominal-dp { color: #34d399; font-weight: 700; }
-    .dp-label   { font-size: 0.68rem; color: #555; }
+    .nominal-dp { color: #16a34a; font-weight: 700; }
+    .dp-label   { font-size: 0.68rem; color: #7a5a5e; }
 
     /* Tombol Aksi */
     .btn-lihat-bukti {
-        background: #1e1e1e; border: 1px solid #333; 
+        background: #F9F5F5; border: 1px solid #E0D0D2;
         border-radius: 7px; padding: 6px 12px; font-size: 0.75rem;
         cursor: pointer; display: inline-flex; align-items: center; gap: 5px;
-        transition: border-color 0.2s, color 0.2s;
+        transition: border-color 0.2s, color 0.2s; color: #1A0808;
         text-decoration: none;
     }
-    .btn-lihat-bukti:hover { border-color: #8B1A2A; color: #8B1A2A; }
+    .btn-lihat-bukti:hover { border-color: #8B1A2A; color: #8B1A2A; background: rgba(139,26,42,0.05); }
     .btn-verify {
-        background: #8B1A2A; color: #000; border: none;
+        background: #8B1A2A; color: #fff; border: none;
         border-radius: 7px; padding: 7px 14px; font-size: 0.75rem; font-weight: 700;
         cursor: pointer; transition: background 0.15s;
     }
-    .btn-verify:hover { background: #d4b070; }
+    .btn-verify:hover { background: #6B1020; }
     .btn-reject {
-        background: transparent; color: #ef4444; border: 1px solid #ef444466;
+        background: transparent; color: #ef4444; border: 1px solid rgba(239,68,68,0.4);
         border-radius: 7px; padding: 7px 12px; font-size: 0.75rem; font-weight: 600;
         cursor: pointer; transition: background 0.15s, border-color 0.15s;
     }
-    .btn-reject:hover { background: #ef44441a; border-color: #ef4444; }
+    .btn-reject:hover { background: rgba(239,68,68,0.08); border-color: #ef4444; }
     .action-group { display: flex; align-items: center; gap: 8px; }
 
     /* Empty State */
-    .dpv-empty { padding: 50px; text-align: center; color: #555; }
+    .dpv-empty { padding: 50px; text-align: center; color: #7a5a5e; }
 
     /* ═══════════════════════════════════════════════════════
        WAITING LIST (Belum Upload)
     ═══════════════════════════════════════════════════════ */
     .wait-row {
         display: flex; align-items: center; gap: 14px;
-        padding: 14px 22px; border-bottom: 1px solid #1a1a1a;
+        padding: 14px 22px; border-bottom: 1px solid #F4EEF0;
         transition: background 0.15s;
     }
     .wait-row:last-child { border-bottom: none; }
-    .wait-row:hover { background: #151515; }
+    .wait-row:hover { background: rgba(139,26,42,0.03); }
     .wait-icon {
         width: 40px; height: 40px; border-radius: 10px;
-        background: #1c1c1c; border: 1px dashed #333;
+        background: #F9F5F5; border: 1px dashed #E0D0D2;
         display: flex; align-items: center; justify-content: center;
-        color: #444; flex-shrink: 0;
+        color: #7a5a5e; flex-shrink: 0;
     }
 
     /* ═══════════════════════════════════════════════════════
        MODAL VERIFIKASI
     ═══════════════════════════════════════════════════════ */
     .modal-content.dpv-modal {
-        background: #111;
-        border: 1px solid #2a2a2a;
+        background: #FFFFFF;
+        border: 1px solid #E0D0D2;
         border-radius: 16px;
-        
     }
     .dpv-modal .modal-header {
-        border-bottom: 1px solid #222;
+        border-bottom: 1px solid #E0D0D2;
         padding: 18px 22px;
+        background: #fdf9f9;
     }
     .dpv-modal .modal-footer {
-        border-top: 1px solid #222;
+        border-top: 1px solid #E0D0D2;
         padding: 14px 22px;
+        background: #fdf9f9;
     }
     .dpv-deal-card {
-        background: #1a1a1a;
-        border: 1px solid #252525;
+        background: #F9F5F5;
+        border: 1px solid #E0D0D2;
         border-radius: 12px;
         padding: 18px 20px;
         margin-bottom: 14px;
     }
-    .dpv-deal-card .label { font-size: 0.7rem; color: #666; text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 5px; }
-    .dpv-deal-card .value { font-size: 0.95rem; color: #ddd; font-weight: 500; }
-    .dpv-deal-card .value.bold { font-size: 1.1rem;  font-weight: 700; }
+    .dpv-deal-card .label { font-size: 0.7rem; color: #7a5a5e; text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 5px; }
+    .dpv-deal-card .value { font-size: 0.95rem; color: #1A0808; font-weight: 500; }
+    .dpv-deal-card .value.bold { font-size: 1.1rem; font-weight: 700; color: #8B1A2A; }
+
     .dpv-profit-card {
         background: linear-gradient(135deg, #1a2e1a, #1e3520);
         border: 1px solid #2d5a2d;

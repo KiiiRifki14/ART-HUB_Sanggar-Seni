@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="id" data-bs-theme="dark">
+<html lang="id">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -13,75 +13,110 @@
     
     <style>
         :root {
-            --klien-gold: #D4AF37;
-            --klien-dark: #0f1014;
-            --glass-bg: rgba(255, 255, 255, 0.03);
-            --glass-border: rgba(255, 255, 255, 0.08);
+            --klien-maroon:       #800000;
+            --klien-maroon-dark:  #800000;
+            --klien-gold:         #D4AF37;
+            --klien-gold-hover:   #F3CE5E;
+            --klien-body-bg:      #FDFBF7;
+            --klien-card-bg:      #FFFFFF;
+            --klien-border:       #E8E3D9;
+            --klien-text:         #1A1A1A;
+            --klien-text-muted:   #7A7A7A;
         }
 
         body {
-            background-color: var(--klien-dark);
-            color: #f1f1f1;
+            background-color: var(--klien-body-bg);
+            color: var(--klien-text);
             font-family: 'Outfit', sans-serif;
-            background-image: 
-                radial-gradient(circle at 15% 50%, rgba(212, 175, 55, 0.08), transparent 25%),
-                radial-gradient(circle at 85% 30%, rgba(255, 255, 255, 0.02), transparent 25%);
-            background-attachment: fixed;
         }
 
         .klien-gold { color: var(--klien-gold); }
 
         .glass-card {
-            background: var(--glass-bg);
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
-            border: 1px solid var(--glass-border);
+            background: var(--klien-card-bg);
+            border: 1px solid var(--klien-gold); /* border gold tipis */
             border-radius: 16px;
-            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
-            transition: transform 0.3s ease, background 0.3s ease;
+            box-shadow: 0 2px 16px rgba(128,0,0,0.06);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
         }
         
         .glass-card:hover {
-            background: rgba(255, 255, 255, 0.05);
-            transform: translateY(-5px);
+            transform: translateY(-4px);
+            box-shadow: 0 6px 24px rgba(128,0,0,0.1);
         }
 
         .navbar-klien {
-            background: rgba(15, 16, 20, 0.8);
-            backdrop-filter: blur(12px);
-            border-bottom: 1px solid var(--glass-border);
+            background: var(--klien-maroon-dark);
+            border-bottom: 1px solid rgba(212,175,55,0.2);
         }
+        .navbar-klien .navbar-brand,
+        .navbar-klien .nav-link { color: #fff !important; }
+        .navbar-klien .nav-link:hover { color: var(--klien-gold) !important; }
+        .navbar-klien .nav-link.active { color: var(--klien-gold) !important; font-weight: 600; }
 
-        .btn-klien-gold {
-            background: linear-gradient(135deg, #E6C25A, #B48B25);
-            color: #000;
+        .btn-klien-primary {
+            background: var(--klien-maroon);
+            color: #FFFFFF;
             font-weight: 600;
             border: none;
             border-radius: 8px;
             padding: 10px 24px;
             transition: all 0.3s ease;
         }
-
-        .btn-klien-gold:hover {
-            background: linear-gradient(135deg, #f7d165, #c59929);
+        .btn-klien-primary:hover {
+            background: #600000;
+            color: #FFFFFF;
             transform: translateY(-2px);
-            box-shadow: 0 4px 15px rgba(212, 175, 55, 0.3);
-            color: #000;
+            box-shadow: 0 4px 15px rgba(128,0,0,0.3);
+        }
+
+        .btn-klien-outline-gold {
+            background: transparent;
+            color: var(--klien-gold);
+            border: 1px solid var(--klien-gold);
+            font-weight: 600;
+            border-radius: 8px;
+            padding: 10px 24px;
+            transition: all 0.3s ease;
+        }
+        .btn-klien-outline-gold:hover {
+            background: var(--klien-gold);
+            color: #1a0508;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(212,175,55,0.3);
         }
 
         .form-control, .form-select {
-            background-color: rgba(255, 255, 255, 0.05);
-            border: 1px solid var(--glass-border);
-            color: #fff;
+            background-color: #FFFFFF;
+            border: 1px solid var(--klien-border);
+            color: var(--klien-text);
             border-radius: 8px;
             padding: 12px 15px;
         }
 
         .form-control:focus, .form-select:focus {
-            background-color: rgba(255, 255, 255, 0.1);
+            background-color: #FFFFFF;
             border-color: var(--klien-gold);
-            box-shadow: 0 0 0 0.25rem rgba(212, 175, 55, 0.25);
+            box-shadow: 0 0 0 0.25rem rgba(212,175,55,0.2);
+            color: var(--klien-text);
+        }
+
+        .form-control::placeholder { color: var(--klien-text-muted); }
+
+        .klien-hero {
+            background: linear-gradient(135deg, var(--klien-maroon), #4a0000);
             color: #fff;
+            padding: 40px;
+            border-radius: 16px;
+            box-shadow: 0 4px 20px rgba(128,0,0,0.15);
+            border-bottom: 3px solid var(--klien-gold);
+        }
+
+        .fp-card {
+            background: rgba(212,175,55,0.1);
+            border: 2px solid var(--klien-gold);
+            border-radius: 12px;
+            padding: 20px;
         }
 
         /* Animations */
@@ -113,10 +148,10 @@
                     </li>
                 </ul>
                 <div class="d-flex align-items-center gap-3">
-                    <span class="fw-semibold">{{ Auth::user()->name }}</span>
+                    <span class="fw-semibold text-white">{{ Auth::user()->name }}</span>
                     <form action="{{ route('logout') }}" method="POST">
                         @csrf
-                        <button type="submit" class="btn btn-sm btn-outline-danger border-0">Logout</button>
+                        <button type="submit" class="btn btn-sm btn-outline-light border-0">Logout</button>
                     </form>
                 </div>
             </div>

@@ -1,421 +1,370 @@
 <!DOCTYPE html>
 <html lang="id">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Register | ART-HUB Sanggar Cahaya Gumilang</title>
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-
-    <style>
-        :root {
-            --bg-dark: #0a0b0d;
-            --bg-card: #15171a;
-            --bg-hover: #1e2126;
-            --text-main: #f3f4f6;
-            --text-muted: #9ca3af;
-            --border-color: #272a30;
-            --gold-primary: #D4AF37;
-            --gold-light: #F3E5AB;
-            --gold-dark: #AA8C2C;
-            --gold-glow: rgba(212, 175, 55, 0.3);
-            --glass-border: rgba(255, 255, 255, 0.05);
-            --error: #ef4444;
-        }
-
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            font-family: 'Outfit', sans-serif;
-        }
-
-        body {
-            background-color: var(--bg-dark);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            min-height: 100vh;
-            padding: 20px;
-            position: relative;
-            overflow: hidden;
-        }
-
-        body::before {
-            content: '';
-            position: absolute;
-            width: 350px; height: 350px;
-            background: var(--gold-glow);
-            border-radius: 50%;
-            filter: blur(120px);
-            top: -80px; right: -80px;
-            animation: floatGlow 8s ease-in-out infinite alternate;
-        }
-        body::after {
-            content: '';
-            position: absolute;
-            width: 250px; height: 250px;
-            background: rgba(212, 175, 55, 0.12);
-            border-radius: 50%;
-            filter: blur(100px);
-            bottom: -60px; left: -60px;
-            animation: floatGlow 10s ease-in-out infinite alternate-reverse;
-        }
-        @keyframes floatGlow {
-            0% { transform: translate(0, 0) scale(1); }
-            100% { transform: translate(20px, 15px) scale(1.1); }
-        }
-
-        .register-container {
-            background: var(--bg-card);
-            border-radius: 20px;
-            overflow: hidden;
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
-            border: 1px solid var(--glass-border);
-            width: 100%;
-            max-width: 550px;
-            padding: 45px 40px;
-            position: relative;
-            z-index: 1;
-            animation: slideUp 0.6s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-        @keyframes slideUp {
-            from { opacity: 0; transform: translateY(30px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        .logo {
-            font-weight: 800;
-            font-size: 28px;
-            color: var(--text-main);
-            text-align: center;
-            margin-bottom: 5px;
-            letter-spacing: 2px;
-        }
-        .logo span { color: var(--gold-primary); }
-
-        .form-header {
-            text-align: center;
-            margin-bottom: 30px;
-        }
-        .form-header h2 {
-            font-size: 22px;
-            color: var(--text-main);
-            margin-bottom: 5px;
-        }
-        .form-header p {
-            color: var(--text-muted);
-            font-size: 0.9rem;
-        }
-
-        .form-group { margin-bottom: 18px; }
-
-        .form-label {
-            display: block;
-            margin-bottom: 8px;
-            font-weight: 600;
-            color: var(--gold-light);
-            font-size: 13px;
-            letter-spacing: 0.5px;
-        }
-
-        .form-input {
-            width: 100%;
-            padding: 12px 15px;
-            border: 1px solid var(--border-color);
-            border-radius: 10px;
-            background: rgba(0,0,0,0.3);
-            color: var(--text-main);
-            font-size: 14px;
-            transition: all 0.3s ease;
-        }
-        .form-input:focus {
-            outline: none;
-            border-color: var(--gold-primary);
-            box-shadow: 0 0 0 3px var(--gold-glow);
-        }
-        .form-input::placeholder { color: var(--text-muted); }
-
-        .error-msg {
-            color: var(--error);
-            font-size: 12px;
-            margin-top: 5px;
-            display: block;
-        }
-
-        /* Radio Buttons */
-        .role-selector {
-            display: flex;
-            gap: 10px;
-            margin-bottom: 20px;
-        }
-        .role-option {
-            flex: 1;
-            position: relative;
-        }
-        .role-option input[type="radio"] {
-            display: none;
-        }
-        .role-label {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-            padding: 12px;
-            border: 1px solid var(--border-color);
-            border-radius: 8px;
-            cursor: pointer;
-            color: var(--text-muted);
-            font-size: 14px;
-            font-weight: 500;
-            transition: all 0.3s;
-        }
-        .role-option input[type="radio"]:checked + .role-label {
-            border-color: var(--gold-primary);
-            color: var(--gold-primary);
-            background: rgba(212, 175, 55, 0.05);
-        }
-        .radio-circle {
-            width: 14px;
-            height: 14px;
-            border: 1px solid var(--text-muted);
-            border-radius: 50%;
-            display: inline-block;
-            position: relative;
-        }
-        .role-option input[type="radio"]:checked + .role-label .radio-circle {
-            border-color: var(--gold-primary);
-        }
-        .role-option input[type="radio"]:checked + .role-label .radio-circle::after {
-            content: '';
-            width: 6px;
-            height: 6px;
-            background: var(--gold-primary);
-            border-radius: 50%;
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-        }
-
-        /* Personnel Info Box */
-        .personnel-info-box {
-            display: none;
-            border: 1px solid var(--border-color);
-            padding: 20px;
-            border-radius: 10px;
-            margin-bottom: 20px;
-            background: rgba(0,0,0,0.2);
-            animation: slideDown 0.4s ease;
-        }
-        @keyframes slideDown {
-            from { opacity: 0; transform: translateY(-10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        .personnel-info-box h3 {
-            font-size: 14px;
-            color: var(--text-main);
-            margin-bottom: 15px;
-            padding-bottom: 10px;
-            border-bottom: 1px solid var(--border-color);
-        }
-        .checkbox-group {
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-            margin-top: 10px;
-        }
-        .checkbox-item {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            font-size: 13px;
-            color: var(--text-muted);
-            cursor: pointer;
-        }
-
-        .btn-primary {
-            display: block;
-            width: 100%;
-            padding: 14px;
-            border-radius: 10px;
-            border: none;
-            background: linear-gradient(135deg, var(--gold-primary), var(--gold-dark));
-            color: var(--bg-dark);
-            font-weight: 700;
-            cursor: pointer;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            text-align: center;
-            margin-top: 28px;
-            letter-spacing: 1px;
-            text-transform: uppercase;
-            font-size: 0.95rem;
-            box-shadow: 0 4px 15px var(--gold-glow);
-        }
-        .btn-primary:hover {
-            transform: translateY(-2px) scale(1.01);
-            box-shadow: 0 6px 25px rgba(212, 175, 55, 0.5);
-            filter: brightness(1.1);
-        }
-
-        .link {
-            color: var(--gold-primary);
-            text-decoration: none;
-            font-weight: 600;
-            font-size: 14px;
-            transition: 0.2s;
-        }
-        .link:hover { color: var(--gold-light); }
-
-        @media (max-width: 480px) {
-            .register-container { padding: 35px 22px; }
-        }
-    </style>
-</head>
-
-<body>
-
-    <div class="register-container">
-        <div class="logo">ART<span>HUB</span></div>
-        <div class="form-header">
-            <h2>Buat Akun Baru</h2>
-            <p>Bergabunglah dengan komunitas seni kami</p>
-        </div>
-
-        <form method="POST" action="{{ route('register') }}">
-            @csrf
-
-            <div class="form-group">
-                <label class="form-label mb-2">I am a:</label>
-                <div class="role-selector">
-                    <label class="role-option">
-                        <input type="radio" name="role_type" value="client" checked onchange="togglePersonnelBox()">
-                        <div class="role-label"><span class="radio-circle"></span> Client</div>
-                    </label>
-                    <label class="role-option">
-                        <input type="radio" name="role_type" value="personnel" onchange="togglePersonnelBox()">
-                        <div class="role-label"><span class="radio-circle"></span> Personnel</div>
-                    </label>
-                </div>
-            </div>
-
-            <div class="form-group">
-                <label for="name" class="form-label">Full Name</label>
-                <input type="text" id="name" name="name" class="form-input" value="{{ old('name') }}" required autofocus autocomplete="name" placeholder="Enter your full name">
-                @error('name')
-                <span class="error-msg">{{ $message }}</span>
-                @enderror
-            </div>
-
-            <div class="form-group">
-                <label for="phone" class="form-label">Phone Number</label>
-                <input type="text" id="phone" name="phone" class="form-input" value="{{ old('phone') }}" required placeholder="0812-3456-7890">
-                @error('phone')
-                <span class="error-msg">{{ $message }}</span>
-                @enderror
-            </div>
-
-            <div class="form-group">
-                <label for="email" class="form-label">Email</label>
-                <input type="email" id="email" name="email" class="form-input" value="{{ old('email') }}" required autocomplete="username" placeholder="Enter your email">
-                @error('email')
-                <span class="error-msg">{{ $message }}</span>
-                @enderror
-            </div>
-
-            <div class="form-group">
-                <label for="password" class="form-label">Password</label>
-                <div style="position: relative;">
-                    <input type="password" id="password" name="password" class="form-input" required autocomplete="new-password" placeholder="Buat password yang kuat" style="padding-right: 40px;">
-                    <span onclick="togglePassword('password', this)" style="position: absolute; right: 12px; top: 12px; cursor: pointer; color: var(--text-muted);">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" viewBox="0 0 16 16">
-                            <path d="M16 8s-3-5.5-8-5.5S0 8 0 8s3 5.5 8 5.5S16 8 16 8zM1.173 8a13.133 13.133 0 0 1 1.66-2.043C4.12 4.668 5.88 3.5 8 3.5c2.12 0 3.879 1.168 5.168 2.457A13.133 13.133 0 0 1 14.828 8c-.058.087-.122.183-.195.288-.335.48-.83 1.12-1.465 1.755C11.879 11.332 10.119 12.5 8 12.5c-2.12 0-3.879-1.168-5.168-2.457A13.134 13.134 0 0 1 1.172 8z"/>
-                            <path d="M8 5.5a2.5 2.5 0 1 0 0 5 2.5 2.5 0 0 0 0-5zM4.5 8a3.5 3.5 0 1 1 7 0 3.5 3.5 0 0 1-7 0z"/>
-                        </svg>
-                    </span>
-                </div>
-                @error('password')
-                <span class="error-msg">{{ $message }}</span>
-                @enderror
-            </div>
-
-            <div class="form-group">
-                <label for="password_confirmation" class="form-label">Confirm Password</label>
-                <div style="position: relative;">
-                    <input type="password" id="password_confirmation" name="password_confirmation" class="form-input" required autocomplete="new-password" placeholder="Confirm your password" style="padding-right: 40px;">
-                    <span onclick="togglePassword('password_confirmation', this)" style="position: absolute; right: 12px; top: 12px; cursor: pointer; color: var(--text-muted);">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" viewBox="0 0 16 16">
-                            <path d="M16 8s-3-5.5-8-5.5S0 8 0 8s3 5.5 8 5.5S16 8 16 8zM1.173 8a13.133 13.133 0 0 1 1.66-2.043C4.12 4.668 5.88 3.5 8 3.5c2.12 0 3.879 1.168 5.168 2.457A13.133 13.133 0 0 1 14.828 8c-.058.087-.122.183-.195.288-.335.48-.83 1.12-1.465 1.755C11.879 11.332 10.119 12.5 8 12.5c-2.12 0-3.879-1.168-5.168-2.457A13.134 13.134 0 0 1 1.172 8z"/>
-                            <path d="M8 5.5a2.5 2.5 0 1 0 0 5 2.5 2.5 0 0 0 0-5zM4.5 8a3.5 3.5 0 1 1 7 0 3.5 3.5 0 0 1-7 0z"/>
-                        </svg>
-                    </span>
-                </div>
-                @error('password_confirmation')
-                <span class="error-msg">{{ $message }}</span>
-                @enderror
-            </div>
-
-            <div id="personnelBox" class="personnel-info-box">
-                <h3>Personnel Information</h3>
-                
-                <div class="form-group">
-                    <label class="form-label">Primary Job / Occupation</label>
-                    <input type="text" name="day_job_name" class="form-input" placeholder="e.g., Office Worker, Freelancer, Student">
-                </div>
-
-                <div class="form-group">
-                    <label class="form-label">Office Hours (If applicable)</label>
-                    <div style="display:flex; gap:10px;">
-                        <div style="flex:1;">
-                            <span style="font-size:11px; color:var(--text-muted); display:block; margin-bottom:4px;">From</span>
-                            <input type="time" name="day_job_start" class="form-input">
-                        </div>
-                        <div style="flex:1;">
-                            <span style="font-size:11px; color:var(--text-muted); display:block; margin-bottom:4px;">To</span>
-                            <input type="time" name="day_job_end" class="form-input">
-                        </div>
-                    </div>
-                </div>
-
-                <div class="form-group" style="margin-top:15px;">
-                    <label class="form-label">Dance Specialties</label>
-                    <div class="checkbox-group">
-                        <label class="checkbox-item"><input type="checkbox" name="dance_specialties[]" value="jaipong"> Jaipong / Sunda</label>
-                        <label class="checkbox-item"><input type="checkbox" name="dance_specialties[]" value="ramayana"> Ramayana / Jawa</label>
-                        <label class="checkbox-item"><input type="checkbox" name="dance_specialties[]" value="legong"> Legong / Bali</label>
-                        <label class="checkbox-item"><input type="checkbox" name="dance_specialties[]" value="other"> Other Traditional</label>
-                    </div>
-                </div>
-            </div>
-
-            <button type="submit" class="btn-primary">CREATE ACCOUNT</button>
-
-            <div style="text-align: center; margin-top: 25px; font-size: 14px; color: var(--text-muted);">
-                Already have an account? <a href="{{ route('login') }}" class="link">Login here</a>
-            </div>
-        </form>
-    </div>
-
+    <meta name="csrf-token" content="{{ csrf_token() }}">
+    <title>Daftar Akun | ART-HUB Sanggar Cahaya Gumilang</title>
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Noto+Serif:ital,wght@0,400;0,600;0,700;1,400&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet">
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com?plugins=forms"></script>
     <script>
-        function togglePersonnelBox() {
-            var isPersonnel = document.querySelector('input[name="role_type"]:checked').value === 'personnel';
-            document.getElementById('personnelBox').style.display = isPersonnel ? 'block' : 'none';
-        }
-
-        function togglePassword(inputId, iconEl) {
-            var input = document.getElementById(inputId);
-            if (input.type === "password") {
-                input.type = "text";
-                iconEl.style.color = "var(--gold-primary)"; // highlight icon
-            } else {
-                input.type = "password";
-                iconEl.style.color = "var(--text-muted)";
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        "primary":                  "#361f1a",
+                        "primary-container":        "#4e342e",
+                        "on-primary":               "#ffffff",
+                        "secondary":                "#705d00",
+                        "secondary-container":      "#fcd400",
+                        "on-secondary-container":   "#6e5c00",
+                        "secondary-fixed-dim":      "#e9c400",
+                        "surface":                  "#faf9f6",
+                        "surface-container-lowest": "#ffffff",
+                        "surface-container-low":    "#f4f3f1",
+                        "surface-container":        "#efeeeb",
+                        "surface-container-high":   "#e9e8e5",
+                        "surface-container-highest":"#e3e2e0",
+                        "on-surface":               "#1a1c1a",
+                        "on-surface-variant":       "#504442",
+                        "outline":                  "#827471",
+                        "outline-variant":          "#d4c3bf",
+                        "primary-fixed":            "#ffdad2",
+                        "on-primary-fixed":         "#2b1611",
+                    },
+                    fontFamily: {
+                        "headline": ["Noto Serif", "serif"],
+                        "display":  ["Noto Serif", "serif"],
+                        "body":     ["Manrope", "sans-serif"],
+                        "label":    ["Manrope", "sans-serif"],
+                    },
+                }
             }
         }
-        
-        // Cek onload
-        togglePersonnelBox();
     </script>
-</body>
+    <style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        /* Floating label animation */
+        .field-group input:not(:placeholder-shown) ~ label,
+        .field-group input:focus ~ label {
+            top: -1.2rem; font-size: 0.7rem; color: #705d00;
+            text-transform: uppercase; letter-spacing: 0.05em;
+        }
+        /* Tab panels */
+        #panel-personnel { display: block; }
+        #panel-client    { display: none; }
+    </style>
+</head>
+<body class="bg-surface font-body text-on-surface antialiased min-h-screen flex selection:bg-secondary-container selection:text-on-secondary-container">
 
+<main class="w-full flex min-h-screen">
+
+    {{-- ══ LEFT PANEL ══ --}}
+    <section id="left-panel"
+        class="hidden lg:flex lg:w-[45%] relative overflow-hidden bg-primary items-end pb-24 px-16"
+        style="background-image:url('https://lh3.googleusercontent.com/aida/ADBb0ugxoJkoOrQB5qHrx3eygc-Cfj4PUh8ZrXcoAElbM9P6kxVgCI1QEzxyvXCaV7CEQKHEEVUPlztp97QrMuTXDeBS8-bBr4qtocWGi-aJRNl3dmg19LPWPCSU3dn7b_ZYwZD0Epaot3C1-HCYSYML-1aldfcEjaeQ1BB6-ohqxYZ5ZTWZiguPChO5fwv9ECOvS94Z_ZgudK0NxNZIbWoAFZtDxXU47DG3hNge5gX3ISZeVjByl9XeWVUf_g'); background-size:cover; background-position:center;"
+        data-aos="fade-right" data-aos-duration="1200">
+        <div class="absolute inset-0 bg-gradient-to-t from-primary via-primary/80 to-transparent"></div>
+        <div class="relative z-10 w-full max-w-md" id="left-content-personnel">
+            <div class="mb-6">
+                <span class="font-display font-black text-white text-2xl tracking-tight">Sanggar Cahaya Gumilang</span>
+            </div>
+            <h1 class="font-headline text-5xl text-white leading-[1.1] tracking-[-0.02em] mb-5 drop-shadow-md">Join the<br>Tradition.</h1>
+            <p class="font-body text-white/75 text-base leading-relaxed">Become a part of our curated ensemble. Elevate your craft within an institution dedicated to preserving and innovating Indonesian arts.</p>
+        </div>
+        <div class="relative z-10 w-full max-w-md hidden" id="left-content-client">
+            <div class="mb-6">
+                <span class="font-display font-black text-white text-2xl tracking-tight">Sanggar Cahaya Gumilang</span>
+            </div>
+            <h1 class="font-headline text-5xl text-white leading-[1.1] tracking-[-0.02em] mb-5 drop-shadow-md">Support<br>the Arts.</h1>
+            <p class="font-body text-white/75 text-base leading-relaxed">Join our curated network of patrons and partners. Your engagement ensures the continuity of our cultural heritage and artistic excellence.</p>
+        </div>
+    </section>
+
+    {{-- ══ RIGHT PANEL ══ --}}
+    <section class="w-full lg:w-[55%] flex flex-col justify-center items-center py-14 px-6 sm:px-12 lg:px-20 bg-surface-container-lowest" data-aos="fade-left" data-aos-duration="1000">
+
+        {{-- Mobile brand --}}
+        <div class="lg:hidden w-full max-w-lg mb-10 text-center" data-aos="fade-down" data-aos-delay="100">
+            <h2 class="font-headline text-3xl text-primary font-bold tracking-tight">Cahaya Gumilang</h2>
+            <p class="font-body text-on-surface-variant mt-1 text-sm">Arts Management Portal</p>
+        </div>
+
+        <div class="w-full max-w-lg">
+
+            {{-- Header --}}
+            <div class="mb-10" data-aos="fade-up" data-aos-delay="200">
+                <h2 class="font-headline text-4xl text-primary font-medium tracking-tight mb-1">Create Account</h2>
+                <p class="font-body text-on-surface-variant text-sm" id="form-subtitle">Please complete the details below to register.</p>
+            </div>
+
+            {{-- Role Toggle --}}
+            <div class="flex bg-surface-container-low p-1 rounded-full mb-10 border border-outline-variant/15" id="role-toggle" data-aos="fade-up" data-aos-delay="300">
+                <button type="button" id="btn-personnel"
+                    onclick="switchTab('personnel')"
+                    class="flex-1 py-2.5 px-4 rounded-full bg-primary text-on-primary font-body text-sm font-semibold transition-all duration-200 shadow-[0_4px_12px_rgba(78,52,46,0.18)] flex justify-center items-center gap-2">
+                    <span class="material-symbols-outlined text-[18px]">badge</span>Personnel
+                </button>
+                <button type="button" id="btn-client"
+                    onclick="switchTab('client')"
+                    class="flex-1 py-2.5 px-4 rounded-full text-on-surface-variant hover:text-primary font-body text-sm font-medium transition-all duration-200 flex justify-center items-center gap-2">
+                    <span class="material-symbols-outlined text-[18px]">group</span>Client
+                </button>
+            </div>
+
+            {{-- Validation Errors --}}
+            @if ($errors->any())
+            <div class="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg">
+                @foreach ($errors->all() as $error)
+                    <p class="text-red-700 text-sm font-body">• {{ $error }}</p>
+                @endforeach
+            </div>
+            @endif
+
+            {{-- ═══ PERSONNEL FORM ═══ --}}
+            <div id="panel-personnel">
+                <form method="POST" action="{{ route('register') }}" class="space-y-7">
+                    @csrf
+                    <input type="hidden" name="role" value="personnel">
+
+                    {{-- Full Name --}}
+                    <div class="field-group relative" data-aos="fade-up" data-aos-delay="400">
+                        <input type="text" name="name" id="p_name" placeholder=" " required value="{{ old('name') }}"
+                            class="peer block w-full bg-surface-container-high border-0 border-b-2 border-outline-variant/40 py-3 px-4 text-on-surface focus:ring-0 focus:border-secondary focus:bg-surface-container-lowest rounded-t-lg transition-all duration-200">
+                        <label for="p_name" class="absolute left-4 top-3 text-on-surface-variant font-label text-sm transition-all duration-200 pointer-events-none
+                            peer-placeholder-shown:top-3 peer-placeholder-shown:text-sm
+                            peer-focus:-top-5 peer-focus:text-xs peer-focus:text-secondary peer-focus:uppercase peer-focus:tracking-widest">
+                            Full Name
+                        </label>
+                    </div>
+
+                    {{-- Phone + Occupation --}}
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-7" data-aos="fade-up" data-aos-delay="450">
+                        <div class="field-group relative">
+                            <input type="tel" name="phone_number" id="p_phone" placeholder=" " value="{{ old('phone_number') }}"
+                                class="peer block w-full bg-surface-container-high border-0 border-b-2 border-outline-variant/40 py-3 px-4 text-on-surface focus:ring-0 focus:border-secondary focus:bg-surface-container-lowest rounded-t-lg transition-all duration-200">
+                            <label for="p_phone" class="absolute left-4 top-3 text-on-surface-variant font-label text-sm transition-all duration-200 pointer-events-none
+                                peer-placeholder-shown:top-3 peer-placeholder-shown:text-sm
+                                peer-focus:-top-5 peer-focus:text-xs peer-focus:text-secondary peer-focus:uppercase peer-focus:tracking-widest">
+                                Phone Number
+                            </label>
+                        </div>
+                        <div class="field-group relative">
+                            <input type="text" name="primary_skill" id="p_skill" placeholder=" " value="{{ old('primary_skill') }}"
+                                class="peer block w-full bg-surface-container-high border-0 border-b-2 border-outline-variant/40 py-3 px-4 text-on-surface focus:ring-0 focus:border-secondary focus:bg-surface-container-lowest rounded-t-lg transition-all duration-200">
+                            <label for="p_skill" class="absolute left-4 top-3 text-on-surface-variant font-label text-sm transition-all duration-200 pointer-events-none
+                                peer-placeholder-shown:top-3 peer-placeholder-shown:text-sm
+                                peer-focus:-top-5 peer-focus:text-xs peer-focus:text-secondary peer-focus:uppercase peer-focus:tracking-widest">
+                                Primary Occupation
+                            </label>
+                        </div>
+                    </div>
+
+                    {{-- Specialties --}}
+                    <div data-aos="fade-up" data-aos-delay="500">
+                        <p class="font-headline text-base text-primary mb-4">Dance &amp; Music Specialties</p>
+                        <div class="grid grid-cols-2 gap-3">
+                            @foreach([['jaipong','Tari Jaipong'],['topeng','Tari Topeng'],['gamelan','Gamelan'],['kendang','Kendang'],['sinden','Sinden'],['other','Other']] as [$val,$label])
+                            <label class="flex items-center gap-3 cursor-pointer group">
+                                <div class="relative flex items-center justify-center flex-shrink-0">
+                                    <input type="checkbox" name="specialties[]" value="{{ $val }}"
+                                        class="peer appearance-none w-5 h-5 border-2 border-outline rounded bg-surface checked:bg-secondary checked:border-secondary focus:ring-2 focus:ring-secondary/20 transition-all cursor-pointer">
+                                    <span class="material-symbols-outlined absolute text-on-primary text-[14px] opacity-0 peer-checked:opacity-100 pointer-events-none" style="font-variation-settings:'FILL' 1;">check</span>
+                                </div>
+                                <span class="font-body text-sm text-on-surface group-hover:text-primary transition-colors">{{ $label }}</span>
+                            </label>
+                            @endforeach
+                        </div>
+                    </div>
+
+                    {{-- Email --}}
+                    <div class="field-group relative" data-aos="fade-up" data-aos-delay="550">
+                        <input type="email" name="email" id="p_email" placeholder=" " required value="{{ old('email') }}"
+                            class="peer block w-full bg-surface-container-high border-0 border-b-2 border-outline-variant/40 py-3 px-4 text-on-surface focus:ring-0 focus:border-secondary focus:bg-surface-container-lowest rounded-t-lg transition-all duration-200">
+                        <label for="p_email" class="absolute left-4 top-3 text-on-surface-variant font-label text-sm transition-all duration-200 pointer-events-none
+                            peer-placeholder-shown:top-3 peer-placeholder-shown:text-sm
+                            peer-focus:-top-5 peer-focus:text-xs peer-focus:text-secondary peer-focus:uppercase peer-focus:tracking-widest">
+                            Email Address
+                        </label>
+                    </div>
+
+                    {{-- Password --}}
+                    <div class="field-group relative" data-aos="fade-up" data-aos-delay="600">
+                        <input type="password" name="password" id="p_password" placeholder=" " required
+                            class="peer block w-full bg-surface-container-high border-0 border-b-2 border-outline-variant/40 py-3 px-4 text-on-surface focus:ring-0 focus:border-secondary focus:bg-surface-container-lowest rounded-t-lg transition-all duration-200">
+                        <label for="p_password" class="absolute left-4 top-3 text-on-surface-variant font-label text-sm transition-all duration-200 pointer-events-none
+                            peer-placeholder-shown:top-3 peer-placeholder-shown:text-sm
+                            peer-focus:-top-5 peer-focus:text-xs peer-focus:text-secondary peer-focus:uppercase peer-focus:tracking-widest">
+                            Password
+                        </label>
+                    </div>
+
+                    {{-- Confirm Password --}}
+                    <div class="field-group relative" data-aos="fade-up" data-aos-delay="650">
+                        <input type="password" name="password_confirmation" id="p_confirm" placeholder=" " required
+                            class="peer block w-full bg-surface-container-high border-0 border-b-2 border-outline-variant/40 py-3 px-4 text-on-surface focus:ring-0 focus:border-secondary focus:bg-surface-container-lowest rounded-t-lg transition-all duration-200">
+                        <label for="p_confirm" class="absolute left-4 top-3 text-on-surface-variant font-label text-sm transition-all duration-200 pointer-events-none
+                            peer-placeholder-shown:top-3 peer-placeholder-shown:text-sm
+                            peer-focus:-top-5 peer-focus:text-xs peer-focus:text-secondary peer-focus:uppercase peer-focus:tracking-widest">
+                            Confirm Password
+                        </label>
+                    </div>
+
+                    {{-- CTA --}}
+                    <div class="pt-2 flex flex-col items-center gap-5" data-aos="fade-up" data-aos-delay="700">
+                        <button type="submit"
+                            class="w-full flex items-center justify-between gap-3 bg-gradient-to-r from-primary-container to-primary text-on-primary py-4 px-7 rounded-xl font-body font-semibold text-sm shadow-[0_8px_24px_rgba(54,31,26,0.2)] hover:shadow-[0_12px_30px_rgba(54,31,26,0.3)] hover:-translate-y-0.5 transition-all duration-300 group">
+                            <span class="tracking-wide">Create Account</span>
+                            <span class="material-symbols-outlined group-hover:translate-x-1 transition-transform duration-200">arrow_forward</span>
+                        </button>
+                        <p class="font-body text-sm text-on-surface-variant">
+                            Already part of the ensemble?
+                            <a href="{{ route('login') }}" class="text-primary font-semibold border-b-2 border-secondary-fixed-dim hover:border-primary transition-colors pb-0.5 ml-1">Log in here</a>
+                        </p>
+                    </div>
+                </form>
+            </div>
+
+            {{-- ═══ CLIENT FORM ═══ --}}
+            <div id="panel-client">
+                <form method="POST" action="{{ route('register') }}" class="space-y-7">
+                    @csrf
+                    <input type="hidden" name="role" value="klien">
+
+                    {{-- Full Name --}}
+                    <div data-aos="fade-up" data-aos-delay="400">
+                        <label class="block font-label text-xs uppercase tracking-[0.05em] text-on-surface-variant mb-2">Full Name</label>
+                        <input type="text" name="name" required value="{{ old('name') }}" placeholder="Raden Saleh"
+                            class="w-full bg-surface-container-high/60 border-0 border-b-2 border-outline-variant/40 text-on-surface font-body px-4 py-3 rounded-t-lg focus:ring-0 focus:border-secondary transition-all duration-200 placeholder:text-on-surface-variant/40">
+                    </div>
+
+                    {{-- Organization --}}
+                    <div data-aos="fade-up" data-aos-delay="450">
+                        <label class="font-label text-xs uppercase tracking-[0.05em] text-on-surface-variant mb-2 flex justify-between">
+                            <span>Organization</span>
+                            <span class="normal-case tracking-normal opacity-50">Optional</span>
+                        </label>
+                        <input type="text" name="organization" value="{{ old('organization') }}" placeholder="e.g. National Gallery"
+                            class="w-full bg-surface-container-high/60 border-0 border-b-2 border-outline-variant/40 text-on-surface font-body px-4 py-3 rounded-t-lg focus:ring-0 focus:border-secondary transition-all duration-200 placeholder:text-on-surface-variant/40">
+                    </div>
+
+                    {{-- Phone + Email --}}
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6" data-aos="fade-up" data-aos-delay="500">
+                        <div>
+                            <label class="block font-label text-xs uppercase tracking-[0.05em] text-on-surface-variant mb-2">Phone Number</label>
+                            <input type="tel" name="phone_number" value="{{ old('phone_number') }}" placeholder="+62 812 3456 7890"
+                                class="w-full bg-surface-container-high/60 border-0 border-b-2 border-outline-variant/40 text-on-surface font-body px-4 py-3 rounded-t-lg focus:ring-0 focus:border-secondary transition-all duration-200 placeholder:text-on-surface-variant/40">
+                        </div>
+                        <div>
+                            <label class="block font-label text-xs uppercase tracking-[0.05em] text-on-surface-variant mb-2">Email Address</label>
+                            <input type="email" name="email" required value="{{ old('email') }}" placeholder="name@domain.com"
+                                class="w-full bg-surface-container-high/60 border-0 border-b-2 border-outline-variant/40 text-on-surface font-body px-4 py-3 rounded-t-lg focus:ring-0 focus:border-secondary transition-all duration-200 placeholder:text-on-surface-variant/40">
+                        </div>
+                    </div>
+
+                    {{-- Password --}}
+                    <div data-aos="fade-up" data-aos-delay="550">
+                        <label class="block font-label text-xs uppercase tracking-[0.05em] text-on-surface-variant mb-2">Password</label>
+                        <div class="relative">
+                            <input type="password" name="password" id="c_password" required placeholder="••••••••"
+                                class="w-full bg-surface-container-high/60 border-0 border-b-2 border-outline-variant/40 text-on-surface font-body px-4 py-3 rounded-t-lg focus:ring-0 focus:border-secondary transition-all duration-200 pr-12">
+                            <button type="button" onclick="togglePwd('c_password', this)" class="absolute right-3 top-1/2 -translate-y-1/2 text-on-surface-variant hover:text-primary transition-colors">
+                                <span class="material-symbols-outlined text-[20px]">visibility_off</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    {{-- Confirm Password --}}
+                    <div data-aos="fade-up" data-aos-delay="600">
+                        <label class="block font-label text-xs uppercase tracking-[0.05em] text-on-surface-variant mb-2">Confirm Password</label>
+                        <input type="password" name="password_confirmation" required placeholder="••••••••"
+                            class="w-full bg-surface-container-high/60 border-0 border-b-2 border-outline-variant/40 text-on-surface font-body px-4 py-3 rounded-t-lg focus:ring-0 focus:border-secondary transition-all duration-200">
+                    </div>
+
+                    {{-- CTA --}}
+                    <div class="pt-2 flex flex-col gap-5" data-aos="fade-up" data-aos-delay="650">
+                        <button type="submit"
+                            class="w-full bg-gradient-to-br from-primary-container to-primary text-on-primary font-body text-sm font-semibold rounded-xl py-4 px-6 flex justify-between items-center hover:opacity-90 hover:-translate-y-0.5 transition-all duration-300 shadow-[0_8px_24px_rgba(54,31,26,0.18)] group">
+                            <span class="tracking-wide">Create Account</span>
+                            <span class="material-symbols-outlined group-hover:translate-x-1 transition-transform duration-200">arrow_forward</span>
+                        </button>
+                        <div class="text-center">
+                            <p class="font-body text-sm text-on-surface-variant">
+                                Already have an account?
+                                <a href="{{ route('login') }}" class="text-primary font-semibold border-b-2 border-secondary-fixed-dim hover:border-primary transition-colors pb-0.5 ml-1">Sign in here</a>
+                            </p>
+                        </div>
+                    </div>
+                </form>
+            </div>
+
+        </div>
+    </section>
+</main>
+
+<script>
+function switchTab(tab) {
+    const isPersonnel = (tab === 'personnel');
+
+    // Panels
+    document.getElementById('panel-personnel').style.display = isPersonnel ? 'block' : 'none';
+    document.getElementById('panel-client').style.display    = isPersonnel ? 'none' : 'block';
+
+    // Left panel content
+    document.getElementById('left-content-personnel').classList.toggle('hidden', !isPersonnel);
+    document.getElementById('left-content-client').classList.toggle('hidden', isPersonnel);
+
+    // Subtitle
+    document.getElementById('form-subtitle').textContent = isPersonnel
+        ? 'Please complete the details below to register.'
+        : 'Register to manage your gallery engagements and bookings.';
+
+    // Toggle buttons style
+    const btnP = document.getElementById('btn-personnel');
+    const btnC = document.getElementById('btn-client');
+
+    if (isPersonnel) {
+        btnP.className = 'flex-1 py-2.5 px-4 rounded-full bg-primary text-white font-body text-sm font-semibold transition-all duration-200 shadow-[0_4px_12px_rgba(78,52,46,0.18)] flex justify-center items-center gap-2';
+        btnC.className = 'flex-1 py-2.5 px-4 rounded-full text-on-surface-variant hover:text-primary font-body text-sm font-medium transition-all duration-200 flex justify-center items-center gap-2';
+    } else {
+        btnC.className = 'flex-1 py-2.5 px-4 rounded-full bg-primary text-white font-body text-sm font-semibold transition-all duration-200 shadow-[0_4px_12px_rgba(78,52,46,0.18)] flex justify-center items-center gap-2';
+        btnP.className = 'flex-1 py-2.5 px-4 rounded-full text-on-surface-variant hover:text-primary font-body text-sm font-medium transition-all duration-200 flex justify-center items-center gap-2';
+    }
+}
+
+function togglePwd(id, btn) {
+    const input = document.getElementById(id);
+    const icon  = btn.querySelector('span');
+    if (input.type === 'password') {
+        input.type = 'text';
+        icon.textContent = 'visibility';
+    } else {
+        input.type = 'password';
+        icon.textContent = 'visibility_off';
+    }
+}
+
+    document.addEventListener('DOMContentLoaded', function() {
+        const oldRole = "{{ old('role') }}";
+        if (oldRole === 'klien') {
+            switchTab('client');
+        }
+    });
+</script>
+
+<script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+<script>
+    AOS.init({
+        duration: 800,
+        easing: 'ease-out-cubic',
+        once: true,
+        offset: 50,
+    });
+</script>
+
+</body>
 </html>

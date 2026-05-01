@@ -1,4 +1,4 @@
-﻿@extends('layouts.admin')
+@extends('layouts.admin')
 @section('title', 'Detail Monitoring – ' . $event->booking->client_name)
 @section('page_title', 'Detail Operasional')
 @section('page_subtitle', $event->event_code . ' · ' . \Carbon\Carbon::parse($event->event_date)->format('d M Y'))
@@ -28,7 +28,7 @@
 @endphp
 
 <style>
-    .det-card { background:#1a1a1a; border:1px solid #2a2a2a; border-radius:12px; padding:24px; }
+    .det-card { background:#FFFFFF; border:1px solid #E0D0D2; border-radius:12px; padding:24px; box-shadow: 0 1px 6px rgba(139,26,42,0.06); }
     .kru-row { display:flex; align-items:center; justify-content:space-between; padding:10px 0; border-bottom:1px solid #222; }
     .kru-row:last-child { border-bottom:none; }
     .absen-dot { width:10px; height:10px; border-radius:50%; display:inline-block; }

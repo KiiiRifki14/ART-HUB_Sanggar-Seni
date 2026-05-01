@@ -15,14 +15,15 @@
             --arh-sidebar-full: 240px;
             --arh-sidebar-mini: 60px;
             --arh-topbar-h: 52px;
-            --arh-gold: #8B1A2A;
-            --arh-gold-dim: rgba(139,26,42,0.12);
-            --arh-bg: #F4F1F1;
-            --arh-sidebar-bg: #1a0a0c;
-            --arh-border: #E0D0D2;
+            --arh-gold: #D4AF37;           /* gold accent */
+            --arh-gold-bright: #D4AF37;    /* gold accent */
+            --arh-gold-dim: rgba(212,175,55,0.12);
+            --arh-bg: #FFFFFF;
+            --arh-sidebar-bg: #800000;     /* Deep Maroon */
+            --arh-border: #E8E3D9;
         }
         * { box-sizing: border-box; }
-        body { font-family: 'Inter', sans-serif; background: #F4F1F1; color: #1a0808; margin: 0; }
+        body { font-family: 'Inter', sans-serif; background: #FFFFFF; color: #1a0808; margin: 0; }
 
         /* ━━━━━━━━━━━━━━━━ SIDEBAR ━━━━━━━━━━━━━━━━ */
         #sidebar {
@@ -53,7 +54,7 @@
         }
         .arh-brand-logo {
             width: 32px; height: 32px; border-radius: 8px; flex-shrink: 0;
-            background: linear-gradient(135deg, #8B1A2A, #5a0e1a);
+            background: linear-gradient(135deg, #800000, #4a0000); border: 1px solid rgba(212, 175, 55, 0.4);
             display: flex; align-items: center; justify-content: center;
             font-weight: 900; font-size: 0.72rem; color: #fff; letter-spacing: -0.5px;
             transition: opacity 0.2s;
@@ -66,17 +67,17 @@
             transition: opacity 0.2s, max-width 0.28s;
             max-width: 200px;
         }
-        .arh-brand-title { font-size: 0.95rem; font-weight: 700; color: var(--arh-gold); letter-spacing: 1.5px; }
-        .arh-brand-sub { font-size: 0.58rem; color: #666; text-transform: uppercase; letter-spacing: 0.8px; }
+        .arh-brand-title { font-family: 'Playfair Display', serif; font-size: 1.15rem; font-weight: 700; color: #D4AF37; letter-spacing: 1px; }
+        .arh-brand-sub { font-size: 0.55rem; color: #FDFBF7; text-transform: uppercase; letter-spacing: 0.8px; }
 
         /* Hamburger toggle – always visible, always at same position */
         #sidebarToggle {
             width: 32px; height: 32px; border-radius: 7px; flex-shrink: 0;
-            border: 1px solid #333; background: #1c1c1c; color: #888;
+            border: 1px solid rgba(255,255,255,0.12); background: rgba(255,255,255,0.06); color: #F5F5F5;
             display: flex; align-items: center; justify-content: center;
             cursor: pointer; transition: all 0.2s; margin-left: auto;
         }
-        #sidebarToggle:hover { background: var(--arh-gold-dim); color: var(--arh-gold); border-color: var(--arh-gold); }
+        #sidebarToggle:hover { background: rgba(212,175,55,0.15); color: #D4AF37; border-color: rgba(212,175,55,0.4); }
         #sidebarToggle .bi { font-size: 0.95rem; pointer-events: none; }
 
         /* In MINI: hide brand text + logo, center the toggle */
@@ -94,13 +95,13 @@
         }
         .arh-avatar {
             width: 30px; height: 30px; border-radius: 50%; flex-shrink: 0;
-            background: linear-gradient(135deg, #8B1A2A, #5a0e1a);
+            background: linear-gradient(135deg, #4a0000, #2d0000); border: 1px solid rgba(212,175,55,0.5);
             display: flex; align-items: center; justify-content: center;
             font-weight: 700; font-size: 0.7rem; color: #fff;
         }
         .arh-user-info { overflow: hidden; white-space: nowrap; }
-        .arh-user-name { font-size: 0.78rem; font-weight: 600; color: #eee; }
-        .arh-user-role { font-size: 0.6rem; color: var(--arh-gold); }
+        .arh-user-name { font-size: 0.78rem; font-weight: 600; color: #FDFBF7; }
+        .arh-user-role { font-size: 0.6rem; color: #D4AF37; }
 
         #sidebar.mini .arh-user { justify-content: center; padding: 0; }
         #sidebar.mini .arh-user-info { display: none; }
@@ -109,7 +110,7 @@
         .arh-nav { list-style: none; padding: 8px 8px 0; margin: 0; overflow-y: auto; flex: 1; }
 
         .arh-nav-section {
-            font-size: 0.58rem; color: #7a3a45; text-transform: uppercase;
+            font-size: 0.58rem; color: rgba(212,175,55,0.8); text-transform: uppercase;
             letter-spacing: 1px; padding: 12px 4px 3px; font-weight: 600;
             white-space: nowrap;
         }
@@ -125,18 +126,19 @@
             display: flex; align-items: center; gap: 10px;
             padding: 9px 8px;
             border-radius: 8px; margin-bottom: 2px;
-            color: #999; text-decoration: none;
+            color: #F5F5F5; text-decoration: none;
             font-size: 0.83rem; font-weight: 500;
             transition: background 0.15s, color 0.15s;
             white-space: nowrap; overflow: hidden;
             position: relative;
         }
-        .arh-nav-link:hover { background: var(--arh-gold-dim); color: #c45a6a; }
+        .arh-nav-link:hover { background: var(--arh-gold-dim); color: #D4AF37; }
         .arh-nav-link.active {
-            background: linear-gradient(90deg, rgba(139,26,42,0.22), rgba(139,26,42,0.05));
+            background: transparent;
             color: var(--arh-gold);
             border-left: 3px solid var(--arh-gold);
             padding-left: 5px;
+            text-shadow: 0 0 8px rgba(212,175,55,0.4);
         }
         .arh-nav-icon { font-size: 1.05rem; width: 22px; text-align: center; flex-shrink: 0; }
         .arh-nav-label { min-width: 0; overflow: hidden; }
@@ -160,10 +162,10 @@
             content: attr(data-tooltip);
             position: fixed;
             left: calc(var(--arh-sidebar-mini) + 10px);
-            background: #222; color: #eee;
+            background: #2D0A10; color: #f5eded;
             font-size: 0.78rem; font-weight: 500;
             padding: 5px 12px; border-radius: 6px;
-            border: 1px solid #333; white-space: nowrap;
+            border: 1px solid rgba(197,160,40,0.3); white-space: nowrap;
             pointer-events: none; opacity: 0;
             transition: opacity 0.15s; z-index: 9999;
             box-shadow: 0 4px 12px rgba(0,0,0,0.4);
@@ -173,28 +175,27 @@
         /* ━━━━━━━━━━━━━━━━ LOGOUT ━━━━━━━━━━━━━━━━ */
         .arh-logout-wrap {
             padding: 8px 8px 16px;
-            border-top: 1px solid var(--arh-border);
             flex-shrink: 0;
         }
         .arh-logout {
             display: flex; align-items: center; gap: 10px;
             padding: 9px 8px; border-radius: 8px;
-            color: #ef4444; font-size: 0.83rem; font-weight: 500;
+            color: #F5F5F5; font-size: 0.83rem; font-weight: 500;
             transition: background 0.15s; white-space: nowrap; overflow: hidden;
             background: none; border: none; width: 100%; cursor: pointer;
             position: relative;
         }
-        .arh-logout:hover { background: rgba(239,68,68,0.1); color: #ff7a7a; }
+        .arh-logout:hover { background: var(--arh-gold-dim); color: var(--arh-gold); }
         #sidebar.mini .arh-logout { justify-content: center; padding: 10px 0; }
         #sidebar.mini .arh-logout-label { display: none; }
         #sidebar.mini .arh-logout::after {
             content: 'Logout';
             position: fixed;
             left: calc(var(--arh-sidebar-mini) + 10px);
-            background: #222; color: #ef4444;
+            background: #2D0A10; color: #ef4444;
             font-size: 0.78rem; font-weight: 500;
             padding: 5px 12px; border-radius: 6px;
-            border: 1px solid #333; white-space: nowrap;
+            border: 1px solid rgba(239,68,68,0.3); white-space: nowrap;
             pointer-events: none; opacity: 0;
             transition: opacity 0.15s; z-index: 9999;
         }
@@ -346,21 +347,21 @@
 <nav id="topbar">
     {{-- Mobile-only hamburger in topbar --}}
     <button class="d-flex d-md-none align-items-center justify-content-center"
-            style="width:34px;height:34px;border-radius:7px;border:1px solid #333;background:#1c1c1c;color:#888;cursor:pointer;flex-shrink:0;"
+            style="width:34px;height:34px;border-radius:7px;border:1px solid #E0D0D2;background:#fdf5f5;color:#8B1A2A;cursor:pointer;flex-shrink:0;"
             onclick="openSidebarMobile()">
         <i class="bi bi-list" style="font-size:1.1rem;"></i>
     </button>
 
     <div class="flex-grow-1">
-        <h6 class="mb-0 fw-bold text-white" style="font-size:0.92rem;">@yield('page_title', 'Admin Panel')</h6>
-        <div class="text-secondary" style="font-size:0.68rem;">@yield('page_subtitle')</div>
+        <h6 class="mb-0 fw-bold" style="font-size:0.92rem; color:#1a0808;">@yield('page_title', 'Admin Panel')</h6>
+        <div style="font-size:0.68rem; color:#7a5a5e;">@yield('page_subtitle')</div>
     </div>
     <div class="d-flex align-items-center gap-2">
         <span class="badge d-none d-sm-inline-flex"
-              style="background:rgba(139,26,42,0.15); color:#8B1A2A; border:1px solid rgba(197,160,89,0.35); font-size:0.68rem;">
+              style="background:rgba(139,26,42,0.1); color:#8B1A2A; border:1px solid rgba(139,26,42,0.25); font-size:0.68rem;">
             <i class="bi bi-shield-lock-fill me-1"></i>Admin
         </span>
-        <span class="text-secondary d-none d-lg-block" style="font-size:0.72rem;">{{ now()->format('d M Y') }}</span>
+        <span style="font-size:0.72rem; color:#9a7a7e;" class="d-none d-lg-block">{{ now()->format('d M Y') }}</span>
     </div>
 </nav>
 

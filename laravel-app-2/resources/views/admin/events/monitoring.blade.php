@@ -1,4 +1,4 @@
-﻿@extends('layouts.admin')
+@extends('layouts.admin')
 @section('title', 'Event Monitoring – ART-HUB')
 @section('page_title', 'Event Monitoring')
 @section('page_subtitle', 'Pantau status & operasional lapangan seluruh pementasan')
@@ -24,30 +24,30 @@
 @endphp
 
 <style>
-    .arh-badge-nego     { background: rgba(251,191,36,0.15); color:#fbbf24; border:1px solid rgba(251,191,36,0.35); }
-    .arh-badge-locked   { background: rgba(249,115,22,0.15); color:#f97316; border:1px solid rgba(249,115,22,0.35); }
-    .arh-badge-dp       { background: rgba(59,130,246,0.15); color:#60a5fa; border:1px solid rgba(59,130,246,0.35); }
-    .arh-badge-paid     { background: rgba(34,197,94,0.15);  color:#4ade80; border:1px solid rgba(34,197,94,0.35); }
-    .arh-badge-completed{ background: rgba(21,128,61,0.2);   color:#86efac; border:1px solid rgba(21,128,61,0.4); }
+    .arh-badge-nego     { background: rgba(217,119,6,0.1);   color:#d97706; border:1px solid rgba(217,119,6,0.3); }
+    .arh-badge-locked   { background: rgba(139,26,42,0.1);   color:#8B1A2A; border:1px solid rgba(139,26,42,0.3); }
+    .arh-badge-dp       { background: rgba(37,99,235,0.1);   color:#2563eb; border:1px solid rgba(37,99,235,0.3); }
+    .arh-badge-paid     { background: rgba(22,163,74,0.1);   color:#16a34a; border:1px solid rgba(22,163,74,0.3); }
+    .arh-badge-completed{ background: rgba(21,128,61,0.12);  color:#15803d; border:1px solid rgba(21,128,61,0.3); }
     .arh-badge-status { display:inline-flex; align-items:center; gap:5px; padding: 5px 12px; border-radius:20px; font-size:0.78rem; font-weight:600; }
 
-    .mon-card { background:#1a1a1a; border:1px solid #2a2a2a; border-radius:12px; transition: border-color 0.2s; }
-    .mon-card:hover { border-color: rgba(139,26,42,0.4); }
+    .mon-card { background:#FFFFFF; border:1px solid #E0D0D2; border-radius:12px; transition: border-color 0.2s, box-shadow 0.2s; box-shadow: 0 1px 6px rgba(139,26,42,0.06); }
+    .mon-card:hover { border-color: rgba(139,26,42,0.4); box-shadow: 0 4px 16px rgba(139,26,42,0.1); }
 
     .filter-tabs { display:flex; gap:8px; flex-wrap:wrap; margin-bottom:24px; }
     .filter-tab {
-        padding: 7px 16px; border-radius:20px; border: 1px solid #333;
-        background: #1a1a1a; color: #aaa; text-decoration:none; font-size:0.82rem;
+        padding: 7px 16px; border-radius:20px; border: 1px solid #E0D0D2;
+        background: #FFFFFF; color: #7a5a5e; text-decoration:none; font-size:0.82rem;
         font-weight:500; display:flex; align-items:center; gap:6px; transition: all 0.2s;
     }
-    .filter-tab:hover { border-color: #8B1A2A; color: #8B1A2A; }
-    .filter-tab.active { background: rgba(139,26,42,0.2); border-color: #8B1A2A; color: #8B1A2A; }
+    .filter-tab:hover { border-color: #8B1A2A; color: #8B1A2A; background: rgba(139,26,42,0.04); }
+    .filter-tab.active { background: rgba(139,26,42,0.08); border-color: #8B1A2A; color: #8B1A2A; font-weight:600; }
 
-    .star-badge { color: #fbbf24; font-size: 0.9rem; }
+    .star-badge { color: #d97706; font-size: 0.9rem; }
 
-    .summary-card { background:#1a1a1a; border:1px solid #2a2a2a; border-radius:10px; padding: 16px 20px; text-align:center; }
-    .summary-num { font-size:1.8rem; font-weight:700; line-height:1; }
-    .summary-label { font-size:0.72rem; color:#888; margin-top:4px; text-transform:uppercase; letter-spacing:0.5px; }
+    .summary-card { background:#FFFFFF; border:1px solid #E0D0D2; border-radius:10px; padding: 16px 20px; text-align:center; box-shadow: 0 1px 4px rgba(139,26,42,0.06); }
+    .summary-num { font-size:1.8rem; font-weight:700; line-height:1; color:#1A0808; }
+    .summary-label { font-size:0.72rem; color:#7a5a5e; margin-top:4px; text-transform:uppercase; letter-spacing:0.5px; }
 </style>
 
 {{-- FILTER TABS --}}
@@ -63,9 +63,9 @@
 {{-- EVENT TABLE --}}
 <div class="mon-card mb-5">
     <div class="table-responsive">
-        <table class="table table-dark mb-0 align-middle" style="background:transparent;">
-            <thead style="border-bottom: 1px solid #333;">
-                <tr class="text-secondary" style="font-size:0.78rem; text-transform:uppercase; letter-spacing:0.5px;">
+        <table class="table mb-0 align-middle" style="background:transparent;">
+            <thead style="border-bottom: 1px solid #E0D0D2; background: #fdf9f9;">
+                <tr style="font-size:0.78rem; text-transform:uppercase; letter-spacing:0.5px; color: #8B1A2A;">
                     <th class="px-4 py-3 fw-semibold">Tanggal Event</th>
                     <th class="px-3 py-3 fw-semibold">Nama Klien</th>
                     <th class="px-3 py-3 fw-semibold">Jenis Acara</th>

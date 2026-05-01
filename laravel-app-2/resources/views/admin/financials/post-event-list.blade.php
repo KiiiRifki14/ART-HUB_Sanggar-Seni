@@ -1,15 +1,15 @@
-﻿@extends('layouts.admin')
+@extends('layouts.admin')
 @section('title', 'Post-Event Update – ART-HUB')
 @section('page_title', 'Post-Event Update')
 @section('page_subtitle', 'Input biaya riil lapangan pasca pementasan')
 
 @section('content')
 <style>
-    .pe-card { background:#1a1a1a; border:1px solid #2a2a2a; border-radius:12px; overflow:hidden; }
-    .pe-row { display:flex; align-items:center; padding:16px 20px; border-bottom:1px solid #222; gap:16px; transition:background 0.15s; }
+    .pe-card { background:#FFFFFF; border:1px solid #E0D0D2; border-radius:12px; overflow:hidden; box-shadow: 0 1px 6px rgba(139,26,42,0.06); }
+    .pe-row { display:flex; align-items:center; padding:16px 20px; border-bottom:1px solid #F4EEF0; gap:16px; transition:background 0.15s; color: #1A0808; }
     .pe-row:last-child { border-bottom:none; }
-    .pe-row:hover { background:#212121; }
-    .budget-bar { height:6px; border-radius:3px; background:#2a2a2a; overflow:hidden; margin-top:4px; }
+    .pe-row:hover { background: rgba(139,26,42,0.03); }
+    .budget-bar { height:6px; border-radius:3px; background:#E0D0D2; overflow:hidden; margin-top:4px; }
     .budget-fill { height:100%; border-radius:3px; transition: width 0.5s ease; }
 </style>
 

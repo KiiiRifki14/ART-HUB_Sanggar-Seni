@@ -1,20 +1,22 @@
 /*
- * ART-HUB Admin – Light Theme (Maroon + White)
+ * ART-HUB Admin – Light Theme (Maroon + White + Gold)
+ * Palet: Sidebar = Maroon Gelap | Body = Putih Hangat | Accent = Gold
  */
 
 /* ── VARIABEL WARNA ── */
 :root {
-    --arh-gold:         #8B1A2A;
-    --arh-gold-light:   #b02035;
-    --arh-gold-dark:    #5a0e1a;
-    --arh-sidebar-bg:   #1a0a0c;
+    --arh-maroon:       #800000;   /* Primary: Deep Maroon */
+    --arh-maroon-dark:  #4a0000;
+    --arh-gold:         #D4AF37;   /* Accent: Gold */
+    --arh-gold-hover:   #F3CE5E;
+    --arh-sidebar-bg:   #800000;
     --arh-sidebar-w:    260px;
     --arh-topbar-bg:    #FFFFFF;
-    --arh-body-bg:      #F4F1F1;
-    --arh-card-bg:      #FFFFFF;
-    --arh-border:       #E0D0D2;
-    --arh-text:         #000000;
-    --arh-text-muted:   #4a4a4a;
+    --arh-body-bg:      #FFFFFF;   /* Background: Clean White */
+    --arh-card-bg:      #FDFBF7;   /* Neutral: Light Gray/Cream */
+    --arh-border:       #E8E3D9;
+    --arh-text:         #1A1A1A;
+    --arh-text-muted:   #7A7A7A;
 }
 
 /* ── BASE ── */
@@ -22,6 +24,27 @@ body {
     font-family: 'Inter', system-ui, sans-serif;
     background-color: var(--arh-body-bg);
     color: var(--arh-text);
+}
+
+/* ── MIKRO-ANIMASI UTILITIES ── */
+@keyframes pulse-border {
+    0% { border-color: rgba(255, 0, 0, 0.4); box-shadow: 0 0 0 0 rgba(255, 0, 0, 0.4); }
+    70% { border-color: rgba(255, 0, 0, 1); box-shadow: 0 0 0 6px rgba(255, 0, 0, 0); }
+    100% { border-color: rgba(255, 0, 0, 0.4); box-shadow: 0 0 0 0 rgba(255, 0, 0, 0); }
+}
+.pulse-border {
+    background-color: #FFFFFF !important;
+    border: 2px solid #FF0000 !important;
+    color: var(--arh-maroon) !important;
+    animation: pulse-border 2s infinite;
+}
+
+.lift-hover {
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+.lift-hover:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
 }
 
 /* ── TOPBAR ── */
