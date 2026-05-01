@@ -8,10 +8,14 @@
 
 {{-- ── ASET KOSTUM SANGGAR ── --}}
 <div class="mb-10">
-    <div class="flex items-center gap-2 mb-6">
-        <h2 class="font-headline text-xl text-primary font-semibold">
-            <i class="bi bi-tag-fill text-secondary me-1"></i> Inventaris Aset Sanggar
+    <div class="flex items-center justify-between mb-6">
+        <h2 class="font-headline text-xl text-primary font-semibold flex items-center gap-2">
+            <div class="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center"><i class="bi bi-tag-fill text-primary"></i></div> 
+            Inventaris Aset Sanggar
         </h2>
+        <button class="px-4 py-2 rounded-lg bg-primary text-white font-label text-xs font-bold uppercase tracking-widest hover:bg-primary-container transition-colors shadow-sm flex items-center gap-1.5">
+            <i class="bi bi-plus-lg"></i> Tambah Aset
+        </button>
     </div>
     
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
@@ -49,10 +53,14 @@
 
 {{-- ── SEWA VENDOR (RENTALS) ── --}}
 <div>
-    <div class="flex items-center gap-2 mb-6">
-        <h2 class="font-headline text-xl text-primary font-semibold">
-            <i class="bi bi-shop text-secondary me-1"></i> Transaksi Sewa Vendor Eksternal
+    <div class="flex items-center justify-between mb-6">
+        <h2 class="font-headline text-xl text-primary font-semibold flex items-center gap-2">
+            <div class="w-10 h-10 rounded-lg bg-secondary/10 flex items-center justify-center"><i class="bi bi-shop text-secondary"></i></div> 
+            Transaksi Sewa Vendor Eksternal
         </h2>
+        <button class="px-4 py-2 rounded-lg bg-secondary text-white font-label text-xs font-bold uppercase tracking-widest hover:bg-secondary-container transition-colors shadow-sm flex items-center gap-1.5">
+            <i class="bi bi-plus-lg"></i> Nambah Sewaan
+        </button>
     </div>
 
     <div class="bg-surface-container-lowest rounded-xl border border-outline-variant/30 shadow-[0_12px_24px_rgba(54,31,26,0.03)] overflow-hidden">

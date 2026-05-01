@@ -77,22 +77,31 @@
                 </tr>
             </thead>
             <tbody class="divide-y divide-outline-variant/20">
-                @forelse($fr->operationalCosts as $cost)
+                @forelse($fr->operationalCosts as $index => $cost)
                 @php $diff = $cost->actual_amount - $cost->estimated_amount; @endphp
-                <tr class="hover:bg-surface-container-low/50 transition-colors">
+                <tr class="{{ $index % 2 === 0 ? 'bg-surface-container-lowest' : 'bg-surface-container-low/30' }} hover:bg-surface-container-low transition-colors group">
                     <td class="px-6 py-4">
                         <span class="inline-block px-2.5 py-1 rounded border border-outline-variant/50 bg-surface-container-highest text-on-surface-variant font-label text-[0.65rem] font-bold uppercase tracking-wider">
                             {{ str_replace('_', ' ', $cost->category) }}
                         </span>
                     </td>
-                    <td class="px-6 py-4 font-body text-sm text-on-surface">{{ $cost->description }}</td>
-                    <td class="px-6 py-4 text-right font-body text-sm text-on-surface-variant">Rp {{ number_format($cost->estimated_amount, 0, ',', '.') }}</td>
-                    <td class="px-6 py-4 text-right font-headline text-sm font-bold text-primary">Rp {{ number_format($cost->actual_amount, 0, ',', '.') }}</td>
+                    <td class="px-6 py-4 font-body text-sm font-semibold text-on-surface">{{ $cost->description }}</td>
+                    <td class="px-6 py-4 text-right font-body text-sm text-outline font-medium">Rp {{ number_format($cost->estimated_amount, 0, ',', '.') }}</td>
+                    <td class="px-6 py-4 text-right">
+                        <form action="{{ route('admin.financials.operational_costs.update', $cost->id) }}" method="POST" class="flex items-center justify-end gap-2">
+                            @csrf
+                            <span class="font-body text-sm text-on-surface font-bold">Rp</span>
+                            <input type="number" name="actual_amount" value="{{ $cost->actual_amount }}" class="w-32 bg-surface-container-highest border border-outline-variant/50 rounded-lg px-3 py-1.5 font-headline text-sm font-bold text-primary focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-colors text-right" required>
+                            <button type="submit" class="w-8 h-8 rounded-lg bg-primary/10 text-primary hover:bg-primary hover:text-white transition-colors flex items-center justify-center opacity-0 group-hover:opacity-100 shadow-sm border border-primary/20" title="Simpan Perubahan">
+                                <i class="bi bi-check-lg"></i>
+                            </button>
+                        </form>
+                    </td>
                     <td class="px-6 py-4 text-right font-body text-sm font-bold">
                         @if($diff > 0) 
-                            <span class="text-red-600">+Rp {{ number_format($diff, 0, ',', '.') }}</span>
+                            <span class="inline-flex items-center gap-1 text-red-600 bg-red-500/10 px-2 py-0.5 rounded border border-red-500/20"><i class="bi bi-arrow-up-short"></i> Rp {{ number_format($diff, 0, ',', '.') }}</span>
                         @elseif($diff < 0) 
-                            <span class="text-green-600">-Rp {{ number_format(abs($diff), 0, ',', '.') }}</span>
+                            <span class="inline-flex items-center gap-1 text-green-600 bg-green-500/10 px-2 py-0.5 rounded border border-green-500/20"><i class="bi bi-arrow-down-short"></i> Rp {{ number_format(abs($diff), 0, ',', '.') }}</span>
                         @else 
                             <span class="text-outline-variant">—</span>
                         @endif
