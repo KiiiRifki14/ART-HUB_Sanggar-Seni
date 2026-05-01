@@ -100,13 +100,22 @@
 <a class="text-[#4e342e]/70 dark:text-[#efeeeb]/70 hover:text-[#705d00] transition-colors duration-300 font-label text-xs tracking-widest uppercase py-1" href="#">Katalog Jasa</a>
 </div>
 </div>
-<div class="flex items-center gap-4">
-<div class="hidden sm:flex items-center bg-surface-container rounded-full px-4 py-1.5 gap-2">
-<span class="material-symbols-outlined text-on-surface-variant text-sm">search</span>
-<input class="bg-transparent border-none focus:ring-0 text-sm font-body w-32" placeholder="Search heritage..." type="text"/>
-</div>
-<button class="material-symbols-outlined text-[#4e342e] dark:text-[#efeeeb] hover:scale-98 transition-all">notifications</button>
-<button class="material-symbols-outlined text-[#4e342e] dark:text-[#efeeeb] hover:scale-98 transition-all">account_circle</button>
+<div class="flex items-center gap-3">
+@auth
+    <a href="{{ url('/dashboard') }}"
+       class="bg-gradient-to-r from-[#4E342E] to-[#361F1A] text-white px-5 py-2 rounded-md font-body font-semibold text-xs hover:opacity-90 transition-all tracking-widest uppercase">
+        Dashboard
+    </a>
+@else
+    <a href="{{ route('login') }}"
+       class="font-label text-xs tracking-widest uppercase text-[#4e342e]/70 hover:text-[#705d00] transition-colors duration-300 py-1 px-3">
+        Masuk
+    </a>
+    <a href="{{ route('register') }}"
+       class="bg-gradient-to-r from-[#4E342E] to-[#361F1A] text-white px-5 py-2 rounded-md font-body font-semibold text-xs hover:opacity-90 transition-all tracking-widest uppercase">
+        Daftar
+    </a>
+@endauth
 </div>
 </nav>
 <main class="pt-16">
@@ -121,8 +130,14 @@
 <h1 class="font-headline text-5xl md:text-7xl text-white font-semibold leading-tight mb-6">Cahaya Gumilang: Melestarikan Warisan Melalui Seni.</h1>
 <p class="text-xl text-white/80 font-body mb-10 max-w-2xl leading-relaxed">Experience the timeless beauty of Indonesian traditional arts, curated through generations of excellence and passion.</p>
 <div class="flex flex-wrap gap-4">
-<button class="bg-gradient-to-r from-[#4E342E] to-[#361F1A] text-white px-8 py-4 rounded-md font-body font-semibold text-sm hover:opacity-90 transition-all shadow-xl">Booking Sekarang</button>
-<button class="bg-white/10 backdrop-blur-md border border-white/20 text-white px-8 py-4 rounded-md font-body font-semibold text-sm hover:bg-white/20 transition-all">Jelajahi Galeri</button>
+<a href="{{ route('register') }}"
+   class="bg-gradient-to-r from-[#4E342E] to-[#361F1A] text-white px-8 py-4 rounded-md font-body font-semibold text-sm hover:opacity-90 transition-all shadow-xl">
+    Booking Sekarang
+</a>
+<a href="#katalog"
+   class="bg-white/10 backdrop-blur-md border border-white/20 text-white px-8 py-4 rounded-md font-body font-semibold text-sm hover:bg-white/20 transition-all">
+    Jelajahi Galeri
+</a>
 </div>
 </div>
 </section>
@@ -139,21 +154,35 @@
 </div>
 </div>
 <div class="lg:col-span-6 lg:offset-1">
-<span class="text-secondary font-label text-sm uppercase tracking-widest font-bold mb-4 block">Narasi Heritage</span>
-<h2 class="font-headline text-4xl md:text-5xl text-primary font-semibold mb-8 leading-tight italic">Melampaui Waktu, Menghidupkan Jiwa.</h2>
-<div class="space-y-6 text-on-surface-variant font-body leading-loose">
-<p>Didirikan dengan tekad untuk menjaga nyala api kebudayaan, Sanggar Cahaya Gumilang bukan sekadar tempat pelatihan, melainkan laboratorium kreatif di mana tradisi berpadu dengan modernitas.</p>
-<p>Setiap gerakan tari dan dentuman gamelan yang kami hadirkan adalah bentuk penghormatan bagi leluhur, sebuah kurasi estetika yang membawa keagungan masa lalu ke panggung kontemporer.</p>
+<span class="text-secondary font-label text-sm uppercase tracking-widest font-bold mb-4 block">Pendiri &amp; Jiwa Sanggar</span>
+<h2 class="font-headline text-4xl md:text-5xl text-primary font-semibold mb-8 leading-tight italic">Bapa A. Kusmana,<br>Cahaya yang Tak Pernah Padam.</h2>
+
+{{-- Quote penghormatan --}}
+<div class="mb-8 pl-5 border-l-2 border-secondary">
+    <p class="font-headline text-xl text-primary italic leading-relaxed mb-3">
+        "Seni bukan sekadar hiburan — ia adalah napas peradaban, warisan yang wajib kita jaga dan wariskan kepada generasi mendatang."
+    </p>
+    <p class="font-label text-xs uppercase tracking-widest text-secondary font-bold">— A. Kusmana, Pendiri Sanggar Cahaya Gumilang</p>
 </div>
-<div class="mt-12 flex gap-12">
-<div>
-<p class="text-3xl font-headline font-bold text-primary">25+</p>
-<p class="text-xs font-label uppercase tracking-tighter text-on-surface-variant">Tahun Pengabdian</p>
+
+<div class="space-y-5 text-on-surface-variant font-body leading-loose">
+    <p>Atas visi dan dedikasi Bapa A. Kusmana, Sanggar Cahaya Gumilang lahir sebagai ruang kebudayaan yang tidak hanya melatih, tetapi juga membentuk karakter dan jiwa para seniman muda Indonesia.</p>
+    <p>Setiap gerakan tari dan dentuman gamelan yang kami hadirkan adalah bentuk penghormatan nyata atas warisan beliau — sebuah estafet budaya yang terus kami emban dengan sepenuh hati.</p>
 </div>
-<div>
-<p class="text-3xl font-headline font-bold text-primary">150+</p>
-<p class="text-xs font-label uppercase tracking-tighter text-on-surface-variant">Koleksi Alat Musik</p>
-</div>
+
+<div class="mt-10 flex gap-12">
+    <div>
+        <p class="text-3xl font-headline font-bold text-primary">25+</p>
+        <p class="text-xs font-label uppercase tracking-tighter text-on-surface-variant">Tahun Pengabdian</p>
+    </div>
+    <div>
+        <p class="text-3xl font-headline font-bold text-primary">150+</p>
+        <p class="text-xs font-label uppercase tracking-tighter text-on-surface-variant">Koleksi Alat Musik</p>
+    </div>
+    <div>
+        <p class="text-3xl font-headline font-bold text-primary">500+</p>
+        <p class="text-xs font-label uppercase tracking-tighter text-on-surface-variant">Seniman Dididik</p>
+    </div>
 </div>
 </div>
 </div>
@@ -375,8 +404,14 @@
 <h2 class="font-headline text-4xl mb-6">Mulai Perjalanan Budaya Anda</h2>
 <p class="text-white/70 mb-10 font-body">Jadilah bagian dari penjaga warisan nusantara. Daftarkan acara Anda atau hubungi kami untuk konsultasi konsep seni yang unik.</p>
 <div class="flex flex-col sm:flex-row gap-4 justify-center">
-<button class="bg-secondary-container text-on-secondary-container px-10 py-4 rounded-md font-bold text-sm hover:scale-98 transition-transform uppercase tracking-widest">Registrasi Akun</button>
-<button class="bg-transparent border border-white/30 text-white px-10 py-4 rounded-md font-bold text-sm hover:bg-white/10 transition-all uppercase tracking-widest">Hubungi Kami</button>
+<a href="{{ route('register') }}"
+   class="bg-secondary-container text-on-secondary-container px-10 py-4 rounded-md font-bold text-sm hover:opacity-90 transition-all uppercase tracking-widest text-center">
+    Registrasi Akun
+</a>
+<a href="mailto:halo@cahayagumilang.id"
+   class="bg-transparent border border-white/30 text-white px-10 py-4 rounded-md font-bold text-sm hover:bg-white/10 transition-all uppercase tracking-widest text-center">
+    Hubungi Kami
+</a>
 </div>
 </div>
 </section>
