@@ -145,7 +145,7 @@
                     {{-- Phone + Occupation --}}
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-7" data-aos="fade-up" data-aos-delay="450">
                         <div class="field-group relative">
-                            <input type="tel" name="phone" id="p_phone" placeholder=" " value="{{ old('phone') }}"
+                            <input type="tel" name="phone" id="p_phone" placeholder=" " value="{{ old('phone') }}" required
                                 class="peer block w-full bg-surface-container-high border-0 border-b-2 border-outline-variant/40 py-3 px-4 text-on-surface focus:ring-0 focus:border-secondary focus:bg-surface-container-lowest rounded-t-lg transition-all duration-200">
                             <label for="p_phone" class="absolute left-4 top-3 text-on-surface-variant font-label text-sm transition-all duration-200 pointer-events-none
                                 peer-placeholder-shown:top-3 peer-placeholder-shown:text-sm
@@ -256,7 +256,7 @@
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6" data-aos="fade-up" data-aos-delay="500">
                         <div>
                             <label class="block font-label text-xs uppercase tracking-[0.05em] text-on-surface-variant mb-2">Phone Number</label>
-                            <input type="tel" name="phone" value="{{ old('phone') }}" placeholder="+62 812 3456 7890"
+                            <input type="tel" name="phone" value="{{ old('phone') }}" placeholder="+62 812 3456 7890" required
                                 class="w-full bg-surface-container-high/60 border-0 border-b-2 border-outline-variant/40 text-on-surface font-body px-4 py-3 rounded-t-lg focus:ring-0 focus:border-secondary transition-all duration-200 placeholder:text-on-surface-variant/40">
                         </div>
                         <div>
