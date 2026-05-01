@@ -237,6 +237,15 @@
         }
 
         /* ── AUTO-STAGGER PAGE ANIMATIONS ── */
+        @keyframes fadeUp {
+            0% { opacity: 0; transform: translateY(15px); }
+            100% { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes scaleUp {
+            0% { opacity: 0; transform: scale(0.97); }
+            100% { opacity: 1; transform: scale(1); }
+        }
+
         /* Menyihir seluruh elemen dalam main content untuk muncul berurutan (Cascade Fade Up) */
         #page-content main > * {
             opacity: 0;
