@@ -6,190 +6,131 @@
 @section('content')
 @php
     $statusMap = [
-        'pending'   => ['label' => 'Negotiation',  'class' => 'arh-badge-nego',     'icon' => 'bi-chat-dots-fill'],
-        'dp_paid'   => ['label' => 'Locked',        'class' => 'arh-badge-locked',   'icon' => 'bi-lock-fill'],
-        'confirmed' => ['label' => 'DP 50%',        'class' => 'arh-badge-dp',       'icon' => 'bi-receipt-cutoff'],
-        'paid_full' => ['label' => 'PAID (Lunas)',  'class' => 'arh-badge-paid',     'icon' => 'bi-check-circle-fill'],
-        'completed' => ['label' => '✓✓ Completed', 'class' => 'arh-badge-completed','icon' => 'bi-patch-check-fill'],
-        'cancelled' => ['label' => 'Cancelled',     'class' => 'bg-secondary',       'icon' => 'bi-x-circle-fill'],
+        'pending'   => ['label' => 'Negotiation',   'class' => 'bg-orange-500/10 text-orange-600 border-orange-500/20',     'icon' => 'bi-chat-dots-fill'],
+        'dp_paid'   => ['label' => 'Locked',        'class' => 'bg-primary/10 text-primary border-primary/20',   'icon' => 'bi-lock-fill'],
+        'confirmed' => ['label' => 'DP 50%',        'class' => 'bg-blue-500/10 text-blue-600 border-blue-500/20',       'icon' => 'bi-receipt-cutoff'],
+        'paid_full' => ['label' => 'PAID (Lunas)',  'class' => 'bg-green-500/10 text-green-600 border-green-500/20',     'icon' => 'bi-check-circle-fill'],
+        'completed' => ['label' => 'Completed',     'class' => 'bg-surface-container-highest text-on-surface-variant border-outline-variant/30', 'icon' => 'bi-patch-check-fill'],
+        'cancelled' => ['label' => 'Cancelled',     'class' => 'bg-red-500/10 text-red-600 border-red-500/20',       'icon' => 'bi-x-circle-fill'],
     ];
     $filters = [
         'all'       => ['label' => 'All Events',    'icon' => 'bi-grid-3x3-gap-fill'],
         'pending'   => ['label' => 'Negotiation',   'icon' => 'bi-chat-dots-fill'],
-        'dp_paid'   => ['label' => 'Locked',         'icon' => 'bi-lock-fill'],
-        'confirmed' => ['label' => 'DP 50%',         'icon' => 'bi-receipt-cutoff'],
-        'paid_full' => ['label' => 'PAID',           'icon' => 'bi-check-circle-fill'],
-        'completed' => ['label' => 'Completed',      'icon' => 'bi-patch-check-fill'],
+        'dp_paid'   => ['label' => 'Locked',        'icon' => 'bi-lock-fill'],
+        'confirmed' => ['label' => 'DP 50%',        'icon' => 'bi-receipt-cutoff'],
+        'paid_full' => ['label' => 'PAID',          'icon' => 'bi-check-circle-fill'],
+        'completed' => ['label' => 'Completed',     'icon' => 'bi-patch-check-fill'],
     ];
+    $currentFilter = $filter ?? 'all';
 @endphp
 
-<style>
-    .arh-badge-nego     { background: rgba(217,119,6,0.1);   color:#d97706; border:1px solid rgba(217,119,6,0.3); }
-    .arh-badge-locked   { background: rgba(139,26,42,0.1);   color:#8B1A2A; border:1px solid rgba(139,26,42,0.3); }
-    .arh-badge-dp       { background: rgba(37,99,235,0.1);   color:#2563eb; border:1px solid rgba(37,99,235,0.3); }
-    .arh-badge-paid     { background: rgba(22,163,74,0.1);   color:#16a34a; border:1px solid rgba(22,163,74,0.3); }
-    .arh-badge-completed{ background: rgba(21,128,61,0.12);  color:#15803d; border:1px solid rgba(21,128,61,0.3); }
-    .arh-badge-status { display:inline-flex; align-items:center; gap:5px; padding: 5px 12px; border-radius:20px; font-size:0.78rem; font-weight:600; }
-
-    .mon-card { background:#FFFFFF; border:1px solid #E0D0D2; border-radius:12px; transition: border-color 0.2s, box-shadow 0.2s; box-shadow: 0 1px 6px rgba(139,26,42,0.06); }
-    .mon-card:hover { border-color: rgba(139,26,42,0.4); box-shadow: 0 4px 16px rgba(139,26,42,0.1); }
-
-    .filter-tabs { display:flex; gap:8px; flex-wrap:wrap; margin-bottom:24px; }
-    .filter-tab {
-        padding: 7px 16px; border-radius:20px; border: 1px solid #E0D0D2;
-        background: #FFFFFF; color: #7a5a5e; text-decoration:none; font-size:0.82rem;
-        font-weight:500; display:flex; align-items:center; gap:6px; transition: all 0.2s;
-    }
-    .filter-tab:hover { border-color: #8B1A2A; color: #8B1A2A; background: rgba(139,26,42,0.04); }
-    .filter-tab.active { background: rgba(139,26,42,0.08); border-color: #8B1A2A; color: #8B1A2A; font-weight:600; }
-
-    .star-badge { color: #d97706; font-size: 0.9rem; }
-
-    .summary-card { background:#FFFFFF; border:1px solid #E0D0D2; border-radius:10px; padding: 16px 20px; text-align:center; box-shadow: 0 1px 4px rgba(139,26,42,0.06); }
-    .summary-num { font-size:1.8rem; font-weight:700; line-height:1; color:#1A0808; }
-    .summary-label { font-size:0.72rem; color:#7a5a5e; margin-top:4px; text-transform:uppercase; letter-spacing:0.5px; }
-</style>
-
-{{-- FILTER TABS --}}
-<div class="filter-tabs">
-    @foreach($filters as $key => $f)
-        <a href="{{ route('admin.events.monitoring', $key !== 'all' ? ['filter' => $key] : []) }}"
-           class="filter-tab {{ $filter === $key || ($filter === 'all' && $key === 'all') ? 'active' : '' }}">
-            <i class="bi {{ $f['icon'] }}"></i> {{ $f['label'] }}
-        </a>
-    @endforeach
+{{-- Header & Filter Tabs --}}
+<div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-6">
+    <h2 class="font-headline text-xl text-primary font-semibold flex items-center gap-2">
+        <i class="bi bi-binoculars text-secondary"></i> Monitoring Lapangan
+    </h2>
+    <div class="flex flex-wrap gap-2">
+        @foreach($filters as $key => $f)
+            <a href="{{ route('admin.events.monitoring', $key !== 'all' ? ['filter' => $key] : []) }}"
+               class="px-3.5 py-1.5 rounded-lg border font-label text-[0.65rem] font-bold uppercase tracking-widest transition-all flex items-center gap-1.5 {{ $currentFilter === $key ? 'bg-primary text-white border-primary shadow-sm' : 'bg-surface-container-lowest text-on-surface-variant border-outline-variant/30 hover:border-primary/40 hover:text-primary' }}">
+                <i class="bi {{ $f['icon'] }}"></i> {{ $f['label'] }}
+            </a>
+        @endforeach
+    </div>
 </div>
 
-{{-- EVENT TABLE --}}
-<div class="mon-card mb-5">
-    <div class="table-responsive">
-        <table class="table mb-0 align-middle" style="background:transparent;">
-            <thead style="border-bottom: 1px solid #E0D0D2; background: #fdf9f9;">
-                <tr style="font-size:0.78rem; text-transform:uppercase; letter-spacing:0.5px; color: #8B1A2A;">
-                    <th class="px-4 py-3 fw-semibold">Tanggal Event</th>
-                    <th class="px-3 py-3 fw-semibold">Nama Klien</th>
-                    <th class="px-3 py-3 fw-semibold">Jenis Acara</th>
-                    <th class="px-3 py-3 fw-semibold">Deal Price</th>
-                    <th class="px-3 py-3 fw-semibold">Status</th>
-                    <th class="px-3 py-3 fw-semibold text-center">Aksi</th>
-                </tr>
-            </thead>
-            <tbody>
-                @forelse($events as $booking)
-                @php
-                    $eventModel = $booking->event; // Bisa null kalau masih nego
-                    $bStatus    = $booking->status ?? 'pending';
-                    $statusInfo = $statusMap[$bStatus] ?? $statusMap['pending'];
-                    $eventDate  = \Carbon\Carbon::parse($booking->event_date);
-                    $daysUntil  = now()->startOfDay()->diffInDays($eventDate->startOfDay(), false);
-                    $isPriority = ($daysUntil >= 0 && $daysUntil <= 3);
-                    
-                    // Deal price display
-                    if ($bStatus === 'pending' && ($booking->price_min || $booking->price_max)) {
-                        $minFmt = $booking->price_min ? 'Rp ' . number_format($booking->price_min/1000000, 0) . 'jt' : '?';
-                        $maxFmt = $booking->price_max ? number_format($booking->price_max/1000000, 0) . 'jt' : '?';
-                        $priceDisplay = $minFmt . ' – ' . $maxFmt;
-                    } elseif ($booking->total_price) {
-                        $priceDisplay = 'Rp ' . number_format($booking->total_price, 0, ',', '.');
-                    } else {
-                        $priceDisplay = '<span class="text-secondary">–</span>';
-                    }
-                @endphp
-                <tr style="border-bottom: 1px solid #222;">
-                    <td class="px-4 py-3">
-                        <div class="d-flex align-items-center gap-2">
-                            <div>
-                                <div class="fw-semibold ">{{ $eventDate->format('d M Y') }}</div>
-                                <div class="text-secondary" style="font-size:0.75rem;">
-                                    {{ \Carbon\Carbon::parse($booking->event_start)->format('H:i') }} WIB
-                                </div>
+{{-- Event Table --}}
+<div class="bg-surface-container-lowest rounded-xl border border-outline-variant/30 shadow-[0_12px_24px_rgba(54,31,26,0.03)] overflow-hidden">
+    <table class="w-full">
+        <thead class="bg-surface-container-low">
+            <tr>
+                <th class="font-label text-[0.65rem] uppercase tracking-widest text-outline font-bold px-6 py-4 text-left">Tanggal Event</th>
+                <th class="font-label text-[0.65rem] uppercase tracking-widest text-outline font-bold px-6 py-4 text-left">Nama Klien & Venue</th>
+                <th class="font-label text-[0.65rem] uppercase tracking-widest text-outline font-bold px-6 py-4 text-left">Jenis Acara</th>
+                <th class="font-label text-[0.65rem] uppercase tracking-widest text-outline font-bold px-6 py-4 text-right">Deal Price</th>
+                <th class="font-label text-[0.65rem] uppercase tracking-widest text-outline font-bold px-6 py-4 text-center">Status</th>
+                <th class="font-label text-[0.65rem] uppercase tracking-widest text-outline font-bold px-6 py-4 text-center">Aksi</th>
+            </tr>
+        </thead>
+        <tbody class="divide-y divide-outline-variant/20">
+            @forelse($events as $booking)
+            @php
+                $eventModel = $booking->event;
+                $bStatus    = $booking->status ?? 'pending';
+                $statusInfo = $statusMap[$bStatus] ?? $statusMap['pending'];
+                $eventDate  = \Carbon\Carbon::parse($booking->event_date);
+                $daysUntil  = now()->startOfDay()->diffInDays($eventDate->startOfDay(), false);
+                $isPriority = ($daysUntil >= 0 && $daysUntil <= 3 && !in_array($bStatus, ['completed', 'cancelled']));
 
-                            </div>
+                if ($bStatus === 'pending' && ($booking->price_min || $booking->price_max)) {
+                    $minFmt = $booking->price_min ? number_format($booking->price_min/1000000, 0) . 'jt' : '?';
+                    $maxFmt = $booking->price_max ? number_format($booking->price_max/1000000, 0) . 'jt' : '?';
+                    $priceDisplay = 'Rp ' . $minFmt . ' – ' . $maxFmt;
+                } elseif ($booking->total_price) {
+                    $priceDisplay = 'Rp ' . number_format($booking->total_price, 0, ',', '.');
+                } else {
+                    $priceDisplay = '<span class="text-outline">—</span>';
+                }
+            @endphp
+            <tr class="hover:bg-surface-container-low/50 transition-colors {{ $isPriority ? 'bg-orange-500/5' : '' }}">
+                <td class="px-6 py-4">
+                    <div class="flex items-center gap-3">
+                        <div class="w-12 h-12 rounded-lg bg-surface-container flex flex-col items-center justify-center border border-outline-variant/30 flex-shrink-0">
+                            <span class="font-headline font-bold text-primary text-lg leading-none">{{ $eventDate->format('d') }}</span>
+                            <span class="font-label text-[0.6rem] uppercase tracking-widest text-outline font-bold mt-0.5">{{ $eventDate->format('M') }}</span>
+                        </div>
+                        <div>
+                            <div class="font-label text-xs text-outline">{{ \Carbon\Carbon::parse($booking->event_start)->format('H:i') }} WIB</div>
                             @if($isPriority)
-                                <span class="star-badge" title="Upcoming Priority – H-{{ $daysUntil }}">
-                                    ★ <span style="font-size:0.7rem; color:#fbbf24;">H-{{ $daysUntil }}</span>
-                                </span>
+                                <div class="font-label text-[0.65rem] font-bold text-orange-600 uppercase tracking-widest mt-1 flex items-center gap-1">
+                                    <i class="bi bi-star-fill text-[0.55rem]"></i> H-{{ $daysUntil }}
+                                </div>
                             @endif
                         </div>
-                    </td>
-                    <td class="px-3 py-3">
-                        <div class="fw-semibold ">{{ $booking->client_name ?? '–' }}</div>
-                        <div class="text-secondary" style="font-size:0.75rem;">{{ $booking->venue }}</div>
-                    </td>
-                    <td class="px-3 py-3">
-                        <span class=" text-capitalize">{{ str_replace('_', ' ', $booking->event_type ?? '–') }}</span>
-                    </td>
-                    <td class="px-3 py-3">
-                        <span class="fw-semibold" style="color:#8B1A2A;">{!! $priceDisplay !!}</span>
-                    </td>
-                    <td class="px-3 py-3">
-                        <span class="arh-badge-status {{ $statusInfo['class'] }}">
-                            <i class="bi {{ $statusInfo['icon'] }}"></i>
-                            {{ $statusInfo['label'] }}
-                        </span>
-                    </td>
-                    <td class="px-3 py-3 text-center">
-                        @if($eventModel)
-                            <a href="{{ route('admin.events.monitoring.show', $eventModel->id) }}"
-                               class="btn btn-sm btn-outline-light rounded-pill px-3" style="font-size:0.8rem;">
-                                <i class="bi bi-eye me-1"></i>View Event
-                            </a>
-                        @else
-                            <a href="{{ route('admin.bookings.show', $booking->id) }}"
-                               class="btn btn-sm btn-outline-warning rounded-pill px-3" style="font-size:0.8rem;">
-                                <i class="bi bi-ui-checks me-1"></i>Nego / DP
-                            </a>
-                        @endif
-                    </td>
-                </tr>
-                @empty
-                <tr>
-                    <td colspan="6" class="text-center py-5 text-secondary">
-                        <i class="bi bi-calendar-x fs-1 d-block mb-2"></i>
-                        Tidak ada booking/event untuk filter ini
-                    </td>
-                </tr>
-                @endforelse
-            </tbody>
-        </table>
-    </div>
-</div>
-
-{{-- SUMMARY BAR --}}
-<div class="row g-3">
-    <div class="col-6 col-md-2-4">
-        <div class="summary-card">
-            <div class="summary-num ">{{ $summary['total'] }}</div>
-            <div class="summary-label">Total Events</div>
-        </div>
-    </div>
-    <div class="col-6 col-md-2-4">
-        <div class="summary-card">
-            <div class="summary-num" style="color:#fbbf24;">{{ $summary['negotiation'] }}</div>
-            <div class="summary-label">Negotiation</div>
-        </div>
-    </div>
-    <div class="col-6 col-md-2-4">
-        <div class="summary-card">
-            <div class="summary-num" style="color:#60a5fa;">{{ $summary['pending_dp'] }}</div>
-            <div class="summary-label">Pending DP</div>
-        </div>
-    </div>
-    <div class="col-6 col-md-2-4">
-        <div class="summary-card">
-            <div class="summary-num" style="color:#f97316;">{{ $summary['confirmed'] }}</div>
-            <div class="summary-label">Confirmed</div>
-        </div>
-    </div>
-    <div class="col-6 col-md-2-4">
-        <div class="summary-card">
-            <div class="summary-num" style="color:#4ade80;">{{ $summary['completed'] }}</div>
-            <div class="summary-label">Completed</div>
-        </div>
-    </div>
+                    </div>
+                </td>
+                <td class="px-6 py-4">
+                    <div class="font-body font-semibold text-on-surface text-sm">{{ $booking->client_name ?? '—' }}</div>
+                    <div class="font-label text-xs text-outline max-w-[200px] truncate" title="{{ $booking->venue }}">{{ $booking->venue }}</div>
+                </td>
+                <td class="px-6 py-4">
+                    <span class="inline-block px-2.5 py-1 rounded bg-surface-container-lowest border border-outline-variant/30 font-label text-[0.65rem] font-bold uppercase tracking-wider text-on-surface-variant">
+                        {{ str_replace('_', ' ', $booking->event_type ?? '—') }}
+                    </span>
+                </td>
+                <td class="px-6 py-4 text-right">
+                    <div class="font-body font-semibold text-primary text-sm">{!! $priceDisplay !!}</div>
+                </td>
+                <td class="px-6 py-4 text-center">
+                    <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded border font-label text-[0.6rem] font-bold uppercase tracking-wider {{ $statusInfo['class'] }}">
+                        <i class="bi {{ $statusInfo['icon'] }}"></i> {{ $statusInfo['label'] }}
+                    </span>
+                </td>
+                <td class="px-6 py-4 text-center">
+                    @if($eventModel)
+                        <a href="{{ route('admin.events.monitoring.show', $eventModel->id) }}"
+                           class="inline-flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-md border border-outline-variant/30 bg-surface-container-lowest font-label text-[0.65rem] font-bold uppercase tracking-widest text-on-surface-variant hover:bg-primary hover:text-white hover:border-primary transition-all">
+                            <i class="bi bi-eye-fill"></i> View
+                        </a>
+                    @else
+                        <a href="{{ route('admin.bookings.show', $booking->id) }}"
+                           class="inline-flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-md border border-secondary/30 bg-secondary/5 font-label text-[0.65rem] font-bold uppercase tracking-widest text-secondary hover:bg-secondary hover:text-white hover:border-secondary transition-all">
+                            <i class="bi bi-ui-checks"></i> Nego
+                        </a>
+                    @endif
+                </td>
+            </tr>
+            @empty
+            <tr>
+                <td colspan="6" class="px-6 py-20 text-center">
+                    <i class="bi bi-calendar-x text-4xl text-outline mb-4 block"></i>
+                    <p class="font-headline text-lg text-on-surface font-semibold mb-1">Tidak ada event</p>
+                    <p class="font-label text-xs uppercase tracking-widest text-outline">Pilih filter lain atau tunggu booking baru</p>
+                </td>
+            </tr>
+            @endforelse
+        </tbody>
+    </table>
 </div>
 
 @endsection
-
-
-

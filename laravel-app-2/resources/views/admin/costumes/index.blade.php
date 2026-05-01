@@ -1,38 +1,45 @@
-﻿@extends('layouts.admin')
+@extends('layouts.admin')
 
-@section('title', 'Costume Rental – ART-HUB')
-@section('page_title', 'Costume Rental Tracker')
-@section('page_subtitle', 'Monitor kostum sanggar & tracking sewa dari vendor.')
+@section('title', 'Costume & Logistik – ART-HUB')
+@section('page_title', 'Costume & Logistik')
+@section('page_subtitle', 'Inventaris aset sanggar dan status persewaan vendor eksternal.')
 
 @section('content')
 
 {{-- ── ASET KOSTUM SANGGAR ── --}}
-<div class="mb-5 animate-fade-up">
-    <h5 class="fw-bold mb-3 d-flex align-items-center gap-2 arh-gold">
-        <i class="bi bi-tag-fill"></i> Inventaris Kostum Sanggar
-    </h5>
+<div class="mb-10">
+    <div class="flex items-center gap-2 mb-6">
+        <h2 class="font-headline text-xl text-primary font-semibold">
+            <i class="bi bi-tag-fill text-secondary me-1"></i> Inventaris Aset Sanggar
+        </h2>
+    </div>
     
-    <div class="row g-3">
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         @foreach($sanggarCostumes as $c)
         @php
             $isDamaged = $c->condition === 'damaged';
-            $bc = $isDamaged ? 'border-danger' : 'border-secondary';
+            $isMaintenance = $c->condition === 'maintenance';
+            $cardClass = $isDamaged ? 'bg-red-500/5 border-red-500/30' : ($isMaintenance ? 'bg-orange-500/5 border-orange-500/30' : 'bg-surface-container-lowest border-outline-variant/30');
         @endphp
-        <div class="col-12 col-md-6 col-xl-3">
-            <div class="p-4 rounded-3 h-100 {{ $isDamaged ? 'bg-danger bg-opacity-10 border-danger border' : 'arh-card border border-dark' }}">
-                <div class="d-flex justify-content-between align-items-start mb-2">
-                    <h6 class="fw-bold mb-0 lh-base">{{ $c->name }}</h6>
-                    @if($c->condition === 'good') 
-                        <span class="badge bg-success">BAIK</span>
-                    @elseif($c->condition === 'damaged') 
-                        <span class="badge bg-danger">RUSAK</span>
-                    @else 
-                        <span class="badge bg-warning text-dark">MAINTENANCE</span>
-                    @endif
+        <div class="rounded-xl p-5 border shadow-[0_4px_12px_rgba(54,31,26,0.02)] {{ $cardClass }} transition-colors hover:shadow-[0_8px_20px_rgba(54,31,26,0.04)]">
+            <div class="flex justify-between items-start mb-4">
+                <h3 class="font-headline font-semibold text-on-surface leading-tight text-lg">{{ $c->name }}</h3>
+                @if($c->condition === 'good') 
+                    <span class="inline-block px-2 py-0.5 rounded border border-green-500/20 bg-green-500/10 font-label text-[0.6rem] font-bold uppercase tracking-wider text-green-600 flex-shrink-0">Baik</span>
+                @elseif($c->condition === 'damaged') 
+                    <span class="inline-block px-2 py-0.5 rounded border border-red-500/20 bg-red-500/10 font-label text-[0.6rem] font-bold uppercase tracking-wider text-red-600 flex-shrink-0">Rusak</span>
+                @else 
+                    <span class="inline-block px-2 py-0.5 rounded border border-orange-500/20 bg-orange-500/10 font-label text-[0.6rem] font-bold uppercase tracking-wider text-orange-600 flex-shrink-0">MTC</span>
+                @endif
+            </div>
+            <div class="flex justify-between items-end">
+                <div>
+                    <div class="font-label text-xs uppercase tracking-widest text-outline mb-1">Kategori</div>
+                    <div class="font-body text-sm text-on-surface-variant capitalize">{{ str_replace('_', ' ', $c->category) }}</div>
                 </div>
-                <div class="text-secondary small">
-                    <div>Kategori: {{ $c->category }}</div>
-                    <div>Qty Sedia: <span class="fw-bold ">{{ $c->quantity }}</span></div>
+                <div class="text-right">
+                    <div class="font-label text-xs uppercase tracking-widest text-outline mb-1">Tersedia</div>
+                    <div class="font-headline text-2xl font-bold text-primary leading-none">{{ $c->quantity }}<span class="text-sm font-normal text-outline">x</span></div>
                 </div>
             </div>
         </div>
@@ -40,64 +47,81 @@
     </div>
 </div>
 
-
 {{-- ── SEWA VENDOR (RENTALS) ── --}}
-<div class="arh-card p-4 animate-fade-up">
-    <h5 class="fw-bold mb-4 d-flex align-items-center gap-2 arh-gold">
-        <i class="bi bi-shop"></i> Transaksi Sewa Vendor Eksternal
-    </h5>
+<div>
+    <div class="flex items-center gap-2 mb-6">
+        <h2 class="font-headline text-xl text-primary font-semibold">
+            <i class="bi bi-shop text-secondary me-1"></i> Transaksi Sewa Vendor Eksternal
+        </h2>
+    </div>
 
-    <div class="table-responsive">
-        <table class="table arh-table table-hover align-middle mb-0">
-            <thead>
+    <div class="bg-surface-container-lowest rounded-xl border border-outline-variant/30 shadow-[0_12px_24px_rgba(54,31,26,0.03)] overflow-hidden">
+        <table class="w-full">
+            <thead class="bg-surface-container-low">
                 <tr>
-                    <th>Event</th>
-                    <th>Vendor</th>
-                    <th>Jenis Kostum</th>
-                    <th>Qty</th>
-                    <th>Tgl Kembali</th>
-                    <th>Status</th>
-                    <th>Denda Telat</th>
+                    <th class="font-label text-[0.65rem] uppercase tracking-widest text-outline font-bold px-6 py-4 text-left">Event</th>
+                    <th class="font-label text-[0.65rem] uppercase tracking-widest text-outline font-bold px-6 py-4 text-left">Vendor & Item</th>
+                    <th class="font-label text-[0.65rem] uppercase tracking-widest text-outline font-bold px-6 py-4 text-center">Qty</th>
+                    <th class="font-label text-[0.65rem] uppercase tracking-widest text-outline font-bold px-6 py-4 text-left">Tgl Kembali</th>
+                    <th class="font-label text-[0.65rem] uppercase tracking-widest text-outline font-bold px-6 py-4 text-center">Status</th>
+                    <th class="font-label text-[0.65rem] uppercase tracking-widest text-outline font-bold px-6 py-4 text-right">Denda Telat</th>
                 </tr>
             </thead>
-            <tbody>
+            <tbody class="divide-y divide-outline-variant/20">
                 @forelse($vendorRentals as $r)
                 @php
                     $isOverdue = !$r->returned_date && \Carbon\Carbon::parse($r->due_date)->isPast();
+                    $rowClass = $isOverdue ? 'bg-red-500/5 border-l-4 border-l-red-500' : 'hover:bg-surface-container-low/50 border-l-4 border-l-transparent';
                 @endphp
-                <tr class="{{ $isOverdue ? 'bg-danger bg-opacity-10' : '' }}">
-                    <td><span class="badge arh-badge-gold">{{ $r->event->event_code ?? '-' }}</span></td>
-                    <td class="fw-semibold">{{ $r->vendor->name ?? '-' }}</td>
-                    <td>{{ $r->costume_type }}</td>
-                    <td><span class="badge bg-secondary">{{ $r->quantity }} pcs</span></td>
-                    <td>
-                        <div>{{ \Carbon\Carbon::parse($r->due_date)->format('d M Y') }}</div>
+                <tr class="{{ $rowClass }} transition-colors">
+                    <td class="px-6 py-4 pl-5">
+                        <span class="inline-block px-2.5 py-1 rounded bg-secondary-container/40 text-on-secondary-container border border-secondary/20 font-label text-[0.65rem] font-bold tracking-wider">
+                            {{ $r->event->event_code ?? '-' }}
+                        </span>
+                    </td>
+                    <td class="px-6 py-4">
+                        <div class="font-body font-semibold text-on-surface text-sm">{{ $r->vendor->name ?? '-' }}</div>
+                        <div class="font-label text-xs text-outline">{{ $r->costume_type }}</div>
+                    </td>
+                    <td class="px-6 py-4 text-center">
+                        <span class="inline-flex items-center justify-center w-8 h-8 rounded-full bg-surface-container font-headline font-bold text-primary text-sm">
+                            {{ $r->quantity }}
+                        </span>
+                    </td>
+                    <td class="px-6 py-4">
+                        <div class="font-body text-sm {{ $isOverdue ? 'text-red-600 font-bold' : 'text-on-surface' }}">
+                            {{ \Carbon\Carbon::parse($r->due_date)->format('d M Y') }}
+                        </div>
                         @if($isOverdue)
-                            <small class="text-danger fw-bold"><i class="bi bi-exclamation-triangle-fill me-1"></i>LEWAT DEADLINE!</small>
+                            <div class="font-label text-[0.6rem] text-red-500 font-bold uppercase tracking-widest flex items-center gap-1 mt-1">
+                                <i class="bi bi-exclamation-triangle-fill"></i> Lewat Deadline
+                            </div>
                         @endif
                     </td>
-                    <td>
-                        @if($r->status === 'rented') 
-                            <span class="badge bg-warning text-dark">DIPINJAM</span>
-                        @elseif($r->status === 'returned') 
-                            <span class="badge bg-success">KEMBALI</span>
+                    <td class="px-6 py-4 text-center">
+                        @if($r->status === 'rented' && $isOverdue) 
+                            <span class="inline-block px-2.5 py-1 rounded border border-red-500/20 bg-red-500/10 font-label text-[0.65rem] font-bold uppercase tracking-wider text-red-600">OVERDUE</span>
+                        @elseif($r->status === 'rented') 
+                            <span class="inline-block px-2.5 py-1 rounded border border-orange-500/20 bg-orange-500/10 font-label text-[0.65rem] font-bold uppercase tracking-wider text-orange-600">DIPINJAM</span>
                         @else 
-                            <span class="badge bg-danger pulse-anim">OVERDUE</span>
+                            <span class="inline-block px-2.5 py-1 rounded border border-green-500/20 bg-green-500/10 font-label text-[0.65rem] font-bold uppercase tracking-wider text-green-600">KEMBALI</span>
                         @endif
                     </td>
-                    <td>
+                    <td class="px-6 py-4 text-right">
                         @if($r->overdue_fine > 0)
-                            <div class="text-danger fw-bold">Rp {{ number_format($r->overdue_fine, 0, ',', '.') }}</div>
-                            <small class="text-secondary">{{ $r->overdue_days }} hari x Rp50.000</small>
+                            <div class="font-headline font-bold text-red-600 text-sm">Rp {{ number_format($r->overdue_fine, 0, ',', '.') }}</div>
+                            <div class="font-label text-xs text-outline">{{ $r->overdue_days }} hari &times; Rp50k</div>
                         @else
-                            <span class="text-secondary">-</span>
+                            <span class="font-label text-xs text-outline">—</span>
                         @endif
                     </td>
                 </tr>
                 @empty
                 <tr>
-                    <td colspan="7" class="text-center py-4 text-secondary">
-                        Belum ada data persewaan kostum vendor.
+                    <td colspan="6" class="px-6 py-20 text-center">
+                        <i class="bi bi-shop text-4xl text-outline mb-4 block"></i>
+                        <p class="font-headline text-lg text-on-surface font-semibold mb-1">Belum ada sewa vendor</p>
+                        <p class="font-label text-xs uppercase tracking-widest text-outline">Aset sanggar cukup untuk event saat ini</p>
                     </td>
                 </tr>
                 @endforelse
@@ -105,5 +129,5 @@
         </table>
     </div>
 </div>
-@endsection
 
+@endsection

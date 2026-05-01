@@ -1,181 +1,143 @@
 <!DOCTYPE html>
-<html lang="id">
+<html lang="id" class="antialiased">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>@yield('title', 'Klien Portal – ART-HUB')</title>
     
-    <!-- Bootstrap 5 CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Tailwind CSS (CDN for development) -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
     <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;500;600;700&family=Noto+Serif:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+    
+    <!-- Bootstrap Icons -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     
-    <style>
-        :root {
-            --klien-maroon:       #800000;
-            --klien-maroon-dark:  #800000;
-            --klien-gold:         #D4AF37;
-            --klien-gold-hover:   #F3CE5E;
-            --klien-body-bg:      #FDFBF7;
-            --klien-card-bg:      #FFFFFF;
-            --klien-border:       #E8E3D9;
-            --klien-text:         #1A1A1A;
-            --klien-text-muted:   #7A7A7A;
+    <!-- Tailwind Config for Heritage Modernist -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: {
+                            DEFAULT: '#361F1A',
+                            container: '#5B3730'
+                        },
+                        secondary: {
+                            DEFAULT: '#FCD400',
+                            container: '#FDF0B2'
+                        },
+                        surface: {
+                            container: {
+                                lowest: '#FFFFFF',
+                                low: '#FAF9F6',
+                                DEFAULT: '#F4F2EE',
+                                high: '#EBE7DF',
+                                highest: '#E2DCD1'
+                            }
+                        },
+                        on: {
+                            surface: {
+                                DEFAULT: '#1A1817',
+                                variant: '#4D4946'
+                            },
+                            primary: {
+                                DEFAULT: '#FFFFFF',
+                                container: '#FFDBCF'
+                            },
+                            secondary: {
+                                container: '#423700'
+                            }
+                        },
+                        outline: {
+                            DEFAULT: '#847B78',
+                            variant: '#D7C4BF'
+                        }
+                    },
+                    fontFamily: {
+                        headline: ['"Noto Serif"', 'serif'],
+                        body: ['"Manrope"', 'sans-serif'],
+                        label: ['"Manrope"', 'sans-serif'],
+                    }
+                }
+            }
         }
-
-        body {
-            background-color: var(--klien-body-bg);
-            color: var(--klien-text);
-            font-family: 'Outfit', sans-serif;
-        }
-
-        .klien-gold { color: var(--klien-gold); }
-
-        .glass-card {
-            background: var(--klien-card-bg);
-            border: 1px solid var(--klien-gold); /* border gold tipis */
-            border-radius: 16px;
-            box-shadow: 0 2px 16px rgba(128,0,0,0.06);
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
-        }
-        
-        .glass-card:hover {
-            transform: translateY(-4px);
-            box-shadow: 0 6px 24px rgba(128,0,0,0.1);
-        }
-
-        .navbar-klien {
-            background: var(--klien-maroon-dark);
-            border-bottom: 1px solid rgba(212,175,55,0.2);
-        }
-        .navbar-klien .navbar-brand,
-        .navbar-klien .nav-link { color: #fff !important; }
-        .navbar-klien .nav-link:hover { color: var(--klien-gold) !important; }
-        .navbar-klien .nav-link.active { color: var(--klien-gold) !important; font-weight: 600; }
-
-        .btn-klien-primary {
-            background: var(--klien-maroon);
-            color: #FFFFFF;
-            font-weight: 600;
-            border: none;
-            border-radius: 8px;
-            padding: 10px 24px;
-            transition: all 0.3s ease;
-        }
-        .btn-klien-primary:hover {
-            background: #600000;
-            color: #FFFFFF;
-            transform: translateY(-2px);
-            box-shadow: 0 4px 15px rgba(128,0,0,0.3);
-        }
-
-        .btn-klien-outline-gold {
-            background: transparent;
-            color: var(--klien-gold);
-            border: 1px solid var(--klien-gold);
-            font-weight: 600;
-            border-radius: 8px;
-            padding: 10px 24px;
-            transition: all 0.3s ease;
-        }
-        .btn-klien-outline-gold:hover {
-            background: var(--klien-gold);
-            color: #1a0508;
-            transform: translateY(-2px);
-            box-shadow: 0 4px 15px rgba(212,175,55,0.3);
-        }
-
-        .form-control, .form-select {
-            background-color: #FFFFFF;
-            border: 1px solid var(--klien-border);
-            color: var(--klien-text);
-            border-radius: 8px;
-            padding: 12px 15px;
-        }
-
-        .form-control:focus, .form-select:focus {
-            background-color: #FFFFFF;
-            border-color: var(--klien-gold);
-            box-shadow: 0 0 0 0.25rem rgba(212,175,55,0.2);
-            color: var(--klien-text);
-        }
-
-        .form-control::placeholder { color: var(--klien-text-muted); }
-
-        .klien-hero {
-            background: linear-gradient(135deg, var(--klien-maroon), #4a0000);
-            color: #fff;
-            padding: 40px;
-            border-radius: 16px;
-            box-shadow: 0 4px 20px rgba(128,0,0,0.15);
-            border-bottom: 3px solid var(--klien-gold);
-        }
-
-        .fp-card {
-            background: rgba(212,175,55,0.1);
-            border: 2px solid var(--klien-gold);
-            border-radius: 12px;
-            padding: 20px;
-        }
-
-        /* Animations */
-        @keyframes fadeUp {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        .animate-fade-up { animation: fadeUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
-    </style>
+    </script>
 </head>
-<body>
+<body class="bg-surface-container-low text-on-surface font-body min-h-screen flex flex-col selection:bg-secondary/30 selection:text-primary">
 
-    <nav class="navbar navbar-expand-lg navbar-dark navbar-klien sticky-top py-3">
-        <div class="container">
-            <a class="navbar-brand fw-bold fs-4" href="{{ route('klien.dashboard') }}">
-                <span class="klien-gold">ART</span>-HUB
-            </a>
-            <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#klienNav">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            
-            <div class="collapse navbar-collapse" id="klienNav">
-                <ul class="navbar-nav me-auto mb-2 mb-lg-0 ms-lg-4">
-                    <li class="nav-item">
-                        <a class="nav-link {{ request()->routeIs('klien.dashboard') ? 'active klien-gold fw-semibold' : '' }}" href="{{ route('klien.dashboard') }}">Dashboard</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link {{ request()->routeIs('klien.bookings.create') ? 'active klien-gold fw-semibold' : '' }}" href="{{ route('klien.bookings.create') }}">Pesan Baru</a>
-                    </li>
-                </ul>
-                <div class="d-flex align-items-center gap-3">
-                    <span class="fw-semibold text-white">{{ Auth::user()->name }}</span>
-                    <form action="{{ route('logout') }}" method="POST">
+    {{-- Top Navbar --}}
+    <nav class="bg-primary text-white border-b border-outline-variant/20 sticky top-0 z-40 shadow-sm">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16">
+                {{-- Logo & Links --}}
+                <div class="flex items-center gap-8">
+                    <a href="{{ route('klien.dashboard') }}" class="font-headline font-bold text-2xl tracking-tight text-white flex items-center gap-2">
+                        <span class="text-secondary">ART</span>-HUB
+                    </a>
+                    
+                    <div class="hidden md:flex space-x-6">
+                        <a href="{{ route('klien.dashboard') }}" 
+                           class="inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium transition-colors {{ request()->routeIs('klien.dashboard') ? 'border-secondary text-secondary' : 'border-transparent text-white/80 hover:text-white hover:border-white/50' }}">
+                            Dashboard
+                        </a>
+                        <a href="{{ route('klien.bookings.create') }}" 
+                           class="inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium transition-colors {{ request()->routeIs('klien.bookings.create') ? 'border-secondary text-secondary' : 'border-transparent text-white/80 hover:text-white hover:border-white/50' }}">
+                            Pesan Baru
+                        </a>
+                    </div>
+                </div>
+
+                {{-- User Menu --}}
+                <div class="flex items-center gap-4">
+                    <div class="hidden sm:flex flex-col text-right">
+                        <span class="font-label text-xs uppercase tracking-widest text-secondary font-bold">{{ Auth::user()->name }}</span>
+                        <span class="font-label text-[0.65rem] text-white/60 uppercase tracking-widest">Client Portal</span>
+                    </div>
+                    <form action="{{ route('logout') }}" method="POST" class="m-0">
                         @csrf
-                        <button type="submit" class="btn btn-sm btn-outline-light border-0">Logout</button>
+                        <button type="submit" class="p-2 rounded-lg text-white/80 hover:text-white hover:bg-white/10 transition-colors" title="Logout">
+                            <i class="bi bi-box-arrow-right text-lg"></i>
+                        </button>
                     </form>
                 </div>
             </div>
         </div>
     </nav>
 
-    <main class="container py-5">
+    {{-- Main Content --}}
+    <main class="flex-grow max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 py-8">
+        
+        {{-- Flash Messages --}}
         @if(session('success'))
-            <div class="alert alert-success alert-dismissible bg-success text-white border-0 fade show rounded-3" role="alert">
-                <i class="bi bi-check-circle-fill me-2"></i>{{ session('success') }}
-                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="alert"></button>
+            <div class="mb-6 bg-green-500/10 border border-green-500/20 text-green-700 px-4 py-3 rounded-xl flex items-center gap-3">
+                <i class="bi bi-check-circle-fill text-green-600 text-lg"></i>
+                <p class="font-body text-sm font-medium">{{ session('success') }}</p>
             </div>
         @endif
         @if(session('error'))
-            <div class="alert alert-danger alert-dismissible bg-danger text-white border-0 fade show rounded-3" role="alert">
-                <i class="bi bi-exclamation-triangle-fill me-2"></i>{{ session('error') }}
-                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="alert"></button>
+            <div class="mb-6 bg-red-500/10 border border-red-500/20 text-red-700 px-4 py-3 rounded-xl flex items-center gap-3">
+                <i class="bi bi-exclamation-triangle-fill text-red-600 text-lg"></i>
+                <p class="font-body text-sm font-medium">{{ session('error') }}</p>
             </div>
         @endif
 
         @yield('content')
+        
     </main>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    {{-- Footer --}}
+    <footer class="bg-surface-container py-6 border-t border-outline-variant/30 mt-auto">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+            <p class="font-label text-xs text-on-surface-variant uppercase tracking-widest font-bold">
+                &copy; {{ date('Y') }} Sanggar Seni Cahaya Gumilang. All rights reserved.
+            </p>
+        </div>
+    </footer>
+
     @stack('scripts')
 </body>
 </html>

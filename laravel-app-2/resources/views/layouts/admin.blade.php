@@ -3,245 +3,227 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>@yield('title', 'ART-HUB | Sanggar Cahaya Gumilang')</title>
+    <title>@yield('title', 'Admin | ART-HUB Sanggar Cahaya Gumilang')</title>
 
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Noto+Serif:ital,wght@0,400;0,600;0,700;1,400&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="{{ asset('css/admin.css') }}">
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        "primary":                  "#361f1a",
+                        "primary-container":        "#4e342e",
+                        "on-primary":               "#ffffff",
+                        "secondary":                "#705d00",
+                        "secondary-container":      "#fcd400",
+                        "on-secondary-container":   "#6e5c00",
+                        "secondary-fixed-dim":      "#e9c400",
+                        "surface":                  "#faf9f6",
+                        "surface-container-lowest": "#ffffff",
+                        "surface-container-low":    "#f4f3f1",
+                        "surface-container":        "#efeeeb",
+                        "surface-container-high":   "#e9e8e5",
+                        "surface-container-highest":"#e3e2e0",
+                        "on-surface":               "#1a1c1a",
+                        "on-surface-variant":       "#504442",
+                        "outline":                  "#827471",
+                        "outline-variant":          "#d4c3bf",
+                        "primary-fixed":            "#ffdad2",
+                        "on-primary-fixed":         "#2b1611",
+                    },
+                    fontFamily: {
+                        "headline": ["Noto Serif", "serif"],
+                        "body":     ["Manrope", "sans-serif"],
+                        "label":    ["Manrope", "sans-serif"],
+                    }
+                }
+            }
+        }
+    </script>
 
     <style>
         :root {
-            --arh-sidebar-full: 240px;
-            --arh-sidebar-mini: 60px;
-            --arh-topbar-h: 52px;
-            --arh-gold: #D4AF37;           /* gold accent */
-            --arh-gold-bright: #D4AF37;    /* gold accent */
-            --arh-gold-dim: rgba(212,175,55,0.12);
-            --arh-bg: #FFFFFF;
-            --arh-sidebar-bg: #800000;     /* Deep Maroon */
-            --arh-border: #E8E3D9;
+            --sidebar-w: 240px;
+            --sidebar-mini: 60px;
+            --topbar-h: 56px;
         }
         * { box-sizing: border-box; }
-        body { font-family: 'Inter', sans-serif; background: #FFFFFF; color: #1a0808; margin: 0; }
+        body { font-family: 'Manrope', sans-serif; background: #faf9f6; color: #1a1c1a; margin: 0; }
+        .material-symbols-outlined { font-variation-settings: 'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24; font-size: 1.1rem; }
 
-        /* ━━━━━━━━━━━━━━━━ SIDEBAR ━━━━━━━━━━━━━━━━ */
+        /* ── SIDEBAR ── */
         #sidebar {
-            width: var(--arh-sidebar-full);
+            width: var(--sidebar-w);
             min-height: 100vh;
-            background: var(--arh-sidebar-bg);
-            border-right: 1px solid var(--arh-border);
-            display: flex;
-            flex-direction: column;
-            position: fixed;
-            top: 0; left: 0;
-            z-index: 1040;
+            background: linear-gradient(180deg, #361f1a 0%, #2a1713 100%);
+            display: flex; flex-direction: column;
+            position: fixed; top: 0; left: 0; z-index: 1040;
             transition: width 0.28s cubic-bezier(0.4,0,0.2,1);
-            overflow: hidden;  /* needed for smooth width animation */
+            overflow: hidden;
         }
-        #sidebar.mini { width: var(--arh-sidebar-mini); }
+        #sidebar.mini { width: var(--sidebar-mini); }
 
-        /* ━━━━━━━━━━━━━━━━ BRAND AREA ━━━━━━━━━━━━━━━━ */
+        /* Brand */
         .arh-brand {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            padding: 0 12px;
-            height: 56px;
-            border-bottom: 1px solid var(--arh-border);
-            flex-shrink: 0;
-            overflow: visible; /* don't clip toggle */
+            display: flex; align-items: center; gap: 10px;
+            padding: 0 14px; height: 60px; flex-shrink: 0;
+            background: rgba(0,0,0,0.15);
         }
         .arh-brand-logo {
-            width: 32px; height: 32px; border-radius: 8px; flex-shrink: 0;
-            background: linear-gradient(135deg, #800000, #4a0000); border: 1px solid rgba(212, 175, 55, 0.4);
+            width: 34px; height: 34px; border-radius: 8px; flex-shrink: 0;
+            background: linear-gradient(135deg, #fcd400, #e9c400);
             display: flex; align-items: center; justify-content: center;
-            font-weight: 900; font-size: 0.72rem; color: #fff; letter-spacing: -0.5px;
-            transition: opacity 0.2s;
+            font-family: 'Noto Serif', serif; font-weight: 700; font-size: 0.78rem; color: #361f1a;
         }
-        .arh-brand-text {
-            flex: 1;
-            min-width: 0;
-            overflow: hidden;
-            white-space: nowrap;
-            transition: opacity 0.2s, max-width 0.28s;
-            max-width: 200px;
-        }
-        .arh-brand-title { font-family: 'Playfair Display', serif; font-size: 1.15rem; font-weight: 700; color: #D4AF37; letter-spacing: 1px; }
-        .arh-brand-sub { font-size: 0.55rem; color: #FDFBF7; text-transform: uppercase; letter-spacing: 0.8px; }
-
-        /* Hamburger toggle – always visible, always at same position */
-        #sidebarToggle {
-            width: 32px; height: 32px; border-radius: 7px; flex-shrink: 0;
-            border: 1px solid rgba(255,255,255,0.12); background: rgba(255,255,255,0.06); color: #F5F5F5;
-            display: flex; align-items: center; justify-content: center;
-            cursor: pointer; transition: all 0.2s; margin-left: auto;
-        }
-        #sidebarToggle:hover { background: rgba(212,175,55,0.15); color: #D4AF37; border-color: rgba(212,175,55,0.4); }
-        #sidebarToggle .bi { font-size: 0.95rem; pointer-events: none; }
-
-        /* In MINI: hide brand text + logo, center the toggle */
+        .arh-brand-text { flex: 1; min-width: 0; overflow: hidden; white-space: nowrap; transition: opacity 0.2s; }
+        .arh-brand-title { font-family: 'Noto Serif', serif; font-size: 1rem; font-weight: 700; color: #fcd400; letter-spacing: 0.5px; }
+        .arh-brand-sub { font-size: 0.55rem; color: rgba(255,255,255,0.5); text-transform: uppercase; letter-spacing: 1px; }
         #sidebar.mini .arh-brand { justify-content: center; padding: 0; }
-        #sidebar.mini .arh-brand-logo { display: none; }
         #sidebar.mini .arh-brand-text { display: none; }
+
+        /* Toggle */
+        #sidebarToggle {
+            width: 30px; height: 30px; border-radius: 6px; flex-shrink: 0; margin-left: auto;
+            border: 1px solid rgba(255,255,255,0.1); background: rgba(255,255,255,0.05);
+            color: rgba(255,255,255,0.6); display: flex; align-items: center; justify-content: center;
+            cursor: pointer; transition: all 0.2s;
+        }
+        #sidebarToggle:hover { background: rgba(252,212,0,0.15); color: #fcd400; border-color: rgba(252,212,0,0.3); }
         #sidebar.mini #sidebarToggle { margin-left: 0; }
 
-        /* ━━━━━━━━━━━━━━━━ USER ROW ━━━━━━━━━━━━━━━━ */
+        /* User row */
         .arh-user {
             display: flex; align-items: center; gap: 10px;
-            padding: 0 12px; height: 48px;
-            border-bottom: 1px solid var(--arh-border);
-            flex-shrink: 0; overflow: hidden;
+            padding: 10px 14px; flex-shrink: 0;
+            border-bottom: 1px solid rgba(255,255,255,0.06);
         }
         .arh-avatar {
-            width: 30px; height: 30px; border-radius: 50%; flex-shrink: 0;
-            background: linear-gradient(135deg, #4a0000, #2d0000); border: 1px solid rgba(212,175,55,0.5);
+            width: 32px; height: 32px; border-radius: 50%; flex-shrink: 0;
+            background: linear-gradient(135deg, #fcd400, #e9c400);
             display: flex; align-items: center; justify-content: center;
-            font-weight: 700; font-size: 0.7rem; color: #fff;
+            font-weight: 800; font-size: 0.72rem; color: #361f1a;
         }
         .arh-user-info { overflow: hidden; white-space: nowrap; }
-        .arh-user-name { font-size: 0.78rem; font-weight: 600; color: #FDFBF7; }
-        .arh-user-role { font-size: 0.6rem; color: #D4AF37; }
-
-        #sidebar.mini .arh-user { justify-content: center; padding: 0; }
+        .arh-user-name { font-size: 0.78rem; font-weight: 600; color: #faf9f6; }
+        .arh-user-role { font-size: 0.58rem; color: rgba(252,212,0,0.7); text-transform: uppercase; letter-spacing: 0.5px; }
+        #sidebar.mini .arh-user { justify-content: center; padding: 10px 0; }
         #sidebar.mini .arh-user-info { display: none; }
 
-        /* ━━━━━━━━━━━━━━━━ NAV LINKS ━━━━━━━━━━━━━━━━ */
+        /* Nav */
         .arh-nav { list-style: none; padding: 8px 8px 0; margin: 0; overflow-y: auto; flex: 1; }
-
         .arh-nav-section {
-            font-size: 0.58rem; color: rgba(212,175,55,0.8); text-transform: uppercase;
-            letter-spacing: 1px; padding: 12px 4px 3px; font-weight: 600;
-            white-space: nowrap;
+            font-size: 0.58rem; color: rgba(252,212,0,0.5); text-transform: uppercase;
+            letter-spacing: 1.2px; padding: 14px 6px 4px; font-weight: 700; white-space: nowrap;
         }
-        /* Mini: section divider becomes a thin line */
-        #sidebar.mini .arh-nav-section {
-            font-size: 0; height: 1px;
-            background: var(--arh-border);
-            margin: 8px 8px 4px;
-            padding: 0;
-        }
+        #sidebar.mini .arh-nav-section { height: 1px; background: rgba(255,255,255,0.06); margin: 8px 8px 4px; padding: 0; font-size: 0; }
 
         .arh-nav-link {
             display: flex; align-items: center; gap: 10px;
-            padding: 9px 8px;
-            border-radius: 8px; margin-bottom: 2px;
-            color: #F5F5F5; text-decoration: none;
-            font-size: 0.83rem; font-weight: 500;
-            transition: background 0.15s, color 0.15s;
-            white-space: nowrap; overflow: hidden;
-            position: relative;
+            padding: 9px 10px; border-radius: 8px; margin-bottom: 2px;
+            color: rgba(255,255,255,0.65); text-decoration: none;
+            font-size: 0.82rem; font-weight: 500;
+            transition: all 0.18s; white-space: nowrap; overflow: hidden;
         }
-        .arh-nav-link:hover { background: var(--arh-gold-dim); color: #D4AF37; }
+        .arh-nav-link:hover { background: rgba(252,212,0,0.1); color: #fcd400; }
         .arh-nav-link.active {
-            background: transparent;
-            color: var(--arh-gold);
-            border-left: 3px solid var(--arh-gold);
-            padding-left: 5px;
-            text-shadow: 0 0 8px rgba(212,175,55,0.4);
+            background: rgba(252,212,0,0.12);
+            color: #fcd400; font-weight: 700;
+            box-shadow: inset 3px 0 0 #fcd400;
         }
-        .arh-nav-icon { font-size: 1.05rem; width: 22px; text-align: center; flex-shrink: 0; }
-        .arh-nav-label { min-width: 0; overflow: hidden; }
-
-        /* Mini: center icon, hide label */
+        .arh-nav-icon { width: 20px; text-align: center; flex-shrink: 0; font-size: 1rem; }
         #sidebar.mini .arh-nav { padding: 8px 4px 0; }
-        #sidebar.mini .arh-nav-link {
-            justify-content: center;
-            padding: 10px 0;
-            border-left: none !important; /* remove active left border */
-        }
-        #sidebar.mini .arh-nav-link.active {
-            border-left: none;
-            padding-left: 0;
-            outline: 1px solid rgba(139,26,42,0.4);
-        }
+        #sidebar.mini .arh-nav-link { justify-content: center; padding: 10px 0; box-shadow: none !important; }
         #sidebar.mini .arh-nav-label { display: none; }
 
-        /* Tooltip on hover in mini mode */
+        /* Tooltip mini */
         #sidebar.mini .arh-nav-link::after {
-            content: attr(data-tooltip);
-            position: fixed;
-            left: calc(var(--arh-sidebar-mini) + 10px);
-            background: #2D0A10; color: #f5eded;
-            font-size: 0.78rem; font-weight: 500;
-            padding: 5px 12px; border-radius: 6px;
-            border: 1px solid rgba(197,160,40,0.3); white-space: nowrap;
-            pointer-events: none; opacity: 0;
-            transition: opacity 0.15s; z-index: 9999;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+            content: attr(data-tooltip); position: fixed;
+            left: calc(var(--sidebar-mini) + 10px);
+            background: #2a1713; color: #faf9f6; font-size: 0.78rem; font-weight: 500;
+            padding: 5px 12px; border-radius: 6px; white-space: nowrap;
+            pointer-events: none; opacity: 0; transition: opacity 0.15s; z-index: 9999;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3); border: 1px solid rgba(252,212,0,0.2);
         }
         #sidebar.mini .arh-nav-link:hover::after { opacity: 1; }
 
-        /* ━━━━━━━━━━━━━━━━ LOGOUT ━━━━━━━━━━━━━━━━ */
-        .arh-logout-wrap {
-            padding: 8px 8px 16px;
-            flex-shrink: 0;
-        }
+        /* Logout */
+        .arh-logout-wrap { padding: 8px 8px 16px; flex-shrink: 0; }
         .arh-logout {
             display: flex; align-items: center; gap: 10px;
-            padding: 9px 8px; border-radius: 8px;
-            color: #F5F5F5; font-size: 0.83rem; font-weight: 500;
-            transition: background 0.15s; white-space: nowrap; overflow: hidden;
-            background: none; border: none; width: 100%; cursor: pointer;
-            position: relative;
+            padding: 9px 10px; border-radius: 8px; width: 100%;
+            color: rgba(255,255,255,0.5); font-size: 0.82rem; font-weight: 500;
+            background: none; border: none; cursor: pointer;
+            transition: all 0.18s; white-space: nowrap; overflow: hidden;
         }
-        .arh-logout:hover { background: var(--arh-gold-dim); color: var(--arh-gold); }
+        .arh-logout:hover { background: rgba(186,26,26,0.15); color: #fca5a5; }
         #sidebar.mini .arh-logout { justify-content: center; padding: 10px 0; }
         #sidebar.mini .arh-logout-label { display: none; }
         #sidebar.mini .arh-logout::after {
-            content: 'Logout';
-            position: fixed;
-            left: calc(var(--arh-sidebar-mini) + 10px);
-            background: #2D0A10; color: #ef4444;
-            font-size: 0.78rem; font-weight: 500;
-            padding: 5px 12px; border-radius: 6px;
-            border: 1px solid rgba(239,68,68,0.3); white-space: nowrap;
-            pointer-events: none; opacity: 0;
-            transition: opacity 0.15s; z-index: 9999;
+            content: 'Logout'; position: fixed; left: calc(var(--sidebar-mini) + 10px);
+            background: #2a1713; color: #fca5a5; font-size: 0.78rem; font-weight: 500;
+            padding: 5px 12px; border-radius: 6px; white-space: nowrap;
+            pointer-events: none; opacity: 0; transition: opacity 0.15s; z-index: 9999;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
         }
         #sidebar.mini .arh-logout:hover::after { opacity: 1; }
 
-        /* ━━━━━━━━━━━━━━━━ TOPBAR ━━━━━━━━━━━━━━━━ */
+        /* ── TOPBAR ── */
         #topbar {
-            height: var(--arh-topbar-h);
-            background: #FFFFFF;
-            border-bottom: 1px solid #E0D0D2;
-            box-shadow: 0 1px 8px rgba(139,26,42,0.07);
-            display: flex; align-items: center;
-            padding: 0 20px;
-            position: fixed;
-            top: 0;
-            left: var(--arh-sidebar-full);
-            right: 0;
-            z-index: 1030;
-            transition: left 0.28s cubic-bezier(0.4,0,0.2,1);
-            gap: 14px;
+            height: var(--topbar-h);
+            background: #ffffff;
+            box-shadow: 0 1px 0 #efeeeb, 0 4px 16px rgba(54,31,26,0.04);
+            display: flex; align-items: center; padding: 0 24px;
+            position: fixed; top: 0; left: var(--sidebar-w); right: 0;
+            z-index: 1030; transition: left 0.28s cubic-bezier(0.4,0,0.2,1); gap: 14px;
         }
-        #topbar.mini { left: var(--arh-sidebar-mini); }
+        #topbar.mini { left: var(--sidebar-mini); }
 
-        /* ━━━━━━━━━━━━━━━━ CONTENT ━━━━━━━━━━━━━━━━ */
+        /* ── CONTENT ── */
         #page-content {
-            margin-left: var(--arh-sidebar-full);
-            padding-top: var(--arh-topbar-h);
+            margin-left: var(--sidebar-w);
+            padding-top: var(--topbar-h);
             min-height: 100vh;
             transition: margin-left 0.28s cubic-bezier(0.4,0,0.2,1);
+            background: #faf9f6;
         }
-        #page-content.mini { margin-left: var(--arh-sidebar-mini); }
+        #page-content.mini { margin-left: var(--sidebar-mini); }
 
-        /* ━━━━━━━━━━━━━━━━ MOBILE ━━━━━━━━━━━━━━━━ */
+        /* ── MOBILE ── */
         #sidebarOverlay {
             display: none; position: fixed; inset: 0;
-            background: rgba(0,0,0,0.6); z-index: 1039;
+            background: rgba(54,31,26,0.55); z-index: 1039; backdrop-filter: blur(2px);
         }
         @media (max-width: 768px) {
-            #sidebar { transform: translateX(-100%); width: var(--arh-sidebar-full) !important; transition: transform 0.28s ease; }
+            #sidebar { transform: translateX(-100%); width: var(--sidebar-w) !important; transition: transform 0.28s ease; }
             #sidebar.mobile-open { transform: translateX(0) !important; }
             #topbar, #topbar.mini { left: 0 !important; }
             #page-content, #page-content.mini { margin-left: 0 !important; }
         }
+
+        /* ── ALERT HERITAGE ── */
+        .alert-heritage-success {
+            background: #f0fdf4; border-left: 3px solid #16a34a;
+            border-radius: 8px; padding: 12px 16px;
+            display: flex; align-items: center; gap: 10px;
+            font-family: 'Manrope', sans-serif; font-size: 0.85rem; color: #15803d;
+        }
+        .alert-heritage-warning {
+            background: #fffbeb; border-left: 3px solid #d97706;
+            border-radius: 8px; padding: 12px 16px;
+            font-family: 'Manrope', sans-serif; font-size: 0.85rem; color: #b45309;
+        }
+        .alert-heritage-danger {
+            background: #fef2f2; border-left: 3px solid #dc2626;
+            border-radius: 8px; padding: 12px 16px;
+            font-family: 'Manrope', sans-serif; font-size: 0.85rem; color: #b91c1c;
+        }
     </style>
 
-    {{-- ⚡ Apply mini state BEFORE render to prevent flash on page navigation --}}
+    {{-- Pre-apply mini state to prevent flash --}}
     <script>
         (function () {
             if (window.innerWidth > 768 && localStorage.getItem('arh_sidebar_mini') === 'true') {
@@ -250,10 +232,9 @@
         })();
     </script>
     <style>
-        /* Pre-apply mini classes via data attribute to prevent flash */
-        [data-sidebar-mini="1"] #sidebar { width: var(--arh-sidebar-mini) !important; }
-        [data-sidebar-mini="1"] #topbar  { left: var(--arh-sidebar-mini) !important; }
-        [data-sidebar-mini="1"] #page-content { margin-left: var(--arh-sidebar-mini) !important; }
+        [data-sidebar-mini="1"] #sidebar      { width: var(--sidebar-mini) !important; }
+        [data-sidebar-mini="1"] #topbar       { left: var(--sidebar-mini) !important; }
+        [data-sidebar-mini="1"] #page-content { margin-left: var(--sidebar-mini) !important; }
     </style>
 
     @yield('styles')
@@ -265,15 +246,15 @@
 {{-- ════ SIDEBAR ════ --}}
 <nav id="sidebar">
 
-    {{-- Brand + Hamburger (always in brand row) --}}
+    {{-- Brand --}}
     <div class="arh-brand">
         <div class="arh-brand-logo">AH</div>
         <div class="arh-brand-text">
             <div class="arh-brand-title">ART-HUB</div>
             <div class="arh-brand-sub">Sanggar Cahaya Gumilang</div>
         </div>
-        <button id="sidebarToggle" title="Expand / Collapse">
-            <i class="bi bi-layout-sidebar-reverse"></i>
+        <button id="sidebarToggle" title="Collapse sidebar">
+            <i class="bi bi-layout-sidebar-reverse" style="font-size:0.95rem;pointer-events:none;"></i>
         </button>
     </div>
 
@@ -345,46 +326,56 @@
 
 {{-- ════ TOPBAR ════ --}}
 <nav id="topbar">
-    {{-- Mobile-only hamburger in topbar --}}
-    <button class="d-flex d-md-none align-items-center justify-content-center"
-            style="width:34px;height:34px;border-radius:7px;border:1px solid #E0D0D2;background:#fdf5f5;color:#8B1A2A;cursor:pointer;flex-shrink:0;"
-            onclick="openSidebarMobile()">
+    {{-- Mobile hamburger --}}
+    <button onclick="openSidebarMobile()"
+        style="width:34px;height:34px;border-radius:8px;border:1px solid #efeeeb;background:#faf9f6;color:#361f1a;cursor:pointer;flex-shrink:0;display:none;"
+        class="mobile-menu-btn" id="mobileMenuBtn">
         <i class="bi bi-list" style="font-size:1.1rem;"></i>
     </button>
 
-    <div class="flex-grow-1">
-        <h6 class="mb-0 fw-bold" style="font-size:0.92rem; color:#1a0808;">@yield('page_title', 'Admin Panel')</h6>
-        <div style="font-size:0.68rem; color:#7a5a5e;">@yield('page_subtitle')</div>
+    <div style="flex:1;">
+        <div style="font-family:'Noto Serif',serif;font-size:1rem;font-weight:600;color:#361f1a;line-height:1.2;">
+            @yield('page_title', 'Admin Panel')
+        </div>
+        <div style="font-size:0.68rem;color:#827471;font-family:'Manrope',sans-serif;text-transform:uppercase;letter-spacing:0.05em;">
+            @yield('page_subtitle')
+        </div>
     </div>
-    <div class="d-flex align-items-center gap-2">
-        <span class="badge d-none d-sm-inline-flex"
-              style="background:rgba(139,26,42,0.1); color:#8B1A2A; border:1px solid rgba(139,26,42,0.25); font-size:0.68rem;">
-            <i class="bi bi-shield-lock-fill me-1"></i>Admin
+
+    <div style="display:flex;align-items:center;gap:12px;">
+        <span style="background:rgba(252,212,0,0.12);color:#705d00;font-size:0.68rem;font-weight:700;padding:4px 10px;border-radius:99px;font-family:'Manrope',sans-serif;text-transform:uppercase;letter-spacing:0.08em;">
+            Admin
         </span>
-        <span style="font-size:0.72rem; color:#9a7a7e;" class="d-none d-lg-block">{{ now()->format('d M Y') }}</span>
+        <span style="font-size:0.72rem;color:#827471;font-family:'Manrope',sans-serif;">
+            {{ now()->translatedFormat('d M Y') }}
+        </span>
     </div>
 </nav>
 
 {{-- ════ CONTENT ════ --}}
 <div id="page-content">
-    <main class="p-4">
+    <main style="padding: 28px 28px;">
 
+        {{-- Flash Messages --}}
         @if(session('success'))
-        <div class="alert alert-success alert-dismissible border-0 d-flex align-items-center gap-2 mb-4" role="alert">
-            <i class="bi bi-check-circle-fill fs-5"></i><span>{{ session('success') }}</span>
-            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        <div class="alert-heritage-success" style="margin-bottom:16px;display:flex;align-items:center;gap:10px;">
+            <i class="bi bi-check-circle-fill"></i>
+            <span>{{ session('success') }}</span>
+            <button onclick="this.parentElement.remove()" style="margin-left:auto;background:none;border:none;cursor:pointer;color:inherit;font-size:1rem;">×</button>
         </div>
         @endif
         @if(session('warning'))
-        <div class="alert alert-warning alert-dismissible border-0 d-flex align-items-center gap-2 mb-4" role="alert">
-            <i class="bi bi-exclamation-triangle-fill fs-5"></i><span>{{ session('warning') }}</span>
-            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        <div class="alert-heritage-warning" style="margin-bottom:16px;display:flex;align-items:center;gap:10px;">
+            <i class="bi bi-exclamation-triangle-fill"></i>
+            <span>{{ session('warning') }}</span>
+            <button onclick="this.parentElement.remove()" style="margin-left:auto;background:none;border:none;cursor:pointer;color:inherit;font-size:1rem;">×</button>
         </div>
         @endif
         @if(session('error'))
-        <div class="alert alert-danger alert-dismissible border-0 d-flex align-items-center gap-2 mb-4" role="alert">
-            <i class="bi bi-x-octagon-fill fs-5"></i><span>{{ session('error') }}</span>
-            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        <div class="alert-heritage-danger" style="margin-bottom:16px;display:flex;align-items:center;gap:10px;">
+            <i class="bi bi-x-octagon-fill"></i>
+            <span>{{ session('error') }}</span>
+            <button onclick="this.parentElement.remove()" style="margin-left:auto;background:none;border:none;cursor:pointer;color:inherit;font-size:1rem;">×</button>
         </div>
         @endif
 
@@ -392,7 +383,6 @@
     </main>
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 <script>
     const sidebar   = document.getElementById('sidebar');
     const topbar    = document.getElementById('topbar');
@@ -401,23 +391,25 @@
     const toggleBtn = document.getElementById('sidebarToggle');
     const isMobile  = () => window.innerWidth <= 768;
 
-    // Toggle classes properly
+    // Mobile menu btn visibility
+    const mobileBtn = document.getElementById('mobileMenuBtn');
+    if (mobileBtn) mobileBtn.style.display = isMobile() ? 'flex' : 'none';
+    window.addEventListener('resize', () => {
+        if (mobileBtn) mobileBtn.style.display = isMobile() ? 'flex' : 'none';
+    });
+
     function applyMiniState(mini) {
         sidebar.classList.toggle('mini', mini);
         topbar.classList.toggle('mini', mini);
         content.classList.toggle('mini', mini);
-        // Flip icon direction
         const icon = toggleBtn.querySelector('.bi');
-        icon.className = mini ? 'bi bi-layout-sidebar' : 'bi bi-layout-sidebar-reverse';
-        // Also remove the data-sidebar-mini attr (no longer needed once JS runs)
+        if (icon) icon.className = mini ? 'bi bi-layout-sidebar' : 'bi bi-layout-sidebar-reverse';
         document.documentElement.removeAttribute('data-sidebar-mini');
     }
 
-    // Restore persisted state on load (no transition flash because CSS pre-applied it)
     const isMini = localStorage.getItem('arh_sidebar_mini') === 'true';
     if (!isMobile()) applyMiniState(isMini);
 
-    // Desktop toggle click
     toggleBtn.addEventListener('click', () => {
         if (isMobile()) return;
         const nowMini = !sidebar.classList.contains('mini');
@@ -425,7 +417,6 @@
         localStorage.setItem('arh_sidebar_mini', String(nowMini));
     });
 
-    // Mobile
     function openSidebarMobile() {
         sidebar.classList.add('mobile-open');
         overlay.style.display = 'block';
@@ -435,9 +426,9 @@
         overlay.style.display = 'none';
     }
 
-    // Auto-dismiss alerts
-    document.querySelectorAll('.alert').forEach(el => {
-        setTimeout(() => { bootstrap.Alert.getOrCreateInstance(el)?.close(); }, 5000);
+    // Auto-dismiss alerts after 5s
+    document.querySelectorAll('[class^="alert-heritage"]').forEach(el => {
+        setTimeout(() => el.remove(), 5000);
     });
 
     // Prevent double-submit
@@ -446,7 +437,7 @@
             if (this.checkValidity()) {
                 this.querySelectorAll('button[type="submit"]').forEach(btn => {
                     btn.disabled = true;
-                    btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Memproses...';
+                    btn.innerHTML = '<i class="bi bi-hourglass-split me-1"></i>Memproses...';
                 });
             }
         });
@@ -455,5 +446,3 @@
 @yield('scripts')
 </body>
 </html>
-
-
