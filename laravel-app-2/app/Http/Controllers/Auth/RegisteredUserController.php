@@ -36,8 +36,7 @@ class RegisteredUserController extends Controller
             'phone' => ['required', 'string', 'max:20'],
             'password' => ['required', 'confirmed', Rules\Password::defaults()],
         ]);
-
-        $role = $request->role_type === 'personnel' ? 'personel' : 'klien';
+        $role = $request->role === 'personnel' ? 'personel' : 'klien';
 
         $user = User::create([
             'name' => $request->name,
