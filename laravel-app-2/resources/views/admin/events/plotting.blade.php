@@ -6,46 +6,57 @@
 
 @section('content')
 
+{{-- BACK NAV --}}
+<div class="flex items-center gap-2 mb-6 font-label text-xs uppercase tracking-widest font-bold">
+    <a href="{{ route('admin.events.show', $event->id) }}" class="text-on-surface-variant hover:text-secondary transition-colors flex items-center gap-1.5">
+        <i class="bi bi-arrow-left"></i> Kembali ke Event
+    </a>
+    <span class="text-outline-variant">/</span>
+    <span class="text-outline">Plotting Personel</span>
+</div>
+
 {{-- ── STATUS BAR: INFO EVENT + RESULT SP ── --}}
-<div class="arh-card-gold p-4 mb-4 animate-fade-up">
-    <div class="row align-items-center g-3">
-        <div class="col-12 col-md-6">
-            <h5 class="fw-bold mb-2 d-flex align-items-center gap-2 arh-gold">
-                <i class="bi bi-people-fill"></i> Formasi {{ $event->personnel_count ?? 12 }} Personel
+<div class="bg-surface-container-lowest rounded-xl border border-outline-variant/30 shadow-[0_12px_24px_rgba(54,31,26,0.03)] p-6 mb-8">
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 items-center">
+        <div>
+            <h5 class="font-headline font-bold text-lg text-primary flex items-center gap-2 mb-2">
+                <i class="bi bi-people-fill text-secondary"></i> Formasi {{ $event->personnel_count ?? 12 }} Personel
             </h5>
-            <div class="text-secondary small">
-                <i class="bi bi-calendar-event me-1"></i> {{ $event->event_date->format('l, d M Y') }} &nbsp;|&nbsp;
-                <i class="bi bi-clock me-1"></i> {{ \Carbon\Carbon::parse($event->event_start)->format('H:i') }} – {{ \Carbon\Carbon::parse($event->event_end)->format('H:i') }} WIB &nbsp;|&nbsp;
-                <i class="bi bi-geo-alt me-1"></i> {{ $event->venue }}
+            <div class="font-label text-xs uppercase tracking-widest text-on-surface-variant font-bold flex items-center gap-2 flex-wrap">
+                <span><i class="bi bi-calendar-event"></i> {{ $event->event_date->format('l, d M Y') }}</span>
+                <span class="text-outline-variant">•</span>
+                <span><i class="bi bi-clock"></i> {{ \Carbon\Carbon::parse($event->event_start)->format('H:i') }} – {{ \Carbon\Carbon::parse($event->event_end)->format('H:i') }} WIB</span>
+                <span class="text-outline-variant">•</span>
+                <span><i class="bi bi-geo-alt"></i> {{ $event->venue }}</span>
             </div>
         </div>
 
         {{-- Hasil Stored Procedure (jika tersedia) --}}
-        <div class="col-12 col-md-6">
+        <div>
             @if(isset($spData) && $spData)
                 @if($spData->collision_count > 0)
-                <div class="p-3 rounded-3 border border-danger d-flex align-items-center gap-3" style="background: rgba(220,53,69,0.15);">
-                    <i class="bi bi-exclamation-octagon-fill text-danger fs-1"></i>
+                <div class="flex items-center gap-4 p-4 rounded-xl bg-red-500/10 border border-red-500/20 text-red-700">
+                    <i class="bi bi-exclamation-octagon-fill text-4xl"></i>
                     <div>
-                        <h6 class="fw-bold mb-1 text-danger">{{ $spData->collision_count }} Personel Konflik Jadwal</h6>
-                        <small class="text-secondary">Ada yang sedang di pekerjaan utama/latihan.</small>
+                        <h6 class="font-headline font-bold text-base mb-1">{{ $spData->collision_count }} Personel Konflik Jadwal</h6>
+                        <p class="font-body text-[0.7rem] opacity-90 leading-tight">Ada yang sedang di pekerjaan utama/latihan di waktu bersamaan.</p>
                     </div>
                 </div>
                 @else
-                <div class="p-3 rounded-3 border border-success d-flex align-items-center gap-3" style="background: rgba(25,135,84,0.15);">
-                    <i class="bi bi-check-circle-fill text-success fs-1"></i>
+                <div class="flex items-center gap-4 p-4 rounded-xl bg-green-500/10 border border-green-500/20 text-green-700">
+                    <i class="bi bi-check-circle-fill text-4xl"></i>
                     <div>
-                        <h6 class="fw-bold mb-1 text-success">Semua Personel Tersedia!</h6>
-                        <small class="text-secondary">Tidak ada konflik jadwal. Silakan assign formasi.</small>
+                        <h6 class="font-headline font-bold text-base mb-1">Semua Personel Tersedia!</h6>
+                        <p class="font-body text-[0.7rem] opacity-90 leading-tight">Tidak ada konflik jadwal ditemukan. Silakan assign formasi.</p>
                     </div>
                 </div>
                 @endif
             @else
-            <div class="p-3 rounded-3 border d-flex align-items-center gap-3 bg-black bg-opacity-25" style="border-color: var(--arh-gold);">
-                <i class="bi bi-database-fill-check fs-1 arh-gold"></i>
+            <div class="flex items-center gap-4 p-4 rounded-xl bg-primary/5 border border-primary/20 text-primary">
+                <i class="bi bi-database-fill-check text-4xl text-secondary"></i>
                 <div>
-                    <h6 class="fw-bold mb-1 col-gold">Deteksi Konflik SQL Siap</h6>
-                    <small class="text-secondary">Klik "Validasi & Kunci Plotting" untuk menjalankan Stored Procedure.</small>
+                    <h6 class="font-headline font-bold text-base text-secondary mb-1">Deteksi Konflik SQL Siap</h6>
+                    <p class="font-body text-[0.7rem] opacity-80 leading-tight">Klik "Validasi & Kunci Plotting" untuk menjalankan Stored Procedure check_personnel_availability.</p>
                 </div>
             </div>
             @endif
@@ -57,28 +68,30 @@
 <form action="{{ route('admin.events.plotting.store', $event->id) }}" method="POST" id="plotting-form">
     @csrf
 
-    <div class="row g-4 animate-fade-up">
+    <div class="flex flex-col xl:flex-row gap-6 items-start">
 
         {{-- ── PANEL KIRI: TABEL ASSIGNMENT PERSONEL ── --}}
-        <div class="col-12 col-xl-8">
-            <div class="arh-card p-4 h-100">
-                <h5 class="fw-bold mb-4 d-flex align-items-center gap-2">
-                    <i class="bi bi-person-lines-fill arh-gold"></i> Pilih & Assign Formasi Personel
-                </h5>
+        <div class="flex-grow w-full">
+            <div class="bg-surface-container-lowest rounded-xl border border-outline-variant/30 shadow-[0_12px_24px_rgba(54,31,26,0.03)] overflow-hidden">
+                <div class="px-6 py-5 border-b border-outline-variant/20 flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-surface-container-low/30">
+                    <h3 class="font-headline text-lg font-bold text-primary flex items-center gap-2">
+                        <i class="bi bi-person-lines-fill text-secondary"></i> Pilih & Assign Formasi Personel
+                    </h3>
+                </div>
 
-                <div class="table-responsive">
-                    <table class="table arh-table table-hover align-middle mb-0" id="plotting-table">
-                        <thead>
+                <div class="overflow-x-auto">
+                    <table class="w-full" id="plotting-table">
+                        <thead class="bg-surface-container-low">
                             <tr>
-                                <th>#</th>
-                                <th>Personel</th>
-                                <th>Spesialisasi</th>
-                                <th>Role di Event</th>
-                                <th>Fee</th>
-                                <th>Status</th>
+                                <th class="font-label text-[0.65rem] uppercase tracking-widest text-outline font-bold px-6 py-4 text-center w-12">#</th>
+                                <th class="font-label text-[0.65rem] uppercase tracking-widest text-outline font-bold px-6 py-4 text-left">Personel</th>
+                                <th class="font-label text-[0.65rem] uppercase tracking-widest text-outline font-bold px-6 py-4 text-left">Spesialisasi</th>
+                                <th class="font-label text-[0.65rem] uppercase tracking-widest text-outline font-bold px-6 py-4 text-left">Role di Event</th>
+                                <th class="font-label text-[0.65rem] uppercase tracking-widest text-outline font-bold px-6 py-4 text-right">Fee</th>
+                                <th class="font-label text-[0.65rem] uppercase tracking-widest text-outline font-bold px-6 py-4 text-center">Status</th>
                             </tr>
                         </thead>
-                        <tbody>
+                        <tbody class="divide-y divide-outline-variant/20">
                             @foreach($personnel as $idx => $p)
                             @php
                                 $pivotData = $event->personnel->firstWhere('id', $p->id)?->pivot;
@@ -89,10 +102,11 @@
                                     $collidingIds = $m[1] ?? [];
                                 }
                                 $isColliding = in_array((string)$p->id, $collidingIds);
+                                $rowClass = $isColliding ? 'bg-red-500/5 hover:bg-red-500/10' : 'hover:bg-surface-container-low/50';
                             @endphp
-                            <tr class="{{ $isColliding ? 'bg-danger bg-opacity-10 border-danger' : '' }}">
-                                <td>
-                                    <input class="form-check-input border-secondary" type="checkbox" name="personnel[{{ $idx }}][selected]"
+                            <tr class="transition-colors {{ $rowClass }}">
+                                <td class="px-6 py-4 text-center">
+                                    <input class="w-4 h-4 rounded border-outline-variant/50 text-secondary focus:ring-secondary cursor-pointer" type="checkbox" name="personnel[{{ $idx }}][selected]"
                                            value="1" id="chk-{{ $p->id }}"
                                            {{ $alreadyPlotted ? 'checked' : '' }}
                                            {{ $isColliding ? 'disabled' : '' }}
@@ -100,20 +114,26 @@
                                     <input type="hidden" name="personnel[{{ $idx }}][id]" value="{{ $p->id }}">
                                     <input type="hidden" name="personnel[{{ $idx }}][fee_reference_id]" value="{{ $fees->first()?->id ?? 1 }}">
                                 </td>
-                                <td>
-                                    <div class="d-flex align-items-center gap-2">
-                                        <div class="arh-avatar-sm">{{ strtoupper(substr($p->user->name ?? 'P', 0, 2)) }}</div>
+                                <td class="px-6 py-4">
+                                    <div class="flex items-center gap-3">
+                                        <div class="w-9 h-9 rounded-full bg-surface-container-highest border border-outline-variant/30 text-on-surface-variant font-headline font-bold text-xs flex items-center justify-center flex-shrink-0">
+                                            {{ strtoupper(substr($p->user->name ?? 'P', 0, 2)) }}
+                                        </div>
                                         <div>
-                                            <div class="fw-semibold">{{ $p->user->name ?? 'Personel' }}</div>
+                                            <div class="font-body font-bold text-sm text-on-surface">{{ $p->user->name ?? 'Personel' }}</div>
                                             @if($p->day_job_name)
-                                            <small class="text-warning"><i class="bi bi-briefcase-fill me-1"></i>{{ $p->day_job_name }}</small>
+                                            <div class="font-body text-[0.65rem] text-orange-500 font-semibold"><i class="bi bi-briefcase-fill me-0.5"></i>{{ $p->day_job_name }}</div>
                                             @endif
                                         </div>
                                     </div>
                                 </td>
-                                <td><span class="badge bg-secondary">{{ $p->specialty }}</span></td>
-                                <td>
-                                    <select class="form-select form-select-sm" name="personnel[{{ $idx }}][role_in_event]" {{ $isColliding ? 'disabled' : '' }}>
+                                <td class="px-6 py-4">
+                                    <span class="inline-block px-2 py-0.5 rounded border border-outline-variant/50 bg-surface-container-highest text-on-surface-variant font-label text-[0.6rem] font-bold uppercase tracking-wider">
+                                        {{ $p->specialty }}
+                                    </span>
+                                </td>
+                                <td class="px-6 py-4">
+                                    <select class="w-full bg-surface-container-low border border-outline-variant/50 rounded-lg px-3 py-1.5 font-body text-xs text-on-surface focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all {{ $isColliding ? 'opacity-50 cursor-not-allowed' : '' }}" name="personnel[{{ $idx }}][role_in_event]" {{ $isColliding ? 'disabled' : '' }}>
                                         <option value="penari_utama" {{ str_contains($p->specialty ?? '', 'Tari') ? 'selected' : '' }}>Penari Utama</option>
                                         <option value="penari_latar">Penari Latar</option>
                                         <option value="pemusik" {{ str_contains($p->specialty ?? '', 'Musik') ? 'selected' : '' }}>Pemusik</option>
@@ -121,16 +141,16 @@
                                         <option value="MC">MC / Pembawa Acara</option>
                                     </select>
                                 </td>
-                                <td>
-                                    <span class="fw-bold arh-gold">Rp {{ number_format($fees->first()?->base_fee ?? 500000, 0, ',', '.') }}</span>
+                                <td class="px-6 py-4 text-right">
+                                    <span class="font-headline font-bold text-sm text-secondary">Rp {{ number_format($fees->first()?->base_fee ?? 500000, 0, ',', '.') }}</span>
                                 </td>
-                                <td>
+                                <td class="px-6 py-4 text-center">
                                     @if($isColliding)
-                                        <span class="badge bg-danger">KONFLIK</span>
+                                        <span class="inline-block px-2 py-0.5 rounded bg-red-500/10 border border-red-500/20 text-red-600 font-label text-[0.6rem] font-bold uppercase tracking-wider shadow-sm">KONFLIK</span>
                                     @elseif($alreadyPlotted)
-                                        <span class="badge arh-badge-gold">ASSIGNED</span>
+                                        <span class="inline-block px-2 py-0.5 rounded bg-secondary/10 border border-secondary/20 text-secondary-container font-label text-[0.6rem] font-bold uppercase tracking-wider shadow-sm">ASSIGNED</span>
                                     @else
-                                        <span class="badge bg-success bg-opacity-25 text-success">AVAILABLE</span>
+                                        <span class="inline-block px-2 py-0.5 rounded bg-green-500/10 border border-green-500/20 text-green-600 font-label text-[0.6rem] font-bold uppercase tracking-wider shadow-sm">AVAILABLE</span>
                                     @endif
                                 </td>
                             </tr>
@@ -142,58 +162,61 @@
         </div>
 
         {{-- ── PANEL KANAN: PREVIEW HONOR + SUBMIT ── --}}
-        <div class="col-12 col-xl-4">
+        <div class="w-full xl:w-80 flex-shrink-0 space-y-6 sticky top-24">
+            
             {{-- Summary Card --}}
-            <div class="arh-card-gold p-4 mb-4">
-                <h5 class="fw-bold mb-4 d-flex align-items-center gap-2 arh-gold">
-                    <i class="bi bi-calculator"></i> Estimasi Anggaran Honor
-                </h5>
-                <div class="d-flex justify-content-between align-items-center mb-3">
-                    <span class="text-secondary">Personel Dipilih</span>
-                    <span class="fw-bold fs-4" id="preview-count">{{ $event->personnel->count() }}</span>
+            <div class="bg-gradient-to-br from-primary-container to-primary rounded-xl overflow-hidden shadow-[0_8px_24px_rgba(54,31,26,0.06)] border border-primary/20">
+                <div class="px-5 py-4 font-label text-xs uppercase tracking-widest font-bold flex items-center gap-2 text-white border-b border-white/10">
+                    <i class="bi bi-calculator text-secondary"></i> Estimasi Anggaran Honor
                 </div>
-                <hr class="border-secondary border-dashed">
-                <div class="d-flex justify-content-between align-items-center mb-4">
-                    <span class="text-secondary">Estimasi Total</span>
-                    <span class="fw-bold fs-4 arh-gold" id="preview-total">
-                        Rp {{ number_format($event->estimated_total_honor > 0 ? $event->estimated_total_honor : ($fees->first()?->base_fee ?? 500000) * $event->personnel->count(), 0, ',', '.') }}
-                    </span>
-                </div>
-
-                @if($event->financialRecord)
-                <div class="bg-black bg-opacity-25 p-3 rounded-3 text-sm">
-                    <div class="d-flex justify-content-between mb-2">
-                        <span class="text-secondary">Budget Operasional</span>
-                        <span class="fw-semibold">Rp {{ number_format($event->financialRecord->operational_budget, 0, ',', '.') }}</span>
+                
+                <div class="p-5">
+                    <div class="flex justify-between items-center mb-4">
+                        <span class="font-label text-[0.65rem] uppercase tracking-widest text-white/70 font-bold">Personel Dipilih</span>
+                        <span class="font-headline font-bold text-2xl text-white" id="preview-count">{{ $event->personnel->count() }}</span>
                     </div>
-                    @php $sisa = $event->financialRecord->operational_budget - $event->estimated_total_honor; @endphp
-                    <div class="d-flex justify-content-between">
-                        <span class="text-secondary">Sisa Budget Ops</span>
-                        <span class="fw-bold {{ $sisa >= 0 ? 'text-success' : 'text-danger' }}">
-                            {{ $sisa >= 0 ? '+' : '-' }}Rp {{ number_format(abs($sisa), 0, ',', '.') }}
+                    
+                    <hr class="border-white/10 border-dashed my-4">
+                    
+                    <div class="mb-4 text-center">
+                        <span class="font-label text-[0.65rem] uppercase tracking-widest text-white/70 font-bold block mb-1">Estimasi Total</span>
+                        <span class="font-headline font-bold text-3xl text-secondary block" id="preview-total">
+                            Rp {{ number_format($event->estimated_total_honor > 0 ? $event->estimated_total_honor : ($fees->first()?->base_fee ?? 500000) * $event->personnel->count(), 0, ',', '.') }}
                         </span>
                     </div>
+
+                    @if($event->financialRecord)
+                    <div class="bg-black/20 rounded-lg p-4 font-body text-xs border border-white/5 space-y-2">
+                        <div class="flex justify-between">
+                            <span class="text-white/60 font-medium">Budget Operasional</span>
+                            <span class="text-white font-bold">Rp {{ number_format($event->financialRecord->operational_budget, 0, ',', '.') }}</span>
+                        </div>
+                        @php $sisa = $event->financialRecord->operational_budget - $event->estimated_total_honor; @endphp
+                        <div class="flex justify-between">
+                            <span class="text-white/60 font-medium">Sisa Budget Ops</span>
+                            <span class="font-bold {{ $sisa >= 0 ? 'text-green-400' : 'text-red-400' }}">
+                                {{ $sisa >= 0 ? '+' : '-' }}Rp {{ number_format(abs($sisa), 0, ',', '.') }}
+                            </span>
+                        </div>
+                    </div>
+                    @endif
                 </div>
-                @endif
             </div>
 
             {{-- Info SQL Function --}}
-            <div class="arh-card border-start border-3 p-3 mb-4" style="border-color: var(--arh-gold) !important; background: rgba(255,255,255,0.03);">
-                <div class="fw-bold mb-2 arh-gold"><i class="bi bi-database-fill me-1"></i> Mekanisme SQL</div>
-                <small class="text-secondary d-block lh-base">
+            <div class="bg-surface-container-lowest border-l-4 border-l-secondary border-y border-r border-outline-variant/30 rounded-r-xl p-4 shadow-sm">
+                <div class="font-label text-xs uppercase tracking-widest text-primary font-bold mb-2 flex items-center gap-1.5"><i class="bi bi-database-fill text-secondary"></i> Mekanisme SQL</div>
+                <div class="font-body text-[0.7rem] text-on-surface-variant leading-relaxed">
                     Saat "Kunci Plotting" diklik, sistem memanggil:<br>
-                    <code class="text-info bg-dark px-1 rounded">CALL sp_check_personnel_availability()</code><br>
+                    <code class="text-blue-600 bg-blue-500/10 border border-blue-500/20 px-1.5 py-0.5 rounded my-1 inline-block text-[0.65rem]">CALL sp_check_personnel_availability()</code><br>
                     Jika lolos, estimasi honor otomatis dihitung SQL.
-                </small>
+                </div>
             </div>
 
             {{-- Tombol Submit --}}
-            <button type="submit" class="btn btn-arh-gold w-100 py-3 fw-bold mb-2">
-                <i class="bi bi-lock-fill me-1"></i> Validasi SQL & Kunci Plotting
+            <button type="submit" class="w-full flex justify-center items-center gap-2 bg-secondary text-primary px-4 py-3.5 rounded-xl font-label text-[0.7rem] font-bold uppercase tracking-widest hover:bg-secondary-container transition-all shadow-md">
+                <i class="bi bi-lock-fill"></i> Validasi SQL & Kunci Plotting
             </button>
-            <a href="{{ route('admin.events.show', $event->id) }}" class="btn btn-outline-secondary w-100">
-                <i class="bi bi-arrow-left me-1"></i> Kembali ke Detail Event
-            </a>
         </div>
 
     </div>
@@ -201,7 +224,7 @@
 
 @endsection
 
-@section('scripts')
+@push('scripts')
 <script>
     const baseFee = Number("{{ $fees->first()?->base_fee ?? 500000 }}");
     function updatePreview() {
@@ -212,4 +235,4 @@
         document.getElementById('preview-total').textContent = 'Rp ' + total.toLocaleString('id-ID');
     }
 </script>
-@endsection
+@endpush
