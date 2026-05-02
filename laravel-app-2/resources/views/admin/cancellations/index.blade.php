@@ -96,10 +96,10 @@
     </h3>
     <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
         @foreach([
-            ['H-14+', '10%', 'text-on-surface-variant bg-surface-container-low border-outline-variant/50'],
-            ['H-7 s/d H-13', '30%', 'text-orange-600 bg-orange-500/5 border-orange-500/20'],
-            ['H-3 s/d H-6', '50%', 'text-red-500 bg-red-500/5 border-red-500/20'],
-            ['H-2 / Kurang', '75%', 'text-red-700 bg-red-700/5 border-red-700/20']
+            ['2 Bulan (H-60+)', '70%', 'text-on-surface-variant bg-surface-container-low border-outline-variant/50'],
+            ['1 Bulan (H-30+)', '80%', 'text-orange-600 bg-orange-500/5 border-orange-500/20'],
+            ['2 Minggu (H-14+)', '95%', 'text-red-500 bg-red-500/5 border-red-500/20'],
+            ['1 Minggu (<H-7)', '100%', 'text-red-700 bg-red-700/5 border-red-700/20']
         ] as [$period, $pct, $classes])
         <div class="text-center p-4 rounded-xl border {{ $classes }}">
             <div class="font-headline text-3xl font-bold mb-1 leading-none">{{ $pct }}</div>
