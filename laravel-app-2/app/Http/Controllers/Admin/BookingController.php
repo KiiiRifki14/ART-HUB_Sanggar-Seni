@@ -153,6 +153,13 @@ class BookingController extends Controller
             return redirect()->back()->with('error', 'Booking ini sudah dikonfirmasi sebelumnya.');
         }
 
+        // Validasi input: Admin WAJIB mengisi nominal fixed profit secara manual
+        $request->validate([
+            'fixed_profit_nominal' => 'required|numeric|min:0',
+        ], [
+            'fixed_profit_nominal.required' => 'Nominal Fixed Profit wajib diisi oleh Admin sebelum mengunci laba.',
+        ]);
+
         try {
             // Variabel yang perlu dibaca di luar closure transaction
             $profitStatus = 'locked';
@@ -161,7 +168,6 @@ class BookingController extends Controller
             DB::transaction(function () use ($booking, $request, &$profitStatus, &$targetProfit) {
                 
                 // 1. UPDATE STATUS BOOKING & BUKTI TRANSFER
-                // (Dalam skenario nyata, upload file diproses di sini dan path-nya disimpan)
                 $receiptPath = $request->input('receipt_path', $booking->payment_receipt); 
 
                 $booking->update([
@@ -171,7 +177,6 @@ class BookingController extends Controller
                 ]);
 
                 // 2. BUAT ENTRI EVENT OTOMATIS
-                // Menyalin data dari booking ke tabel events untuk persiapan operasional
                 $eventCode = 'EVT-' . date('Y') . '-' . str_pad($booking->id, 3, '0', STR_PAD_LEFT);
                 
                 $event = Event::create([
@@ -182,22 +187,18 @@ class BookingController extends Controller
                     'event_start'     => $booking->event_start,
                     'event_end'       => $booking->event_end,
                     'venue'           => $booking->venue,
-                    'personnel_count' => 12, // Standar 11+1
+                    'personnel_count' => 12,
                 ]);
 
-                // 3. HITUNG DAN KUNCI FIXED PROFIT (Laba Pak Yat) — CELAH #1 FIX
+                // 3. KUNCI FIXED PROFIT — INPUT MANUAL DARI ADMIN (bukan otomatis 30%)
                 // ══════════════════════════════════════════════════════════════
-                // ATURAN "PROFIT FIRST — DP CICIL LABA":
-                //   - Laba 30 % dihitung dari TOTAL, BUKAN dari DP.
-                //   - Jika DP ≥ target laba  → potong laba di muka, sisa DP → modal operasional.
-                //   - Jika DP < target laba  → SELURUH DP dikunci sebagai cicilan laba,
-                //     modal operasional = 0, sistem mencatat ini sebagai "partial_lock".
-                //     Operasional HANYA cair setelah pelunasan masuk.
+                // Pimpinan Sanggar menentukan nominal keuntungan langsung (misal: Rp 2.500.000)
+                // bukan persentase baku, sesuai hasil wawancara.
                 // ══════════════════════════════════════════════════════════════
-                $profitPct   = $request->input('override_profit_pct', 30.00);
-                $isOverridden = $request->has('override_profit_pct');
-
-                $targetProfit = $booking->total_price * ($profitPct / 100); // Rp 3 Jt dari Rp 10 Jt
+                $targetProfit = (float) $request->input('fixed_profit_nominal');
+                // Hitung persen informasional (untuk dicatat di DB, bukan untuk kalkulasi)
+                $profitPct    = $booking->total_price > 0 ? ($targetProfit / $booking->total_price) * 100 : 0;
+                $isOverridden = true; // Selalu true karena manual
                 $dpMasuk      = $booking->dp_amount;                         // e.g. Rp 1.5 Jt (DP VIP kecil)
 
                 if ($dpMasuk >= $targetProfit) {
@@ -260,6 +261,85 @@ class BookingController extends Controller
         } catch (\Exception $e) {
             // ═══ ROLLBACK TRANSACTION otomatis terjadi di dalam DB::transaction ═══
             return redirect()->back()->with('error', 'Gagal mengonfirmasi transaksi: ' . $e->getMessage());
+        }
+    }
+
+    /**
+     * KONFIRMASI PEMBAYARAN DP SECARA TUNAI / OFFLINE
+     * Untuk klien yang membayar langsung ke sanggar (tanpa upload bukti transfer).
+     */
+    public function confirmCashPayment(Request $request, Booking $booking)
+    {
+        if ($booking->status === 'dp_paid' || $booking->status === 'confirmed') {
+            return redirect()->back()->with('error', 'Booking ini sudah dikonfirmasi sebelumnya.');
+        }
+
+        $request->validate([
+            'fixed_profit_nominal' => 'required|numeric|min:0',
+            'cash_note'            => 'nullable|string|max:255',
+        ], [
+            'fixed_profit_nominal.required' => 'Nominal Fixed Profit wajib diisi.',
+        ]);
+
+        try {
+            $profitStatus = 'locked';
+            $targetProfit = (float) $request->input('fixed_profit_nominal');
+
+            DB::transaction(function () use ($booking, $request, &$targetProfit) {
+
+                // Tandai booking sebagai DP PAID dengan catatan cash
+                $booking->update([
+                    'status'           => 'dp_paid',
+                    'payment_proof'    => null,      // Tidak ada gambar struk
+                    'payment_receipt'  => 'CASH_OFFLINE: ' . ($request->cash_note ?? 'Dibayar tunai di sanggar'),
+                    'dp_paid_at'       => now(),
+                ]);
+
+                // Buat Event
+                $eventCode = 'EVT-' . date('Y') . '-' . str_pad($booking->id, 3, '0', STR_PAD_LEFT);
+                $event = Event::firstOrCreate(
+                    ['booking_id' => $booking->id],
+                    [
+                        'event_code'      => $eventCode,
+                        'status'          => 'planning',
+                        'event_date'      => $booking->event_date,
+                        'event_start'     => $booking->event_start,
+                        'event_end'       => $booking->event_end,
+                        'venue'           => $booking->venue,
+                        'personnel_count' => 12,
+                    ]
+                );
+
+                // Kunci laba dengan nominal manual
+                $profitPct        = $booking->total_price > 0 ? ($request->fixed_profit_nominal / $booking->total_price) * 100 : 0;
+                $dpMasuk          = $booking->dp_amount;
+                $operationalBudget = max(0, $dpMasuk - $request->fixed_profit_nominal);
+                $safetyBufferAmt  = $operationalBudget * 0.10;
+
+                FinancialRecord::firstOrCreate(
+                    ['event_id' => $event->id],
+                    [
+                        'total_revenue'        => $booking->total_price,
+                        'fixed_profit_pct'     => round($profitPct, 2),
+                        'is_profit_overridden' => true,
+                        'fixed_profit'         => $request->fixed_profit_nominal,
+                        'dp_received'          => $dpMasuk,
+                        'operational_budget'   => $operationalBudget,
+                        'safety_buffer_pct'    => 10.00,
+                        'safety_buffer_amt'    => $safetyBufferAmt,
+                        'budget_warning'       => $operationalBudget < 2000000,
+                        'warning_message'      => 'Pembayaran DP via Tunai/Offline.',
+                        'profit_locked'        => true,
+                        'status'               => 'locked',
+                    ]
+                );
+            });
+
+            return redirect()->back()->with('success',
+                '✅ [TUNAI] DP Dikonfirmasi! Laba Rp ' . number_format($targetProfit, 0, ',', '.') . ' telah dikunci. Event berhasil dibuat.');
+
+        } catch (\Exception $e) {
+            return redirect()->back()->with('error', 'Gagal konfirmasi cash: ' . $e->getMessage());
         }
     }
     

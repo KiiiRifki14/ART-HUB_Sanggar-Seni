@@ -153,9 +153,12 @@
                 <div class="font-label text-[0.6rem] uppercase tracking-widest text-outline font-bold mb-0.5">Total Kontrak</div>
                 <div class="font-headline font-bold text-primary text-sm">Rp {{ number_format($booking->total_price, 0, ',', '.') }}</div>
             </div>
-            <div class="flex-shrink-0 ml-4">
-                <a href="{{ route('admin.bookings.show', $booking->id) }}" class="inline-flex items-center justify-center w-9 h-9 rounded-lg border border-outline-variant/50 bg-surface-container-highest text-on-surface-variant hover:border-primary hover:text-primary hover:bg-surface-container-lowest transition-all" title="Nego / Update">
-                    <i class="bi bi-pencil"></i>
+            <div class="flex-shrink-0 ml-4 flex gap-2">
+                <button type="button" data-bs-toggle="modal" data-bs-target="#modalCash{{ $booking->id }}" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-green-600 text-white font-label text-[0.65rem] font-bold uppercase tracking-widest hover:bg-green-700 transition-colors shadow-sm" title="Terima Pembayaran Tunai (Offline)">
+                    <i class="bi bi-cash-stack"></i> Terima Cash
+                </button>
+                <a href="{{ route('admin.bookings.show', $booking->id) }}" class="inline-flex items-center justify-center w-8 h-8 rounded-lg border border-outline-variant/50 bg-surface-container-highest text-on-surface-variant hover:border-primary hover:text-primary hover:bg-surface-container-lowest transition-all" title="Detail & Nego Harga">
+                    <i class="bi bi-arrow-right"></i>
                 </a>
             </div>
         </div>
@@ -306,6 +309,56 @@
                 </div>
             </div>
 
+        </div>
+    </div>
+</div>
+@endforeach
+
+{{-- ═══════════════════════════════════════════════════════
+     MODAL KONFIRMASI PEMBAYARAN CASH (Offline)
+═══════════════════════════════════════════════════════ --}}
+@foreach($pendingNoProof as $booking)
+<div class="modal fade" id="modalCash{{ $booking->id }}" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 rounded-2xl overflow-hidden shadow-2xl bg-surface-container-lowest">
+            <div class="px-6 py-5 border-b border-green-500/20 flex justify-between items-center bg-green-500/10">
+                <h5 class="font-headline font-bold text-lg text-green-700 flex items-center gap-2">
+                    <i class="bi bi-cash-stack"></i> Terima Pembayaran Tunai
+                </h5>
+                <button type="button" class="text-green-700/50 hover:text-green-700 transition-colors" data-bs-dismiss="modal">
+                    <i class="bi bi-x-lg"></i>
+                </button>
+            </div>
+            <form action="{{ route('admin.bookings.confirm_cash', $booking->id) }}" method="POST">
+                @csrf
+                <div class="p-6 space-y-5">
+                    <div class="flex items-center justify-between p-3 rounded-lg border border-outline-variant/30 bg-surface-container-low/50">
+                        <span class="font-label text-xs uppercase tracking-widest text-outline font-bold">Total Deal</span>
+                        <span class="font-headline text-lg font-bold text-on-surface">Rp {{ number_format($booking->total_price, 0, ',', '.') }}</span>
+                    </div>
+                    <div class="flex items-center justify-between p-3 rounded-lg border border-green-500/30 bg-green-500/5">
+                        <span class="font-label text-xs uppercase tracking-widest text-green-600 font-bold">DP Tunai Diterima (50%)</span>
+                        <span class="font-headline text-2xl font-bold text-green-600">Rp {{ number_format($booking->dp_amount, 0, ',', '.') }}</span>
+                    </div>
+
+                    <hr class="border-outline-variant/20 border-dashed">
+
+                    <div>
+                        <label class="block font-label text-[0.65rem] uppercase tracking-widest text-primary font-bold mb-1.5"><i class="bi bi-lock-fill"></i> Fixed Profit Pimpinan (Rp)</label>
+                        <p class="font-body text-[0.7rem] text-on-surface-variant mb-2">Tentukan nominal laba yang ingin dikunci langsung dari uang tunai ini.</p>
+                        <input type="number" name="fixed_profit_nominal" min="0" placeholder="Contoh: 2000000" class="w-full bg-surface-container border border-primary/30 rounded-lg px-4 py-2.5 font-headline font-bold text-primary focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all" required>
+                    </div>
+
+                    <div>
+                        <label class="block font-label text-[0.65rem] uppercase tracking-widest text-on-surface-variant font-bold mb-1.5">Catatan Pembayaran</label>
+                        <input type="text" name="cash_note" placeholder="Diterima oleh..., Catatan kwitansi..." class="w-full bg-surface-container-lowest border border-outline-variant/50 rounded-lg px-4 py-2 font-body text-sm text-on-surface focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all">
+                    </div>
+                </div>
+                <div class="px-6 py-4 border-t border-outline-variant/20 bg-surface-container-low flex justify-end gap-3">
+                    <button type="button" class="px-5 py-2.5 rounded-lg border border-outline-variant/50 font-label text-xs font-bold uppercase tracking-widest text-on-surface-variant hover:bg-surface-container transition-colors" data-bs-dismiss="modal">Batal</button>
+                    <button type="submit" class="px-5 py-2.5 rounded-lg bg-green-600 text-white font-label text-xs font-bold uppercase tracking-widest hover:bg-green-700 transition-colors shadow-sm" onclick="return confirm('Proses pembayaran tunai ini? Status akan otomatis menjadi DP PAID.')">Verifikasi Cash</button>
+                </div>
+            </form>
         </div>
     </div>
 </div>

@@ -218,4 +218,32 @@ class EventController extends Controller
             return redirect()->back()->with('error', 'Gagal memproses plotting: ' . $e->getMessage());
         }
     }
+
+    /**
+     * TANDAI EVENT SELESAI (Fix Bug #1 - Status Gantung)
+     * Mengubah status event yang sudah lewat tanggalnya menjadi 'completed'
+     * dan juga mengupdate status booking terkait.
+     */
+    public function markCompleted(Request $request, Event $event)
+    {
+        try {
+            DB::transaction(function () use ($event) {
+                // Ubah status event
+                $event->update([
+                    'status' => 'completed'
+                ]);
+
+                // Ubah status booking terkait
+                if ($event->booking) {
+                    $event->booking->update([
+                        'status' => 'completed'
+                    ]);
+                }
+            });
+
+            return redirect()->back()->with('success', 'Event berhasil ditandai sebagai Selesai!');
+        } catch (\Exception $e) {
+            return redirect()->back()->with('error', 'Gagal menandai event selesai: ' . $e->getMessage());
+        }
+    }
 }

@@ -111,26 +111,44 @@
                 
                 <hr class="border-outline-variant/20 border-dashed my-2">
                 
-                <div class="flex justify-between items-center text-sm">
-                    <span class="text-on-surface-variant font-medium flex items-center gap-1.5"><i class="bi bi-lock-fill text-secondary"></i> Fixed Profit (30%)</span>
-                    <span class="font-bold text-primary">Rp {{ number_format($booking->total_price * 0.30, 0, ',', '.') }}</span>
+                {{-- INPUT MANUAL FIXED PROFIT --}}
+                @if($booking->status === 'pending')
+                <div class="p-3 rounded-lg border border-primary/20 bg-primary/5">
+                    <label class="block font-label text-[0.65rem] uppercase tracking-widest text-primary font-bold mb-1.5"><i class="bi bi-lock-fill me-1"></i> Fixed Profit (Nominal Manual)</label>
+                    <p class="font-body text-[0.7rem] text-on-surface-variant mb-2">Isi nominal keuntungan pimpinan sebelum mengunci laba. Wajib diisi.</p>
+                    <input type="number" id="fixedProfitInput" placeholder="Contoh: 2500000" class="w-full bg-surface-container-lowest border border-primary/30 rounded-lg px-3 py-2 font-headline text-sm font-bold text-primary focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all" min="0" required>
                 </div>
                 <div class="flex justify-between items-center text-sm">
                     <span class="text-on-surface-variant font-medium">Budget Operasional</span>
-                    <span class="font-bold text-on-surface">Rp {{ number_format($booking->dp_amount - ($booking->total_price * 0.30), 0, ',', '.') }}</span>
+                    <span class="font-bold text-on-surface" id="budgetOpsDisplay">—</span>
                 </div>
                 <div class="flex justify-between items-center text-sm">
                     <span class="text-on-surface-variant font-medium">Safety Buffer (10%)</span>
-                    <span class="font-bold text-green-600">Rp {{ number_format(($booking->dp_amount - ($booking->total_price * 0.30)) * 0.10, 0, ',', '.') }}</span>
+                    <span class="font-bold text-green-600" id="safetyBufferDisplay">—</span>
                 </div>
+                @else
+                <div class="flex justify-between items-center text-sm">
+                    <span class="text-on-surface-variant font-medium flex items-center gap-1.5"><i class="bi bi-lock-fill text-secondary"></i> Fixed Profit (Dikunci)</span>
+                    <span class="font-bold text-primary">Rp {{ number_format($booking->event->financialRecord->fixed_profit ?? 0, 0, ',', '.') }}</span>
+                </div>
+                <div class="flex justify-between items-center text-sm">
+                    <span class="text-on-surface-variant font-medium">Budget Operasional</span>
+                    <span class="font-bold text-on-surface">Rp {{ number_format($booking->event->financialRecord->operational_budget ?? 0, 0, ',', '.') }}</span>
+                </div>
+                <div class="flex justify-between items-center text-sm">
+                    <span class="text-on-surface-variant font-medium">Safety Buffer (10%)</span>
+                    <span class="font-bold text-green-600">Rp {{ number_format($booking->event->financialRecord->safety_buffer_amt ?? 0, 0, ',', '.') }}</span>
+                </div>
+                @endif
             </div>
 
             <div class="p-5 bg-surface-container-low border-t border-outline-variant/30">
                 @if($booking->status === 'pending')
                 @php $delMsg = 'Kunci laba dari DP booking ini?\nAksi ini TIDAK BISA DIBATALKAN dan akan mengalokasikan profit pimpinan.'; @endphp
-                <form method="POST" action="{{ route('admin.bookings.confirm', $booking->id) }}" class="m-0"
-                      onsubmit="return confirm('{{ $delMsg }}')">
+                <form method="POST" action="{{ route('admin.bookings.confirm', $booking->id) }}" class="m-0" id="formKunciLaba"
+                      onsubmit="return validateAndConfirmKunci(event, '{{ $delMsg }}')">
                     @csrf
+                    <input type="hidden" name="fixed_profit_nominal" id="hiddenFixedProfit" value="">
                     <button type="submit" class="w-full flex justify-center items-center gap-2 bg-gradient-to-br from-primary-container to-primary text-white px-4 py-3 rounded-xl font-label text-xs font-bold uppercase tracking-widest hover:opacity-90 transition-all shadow-md">
                         <i class="bi bi-lock-fill"></i> Kunci Laba
                     </button>
@@ -180,4 +198,41 @@
 </div>
 @endif
 
+
 @endsection
+
+@push('scripts')
+<script>
+    const dpAmount    = Number("{{ $booking->dp_amount ?? 0 }}");
+    const profitInput = document.getElementById('fixedProfitInput');
+    const budgetDisp  = document.getElementById('budgetOpsDisplay');
+    const bufferDisp  = document.getElementById('safetyBufferDisplay');
+    const hiddenInput = document.getElementById('hiddenFixedProfit');
+
+    function fmt(num) {
+        return 'Rp ' + Math.round(num).toLocaleString('id-ID');
+    }
+
+    if (profitInput) {
+        profitInput.addEventListener('input', function () {
+            const profit = parseFloat(this.value) || 0;
+            const ops    = Math.max(0, dpAmount - profit);
+            const safety = ops * 0.10;
+            budgetDisp.textContent = fmt(ops);
+            bufferDisp.textContent = fmt(safety);
+            if (hiddenInput) hiddenInput.value = profit;
+        });
+    }
+
+    function validateAndConfirmKunci(e, msg) {
+        const profit = parseFloat(profitInput ? profitInput.value : 0);
+        if (!profit || profit <= 0) {
+            e.preventDefault();
+            alert('⚠️ Nominal Fixed Profit belum diisi! Silakan isi keuntungan pimpinan terlebih dahulu.');
+            return false;
+        }
+        if (hiddenInput) hiddenInput.value = profit;
+        return confirm(msg);
+    }
+</script>
+@endpush

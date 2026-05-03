@@ -170,9 +170,17 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
     // FULL PAYMENT CONFIRM
     Route::patch('/bookings/{booking}/full-payment', [BookingController::class, 'confirmFullPayment'])->name('bookings.full_payment');
 
+    // KONFIRMASI DP TUNAI / CASH (Offline)
+    Route::post('/bookings/{booking}/confirm-cash', [BookingController::class, 'confirmCashPayment'])->name('bookings.confirm_cash');
 
     // POST-EVENT LIST (menu mandiri)
     Route::get('/post-event', [FinancialController::class, 'postEventList'])->name('financials.post_event_list');
+
+    // TAMBAH BIAYA OPERASIONAL BARU (Post-Event)
+    Route::post('/financials/post-event/{event}/costs', [FinancialController::class, 'storeOperationalCost'])->name('financials.operational_costs.store');
+
+    // TANDAI EVENT SELESAI (Fix Bug Status Gantung)
+    Route::patch('/events/{event}/complete', [EventController::class, 'markCompleted'])->name('events.mark_completed');
 });
 
 // ══════════════════════════════════════════════════════════════════════════

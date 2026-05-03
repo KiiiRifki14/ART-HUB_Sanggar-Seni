@@ -61,18 +61,42 @@ class FinancialController extends Controller
 
         $cost->update([
             'actual_amount' => $newAmount,
-            'updated_by'    => Auth::id() // Trigger akan mengambil User ID ini untuk Audit Trail
+            'updated_by'    => Auth::id()
         ]);
 
-        // Karena trigger trg_operational_cost_audit bekerja setelah aksi UPDATE,
-        // jika nilai (actual_amount) berubah, trigger MySQL secara ghaib akan memasukkan
-        // Log ke dalam tabel 'financial_audits' tanpa perlu satu baris pun kode Eloquent di sini!
-        
         $msg = 'Realisasi biaya berhasil diperbarui.';
         if ($oldAmount !== $newAmount) {
             $msg .= ' [SISTEM KEAMANAN] Perubahan nilai mendadak telah berhasil di-Audit (disimpan) oleh Database untuk mencegah kebocoran RAB.';
         }
 
         return redirect()->back()->with('success', $msg);
+    }
+
+    /**
+     * TAMBAH BIAYA OPERASIONAL BARU (Fix Bug #4 - Tumpang Tindih Post-Event)
+     * Admin bisa menambah item pengeluaran baru (Honor Kru Ekstra, dll)
+     */
+    public function storeOperationalCost(Request $request, \App\Models\Event $event)
+    {
+        $request->validate([
+            'category'         => 'required|string|max:100',
+            'description'      => 'required|string|max:255',
+            'estimated_amount' => 'required|numeric|min:0',
+            'actual_amount'    => 'required|numeric|min:0',
+        ]);
+
+        if (!$event->financialRecord) {
+            return redirect()->back()->with('error', 'Data keuangan event belum terbentuk. Pastikan DP sudah dikonfirmasi.');
+        }
+
+        $event->financialRecord->operationalCosts()->create([
+            'category'         => $request->category,
+            'description'      => $request->description,
+            'estimated_amount' => $request->estimated_amount,
+            'actual_amount'    => $request->actual_amount,
+            'updated_by'       => Auth::id(),
+        ]);
+
+        return redirect()->back()->with('success', 'Biaya operasional baru berhasil ditambahkan.');
     }
 }
