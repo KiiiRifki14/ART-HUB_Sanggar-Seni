@@ -99,12 +99,12 @@ class PersonnelController extends Controller
                 // Update Personnel specific fields
                 $personnel->update([
                     'specialty'     => $request->specialty,
-                    'has_day_job'   => $request->boolean('has_day_job'),
-                    'day_job_desc'  => $request->has_day_job ? $request->day_job_name : null,
-                    'day_job_start' => $request->has_day_job ? $request->day_job_start : null,
-                    'day_job_end'   => $request->has_day_job ? $request->day_job_end : null,
-                    'is_active'     => $request->boolean('is_active', true),
-                    'is_backup'     => $request->boolean('is_backup'),
+                    'has_day_job'   => $request->has('has_day_job'),
+                    'day_job_desc'  => $request->has('has_day_job') ? $request->day_job_name : null,
+                    'day_job_start' => $request->has('has_day_job') ? $request->day_job_start : null,
+                    'day_job_end'   => $request->has('has_day_job') ? $request->day_job_end : null,
+                    'is_active'     => $request->has('is_active'),
+                    'is_backup'     => $request->has('is_backup'),
                 ]);
             });
 

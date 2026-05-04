@@ -144,15 +144,12 @@
 
             <div class="p-5 bg-surface-container-low border-t border-outline-variant/30">
                 @if($booking->status === 'pending')
-                @php $delMsg = 'Kunci laba dari DP booking ini?\nAksi ini TIDAK BISA DIBATALKAN dan akan mengalokasikan profit pimpinan.'; @endphp
-                <form method="POST" action="{{ route('admin.bookings.confirm', $booking->id) }}" class="m-0" id="formKunciLaba"
-                      onsubmit="return validateAndConfirmKunci(event, '{{ $delMsg }}')">
-                    @csrf
-                    <input type="hidden" name="fixed_profit_nominal" id="hiddenFixedProfit" value="">
-                    <button type="submit" class="w-full flex justify-center items-center gap-2 bg-gradient-to-br from-primary-container to-primary text-white px-4 py-3 rounded-xl font-label text-xs font-bold uppercase tracking-widest hover:opacity-90 transition-all shadow-md">
-                        <i class="bi bi-lock-fill"></i> Kunci Laba
-                    </button>
-                </form>
+                <div class="text-center p-3 rounded-lg border border-orange-500/30 bg-orange-500/10 mb-3">
+                    <p class="font-body text-xs text-orange-700"><i class="bi bi-exclamation-triangle"></i> Penguncian laba & verifikasi DP sekarang dipusatkan di menu <b>DP Verification</b> untuk mencegah bypass antrean.</p>
+                </div>
+                <a href="{{ route('admin.bookings.dp_verification') }}" class="w-full flex justify-center items-center gap-2 bg-gradient-to-br from-primary-container to-primary text-white px-4 py-3 rounded-xl font-label text-xs font-bold uppercase tracking-widest hover:opacity-90 transition-all shadow-md">
+                    <i class="bi bi-shield-check"></i> Proses Verifikasi DP
+                </a>
                 @elseif(in_array($booking->status, ['dp_paid','confirmed','completed']))
                 <div class="p-4 text-center rounded-xl bg-green-500/10 border border-green-500/20 text-green-700">
                     <i class="bi bi-patch-check-fill text-3xl mb-2 block"></i>
