@@ -90,22 +90,25 @@ class PersonnelController extends Controller
 
         try {
             DB::transaction(function () use ($request, $personnel) {
-                // Update User for name and phone
-                $personnel->user->update([
-                    'name' => $request->name,
-                    'phone' => $request->phone
-                ]);
-                
-                // Update Personnel specific fields
-                $personnel->update([
-                    'specialty'     => $request->specialty,
-                    'has_day_job'   => $request->has('has_day_job'),
-                    'day_job_desc'  => $request->has('has_day_job') ? $request->day_job_name : null,
-                    'day_job_start' => $request->has('has_day_job') ? $request->day_job_start : null,
-                    'day_job_end'   => $request->has('has_day_job') ? $request->day_job_end : null,
-                    'is_active'     => $request->has('is_active'),
-                    'is_backup'     => $request->has('is_backup'),
-                ]);
+                // 1. Update data User (Nama & HP)
+                $personnel->user->name = $request->name;
+                $personnel->user->phone = $request->phone;
+                $personnel->user->save();
+
+                // 2. Update data Personnel (Gunakan explicit assignment)
+                $personnel->specialty = $request->specialty;
+
+                // Method boolean() otomatis menerjemahkan nilai checkbox menjadi true/false
+                $personnel->has_day_job = $request->boolean('has_day_job');
+                $personnel->day_job_desc = $request->boolean('has_day_job') ? $request->day_job_name : null;
+                $personnel->day_job_start = $request->boolean('has_day_job') ? $request->day_job_start : null;
+                $personnel->day_job_end = $request->boolean('has_day_job') ? $request->day_job_end : null;
+
+                $personnel->is_active = $request->boolean('is_active');
+                $personnel->is_backup = $request->boolean('is_backup');
+
+                // Perintah save() memaksa data tersimpan meskipun tidak ada di $fillable model
+                $personnel->save();
             });
 
             return redirect()->route('admin.personnel.index')

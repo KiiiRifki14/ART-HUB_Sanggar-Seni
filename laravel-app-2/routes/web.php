@@ -142,6 +142,13 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
     Route::get('/costumes', [CostumeController::class, 'index'])->name('costumes.index');
     Route::post('/costume-usages/{usage}/return', [CostumeController::class, 'returnSanggarCostume'])->name('costumes.usage.return');
     Route::post('/costume-rentals/{rental}/return', [CostumeController::class, 'returnVendorRental'])->name('costumes.rental.return');
+    Route::get('/costumes/create-asset', [\App\Http\Controllers\Admin\CostumeController::class, 'createAsset'])->name('costumes.create-asset');
+    Route::post('/costumes/store-asset', [\App\Http\Controllers\Admin\CostumeController::class, 'storeAsset'])->name('costumes.store-asset');
+    // Rute API untuk Tambah Vendor (AJAX)
+    Route::post('/costumes/vendor/api', [\App\Http\Controllers\Admin\CostumeController::class, 'storeVendorApi'])->name('costumes.store-vendor-api');
+
+    Route::get('/costumes/create-rental', [\App\Http\Controllers\Admin\CostumeController::class, 'createRental'])->name('costumes.create-rental');
+    Route::post('/costumes/store-rental', [\App\Http\Controllers\Admin\CostumeController::class, 'storeRental'])->name('costumes.store-rental');
 
     // FINANCIAL
     Route::get('/financials', [FinancialController::class, 'index'])->name('financials.index');
@@ -187,7 +194,7 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
 // 🎭 2. PERSONNEL ROUTES (Kru & Penari)
 // ══════════════════════════════════════════════════════════════════════════
 Route::middleware(['auth', 'role:personel'])->prefix('personnel')->name('personnel.')->group(function () {
-    
+
     // Rute Bebas Akses (Hanya Untuk Menunggu)
     Route::get('/pending', function () {
         return view('personnel.pending');

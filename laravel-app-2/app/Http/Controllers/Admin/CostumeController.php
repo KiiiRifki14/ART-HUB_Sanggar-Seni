@@ -19,12 +19,83 @@ class CostumeController extends Controller
         $vendorRentals = \App\Models\CostumeRental::with(['event', 'vendor'])->latest()->get();
         return view('admin.costumes.index', compact('sanggarCostumes', 'vendorRentals'));
     }
+    // ==========================================
+    // BAGIAN 1: ASET KOSTUM SANGGAR
+    // ==========================================
 
+    public function createAsset()
+    {
+        // Menampilkan form tambah aset sanggar
+        return view('admin.costumes.create-asset');
+    }
+
+    public function storeAsset(Request $request)
+    {
+        // Validasi input dari form
+        $request->validate([
+            'name'      => 'required|string|max:255',
+            'category'  => 'required|string|max:100',
+            'quantity'  => 'required|integer|min:1',
+            'condition' => 'required|in:good,damaged,maintenance',
+        ]);
+
+        // Simpan ke database
+        \App\Models\SanggarCostume::create([
+            'name'      => $request->name,
+            'category'  => $request->category,
+            'quantity'  => $request->quantity,
+            'condition' => $request->condition,
+        ]);
+
+        return redirect()->route('admin.costumes.index')
+            ->with('success', 'Aset Sanggar baru berhasil ditambahkan!');
+    }
+
+    // ==========================================
+    // BAGIAN 2: SEWA VENDOR EKSTERNAL
+    // ==========================================
+
+    public function createRental()
+    {
+        // Ambil data event dan vendor untuk ditampilkan di dropdown form
+        $events = \App\Models\Event::all();
+        $vendors = \App\Models\CostumeVendor::all();
+
+        // Menampilkan form tambah sewaan
+        return view('admin.costumes.create-rental', compact('events', 'vendors'));
+    }
+
+    public function storeRental(Request $request)
+    {
+        // Validasi input
+        $request->validate([
+            'event_id'          => 'required|exists:events,id',
+            'costume_vendor_id' => 'required|exists:costume_vendors,id',
+            'costume_type'      => 'required|string|max:255',
+            'quantity'          => 'required|integer|min:1',
+            'rental_cost'       => 'required|numeric|min:0',
+            'due_date'          => 'required|date',
+        ]);
+
+        // Simpan transaksi sewa ke database
+        \App\Models\CostumeRental::create([
+            'event_id'          => $request->event_id,
+            'costume_vendor_id' => $request->costume_vendor_id,
+            'costume_type'      => $request->costume_type,
+            'quantity'          => $request->quantity,
+            'rental_cost'       => $request->rental_cost,
+            'due_date'          => $request->due_date,
+            'status'            => 'rented', // Default status saat baru menyewa
+        ]);
+
+        return redirect()->route('admin.costumes.index')
+            ->with('success', 'Data penyewaan kostum vendor berhasil dicatat!');
+    }
     /**
      * MENGEMBALIKAN KOSTUM ASET SANGGAR
      * Controller ini akan memicu DUA TRIGGERS SECARA BERANTAI di MySQL:
      * 1. trg_sanggar_costume_return : Menentukan apakah 'returned' / 'damaged' berdasarkan tanggal telat.
-     * 2. trg_sync_costume_condition : Men-sinkronisasikan kondisi ke tabel sanggar_costumes (Inventaris) 
+     * 2. trg_sync_costume_condition : Men-sinkronisasikan kondisi ke tabel sanggar_costumes (Inventaris)
      *    misal jika rusak, inventaris mark as 'damaged' / 'maintenance'.
      */
     public function returnSanggarCostume(Request $request, CostumeUsage $usage)
@@ -64,7 +135,7 @@ class CostumeController extends Controller
         // Peringatan: Kita hanya mengisi 'returned_date'
         // Seluruh kalkulasi status OVERDUE, hari OVERDUE_DAYS, dan OVERDUE_FINE (Rp 50.000 / hari)
         // Dihandle 100% oleh TRIGGER MySQL (trg_costume_rental_overdue).
-        
+
         $rental->update([
             'returned_date' => Carbon::now()->format('Y-m-d'),
         ]);
@@ -73,7 +144,7 @@ class CostumeController extends Controller
         $rental->refresh();
 
         $msg = 'Pengembalian kostum vendor eksekutif selesai dicatat.';
-        
+
         if ($rental->status === 'overdue') {
             $msg .= sprintf(
                 ' [SYSTEM WARNING] Terdeteksi Overdue sebanyak %d hari! Total Denda Otomatis via Trigger MySQL: Rp %s.',
@@ -84,5 +155,27 @@ class CostumeController extends Controller
         }
 
         return redirect()->back()->with('success', $msg);
+    }
+    // ==========================================
+    // BAGIAN 3: API UNTUK AJAX CALL
+    // ==========================================
+
+    public function storeVendorApi(Request $request)
+    {
+        // Validasi input
+        $request->validate([
+            'name' => 'required|string|max:255',
+        ]);
+
+        // Simpan vendor baru ke database
+        $vendor = \App\Models\CostumeVendor::create([
+            'name' => $request->name,
+        ]);
+
+        // Kembalikan respons dalam bentuk JSON (agar bisa dibaca oleh JavaScript)
+        return response()->json([
+            'success' => true,
+            'vendor'  => $vendor
+        ]);
     }
 }

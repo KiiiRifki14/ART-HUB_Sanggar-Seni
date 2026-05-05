@@ -10,14 +10,14 @@
 <div class="mb-10">
     <div class="flex items-center justify-between mb-6">
         <h2 class="font-headline text-xl text-primary font-semibold flex items-center gap-2">
-            <div class="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center"><i class="bi bi-tag-fill text-primary"></i></div> 
+            <div class="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center"><i class="bi bi-tag-fill text-primary"></i></div>
             Inventaris Aset Sanggar
         </h2>
-        <button class="px-4 py-2 rounded-lg bg-primary text-white font-label text-xs font-bold uppercase tracking-widest hover:bg-primary-container transition-colors shadow-sm flex items-center gap-1.5">
-            <i class="bi bi-plus-lg"></i> Tambah Aset
-        </button>
+        <a href="{{ route('admin.costumes.create-asset') }}" class="px-4 py-2 rounded-lg bg-primary text-white font-label text-xs font-bold uppercase tracking-widest hover:bg-primary-container transition-colors shadow-sm flex items-center gap-1.5 inline-flex">
+    <i class="bi bi-plus-lg"></i> Tambah Aset
+</a>
     </div>
-    
+
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         @foreach($sanggarCostumes as $c)
         @php
@@ -28,11 +28,11 @@
         <div class="rounded-xl p-5 border shadow-[0_4px_12px_rgba(54,31,26,0.02)] {{ $cardClass }} transition-colors hover:shadow-[0_8px_20px_rgba(54,31,26,0.04)]">
             <div class="flex justify-between items-start mb-4">
                 <h3 class="font-headline font-semibold text-on-surface leading-tight text-lg">{{ $c->name }}</h3>
-                @if($c->condition === 'good') 
+                @if($c->condition === 'good')
                     <span class="inline-block px-2 py-0.5 rounded border border-green-500/20 bg-green-500/10 font-label text-[0.6rem] font-bold uppercase tracking-wider text-green-600 flex-shrink-0">Baik</span>
-                @elseif($c->condition === 'damaged') 
+                @elseif($c->condition === 'damaged')
                     <span class="inline-block px-2 py-0.5 rounded border border-red-500/20 bg-red-500/10 font-label text-[0.6rem] font-bold uppercase tracking-wider text-red-600 flex-shrink-0">Rusak</span>
-                @else 
+                @else
                     <span class="inline-block px-2 py-0.5 rounded border border-orange-500/20 bg-orange-500/10 font-label text-[0.6rem] font-bold uppercase tracking-wider text-orange-600 flex-shrink-0">MTC</span>
                 @endif
             </div>
@@ -55,12 +55,12 @@
 <div>
     <div class="flex items-center justify-between mb-6">
         <h2 class="font-headline text-xl text-primary font-semibold flex items-center gap-2">
-            <div class="w-10 h-10 rounded-lg bg-secondary/10 flex items-center justify-center"><i class="bi bi-shop text-secondary"></i></div> 
+            <div class="w-10 h-10 rounded-lg bg-secondary/10 flex items-center justify-center"><i class="bi bi-shop text-secondary"></i></div>
             Transaksi Sewa Vendor Eksternal
         </h2>
-        <button class="px-4 py-2 rounded-lg bg-secondary text-white font-label text-xs font-bold uppercase tracking-widest hover:bg-secondary-container transition-colors shadow-sm flex items-center gap-1.5">
-            <i class="bi bi-plus-lg"></i> Nambah Sewaan
-        </button>
+        <a href="{{ route('admin.costumes.create-rental') }}" class="px-4 py-2 rounded-lg bg-secondary text-white font-label text-xs font-bold uppercase tracking-widest hover:bg-secondary-container transition-colors shadow-sm flex items-center gap-1.5 inline-flex">
+    <i class="bi bi-plus-lg"></i> Nambah Sewaan
+</a>
     </div>
 
     <div class="bg-surface-container-lowest rounded-xl border border-outline-variant/30 shadow-[0_12px_24px_rgba(54,31,26,0.03)] overflow-hidden">
@@ -107,11 +107,11 @@
                         @endif
                     </td>
                     <td class="px-6 py-4 text-center">
-                        @if($r->status === 'rented' && $isOverdue) 
+                        @if($r->status === 'rented' && $isOverdue)
                             <span class="inline-block px-2.5 py-1 rounded border border-red-500/20 bg-red-500/10 font-label text-[0.65rem] font-bold uppercase tracking-wider text-red-600">OVERDUE</span>
-                        @elseif($r->status === 'rented') 
+                        @elseif($r->status === 'rented')
                             <span class="inline-block px-2.5 py-1 rounded border border-orange-500/20 bg-orange-500/10 font-label text-[0.65rem] font-bold uppercase tracking-wider text-orange-600">DIPINJAM</span>
-                        @else 
+                        @else
                             <span class="inline-block px-2.5 py-1 rounded border border-green-500/20 bg-green-500/10 font-label text-[0.65rem] font-bold uppercase tracking-wider text-green-600">KEMBALI</span>
                         @endif
                     </td>
