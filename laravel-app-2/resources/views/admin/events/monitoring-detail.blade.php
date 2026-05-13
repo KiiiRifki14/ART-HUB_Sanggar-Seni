@@ -23,8 +23,7 @@
     $statusInfo = $statusMap[$bStatus] ?? $statusMap['pending'];
 @endphp
 
-{{-- Alpine Component for entire page (to handle modal) --}}
-<div x-data="{ showGPSModal: false }">
+<div>
 
     {{-- Top Action Bar --}}
     <div class="flex items-center gap-3 mb-6">
@@ -109,12 +108,9 @@
                     </div>
                     
                     <div class="flex gap-2">
-                        <a href="https://maps.google.com/?q={{ $event->latitude }},{{ $event->longitude }}" target="_blank" class="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg border border-outline-variant/30 font-label text-xs font-bold uppercase tracking-widest text-on-surface-variant hover:bg-surface-container hover:text-primary transition-colors">
+                        <a href="https://maps.google.com/?q={{ $event->latitude }},{{ $event->longitude }}" target="_blank" class="w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg border border-outline-variant/30 font-label text-xs font-bold uppercase tracking-widest text-on-surface-variant hover:bg-surface-container hover:text-primary transition-colors">
                             <i class="bi bi-map"></i> Buka Maps
                         </a>
-                        <button @click="showGPSModal = true" class="flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg border border-secondary/30 bg-secondary/5 font-label text-xs font-bold uppercase tracking-widest text-secondary hover:bg-secondary hover:text-white transition-colors">
-                            <i class="bi bi-pencil-square"></i> Ubah
-                        </button>
                     </div>
                 @else
                     <div class="bg-orange-500/5 border border-orange-500/20 rounded-xl p-4 mb-4 flex items-start gap-3">
@@ -124,9 +120,9 @@
                             <p class="font-body text-xs text-orange-600/80">Personel tidak akan bisa melakukan check-in lokasi karena sistem Ghosting Guard belum mengenali area venue.</p>
                         </div>
                     </div>
-                    <button @click="showGPSModal = true" class="w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg bg-orange-500 hover:bg-orange-600 text-white font-label text-xs font-bold uppercase tracking-widest transition-colors shadow-sm">
-                        <i class="bi bi-geo-alt"></i> Set Koordinat GPS
-                    </button>
+                    <p class="font-label text-[0.65rem] text-center text-outline font-bold uppercase tracking-widest mt-3">
+                        Atur koordinat di menu Event Management.
+                    </p>
                 @endif
             </div>
         </div>
@@ -215,63 +211,6 @@
         </div>
     </div>
 
-    {{-- Modal Alpine: Set Koordinat --}}
-    <div x-show="showGPSModal" 
-         x-transition:enter="transition ease-out duration-300"
-         x-transition:enter-start="opacity-0"
-         x-transition:enter-end="opacity-100"
-         x-transition:leave="transition ease-in duration-200"
-         x-transition:leave-start="opacity-100"
-         x-transition:leave-end="opacity-0"
-         class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm"
-         style="display: none;">
-        
-        <div x-show="showGPSModal"
-             @click.away="showGPSModal = false"
-             x-transition:enter="transition ease-out duration-300"
-             x-transition:enter-start="opacity-0 translate-y-8 scale-95"
-             x-transition:enter-end="opacity-100 translate-y-0 scale-100"
-             x-transition:leave="transition ease-in duration-200"
-             x-transition:leave-start="opacity-100 translate-y-0 scale-100"
-             x-transition:leave-end="opacity-0 translate-y-8 scale-95"
-             class="bg-surface-container-lowest w-full max-w-md rounded-2xl border border-outline-variant/30 shadow-2xl overflow-hidden flex flex-col">
-            
-            <div class="px-6 py-4 border-b border-outline-variant/20 flex items-center justify-between bg-surface-container-low/30">
-                <h4 class="font-headline text-primary font-bold flex items-center gap-2">
-                    <i class="bi bi-geo-fill text-secondary"></i> Set Lokasi Geofencing
-                </h4>
-                <button @click="showGPSModal = false" class="text-outline hover:text-primary transition-colors">
-                    <i class="bi bi-x-lg"></i>
-                </button>
-            </div>
-            
-            <form action="{{ route('admin.events.update_coordinates', $event->id) }}" method="POST">
-                @csrf @method('PATCH')
-                <div class="p-6 space-y-4">
-                    <p class="font-body text-sm text-on-surface-variant leading-relaxed">
-                        Masukkan titik koordinat (Latitude & Longitude) agar fitur absensi <b>Ghosting Guard</b> dapat mengunci kehadiran kru berdasarkan radius lokasi.
-                    </p>
-                    
-                    <div>
-                        <label class="font-label text-[0.65rem] font-bold uppercase tracking-widest text-outline block mb-1.5 ml-1">Latitude</label>
-                        <input type="number" name="latitude" step="any" class="w-full bg-surface-container-low border border-outline-variant/50 rounded-xl px-4 py-3 font-body text-sm text-on-surface focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-colors" placeholder="-6.200000" value="{{ $event->latitude }}" required>
-                    </div>
-                    <div>
-                        <label class="font-label text-[0.65rem] font-bold uppercase tracking-widest text-outline block mb-1.5 ml-1">Longitude</label>
-                        <input type="number" name="longitude" step="any" class="w-full bg-surface-container-low border border-outline-variant/50 rounded-xl px-4 py-3 font-body text-sm text-on-surface focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-colors" placeholder="106.816666" value="{{ $event->longitude }}" required>
-                    </div>
-                </div>
-                
-                <div class="px-6 py-4 border-t border-outline-variant/20 flex gap-3 bg-surface-container-low/30">
-                    <button type="button" @click="showGPSModal = false" class="flex-1 px-4 py-2.5 rounded-xl border border-outline-variant/50 font-label text-xs font-bold uppercase tracking-widest text-on-surface-variant hover:bg-surface-container transition-colors">
-                        Batal
-                    </button>
-                    <button type="submit" class="flex-1 px-4 py-2.5 rounded-xl bg-primary text-white font-label text-xs font-bold uppercase tracking-widest hover:bg-primary-container transition-colors shadow-md hover:shadow-lg">
-                        Simpan Area
-                    </button>
-                </div>
-            </form>
-        </div>
-    </div>
+
 </div>
 @endsection

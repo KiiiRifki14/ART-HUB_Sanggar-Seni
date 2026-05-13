@@ -237,9 +237,9 @@
 
                         {{-- Profit Card --}}
                         <div class="bg-gradient-to-br from-primary-container to-primary rounded-xl p-5 border border-primary/20 shadow-md">
-                            <div class="font-label text-[0.65rem] uppercase tracking-widest text-secondary font-bold mb-1">Fixed Profit Secured (30%)</div>
-                            <div class="font-headline font-bold text-2xl text-secondary mb-1">Rp {{ number_format($fixedProfit, 0, ',', '.') }}</div>
-                            <div class="font-body text-[0.65rem] text-white/60">Fixed profit amount set aside from total contract price</div>
+                            <label class="block font-label text-[0.65rem] uppercase tracking-widest text-secondary font-bold mb-1.5"><i class="bi bi-lock-fill"></i> Fixed Profit Pimpinan (Rp)</label>
+                            <p class="font-body text-[0.65rem] text-white/80 mb-2">Tentukan nominal laba yang ingin dikunci (Saran: Rp {{ number_format($fixedProfit, 0, ',', '.') }}).</p>
+                            <input type="number" name="fixed_profit_nominal" min="0" value="{{ $fixedProfit }}" placeholder="Nominal Rp" class="w-full bg-white/10 border border-white/20 rounded-lg px-4 py-2 font-headline font-bold text-white placeholder-white/50 focus:border-secondary focus:ring-1 focus:ring-secondary outline-none transition-all" required form="formConfirm{{ $booking->id }}">
                         </div>
 
                         @if($opsBudget > 0)
@@ -299,8 +299,8 @@
                         </button>
                     </form>
                     {{-- Confirm --}}
-                    @php $cfMsg = 'Konfirmasi DP & Kunci Laba Rp ' . number_format($fixedProfit, 0, ',', '.') . ' untuk booking ' . addslashes($booking->client_name) . '?'; @endphp
-                    <form action="{{ route('admin.bookings.confirm', $booking->id) }}" method="POST" class="m-0" onsubmit="return confirm('{{ $cfMsg }}')">
+                    @php $cfMsg = 'Konfirmasi DP & Kunci Laba (Fixed Profit akan disimpan sesuai input) untuk booking ' . addslashes($booking->client_name) . '?'; @endphp
+                    <form action="{{ route('admin.bookings.confirm', $booking->id) }}" method="POST" class="m-0" id="formConfirm{{ $booking->id }}" onsubmit="return confirm('{{ $cfMsg }}')">
                         @csrf
                         <button type="submit" class="px-5 py-2.5 rounded-lg bg-green-500 text-white font-label text-xs font-bold uppercase tracking-widest hover:bg-green-600 transition-colors flex items-center gap-1.5 shadow-md">
                             <i class="bi bi-check-circle"></i> Confirm

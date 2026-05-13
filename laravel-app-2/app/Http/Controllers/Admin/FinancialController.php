@@ -8,6 +8,7 @@ use App\Models\OperationalCost;
 use Illuminate\Http\Request;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
+use Barryvdh\DomPDF\Facade\Pdf;
 
 class FinancialController extends Controller
 {
@@ -18,6 +19,17 @@ class FinancialController extends Controller
     {
         $records = FinancialRecord::with('event.booking')->get();
         return view('admin.financials.index', compact('records'));
+    }
+
+    /**
+     * Export Financial Report to PDF
+     */
+    public function exportPdf()
+    {
+        $records = FinancialRecord::with('event.booking')->get();
+        $pdf = Pdf::loadView('admin.financials.pdf', compact('records'))
+                  ->setPaper('a4', 'landscape');
+        return $pdf->download('Laporan_Keuangan_ARTHUB_'.now()->format('Ymd').'.pdf');
     }
 
     /**
@@ -64,6 +76,13 @@ class FinancialController extends Controller
             'updated_by'    => Auth::id()
         ]);
 
+        // Update total realisasi lapangan pada FinancialRecord
+        if ($cost->financialRecord) {
+            $cost->financialRecord->update([
+                'actual_operational_cost' => $cost->financialRecord->operationalCosts()->sum('actual_amount')
+            ]);
+        }
+
         $msg = 'Realisasi biaya berhasil diperbarui.';
         if ($oldAmount !== $newAmount) {
             $msg .= ' [SISTEM KEAMANAN] Perubahan nilai mendadak telah berhasil di-Audit (disimpan) oleh Database untuk mencegah kebocoran RAB.';
@@ -95,6 +114,11 @@ class FinancialController extends Controller
             'estimated_amount' => $request->estimated_amount,
             'actual_amount'    => $request->actual_amount,
             'updated_by'       => Auth::id(),
+        ]);
+
+        // Update total realisasi lapangan pada FinancialRecord
+        $event->financialRecord->update([
+            'actual_operational_cost' => $event->financialRecord->operationalCosts()->sum('actual_amount')
         ]);
 
         return redirect()->back()->with('success', 'Biaya operasional baru berhasil ditambahkan.');

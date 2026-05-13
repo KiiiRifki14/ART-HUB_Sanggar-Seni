@@ -30,18 +30,21 @@ class RegisteredUserController extends Controller
      */
     public function store(Request $request): RedirectResponse
     {
+        // Tambahkan validasi regex ketat untuk mencegah karakter aneh / injeksi XSS/SQL
         $request->validate([
-            'name' => ['required', 'string', 'max:255'],
+            'name' => ['required', 'string', 'max:255', 'regex:/^[a-zA-Z\s\.]+$/'],
             'email' => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:'.User::class],
-            'phone' => ['required', 'string', 'max:20'],
+            'phone' => ['required', 'string', 'max:20', 'regex:/^[0-9\-\+\(\)]+$/'],
             'password' => ['required', 'confirmed', Rules\Password::defaults()],
         ]);
+        
         $role = $request->role === 'personnel' ? 'personel' : 'klien';
 
+        // Sanitasi input menggunakan strip_tags untuk mencegah XSS
         $user = User::create([
-            'name' => $request->name,
-            'email' => $request->email,
-            'phone' => $request->phone,
+            'name' => strip_tags($request->name),
+            'email' => strip_tags($request->email),
+            'phone' => strip_tags($request->phone),
             'password' => Hash::make($request->password),
             'role' => $role,
         ]);

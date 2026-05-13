@@ -43,10 +43,13 @@
 </div>
 
 {{-- Header --}}
-<div class="flex items-center gap-2 mb-6">
+<div class="flex justify-between items-center mb-6">
     <h2 class="font-headline text-xl text-primary font-semibold">
         <i class="bi bi-activity text-secondary me-1"></i> Laporan Keuangan per Event
     </h2>
+    <a href="{{ route('admin.financials.export_pdf') }}" class="bg-red-600 text-white px-4 py-2 rounded-lg font-bold text-xs uppercase tracking-widest hover:bg-red-700 transition-colors shadow-md">
+        <i class="bi bi-file-earmark-pdf-fill me-1"></i> Unduh Laporan PDF
+    </a>
 </div>
 
 {{-- ── DETAIL PER EVENT ── --}}
@@ -60,7 +63,10 @@
                 <th class="font-label text-[0.65rem] uppercase tracking-widest text-outline font-bold px-6 py-4 text-right">Honor Kru</th>
                 <th class="font-label text-[0.65rem] uppercase tracking-widest text-outline font-bold px-6 py-4 text-right">Budget Ops</th>
                 <th class="font-label text-[0.65rem] uppercase tracking-widest text-outline font-bold px-6 py-4 text-right">Realisasi Ops</th>
-                <th class="font-label text-[0.65rem] uppercase tracking-widest text-outline font-bold px-6 py-4 text-right">Selisih Ops</th>
+                <th class="font-label text-[0.65rem] uppercase tracking-widest text-outline font-bold px-6 py-4 text-right">
+                    Efisiensi Ops 
+                    <i class="bi bi-info-circle ml-1 text-on-surface-variant cursor-help" title="Selisih antara Budget Operasional dengan Biaya Riil (Realisasi Ops). Positif = Efisien/Sisa Budget. Negatif = Melebihi Anggaran."></i>
+                </th>
                 <th class="font-label text-[0.65rem] uppercase tracking-widest text-outline font-bold px-6 py-4 text-center">Aksi</th>
             </tr>
         </thead>

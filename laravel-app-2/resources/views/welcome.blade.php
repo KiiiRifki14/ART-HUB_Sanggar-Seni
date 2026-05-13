@@ -9,6 +9,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
 <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
 <script id="tailwind-config">
       tailwind.config = {
         darkMode: "class",
@@ -88,16 +89,16 @@
       .fill-1 { font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
     </style>
 </head>
-<body class="bg-background text-on-surface font-body selection:bg-secondary-container/30">
+<body class="bg-background text-on-surface font-body selection:bg-secondary-container/30" x-data="{ showServiceModal: false, activeServiceTitle: '', activeServiceDesc: '', activeServicePrice: '' }">
 <!-- TopNavBar (Shared Component) -->
 <nav class="fixed top-0 w-full z-50 flex justify-between items-center px-6 py-4 bg-[#faf9f6]/80 dark:bg-[#1a1c1a]/80 backdrop-blur-md shadow-[0_20px_40px_rgba(78,52,46,0.04)]">
 <div class="flex items-center gap-8">
 <span class="font-serif text-xl tracking-tight text-[#361f1a] dark:text-[#faf9f6] font-headline font-semibold">Cahaya Gumilang</span>
 <div class="hidden md:flex items-center gap-6">
-<a class="text-[#705d00] font-bold border-b-2 border-[#705d00] font-label text-xs tracking-widest uppercase py-1" href="#">Profil</a>
-<a class="text-[#4e342e]/70 dark:text-[#efeeeb]/70 hover:text-[#705d00] transition-colors duration-300 font-label text-xs tracking-widest uppercase py-1" href="#">Sejarah</a>
-<a class="text-[#4e342e]/70 dark:text-[#efeeeb]/70 hover:text-[#705d00] transition-colors duration-300 font-label text-xs tracking-widest uppercase py-1" href="#">Galeri</a>
-<a class="text-[#4e342e]/70 dark:text-[#efeeeb]/70 hover:text-[#705d00] transition-colors duration-300 font-label text-xs tracking-widest uppercase py-1" href="#">Katalog Jasa</a>
+<a class="text-[#705d00] font-bold border-b-2 border-[#705d00] font-label text-xs tracking-widest uppercase py-1" href="#profil">Profil</a>
+<a class="text-[#4e342e]/70 dark:text-[#efeeeb]/70 hover:text-[#705d00] transition-colors duration-300 font-label text-xs tracking-widest uppercase py-1" href="#sejarah">Sejarah</a>
+<a class="text-[#4e342e]/70 dark:text-[#efeeeb]/70 hover:text-[#705d00] transition-colors duration-300 font-label text-xs tracking-widest uppercase py-1" href="#galeri">Galeri Seniman</a>
+<a class="text-[#4e342e]/70 dark:text-[#efeeeb]/70 hover:text-[#705d00] transition-colors duration-300 font-label text-xs tracking-widest uppercase py-1" href="#katalog">Katalog Jasa</a>
 </div>
 </div>
 <div class="flex items-center gap-3">
@@ -120,7 +121,7 @@
 </nav>
 <main class="pt-16">
 <!-- Hero Section -->
-<section class="relative h-[921px] min-h-[600px] flex items-center overflow-hidden px-6 lg:px-20">
+<section id="profil" class="relative h-[921px] min-h-[600px] flex items-center overflow-hidden px-6 lg:px-20">
 <div class="absolute inset-0 z-0">
 <img class="w-full h-full object-cover brightness-[0.7]" data-alt="Cinematic wide shot of Indonesian traditional dancers performing in a historic courtyard with warm golden hour lighting and dramatic shadows" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAKLJeZoxR8JGephSpt-CQ1qwaU9sXDbR_yFfvj_6hYNaUcw7tKNLK_SAqoX2jJhGKyMlYSaEUkIp8pc_tG0KZQn9D5MmfA9zZkQCHoMdVt4ahPKs3UZaGMJvQEjafV20nGf0iOcRwVhK7QGQMG1tUBHMRw5R259gVLoNw4PzeXIZGKOdZRfDoXvuMp7MNBEnN7OzKBKEXaNgiwCU66Ev2gnfn5xy3labIA8gxkvL1aXUIsbTv8QxMbyP8ql3EtI6Boi3-jMKHG5Q"/>
 <div class="absolute inset-0 bg-gradient-to-r from-primary/80 to-transparent"></div>
@@ -142,7 +143,7 @@
 </div>
 </section>
 <!-- Sejarah Warisan (Elegant Typography) -->
-<section class="py-24 px-6 lg:px-20 bg-surface">
+<section id="sejarah" class="py-24 px-6 lg:px-20 bg-surface">
 <div class="grid lg:grid-cols-12 gap-12 items-center">
 <div class="lg:col-span-5 relative">
 <div class="aspect-[4/5] bg-surface-container-high rounded-xl overflow-hidden shadow-2xl">
@@ -155,19 +156,18 @@
 </div>
 <div class="lg:col-span-6 lg:offset-1">
 <span class="text-secondary font-label text-sm uppercase tracking-widest font-bold mb-4 block">Pendiri &amp; Jiwa Sanggar</span>
-<h2 class="font-headline text-4xl md:text-5xl text-primary font-semibold mb-8 leading-tight italic">Bapa A. Kusmana,<br>Cahaya yang Tak Pernah Padam.</h2>
+<h2 class="font-headline text-4xl md:text-5xl text-primary font-semibold mb-8 leading-tight italic">{{ $contents['history_founder_name'] ?? 'Bapa A. Kusmana' }},<br>Cahaya yang Tak Pernah Padam.</h2>
 
 {{-- Quote penghormatan --}}
 <div class="mb-8 pl-5 border-l-2 border-secondary">
     <p class="font-headline text-xl text-primary italic leading-relaxed mb-3">
-        "Seni bukan sekadar hiburan — ia adalah napas peradaban, warisan yang wajib kita jaga dan wariskan kepada generasi mendatang."
+        "{{ $contents['history_quote'] ?? 'Seni bukan sekadar hiburan — ia adalah napas peradaban, warisan yang wajib kita jaga dan wariskan kepada generasi mendatang.' }}"
     </p>
-    <p class="font-label text-xs uppercase tracking-widest text-secondary font-bold">— A. Kusmana, Pendiri Sanggar Cahaya Gumilang</p>
+    <p class="font-label text-xs uppercase tracking-widest text-secondary font-bold">— {{ $contents['history_founder_name'] ?? 'A. Kusmana' }}, Pendiri Sanggar Cahaya Gumilang</p>
 </div>
 
 <div class="space-y-5 text-on-surface-variant font-body leading-loose">
-    <p>Atas visi dan dedikasi Bapa A. Kusmana, Sanggar Cahaya Gumilang lahir sebagai ruang kebudayaan yang tidak hanya melatih, tetapi juga membentuk karakter dan jiwa para seniman muda Indonesia.</p>
-    <p>Setiap gerakan tari dan dentuman gamelan yang kami hadirkan adalah bentuk penghormatan nyata atas warisan beliau — sebuah estafet budaya yang terus kami emban dengan sepenuh hati.</p>
+    <p>{{ $contents['history_paragraph'] ?? 'Atas visi dan dedikasi Bapa A. Kusmana, Sanggar Cahaya Gumilang lahir sebagai ruang kebudayaan yang tidak hanya melatih, tetapi juga membentuk karakter dan jiwa para seniman muda Indonesia. Setiap gerakan tari dan dentuman gamelan yang kami hadirkan adalah bentuk penghormatan nyata atas warisan beliau.' }}</p>
 </div>
 
 <div class="mt-10 flex gap-12">
@@ -188,7 +188,7 @@
 </div>
 </section>
 <!-- Katalog Jasa (Package Cards) -->
-<section class="py-24 bg-surface-container-low px-6 lg:px-20 overflow-hidden">
+<section id="katalog" class="py-24 bg-surface-container-low px-6 lg:px-20 overflow-hidden">
 <div class="flex flex-col md:flex-row justify-between items-end mb-16 gap-6">
 <div>
 <span class="text-secondary font-label text-sm uppercase tracking-widest font-bold mb-2 block">Pilih Pengalaman Anda</span>
@@ -214,7 +214,7 @@
 <p class="text-[10px] font-label uppercase tracking-widest text-on-surface-variant mb-1">Mulai Dari</p>
 <p class="text-xl font-headline font-bold text-primary">Rp 2.500.000</p>
 </div>
-<button class="material-symbols-outlined bg-surface-container p-3 rounded-full hover:bg-primary hover:text-white transition-colors">arrow_forward</button>
+<button @click="showServiceModal = true; activeServiceTitle = 'Pertunjukan Tari'; activeServiceDesc = 'Pilihan tari tradisional mulai dari Keraton hingga tari rakyat yang enerjik untuk acara formal maupun perayaan. Ideal untuk opening event, resepsi, dll. (Estimasi Durasi: 15-30 Menit, Tim: 5-7 Penari)'; activeServicePrice = 'Rp 2.500.000'" class="material-symbols-outlined bg-surface-container p-3 rounded-full hover:bg-primary hover:text-white transition-colors">arrow_forward</button>
 </div>
 </div>
 </div>
@@ -231,7 +231,7 @@
 <p class="text-[10px] font-label uppercase tracking-widest text-on-surface-variant mb-1">Mulai Dari</p>
 <p class="text-xl font-headline font-bold text-primary">Rp 3.800.000</p>
 </div>
-<button class="material-symbols-outlined bg-surface-container p-3 rounded-full hover:bg-primary hover:text-white transition-colors">arrow_forward</button>
+<button @click="showServiceModal = true; activeServiceTitle = 'Ensembel Musik'; activeServiceDesc = 'Harmoni magis Gamelan, Angklung, atau Kecapi Suling untuk menciptakan suasana yang tenang dan bermartabat. (Estimasi Durasi: 2-3 Jam, Tim: 8-12 Pemusik)'; activeServicePrice = 'Rp 3.800.000'" class="material-symbols-outlined bg-surface-container p-3 rounded-full hover:bg-primary hover:text-white transition-colors">arrow_forward</button>
 </div>
 </div>
 </div>
@@ -248,106 +248,40 @@
 <p class="text-[10px] font-label uppercase tracking-widest text-on-surface-variant mb-1">Mulai Dari</p>
 <p class="text-xl font-headline font-bold text-primary">Rp 5.500.000</p>
 </div>
-<button class="material-symbols-outlined bg-surface-container p-3 rounded-full hover:bg-primary hover:text-white transition-colors">arrow_forward</button>
+<button @click="showServiceModal = true; activeServiceTitle = 'Paket Gabungan'; activeServiceDesc = 'Kolaborasi megah musik dan tari dalam satu konsep pertunjukan teatrikal yang tak terlupakan. (Estimasi Durasi: Full Event, Tim: 15-20 Seniman)'; activeServicePrice = 'Rp 5.500.000'" class="material-symbols-outlined bg-surface-container p-3 rounded-full hover:bg-primary hover:text-white transition-colors">arrow_forward</button>
 </div>
 </div>
 </div>
 </div>
-</section><section class="py-24 bg-surface px-6 lg:px-20">
+</section>
+<section id="galeri" class="py-24 bg-surface px-6 lg:px-20">
 <div class="mb-16 text-center">
 <span class="text-secondary font-label text-sm uppercase tracking-widest font-bold mb-2 block">Mengenal Talenta Kami</span>
 <h2 class="font-headline text-4xl text-primary font-semibold italic">Para Seniman Cahaya Gumilang</h2>
 </div>
 <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
-<!-- Artist 1 -->
-<div class="group text-center">
-<div class="aspect-square mb-4 overflow-hidden rounded-xl bg-surface-container">
-<img alt="Artist 1" class="w-full h-full object-cover grayscale hover:grayscale-0 transition-all duration-500" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAF41nW0SEyv9O4aqM0b3R4kEgaL2Jyu2bCR7cp0LMScBbObqoS-YBORfi-yqZWisee8QnW7u2fLJcf_nql0YcGBTOeo0v6_NxugDIUkZys71Wt91M-oTt4dZAFDnEDCUQwxMJY5NlXBK9wskjMlMAadK07XEuZbXrDRlgTRXjp-SC4S5hoXgyu2mMDCmxYU7zKUMDLbhw1jXQv558pROaDVWXntuMcc-5WadhGwOUrqByv3bbfeWwR91tL-9EiAgbdPRjbHRyGgA"/>
+@foreach($personnels as $index => $person)
+    @php
+        // Fallback images since we don't have real profile pictures in DB
+        $images = [
+            'https://lh3.googleusercontent.com/aida-public/AB6AXuAF41nW0SEyv9O4aqM0b3R4kEgaL2Jyu2bCR7cp0LMScBbObqoS-YBORfi-yqZWisee8QnW7u2fLJcf_nql0YcGBTOeo0v6_NxugDIUkZys71Wt91M-oTt4dZAFDnEDCUQwxMJY5NlXBK9wskjMlMAadK07XEuZbXrDRlgTRXjp-SC4S5hoXgyu2mMDCmxYU7zKUMDLbhw1jXQv558pROaDVWXntuMcc-5WadhGwOUrqByv3bbfeWwR91tL-9EiAgbdPRjbHRyGgA',
+            'https://lh3.googleusercontent.com/aida-public/AB6AXuD71OTocZUH9eFF4ePBkSLAaXrIEk7ylHj7oAMoze4pDrNZpsP7nyvYN8df3Of-q1uluCVCbjwiifRAPSFGRnx5YNG6W09EJXht0-0GagEFGMra7k21x1GBGNXZjyeUogInhx1hBQk4O8l2k9pnPscBDZIwcI9cE5lTY-jxbtPYUBFOCBWWHcTXoNpO3ya3mBF0npiG7PSbleLRQ-yk4ySxB35mE8lQTRrjRR0iPAIjghuxy4CT9JyYOyjdynCSiZ_4o5h-l6hqfw',
+            'https://lh3.googleusercontent.com/aida-public/AB6AXuAJPyCghH9erUQyj5Tq1PBTLJgrhSmN9WN-wh3FXJg7ev9AymEqBoW7J8iN0TzrhftCDPbg2J6o777zegiYDiTYfWwNpMsiEQifdL5xyu9jkYMI9DWO94KNlI40SiZl4UUpVMQ5sDl-_dnSERRSRykhT7vre3LCJQ3R1b325CRW-N4JXX3lwJayyNfm10MArim6Mol6b4zHyt2S09dGWLeGkOZaLQ_SRgWAlzuq6k8ZnGOOgM7t9dJFlaPOc9wdkcwkOxklauMVjQ',
+            'https://lh3.googleusercontent.com/aida-public/AB6AXuCTox9iuu0JGUWEz25Dkf9WYWLSkLAg8M6xNFbQ_AQNm-4EXgE0ftmo3pQf4Cu06MW9cMdoQfhH8IXdkTp5LP63EQXmToQfda0fby8LTQGdL4GfDVOc0nxdf7Lccsw1yh3d6TJQiO5VWxHzfwCHDwxUUvsF-8JYMZ1y2aW7oTJsj5s0QYWESyxNIHByLiUVfRFtyn7hacrwWXWaI1JVnevhJKhWSl_oj69iRJxUn3dX26PNv2RqiDSZi7Si_2qT_IaCrOWTFqQymw',
+        ];
+        $img = $images[$index % 4];
+    @endphp
+    <div class="group text-center">
+        <div class="aspect-square mb-4 overflow-hidden rounded-xl bg-surface-container">
+            <img alt="{{ $person->user->name }}" class="w-full h-full object-cover grayscale hover:grayscale-0 transition-all duration-500" src="{{ $img }}"/>
+        </div>
+        <h3 class="font-headline text-lg text-primary font-bold">{{ $person->user->name }}</h3>
+        <p class="text-xs font-label uppercase tracking-widest text-on-surface-variant">{{ ucwords($person->specialty) }}</p>
+    </div>
+@endforeach
 </div>
-<h3 class="font-headline text-lg text-primary font-bold">Ayu Larasati</h3>
-<p class="text-xs font-label uppercase tracking-widest text-on-surface-variant">Lead Dancer</p>
-</div>
-<!-- Artist 2 -->
-<div class="group text-center">
-<div class="aspect-square mb-4 overflow-hidden rounded-xl bg-surface-container">
-<img alt="Artist 2" class="w-full h-full object-cover grayscale hover:grayscale-0 transition-all duration-500" src="https://lh3.googleusercontent.com/aida-public/AB6AXuD71OTocZUH9eFF4ePBkSLAaXrIEk7ylHj7oAMoze4pDrNZpsP7nyvYN8df3Of-q1uluCVCbjwiifRAPSFGRnx5YNG6W09EJXht0-0GagEFGMra7k21x1GBGNXZjyeUogInhx1hBQk4O8l2k9pnPscBDZIwcI9cE5lTY-jxbtPYUBFOCBWWHcTXoNpO3ya3mBF0npiG7PSbleLRQ-yk4ySxB35mE8lQTRrjRR0iPAIjghuxy4CT9JyYOyjdynCSiZ_4o5h-l6hqfw"/>
-</div>
-<h3 class="font-headline text-lg text-primary font-bold">Budi Santoso</h3>
-<p class="text-xs font-label uppercase tracking-widest text-on-surface-variant">Gamelan Lead</p>
-</div>
-<!-- Artist 3-12 (Repetitive structure for 12 members) -->
-<!-- Artist 3 -->
-<div class="group text-center">
-<div class="aspect-square mb-4 overflow-hidden rounded-xl bg-surface-container">
-<img alt="Artist 3" class="w-full h-full object-cover grayscale hover:grayscale-0 transition-all duration-500" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAJPyCghH9erUQyj5Tq1PBTLJgrhSmN9WN-wh3FXJg7ev9AymEqBoW7J8iN0TzrhftCDPbg2J6o777zegiYDiTYfWwNpMsiEQifdL5xyu9jkYMI9DWO94KNlI40SiZl4UUpVMQ5sDl-_dnSERRSRykhT7vre3LCJQ3R1b325CRW-N4JXX3lwJayyNfm10MArim6Mol6b4zHyt2S09dGWLeGkOZaLQ_SRgWAlzuq6k8ZnGOOgM7t9dJFlaPOc9wdkcwkOxklauMVjQ"/>
-</div>
-<h3 class="font-headline text-lg text-primary font-bold">Dewi Sinta</h3>
-<p class="text-xs font-label uppercase tracking-widest text-on-surface-variant">Traditional Dancer</p>
-</div>
-<div class="group text-center">
-<div class="aspect-square mb-4 overflow-hidden rounded-xl bg-surface-container">
-<img alt="Artist 4" class="w-full h-full object-cover grayscale hover:grayscale-0 transition-all duration-500" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCTox9iuu0JGUWEz25Dkf9WYWLSkLAg8M6xNFbQ_AQNm-4EXgE0ftmo3pQf4Cu06MW9cMdoQfhH8IXdkTp5LP63EQXmToQfda0fby8LTQGdL4GfDVOc0nxdf7Lccsw1yh3d6TJQiO5VWxHzfwCHDwxUUvsF-8JYMZ1y2aW7oTJsj5s0QYWESyxNIHByLiUVfRFtyn7hacrwWXWaI1JVnevhJKhWSl_oj69iRJxUn3dX26PNv2RqiDSZi7Si_2qT_IaCrOWTFqQymw"/>
-</div>
-<h3 class="font-headline text-lg text-primary font-bold">Wayan Putra</h3>
-<p class="text-xs font-label uppercase tracking-widest text-on-surface-variant">Kendang Specialist</p>
-</div>
-<!-- Adding remaining slots to fulfill 12 total -->
-<div class="group text-center">
-<div class="aspect-square mb-4 overflow-hidden rounded-xl bg-surface-container">
-<img alt="Artist 5" class="w-full h-full object-cover grayscale hover:grayscale-0 transition-all duration-500" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAKLJeZoxR8JGephSpt-CQ1qwaU9sXDbR_yFfvj_6hYNaUcw7tKNLK_SAqoX2jJhGKyMlYSaEUkIp8pc_tG0KZQn9D5MmfA9zZkQCHoMdVt4ahPKs3UZaGMJvQEjafV20nGf0iOcRwVhK7QGQMG1tUBHMRw5R259gVLoNw4PzeXIZGKOdZRfDoXvuMp7MNBEnN7OzKBKEXaNgiwCU66Ev2gnfn5xy3labIA8gxkvL1aXUIsbTv8QxMbyP8ql3EtI6Boi3-jMKHG5Q"/>
-</div>
-<h3 class="font-headline text-lg text-primary font-bold">Siti Aminah</h3>
-<p class="text-xs font-label uppercase tracking-widest text-on-surface-variant">Sinden</p>
-</div>
-<div class="group text-center">
-<div class="aspect-square mb-4 overflow-hidden rounded-xl bg-surface-container">
-<img alt="Artist 6" class="w-full h-full object-cover grayscale hover:grayscale-0 transition-all duration-500" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDpA4-8mFYLi5Gl8SNfgM7ZJXVjd1ynL8_4TNfr5wmL661kKn1PajBCbF8MwPtytwLy_mQhev_0E-qXE_QcQQj__hu9Dc_2A0PEjKLab4MdT_L2ZsRcChi9a4nSRHBatx2lqQ8BhqpGT63EyEpMAib1ZiMsbaN9Gsb_b7DmuAZ54D6id8N483Qp26ckl1bwTIDixfqTENNyhaqE83DABN0jyIgy-3R7oOSDWeWjfz1wewKAaZ6-nv68RlDqEahSOikzkn-LFYxdQw"/>
-</div>
-<h3 class="font-headline text-lg text-primary font-bold">Eko Prasetyo</h3>
-<p class="text-xs font-label uppercase tracking-widest text-on-surface-variant">Flutist (Suling)</p>
-</div>
-<div class="group text-center">
-<div class="aspect-square mb-4 overflow-hidden rounded-xl bg-surface-container">
-<img alt="Artist 7" class="w-full h-full object-cover grayscale hover:grayscale-0 transition-all duration-500" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAF41nW0SEyv9O4aqM0b3R4kEgaL2Jyu2bCR7cp0LMScBbObqoS-YBORfi-yqZWisee8QnW7u2fLJcf_nql0YcGBTOeo0v6_NxugDIUkZys71Wt91M-oTt4dZAFDnEDCUQwxMJY5NlXBK9wskjMlMAadK07XEuZbXrDRlgTRXjp-SC4S5hoXgyu2mMDCmxYU7zKUMDLbhw1jXQv558pROaDVWXntuMcc-5WadhGwOUrqByv3bbfeWwR91tL-9EiAgbdPRjbHRyGgA"/>
-</div>
-<h3 class="font-headline text-lg text-primary font-bold">Ratna Sari</h3>
-<p class="text-xs font-label uppercase tracking-widest text-on-surface-variant">Mask Dancer</p>
-</div>
-<div class="group text-center">
-<div class="aspect-square mb-4 overflow-hidden rounded-xl bg-surface-container">
-<img alt="Artist 8" class="w-full h-full object-cover grayscale hover:grayscale-0 transition-all duration-500" src="https://lh3.googleusercontent.com/aida-public/AB6AXuD71OTocZUH9eFF4ePBkSLAaXrIEk7ylHj7oAMoze4pDrNZpsP7nyvYN8df3Of-q1uluCVCbjwiifRAPSFGRnx5YNG6W09EJXht0-0GagEFGMra7k21x1GBGNXZjyeUogInhx1hBQk4O8l2k9pnPscBDZIwcI9cE5lTY-jxbtPYUBFOCBWWHcTXoNpO3ya3mBF0npiG7PSbleLRQ-yk4ySxB35mE8lQTRrjRR0iPAIjghuxy4CT9JyYOyjdynCSiZ_4o5h-l6hqfw"/>
-</div>
-<h3 class="font-headline text-lg text-primary font-bold">Agung Wijaya</h3>
-<p class="text-xs font-label uppercase tracking-widest text-on-surface-variant">Rebab Player</p>
-</div>
-<div class="group text-center">
-<div class="aspect-square mb-4 overflow-hidden rounded-xl bg-surface-container">
-<img alt="Artist 9" class="w-full h-full object-cover grayscale hover:grayscale-0 transition-all duration-500" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAJPyCghH9erUQyj5Tq1PBTLJgrhSmN9WN-wh3FXJg7ev9AymEqBoW7J8iN0TzrhftCDPbg2J6o777zegiYDiTYfWwNpMsiEQifdL5xyu9jkYMI9DWO94KNlI40SiZl4UUpVMQ5sDl-_dnSERRSRykhT7vre3LCJQ3R1b325CRW-N4JXX3lwJayyNfm10MArim6Mol6b4zHyt2S09dGWLeGkOZaLQ_SRgWAlzuq6k8ZnGOOgM7t9dJFlaPOc9wdkcwkOxklauMVjQ"/>
-</div>
-<h3 class="font-headline text-lg text-primary font-bold">Lestari Wahyu</h3>
-<p class="text-xs font-label uppercase tracking-widest text-on-surface-variant">Court Dancer</p>
-</div>
-<div class="group text-center">
-<div class="aspect-square mb-4 overflow-hidden rounded-xl bg-surface-container">
-<img alt="Artist 10" class="w-full h-full object-cover grayscale hover:grayscale-0 transition-all duration-500" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCTox9iuu0JGUWEz25Dkf9WYWLSkLAg8M6xNFbQ_AQNm-4EXgE0ftmo3pQf4Cu06MW9cMdoQfhH8IXdkTp5LP63EQXmToQfda0fby8LTQGdL4GfDVOc0nxdf7Lccsw1yh3d6TJQiO5VWxHzfwCHDwxUUvsF-8JYMZ1y2aW7oTJsj5s0QYWESyxNIHByLiUVfRFtyn7hacrwWXWaI1JVnevhJKhWSl_oj69iRJxUn3dX26PNv2RqiDSZi7Si_2qT_IaCrOWTFqQymw"/>
-</div>
-<h3 class="font-headline text-lg text-primary font-bold">Dian Sastro</h3>
-<p class="text-xs font-label uppercase tracking-widest text-on-surface-variant">Gong Specialist</p>
-</div>
-<div class="group text-center">
-<div class="aspect-square mb-4 overflow-hidden rounded-xl bg-surface-container">
-<img alt="Artist 11" class="w-full h-full object-cover grayscale hover:grayscale-0 transition-all duration-500" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAKLJeZoxR8JGephSpt-CQ1qwaU9sXDbR_yFfvj_6hYNaUcw7tKNLK_SAqoX2jJhGKyMlYSaEUkIp8pc_tG0KZQn9D5MmfA9zZkQCHoMdVt4ahPKs3UZaGMJvQEjafV20nGf0iOcRwVhK7QGQMG1tUBHMRw5R259gVLoNw4PzeXIZGKOdZRfDoXvuMp7MNBEnN7OzKBKEXaNgiwCU66Ev2gnfn5xy3labIA8gxkvL1aXUIsbTv8QxMbyP8ql3EtI6Boi3-jMKHG5Q"/>
-</div>
-<h3 class="font-headline text-lg text-primary font-bold">Rizky Febian</h3>
-<p class="text-xs font-label uppercase tracking-widest text-on-surface-variant">Gambus Player</p>
-</div>
-<div class="group text-center">
-<div class="aspect-square mb-4 overflow-hidden rounded-xl bg-surface-container">
-<img alt="Artist 12" class="w-full h-full object-cover grayscale hover:grayscale-0 transition-all duration-500" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDpA4-8mFYLi5Gl8SNfgM7ZJXVjd1ynL8_4TNfr5wmL661kKn1PajBCbF8MwPtytwLy_mQhev_0E-qXE_QcQQj__hu9Dc_2A0PEjKLab4MdT_L2ZsRcChi9a4nSRHBatx2lqQ8BhqpGT63EyEpMAib1ZiMsbaN9Gsb_b7DmuAZ54D6id8N483Qp26ckl1bwTIDixfqTENNyhaqE83DABN0jyIgy-3R7oOSDWeWjfz1wewKAaZ6-nv68RlDqEahSOikzkn-LFYxdQw"/>
-</div>
-<h3 class="font-headline text-lg text-primary font-bold">Maya Hasan</h3>
-<p class="text-xs font-label uppercase tracking-widest text-on-surface-variant">Contemporary Harpist</p>
-</div>
+<div class="mt-12 text-center">
+    <button @click="alert('Halaman daftar seluruh seniman sedang dalam pengembangan.')" class="px-8 py-3 rounded-xl border border-secondary-fixed-dim text-secondary font-label text-xs font-bold uppercase tracking-widest hover:bg-secondary-fixed-dim/10 transition-all">Lihat Lainnya</button>
 </div>
 </section>
 <!-- CTA Section -->
@@ -416,6 +350,51 @@
 </div>
 </section>
 </main>
+
+{{-- Modal Alpine JS untuk Detail Jasa --}}
+<div x-show="showServiceModal" style="display: none;"
+     class="fixed inset-0 z-[1050] flex items-center justify-center p-4">
+    <div x-show="showServiceModal" 
+         x-transition:enter="transition ease-out duration-300"
+         x-transition:enter-start="opacity-0"
+         x-transition:enter-end="opacity-100"
+         x-transition:leave="transition ease-in duration-200"
+         x-transition:leave-start="opacity-100"
+         x-transition:leave-end="opacity-0"
+         @click="showServiceModal = false"
+         class="fixed inset-0 bg-primary/40 backdrop-blur-sm"></div>
+
+    <div x-show="showServiceModal"
+         x-transition:enter="transition ease-out duration-300"
+         x-transition:enter-start="opacity-0 translate-y-8 scale-95"
+         x-transition:enter-end="opacity-100 translate-y-0 scale-100"
+         x-transition:leave="transition ease-in duration-200"
+         x-transition:leave-start="opacity-100 translate-y-0 scale-100"
+         x-transition:leave-end="opacity-0 translate-y-8 scale-95"
+         class="relative bg-surface-container-lowest w-full max-w-lg rounded-2xl shadow-2xl border border-outline-variant/20 overflow-hidden z-10">
+        
+        <div class="px-6 py-5 border-b border-outline-variant/20 flex justify-between items-center bg-surface-container-low">
+            <h5 class="font-headline font-bold text-lg text-primary" x-text="activeServiceTitle"></h5>
+            <button type="button" @click="showServiceModal = false" class="text-on-surface-variant hover:text-primary transition-colors">
+                <span class="material-symbols-outlined">close</span>
+            </button>
+        </div>
+
+        <div class="p-6 space-y-4">
+            <p class="font-body text-sm text-on-surface-variant leading-relaxed" x-text="activeServiceDesc"></p>
+            <div class="bg-secondary/10 border border-secondary/20 p-4 rounded-xl flex justify-between items-center">
+                <span class="font-label text-xs font-bold uppercase tracking-widest text-secondary-container">Estimasi Mulai</span>
+                <span class="font-headline font-bold text-xl text-secondary" x-text="activeServicePrice"></span>
+            </div>
+        </div>
+        
+        <div class="px-6 py-4 border-t border-outline-variant/20 bg-surface-container-low flex justify-end gap-3">
+            <button type="button" @click="showServiceModal = false" class="px-5 py-2.5 rounded-lg border border-outline-variant/50 font-label text-xs font-bold uppercase tracking-widest text-on-surface-variant hover:bg-surface-container transition-colors">Tutup</button>
+            <a href="{{ route('register') }}" class="px-5 py-2.5 rounded-lg bg-gradient-to-r from-[#4E342E] to-[#361F1A] text-white font-label text-xs font-bold uppercase tracking-widest hover:opacity-90 transition-all">Booking Sekarang</a>
+        </div>
+    </div>
+</div>
+
 <!-- Footer -->
 <footer class="bg-surface py-20 px-6 lg:px-20">
 <div class="grid md:grid-cols-4 gap-12 border-b border-surface-container-high pb-16">

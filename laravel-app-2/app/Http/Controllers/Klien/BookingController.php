@@ -49,7 +49,19 @@ class BookingController extends Controller
 
         $request->validate([
             'event_type'   => 'required|in:' . implode(',', array_keys($packages)),
-            'event_date'   => 'required|date|after:today',
+            'event_date'   => [
+                'required',
+                'date',
+                'after:today',
+                function ($attribute, $value, $fail) {
+                    $exists = Booking::where('event_date', $value)
+                        ->whereIn('status', ['dp_paid', 'confirmed', 'paid_full', 'completed'])
+                        ->exists();
+                    if ($exists) {
+                        $fail('Tanggal ' . \Carbon\Carbon::parse($value)->format('d M Y') . ' sudah penuh/di-booking oleh klien lain. Silakan pilih tanggal lain.');
+                    }
+                },
+            ],
             'event_start'  => 'required',
             'event_end'    => 'required',
             'venue'        => 'required|string',
@@ -97,7 +109,7 @@ class BookingController extends Controller
         $booking = Booking::where('id', $id)->where('client_id', Auth::id())->firstOrFail();
 
         $request->validate([
-            'payment_proof' => 'required|image|max:5120', // Maks 5MB
+            'payment_proof' => 'required|image|mimes:jpg,jpeg,png|max:5120', // Maks 5MB (MIME check)
         ]);
 
         // Simpan file ke storage public (Contoh sederhana)
@@ -108,5 +120,29 @@ class BookingController extends Controller
         ]);
 
         return redirect()->back()->with('success', 'Bukti bayar berhasil diunggah! Menunggu konfirmasi Admin.');
+    }
+
+    /**
+     * Upload Bukti Pelunasan
+     */
+    public function uploadFullProof(Request $request, $id)
+    {
+        $booking = Booking::where('id', $id)->where('client_id', Auth::id())->firstOrFail();
+
+        if (!in_array($booking->status, ['dp_paid', 'confirmed'])) {
+            return redirect()->back()->with('error', 'Status pesanan belum valid untuk pelunasan.');
+        }
+
+        $request->validate([
+            'full_payment_proof' => 'required|image|mimes:jpg,jpeg,png|max:5120',
+        ]);
+
+        $path = $request->file('full_payment_proof')->store('proofs', 'public');
+
+        $booking->update([
+            'full_payment_proof' => $path
+        ]);
+
+        return redirect()->back()->with('success', 'Bukti pelunasan berhasil diunggah! Menunggu verifikasi dari Admin.');
     }
 }

@@ -12,10 +12,7 @@
         <h2 class="font-headline text-2xl text-primary font-semibold mb-1">Daftar Event</h2>
         <p class="font-label text-xs uppercase tracking-widest text-outline">{{ $events->count() }} event terdaftar</p>
     </div>
-    <a href="{{ route('admin.bookings.create') }}"
-       class="bg-gradient-to-br from-primary-container to-primary text-white px-6 py-3 rounded-lg font-label text-xs font-bold uppercase tracking-widest hover:opacity-90 transition-all shadow-md flex items-center gap-2">
-        <i class="bi bi-plus-circle-fill"></i> Booking Baru
-    </a>
+
 </div>
 
 {{-- Table Card --}}

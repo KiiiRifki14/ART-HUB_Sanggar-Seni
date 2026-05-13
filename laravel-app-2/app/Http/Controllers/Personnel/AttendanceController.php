@@ -18,7 +18,7 @@ class AttendanceController extends Controller
     public function checkIn(Request $request, Event $event)
     {
         $user = Auth::user();
-        $personnel = collect($user->personnelProfile)->first(); // Asumsi setup relation HasOne/BelongsTo
+        $personnel = $user->personnelProfile;
 
         if (!$personnel) {
             return redirect()->back()->with('error', 'Akses ditolak. Anda bukan roster.');

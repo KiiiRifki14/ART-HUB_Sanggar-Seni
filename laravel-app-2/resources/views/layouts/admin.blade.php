@@ -10,6 +10,7 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
 
     <script src="https://cdn.tailwindcss.com"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
     <script>
         tailwind.config = {
             theme: {
@@ -68,6 +69,7 @@
         * { box-sizing: border-box; }
         body { font-family: 'Manrope', sans-serif; background: #faf9f6; color: #1a1c1a; margin: 0; }
         .material-symbols-outlined { font-variation-settings: 'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24; font-size: 1.1rem; }
+        [x-cloak] { display: none !important; }
 
         /* ── SIDEBAR ── */
         #sidebar {
@@ -330,7 +332,6 @@
             ],
             'KEUANGAN' => [
                 ['Daftar Booking',    'bi-journal-text',          'admin.bookings.index',             $r->routeIs('admin.bookings.index')],
-                ['New Booking',       'bi-plus-circle-fill',      'admin.bookings.create',            $r->routeIs('admin.bookings.create')],
                 ['DP Verification',   'bi-patch-check-fill',      'admin.bookings.dp_verification',   $r->routeIs('admin.bookings.dp_verification')],
                 ['Payment Tracking',  'bi-receipt-cutoff',        'admin.payments.index',             $r->routeIs('admin.payments.*')],
                 ['Financial Report',  'bi-graph-up-arrow',        'admin.financials.index',           $r->routeIs('admin.financials.index')],
@@ -338,6 +339,7 @@
             ],
             'MANAJEMEN' => [
                 ['Cancellation',      'bi-shield-exclamation',    'admin.cancellations.index',        $r->routeIs('admin.cancellations.*')],
+                ['CMS Landing Page',  'bi-window-sidebar',        'admin.cms.index',                  $r->routeIs('admin.cms.*')],
             ],
         ];
     @endphp

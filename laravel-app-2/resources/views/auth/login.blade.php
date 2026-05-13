@@ -68,10 +68,10 @@
                 Sanggar Seni Cahaya Gumilang
             </span>
             <h2 class="font-display text-4xl xl:text-5xl text-on-primary leading-tight tracking-tight mb-4 drop-shadow-md">
-                Preserving the rhythm of the past, orchestrating the future.
+                Melestarikan irama masa lalu, mengorkestrasi masa depan.
             </h2>
             <p class="font-body text-lg text-primary-fixed-dim/90 font-light">
-                Secure access to the gallery's digital curation and management ecosystem.
+                Akses aman ke ekosistem kurasi digital dan manajemen sanggar.
             </p>
         </div>
     </div>
@@ -84,7 +84,7 @@
             {{-- Brand Identity Header --}}
             <div class="mb-14" data-aos="fade-up" data-aos-delay="200">
                 <h1 class="font-display text-5xl text-primary tracking-tight mb-3">Art-Hub</h1>
-                <p class="font-label text-sm uppercase tracking-[0.2em] text-outline">The Digital Curator</p>
+                <p class="font-label text-sm uppercase tracking-[0.2em] text-outline">Kurator Digital</p>
             </div>
 
             {{-- Validation Errors --}}
@@ -112,23 +112,23 @@
                     {{-- Email --}}
                     <div class="relative group" data-aos="fade-up" data-aos-delay="350">
                         <input class="peer w-full bg-surface-container-low text-on-surface font-body px-5 py-4 pt-6 rounded-lg border-none focus:ring-0 focus:bg-surface-container-lowest focus:shadow-[0_8px_24px_rgba(78,52,46,0.04)] transition-all placeholder-transparent"
-                            id="email" name="email" placeholder="Email Address" type="email"
+                            id="email" name="email" placeholder="Alamat Email" type="email"
                             value="{{ old('email') }}" required autofocus>
-                        <label class="absolute left-5 top-4 font-label text-xs uppercase tracking-widest text-outline transition-all
+                        <label class="absolute left-5 top-2 font-label text-xs uppercase tracking-widest text-outline transition-all
                             peer-placeholder-shown:text-sm peer-placeholder-shown:top-5 peer-placeholder-shown:normal-case peer-placeholder-shown:tracking-normal
                             peer-focus:text-xs peer-focus:uppercase peer-focus:tracking-widest peer-focus:top-2 peer-focus:text-secondary"
-                            for="email">Email Address</label>
+                            for="email">Alamat Email</label>
                         <span class="absolute bottom-0 left-1/2 -translate-x-1/2 w-0 h-[2px] bg-secondary transition-all duration-300 peer-focus:w-full rounded-full"></span>
                     </div>
 
                     {{-- Password --}}
                     <div class="relative group" data-aos="fade-up" data-aos-delay="450">
                         <input class="peer w-full bg-surface-container-low text-on-surface font-body px-5 py-4 pt-6 rounded-lg border-none focus:ring-0 focus:bg-surface-container-lowest focus:shadow-[0_8px_24px_rgba(78,52,46,0.04)] transition-all placeholder-transparent pr-14"
-                            id="password" name="password" placeholder="Password" type="password" required>
-                        <label class="absolute left-5 top-4 font-label text-xs uppercase tracking-widest text-outline transition-all
+                            id="password" name="password" placeholder="Kata Sandi" type="password" required>
+                        <label class="absolute left-5 top-2 font-label text-xs uppercase tracking-widest text-outline transition-all
                             peer-placeholder-shown:text-sm peer-placeholder-shown:top-5 peer-placeholder-shown:normal-case peer-placeholder-shown:tracking-normal
                             peer-focus:text-xs peer-focus:uppercase peer-focus:tracking-widest peer-focus:top-2 peer-focus:text-secondary"
-                            for="password">Password</label>
+                            for="password">Kata Sandi</label>
                         <span class="absolute bottom-0 left-1/2 -translate-x-1/2 w-0 h-[2px] bg-secondary transition-all duration-300 peer-focus:w-full rounded-full"></span>
                         <button type="button" onclick="togglePassword(this)"
                             class="absolute right-5 top-1/2 -translate-y-1/2 text-outline hover:text-primary transition-colors">
@@ -144,11 +144,11 @@
                             <input type="checkbox" name="remember" id="remember" class="absolute opacity-0 w-full h-full cursor-pointer">
                             <span class="material-symbols-outlined text-sm text-primary opacity-0 peer-checked:opacity-100 transition-opacity" style="font-variation-settings:'FILL' 1;">check</span>
                         </div>
-                        <span class="font-body text-sm text-on-surface-variant group-hover:text-primary transition-colors">Retain Session</span>
+                        <span class="font-body text-sm text-on-surface-variant group-hover:text-primary transition-colors">Ingat Saya</span>
                     </label>
                     @if (Route::has('password.request'))
                     <a class="font-label text-xs uppercase tracking-widest text-primary font-semibold hover:text-secondary transition-colors underline decoration-secondary-fixed-dim decoration-2 underline-offset-4"
-                        href="{{ route('password.request') }}">Recover Access</a>
+                        href="{{ route('password.request') }}">Lupa Kata Sandi?</a>
                     @endif
                 </div>
 
@@ -169,7 +169,7 @@
                 <p class="font-body text-sm text-on-surface-variant">
                     Belum punya akun?
                     <a class="inline-block ml-2 font-label text-xs uppercase tracking-widest text-primary font-bold hover:text-secondary transition-colors"
-                        href="{{ route('register') }}">Register Here</a>
+                        href="{{ route('register') }}">Daftar Di Sini</a>
                 </p>
             </div>
 

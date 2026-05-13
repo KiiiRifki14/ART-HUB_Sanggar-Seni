@@ -116,18 +116,28 @@
                     @else
                         @if($booking->status === 'completed')
                             @php $sisaFormatted = number_format($sisa, 0, ',', '.'); @endphp
-                            <form method="POST" action="#" class="m-0" onsubmit="return confirm('Tandai pelunasan tagihan ini sebesar Rp {{ $sisaFormatted }}?')">
+                            <form method="POST" action="{{ route('admin.bookings.full_payment', $booking->id) }}" class="m-0" onsubmit="return confirm('Tandai pelunasan tagihan ini sebesar Rp {{ $sisaFormatted }}?')">
                                 @csrf
-                                <button type="button" 
-                                        class="w-full py-1.5 rounded border border-green-500 text-green-600 hover:bg-green-500 hover:text-white transition-all font-label text-xs font-bold uppercase tracking-wider" 
-                                        onclick="alert('Demo: Fitur proses pelunasan segera diaktifkan')">
+                                @method('PATCH')
+                                <button type="submit" 
+                                        class="w-full py-1.5 rounded border border-green-500 text-green-600 hover:bg-green-500 hover:text-white transition-all font-label text-xs font-bold uppercase tracking-wider">
                                     <i class="bi bi-check-circle me-1"></i>Tandai Lunas
                                 </button>
                             </form>
                         @else
-                            <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded bg-orange-500/10 text-orange-600 border border-orange-500/20 font-label text-[0.65rem] font-bold uppercase tracking-wider">
-                                <i class="bi bi-hourglass-split"></i> MENUNGGU EVENT
-                            </span>
+                            @if(\Carbon\Carbon::parse($booking->event_date)->isPast() && $booking->event)
+                                <form method="POST" action="{{ route('admin.events.mark_completed', $booking->event->id) }}" class="m-0" onsubmit="return confirm('Tandai event ini sebagai SELESAI?')">
+                                    @csrf
+                                    @method('PATCH')
+                                    <button type="submit" class="w-full py-1.5 rounded border border-blue-500 text-blue-600 hover:bg-blue-500 hover:text-white transition-all font-label text-xs font-bold uppercase tracking-wider">
+                                        <i class="bi bi-check2-all me-1"></i>Tandai Selesai
+                                    </button>
+                                </form>
+                            @else
+                                <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded bg-orange-500/10 text-orange-600 border border-orange-500/20 font-label text-[0.65rem] font-bold uppercase tracking-wider">
+                                    <i class="bi bi-hourglass-split"></i> MENUNGGU EVENT
+                                </span>
+                            @endif
                         @endif
                     @endif
                 </td>

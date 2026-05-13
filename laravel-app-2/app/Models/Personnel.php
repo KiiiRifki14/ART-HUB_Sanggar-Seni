@@ -3,12 +3,15 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 class Personnel extends Model
 {
+    use SoftDeletes;
+
     protected $table = 'personnel';
     protected $guarded = ['id'];
 
@@ -32,8 +35,8 @@ class Personnel extends Model
             ->withTimestamps();
     }
 
-    public function schedules(): HasMany
-    {
-        return $this->hasMany(PersonnelSchedule::class);
-    }
+    // public function schedules(): HasMany
+    // {
+    //     return $this->hasMany(PersonnelSchedule::class);
+    // }
 }

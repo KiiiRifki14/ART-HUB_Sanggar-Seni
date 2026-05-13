@@ -5,6 +5,7 @@
 @section('page_subtitle', 'Detail & Monitoring Event Pementasan.')
 
 @section('content')
+<div x-data="{ showKoordinatModal: {{ $errors->has('latitude') || $errors->has('longitude') ? 'true' : 'false' }} }">
 
 {{-- BACK NAV --}}
 <div class="flex items-center gap-2 mb-6 font-label text-xs uppercase tracking-widest font-bold">
@@ -16,7 +17,7 @@
 </div>
 
 {{-- ── ROW ATAS: PANEL INFORMASI ── --}}
-<div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+<div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
 
     {{-- Info Event --}}
     <div class="bg-surface-container-lowest rounded-xl border border-outline-variant/30 shadow-[0_12px_24px_rgba(54,31,26,0.03)] overflow-hidden">
@@ -28,19 +29,21 @@
                 {{ str_replace('_', ' ', $event->booking->event_type ?? '-') }}
             </span>
         </div>
-        <div class="p-5 space-y-4">
-            <div class="flex flex-col border-b border-outline-variant/20 pb-3">
-                <span class="font-label text-[0.65rem] uppercase tracking-widest text-outline font-bold mb-1">Tanggal</span>
-                <span class="font-body font-bold text-on-surface text-sm">{{ $event->event_date->format('d M Y') }}</span>
+        <div class="p-4">
+            <div class="grid grid-cols-2 gap-4 mb-3 pb-3 border-b border-outline-variant/20">
+                <div>
+                    <span class="font-label text-[0.6rem] uppercase tracking-widest text-outline font-bold mb-1 block">Tanggal</span>
+                    <span class="font-body font-bold text-on-surface text-sm">{{ $event->event_date->format('d M Y') }}</span>
+                </div>
+                <div>
+                    <span class="font-label text-[0.6rem] uppercase tracking-widest text-outline font-bold mb-1 block">Waktu</span>
+                    <span class="font-body font-bold text-on-surface text-sm">
+                        {{ \Carbon\Carbon::parse($event->event_start)->format('H:i') }} – {{ \Carbon\Carbon::parse($event->event_end)->format('H:i') }}
+                    </span>
+                </div>
             </div>
-            <div class="flex flex-col border-b border-outline-variant/20 pb-3">
-                <span class="font-label text-[0.65rem] uppercase tracking-widest text-outline font-bold mb-1">Waktu</span>
-                <span class="font-body font-bold text-on-surface text-sm">
-                    {{ \Carbon\Carbon::parse($event->event_start)->format('H:i') }} – {{ \Carbon\Carbon::parse($event->event_end)->format('H:i') }}
-                </span>
-            </div>
-            <div class="flex flex-col border-b border-outline-variant/20 pb-3">
-                <span class="font-label text-[0.65rem] uppercase tracking-widest text-outline font-bold mb-1">Venue</span>
+            <div class="flex flex-col border-b border-outline-variant/20 pb-3 mb-3">
+                <span class="font-label text-[0.6rem] uppercase tracking-widest text-outline font-bold mb-1 block">Venue</span>
                 <span class="font-body font-bold text-on-surface text-sm">{{ $event->venue }}</span>
             </div>
             
@@ -51,15 +54,16 @@
                 @else
                     <div class="font-body text-xs font-bold text-red-600 bg-red-500/10 px-3 py-1.5 rounded-lg border border-red-500/20 flex items-start gap-1.5 mb-2"><i class="bi bi-exclamation-triangle-fill mt-0.5"></i> Belum Di-set! (Wajib untuk Absensi)</div>
                 @endif
-                <button type="button" class="mt-3 inline-flex items-center justify-center gap-1.5 px-4 py-2 rounded-lg border border-outline-variant/50 font-label text-[0.65rem] font-bold uppercase tracking-widest text-on-surface-variant hover:border-primary hover:text-primary hover:bg-surface-container transition-colors" data-bs-toggle="modal" data-bs-target="#modalKoordinat">
+                <button type="button" @click="showKoordinatModal = true" class="mt-3 inline-flex items-center justify-center gap-1.5 px-4 py-2 rounded-lg border border-outline-variant/50 font-label text-[0.65rem] font-bold uppercase tracking-widest text-on-surface-variant hover:border-primary hover:text-primary hover:bg-surface-container transition-colors">
                     <i class="bi bi-pencil"></i> Set Koordinat
                 </button>
             </div>
         </div>
     </div>
 
-    {{-- Status & Estimasi Honor --}}
-    <div class="bg-surface-container-lowest rounded-xl border border-outline-variant/30 shadow-[0_12px_24px_rgba(54,31,26,0.03)] overflow-hidden flex flex-col">
+    <div class="flex flex-col gap-6">
+        {{-- Status & Estimasi Honor --}}
+        <div class="bg-surface-container-lowest rounded-xl border border-outline-variant/30 shadow-[0_12px_24px_rgba(54,31,26,0.03)] overflow-hidden flex flex-col">
         <div class="px-5 py-4 border-b border-outline-variant/20 flex items-center justify-between bg-surface-container-low">
             <h5 class="font-headline font-bold text-base text-primary flex items-center gap-2">
                 <i class="bi bi-activity text-blue-600"></i> Status Monitor
@@ -78,17 +82,17 @@
             </span>
         </div>
         
-        <div class="p-5 flex-grow flex flex-col">
-            <div class="bg-surface-container-low border border-outline-variant/50 rounded-xl p-4 mb-4 flex-grow flex flex-col justify-center text-center group hover:border-primary transition-colors cursor-default">
-                <span class="font-label text-[0.65rem] uppercase tracking-widest text-outline font-bold mb-1">Personel Diplot</span>
-                <div class="font-headline font-bold text-4xl text-primary flex items-baseline justify-center gap-1">
-                    {{ $event->personnel->count() }}<span class="text-xl text-outline-variant">/{{ $event->personnel_count }}</span>
+        <div class="p-4 grid grid-cols-2 gap-4">
+            <div class="bg-surface-container-low border border-outline-variant/50 rounded-xl p-4 flex flex-col justify-center text-center group hover:border-primary transition-colors cursor-default">
+                <span class="font-label text-[0.6rem] uppercase tracking-widest text-outline font-bold mb-1 block">Personel Diplot</span>
+                <div class="font-headline font-bold text-3xl text-primary flex items-baseline justify-center gap-1">
+                    {{ $event->personnel->count() }}<span class="text-lg text-outline-variant">/{{ $event->personnel_count }}</span>
                 </div>
             </div>
 
-            <div class="bg-surface-container-low border border-outline-variant/50 rounded-xl p-4">
-                <span class="font-label text-[0.65rem] uppercase tracking-widest text-outline font-bold mb-1 block">Estimasi Honor Total</span>
-                <div class="font-headline font-bold text-xl text-secondary">Rp {{ number_format($event->estimated_total_honor, 0, ',', '.') }}</div>
+            <div class="bg-surface-container-low border border-outline-variant/50 rounded-xl p-4 flex flex-col justify-center text-center">
+                <span class="font-label text-[0.6rem] uppercase tracking-widest text-outline font-bold mb-1 block">Estimasi Honor Total</span>
+                <div class="font-headline font-bold text-xl text-secondary mt-1">Rp {{ number_format($event->estimated_total_honor, 0, ',', '.') }}</div>
             </div>
         </div>
     </div>
@@ -127,7 +131,7 @@
             @endif
         </div>
     </div>
-
+    </div>
 </div>
 
 {{-- ── ROW BAWAH: TABEL PERSONEL ── --}}
@@ -207,40 +211,65 @@
 </div>
 
 {{-- Modal Update Koordinat --}}
-<div class="modal fade" id="modalKoordinat" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content border-0 rounded-2xl overflow-hidden shadow-2xl bg-surface-container-lowest">
-            <div class="px-6 py-5 border-b border-outline-variant/20 flex justify-between items-center bg-surface-container-low">
-                <h5 class="font-headline font-bold text-lg text-primary flex items-center gap-2">
-                    <i class="bi bi-geo-alt-fill text-secondary"></i> Set Koordinat Geofencing
-                </h5>
-                <button type="button" class="text-on-surface-variant hover:text-primary transition-colors" data-bs-dismiss="modal">
-                    <i class="bi bi-x-lg"></i>
-                </button>
-            </div>
-            <form action="{{ route('admin.events.update_coordinates', $event->id) }}" method="POST">
-                @csrf
-                @method('PATCH')
-                <div class="p-6">
-                    <p class="font-body text-sm text-on-surface-variant leading-relaxed mb-5">Masukkan koordinat acara untuk keperluan absensi Geofencing kru (Radius 100m - 200m).</p>
-                    <div class="space-y-4">
-                        <div>
-                            <label class="block font-label text-xs uppercase tracking-widest text-on-surface-variant font-bold mb-1.5">Latitude</label>
-                            <input type="text" name="latitude" class="w-full bg-surface-container-low border border-outline-variant/50 rounded-lg px-4 py-2.5 font-body text-sm text-on-surface focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all" value="{{ $event->latitude }}" placeholder="Contoh: -6.561567" required>
-                        </div>
-                        <div>
-                            <label class="block font-label text-xs uppercase tracking-widest text-on-surface-variant font-bold mb-1.5">Longitude</label>
-                            <input type="text" name="longitude" class="w-full bg-surface-container-low border border-outline-variant/50 rounded-lg px-4 py-2.5 font-body text-sm text-on-surface focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all" value="{{ $event->longitude }}" placeholder="Contoh: 107.766724" required>
-                        </div>
+{{-- Modal Update Koordinat (AlpineJS) --}}
+<div x-show="showKoordinatModal" style="display: none;"
+     class="fixed inset-0 z-[1050] flex items-center justify-center p-4">
+    <!-- Backdrop -->
+    <div x-show="showKoordinatModal" 
+         x-transition:enter="transition ease-out duration-300"
+         x-transition:enter-start="opacity-0"
+         x-transition:enter-end="opacity-100"
+         x-transition:leave="transition ease-in duration-200"
+         x-transition:leave-start="opacity-100"
+         x-transition:leave-end="opacity-0"
+         @click="showKoordinatModal = false"
+         class="fixed inset-0 bg-primary/40 backdrop-blur-sm"></div>
+
+    <!-- Modal Content -->
+    <div x-show="showKoordinatModal"
+         x-transition:enter="transition ease-out duration-300"
+         x-transition:enter-start="opacity-0 translate-y-8 scale-95"
+         x-transition:enter-end="opacity-100 translate-y-0 scale-100"
+         x-transition:leave="transition ease-in duration-200"
+         x-transition:leave-start="opacity-100 translate-y-0 scale-100"
+         x-transition:leave-end="opacity-0 translate-y-8 scale-95"
+         class="relative bg-surface-container-lowest w-full max-w-lg rounded-2xl shadow-2xl border border-outline-variant/20 overflow-hidden z-10">
+        
+        <div class="px-6 py-5 border-b border-outline-variant/20 flex justify-between items-center bg-surface-container-low">
+            <h5 class="font-headline font-bold text-lg text-primary flex items-center gap-2">
+                <i class="bi bi-geo-alt-fill text-secondary"></i> Set Koordinat Geofencing
+            </h5>
+            <button type="button" @click="showKoordinatModal = false" class="text-on-surface-variant hover:text-primary transition-colors">
+                <i class="bi bi-x-lg"></i>
+            </button>
+        </div>
+
+        <form action="{{ route('admin.events.update_coordinates', $event->id) }}" method="POST">
+            @csrf
+            @method('PATCH')
+            <div class="p-6">
+                <p class="font-body text-sm text-on-surface-variant leading-relaxed mb-5">Masukkan koordinat acara untuk keperluan absensi Geofencing kru (Radius 100m - 200m).</p>
+                <div class="space-y-4">
+                    <div>
+                        <label class="block font-label text-xs uppercase tracking-widest text-on-surface-variant font-bold mb-1.5">Latitude</label>
+                        <input type="text" name="latitude" class="w-full bg-surface-container-low border border-outline-variant/50 rounded-lg px-4 py-2.5 font-body text-sm text-on-surface focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all" value="{{ old('latitude', $event->latitude) }}" placeholder="Contoh: -6.561567" required>
+                        @error('latitude') <p class="text-xs text-red-600 mt-1">{{ $message }}</p> @enderror
+                    </div>
+                    <div>
+                        <label class="block font-label text-xs uppercase tracking-widest text-on-surface-variant font-bold mb-1.5">Longitude</label>
+                        <input type="text" name="longitude" class="w-full bg-surface-container-low border border-outline-variant/50 rounded-lg px-4 py-2.5 font-body text-sm text-on-surface focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all" value="{{ old('longitude', $event->longitude) }}" placeholder="Contoh: 107.766724" required>
+                        @error('longitude') <p class="text-xs text-red-600 mt-1">{{ $message }}</p> @enderror
                     </div>
                 </div>
-                <div class="px-6 py-4 border-t border-outline-variant/20 bg-surface-container-low flex justify-end gap-3">
-                    <button type="button" class="px-5 py-2.5 rounded-lg border border-outline-variant/50 font-label text-xs font-bold uppercase tracking-widest text-on-surface-variant hover:bg-surface-container transition-colors" data-bs-dismiss="modal">Batal</button>
-                    <button type="submit" class="px-5 py-2.5 rounded-lg bg-primary text-white font-label text-xs font-bold uppercase tracking-widest hover:bg-primary-container transition-colors">Simpan Koordinat</button>
-                </div>
-            </form>
-        </div>
+            </div>
+            <div class="px-6 py-4 border-t border-outline-variant/20 bg-surface-container-low flex justify-end gap-3">
+                <button type="button" @click="showKoordinatModal = false" class="px-5 py-2.5 rounded-lg border border-outline-variant/50 font-label text-xs font-bold uppercase tracking-widest text-on-surface-variant hover:bg-surface-container transition-colors">Batal</button>
+                <button type="submit" class="px-5 py-2.5 rounded-lg bg-primary text-white font-label text-xs font-bold uppercase tracking-widest hover:bg-primary-container transition-colors">Simpan Koordinat</button>
+            </div>
+        </form>
     </div>
+</div>
+
 </div>
 
 @endsection

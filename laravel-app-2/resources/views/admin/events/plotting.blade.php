@@ -234,5 +234,8 @@
         document.getElementById('preview-count').textContent = count;
         document.getElementById('preview-total').textContent = 'Rp ' + total.toLocaleString('id-ID');
     }
+    
+    // Call on load to ensure accurate initial state
+    document.addEventListener('DOMContentLoaded', updatePreview);
 </script>
 @endpush

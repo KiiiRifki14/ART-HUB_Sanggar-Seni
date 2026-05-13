@@ -73,15 +73,15 @@
             <div class="mb-6">
                 <span class="font-display font-black text-white text-2xl tracking-tight">Sanggar Cahaya Gumilang</span>
             </div>
-            <h1 class="font-headline text-5xl text-white leading-[1.1] tracking-[-0.02em] mb-5 drop-shadow-md">Join the<br>Tradition.</h1>
-            <p class="font-body text-white/75 text-base leading-relaxed">Become a part of our curated ensemble. Elevate your craft within an institution dedicated to preserving and innovating Indonesian arts.</p>
+            <h1 class="font-headline text-5xl text-white leading-[1.1] tracking-[-0.02em] mb-5 drop-shadow-md">Bergabung<br>Bersama Kami.</h1>
+            <p class="font-body text-white/75 text-base leading-relaxed">Jadilah bagian dari keluarga besar Sanggar Cahaya Gumilang. Tingkatkan keahlian seni Anda bersama instruktur berpengalaman.</p>
         </div>
         <div class="relative z-10 w-full max-w-md hidden" id="left-content-client">
             <div class="mb-6">
                 <span class="font-display font-black text-white text-2xl tracking-tight">Sanggar Cahaya Gumilang</span>
             </div>
-            <h1 class="font-headline text-5xl text-white leading-[1.1] tracking-[-0.02em] mb-5 drop-shadow-md">Support<br>the Arts.</h1>
-            <p class="font-body text-white/75 text-base leading-relaxed">Join our curated network of patrons and partners. Your engagement ensures the continuity of our cultural heritage and artistic excellence.</p>
+            <h1 class="font-headline text-5xl text-white leading-[1.1] tracking-[-0.02em] mb-5 drop-shadow-md">Pesan<br>Layanan Kami.</h1>
+            <p class="font-body text-white/75 text-base leading-relaxed">Kami siap memukau acara Anda dengan pertunjukan seni tradisional berkualitas tinggi yang dikelola secara profesional.</p>
         </div>
     </section>
 
@@ -91,15 +91,15 @@
         {{-- Mobile brand --}}
         <div class="lg:hidden w-full max-w-lg mb-10 text-center" data-aos="fade-down" data-aos-delay="100">
             <h2 class="font-headline text-3xl text-primary font-bold tracking-tight">Cahaya Gumilang</h2>
-            <p class="font-body text-on-surface-variant mt-1 text-sm">Arts Management Portal</p>
+            <p class="font-body text-on-surface-variant mt-1 text-sm">Portal Manajemen Seni</p>
         </div>
 
         <div class="w-full max-w-lg">
 
             {{-- Header --}}
             <div class="mb-10" data-aos="fade-up" data-aos-delay="200">
-                <h2 class="font-headline text-4xl text-primary font-medium tracking-tight mb-1">Create Account</h2>
-                <p class="font-body text-on-surface-variant text-sm" id="form-subtitle">Please complete the details below to register.</p>
+                <h2 class="font-headline text-4xl text-primary font-medium tracking-tight mb-1">Buat Akun Baru</h2>
+                <p class="font-body text-on-surface-variant text-sm" id="form-subtitle">Silakan lengkapi form di bawah ini untuk mendaftar.</p>
             </div>
 
             {{-- Role Toggle --}}
@@ -107,12 +107,12 @@
                 <button type="button" id="btn-personnel"
                     onclick="switchTab('personnel')"
                     class="flex-1 py-2.5 px-4 rounded-full bg-primary text-on-primary font-body text-sm font-semibold transition-all duration-200 shadow-[0_4px_12px_rgba(78,52,46,0.18)] flex justify-center items-center gap-2">
-                    <span class="material-symbols-outlined text-[18px]">badge</span>Personnel
+                    <span class="material-symbols-outlined text-[18px]">badge</span>Kru Sanggar
                 </button>
                 <button type="button" id="btn-client"
                     onclick="switchTab('client')"
                     class="flex-1 py-2.5 px-4 rounded-full text-on-surface-variant hover:text-primary font-body text-sm font-medium transition-all duration-200 flex justify-center items-center gap-2">
-                    <span class="material-symbols-outlined text-[18px]">group</span>Client
+                    <span class="material-symbols-outlined text-[18px]">group</span>Klien
                 </button>
             </div>
 
@@ -138,7 +138,7 @@
                         <label for="p_name" class="absolute left-4 top-3 text-on-surface-variant font-label text-sm transition-all duration-200 pointer-events-none
                             peer-placeholder-shown:top-3 peer-placeholder-shown:text-sm
                             peer-focus:-top-5 peer-focus:text-xs peer-focus:text-secondary peer-focus:uppercase peer-focus:tracking-widest">
-                            Full Name
+                            Nama Lengkap
                         </label>
                     </div>
 
@@ -150,7 +150,7 @@
                             <label for="p_phone" class="absolute left-4 top-3 text-on-surface-variant font-label text-sm transition-all duration-200 pointer-events-none
                                 peer-placeholder-shown:top-3 peer-placeholder-shown:text-sm
                                 peer-focus:-top-5 peer-focus:text-xs peer-focus:text-secondary peer-focus:uppercase peer-focus:tracking-widest">
-                                Phone Number
+                                Nomor WhatsApp
                             </label>
                         </div>
                         <div class="field-group relative">
@@ -159,16 +159,16 @@
                             <label for="p_skill" class="absolute left-4 top-3 text-on-surface-variant font-label text-sm transition-all duration-200 pointer-events-none
                                 peer-placeholder-shown:top-3 peer-placeholder-shown:text-sm
                                 peer-focus:-top-5 peer-focus:text-xs peer-focus:text-secondary peer-focus:uppercase peer-focus:tracking-widest">
-                                Primary Occupation
+                                Pekerjaan Utama / Status
                             </label>
                         </div>
                     </div>
 
                     {{-- Specialties --}}
                     <div data-aos="fade-up" data-aos-delay="500">
-                        <p class="font-headline text-base text-primary mb-4">Dance &amp; Music Specialties</p>
+                        <p class="font-headline text-base text-primary mb-4">Keahlian Tari &amp; Musik</p>
                         <div class="grid grid-cols-2 gap-3">
-                            @foreach([['jaipong','Tari Jaipong'],['topeng','Tari Topeng'],['gamelan','Gamelan'],['kendang','Kendang'],['sinden','Sinden'],['other','Other']] as [$val,$label])
+                            @foreach([['jaipong','Tari Jaipong'],['topeng','Tari Topeng'],['gamelan','Gamelan'],['kendang','Kendang'],['sinden','Sinden'],['other','Lainnya']] as [$val,$label])
                             <label class="flex items-center gap-3 cursor-pointer group">
                                 <div class="relative flex items-center justify-center flex-shrink-0">
                                     <input type="checkbox" name="specialties[]" value="{{ $val }}"
@@ -188,7 +188,7 @@
                         <label for="p_email" class="absolute left-4 top-3 text-on-surface-variant font-label text-sm transition-all duration-200 pointer-events-none
                             peer-placeholder-shown:top-3 peer-placeholder-shown:text-sm
                             peer-focus:-top-5 peer-focus:text-xs peer-focus:text-secondary peer-focus:uppercase peer-focus:tracking-widest">
-                            Email Address
+                            Alamat Email
                         </label>
                     </div>
 
@@ -199,7 +199,7 @@
                         <label for="p_password" class="absolute left-4 top-3 text-on-surface-variant font-label text-sm transition-all duration-200 pointer-events-none
                             peer-placeholder-shown:top-3 peer-placeholder-shown:text-sm
                             peer-focus:-top-5 peer-focus:text-xs peer-focus:text-secondary peer-focus:uppercase peer-focus:tracking-widest">
-                            Password
+                            Kata Sandi
                         </label>
                     </div>
 
@@ -210,7 +210,7 @@
                         <label for="p_confirm" class="absolute left-4 top-3 text-on-surface-variant font-label text-sm transition-all duration-200 pointer-events-none
                             peer-placeholder-shown:top-3 peer-placeholder-shown:text-sm
                             peer-focus:-top-5 peer-focus:text-xs peer-focus:text-secondary peer-focus:uppercase peer-focus:tracking-widest">
-                            Confirm Password
+                            Konfirmasi Kata Sandi
                         </label>
                     </div>
 
@@ -218,12 +218,12 @@
                     <div class="pt-2 flex flex-col items-center gap-5" data-aos="fade-up" data-aos-delay="700">
                         <button type="submit"
                             class="w-full flex items-center justify-between gap-3 bg-gradient-to-r from-primary-container to-primary text-on-primary py-4 px-7 rounded-xl font-body font-semibold text-sm shadow-[0_8px_24px_rgba(54,31,26,0.2)] hover:shadow-[0_12px_30px_rgba(54,31,26,0.3)] hover:-translate-y-0.5 transition-all duration-300 group">
-                            <span class="tracking-wide">Create Account</span>
+                            <span class="tracking-wide">Daftar Akun</span>
                             <span class="material-symbols-outlined group-hover:translate-x-1 transition-transform duration-200">arrow_forward</span>
                         </button>
                         <p class="font-body text-sm text-on-surface-variant">
-                            Already part of the ensemble?
-                            <a href="{{ route('login') }}" class="text-primary font-semibold border-b-2 border-secondary-fixed-dim hover:border-primary transition-colors pb-0.5 ml-1">Log in here</a>
+                            Sudah punya akun personel?
+                            <a href="{{ route('login') }}" class="text-primary font-semibold border-b-2 border-secondary-fixed-dim hover:border-primary transition-colors pb-0.5 ml-1">Masuk di sini</a>
                         </p>
                     </div>
                 </form>
@@ -237,7 +237,7 @@
 
                     {{-- Full Name --}}
                     <div data-aos="fade-up" data-aos-delay="400">
-                        <label class="block font-label text-xs uppercase tracking-[0.05em] text-on-surface-variant mb-2">Full Name</label>
+                        <label class="block font-label text-xs uppercase tracking-[0.05em] text-on-surface-variant mb-2">Nama Lengkap</label>
                         <input type="text" name="name" required value="{{ old('name') }}" placeholder="Raden Saleh"
                             class="w-full bg-surface-container-high/60 border-0 border-b-2 border-outline-variant/40 text-on-surface font-body px-4 py-3 rounded-t-lg focus:ring-0 focus:border-secondary transition-all duration-200 placeholder:text-on-surface-variant/40">
                     </div>
@@ -245,8 +245,8 @@
                     {{-- Organization --}}
                     <div data-aos="fade-up" data-aos-delay="450">
                         <label class="font-label text-xs uppercase tracking-[0.05em] text-on-surface-variant mb-2 flex justify-between">
-                            <span>Organization</span>
-                            <span class="normal-case tracking-normal opacity-50">Optional</span>
+                            <span>Instansi / Organisasi</span>
+                            <span class="normal-case tracking-normal opacity-50">Opsional</span>
                         </label>
                         <input type="text" name="organization" value="{{ old('organization') }}" placeholder="e.g. National Gallery"
                             class="w-full bg-surface-container-high/60 border-0 border-b-2 border-outline-variant/40 text-on-surface font-body px-4 py-3 rounded-t-lg focus:ring-0 focus:border-secondary transition-all duration-200 placeholder:text-on-surface-variant/40">
@@ -255,12 +255,12 @@
                     {{-- Phone + Email --}}
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6" data-aos="fade-up" data-aos-delay="500">
                         <div>
-                            <label class="block font-label text-xs uppercase tracking-[0.05em] text-on-surface-variant mb-2">Phone Number</label>
+                            <label class="block font-label text-xs uppercase tracking-[0.05em] text-on-surface-variant mb-2">Nomor Telepon (WA)</label>
                             <input type="tel" name="phone" value="{{ old('phone') }}" placeholder="+62 812 3456 7890" required
                                 class="w-full bg-surface-container-high/60 border-0 border-b-2 border-outline-variant/40 text-on-surface font-body px-4 py-3 rounded-t-lg focus:ring-0 focus:border-secondary transition-all duration-200 placeholder:text-on-surface-variant/40">
                         </div>
                         <div>
-                            <label class="block font-label text-xs uppercase tracking-[0.05em] text-on-surface-variant mb-2">Email Address</label>
+                            <label class="block font-label text-xs uppercase tracking-[0.05em] text-on-surface-variant mb-2">Alamat Email</label>
                             <input type="email" name="email" required value="{{ old('email') }}" placeholder="name@domain.com"
                                 class="w-full bg-surface-container-high/60 border-0 border-b-2 border-outline-variant/40 text-on-surface font-body px-4 py-3 rounded-t-lg focus:ring-0 focus:border-secondary transition-all duration-200 placeholder:text-on-surface-variant/40">
                         </div>
@@ -268,7 +268,7 @@
 
                     {{-- Password --}}
                     <div data-aos="fade-up" data-aos-delay="550">
-                        <label class="block font-label text-xs uppercase tracking-[0.05em] text-on-surface-variant mb-2">Password</label>
+                        <label class="block font-label text-xs uppercase tracking-[0.05em] text-on-surface-variant mb-2">Kata Sandi</label>
                         <div class="relative">
                             <input type="password" name="password" id="c_password" required placeholder="••••••••"
                                 class="w-full bg-surface-container-high/60 border-0 border-b-2 border-outline-variant/40 text-on-surface font-body px-4 py-3 rounded-t-lg focus:ring-0 focus:border-secondary transition-all duration-200 pr-12">
@@ -280,7 +280,7 @@
 
                     {{-- Confirm Password --}}
                     <div data-aos="fade-up" data-aos-delay="600">
-                        <label class="block font-label text-xs uppercase tracking-[0.05em] text-on-surface-variant mb-2">Confirm Password</label>
+                        <label class="block font-label text-xs uppercase tracking-[0.05em] text-on-surface-variant mb-2">Konfirmasi Kata Sandi</label>
                         <input type="password" name="password_confirmation" required placeholder="••••••••"
                             class="w-full bg-surface-container-high/60 border-0 border-b-2 border-outline-variant/40 text-on-surface font-body px-4 py-3 rounded-t-lg focus:ring-0 focus:border-secondary transition-all duration-200">
                     </div>
@@ -289,13 +289,13 @@
                     <div class="pt-2 flex flex-col gap-5" data-aos="fade-up" data-aos-delay="650">
                         <button type="submit"
                             class="w-full bg-gradient-to-br from-primary-container to-primary text-on-primary font-body text-sm font-semibold rounded-xl py-4 px-6 flex justify-between items-center hover:opacity-90 hover:-translate-y-0.5 transition-all duration-300 shadow-[0_8px_24px_rgba(54,31,26,0.18)] group">
-                            <span class="tracking-wide">Create Account</span>
+                            <span class="tracking-wide">Daftar Akun</span>
                             <span class="material-symbols-outlined group-hover:translate-x-1 transition-transform duration-200">arrow_forward</span>
                         </button>
                         <div class="text-center">
                             <p class="font-body text-sm text-on-surface-variant">
-                                Already have an account?
-                                <a href="{{ route('login') }}" class="text-primary font-semibold border-b-2 border-secondary-fixed-dim hover:border-primary transition-colors pb-0.5 ml-1">Sign in here</a>
+                                Sudah punya akun?
+                                <a href="{{ route('login') }}" class="text-primary font-semibold border-b-2 border-secondary-fixed-dim hover:border-primary transition-colors pb-0.5 ml-1">Masuk di sini</a>
                             </p>
                         </div>
                     </div>
@@ -320,8 +320,8 @@ function switchTab(tab) {
 
     // Subtitle
     document.getElementById('form-subtitle').textContent = isPersonnel
-        ? 'Please complete the details below to register.'
-        : 'Register to manage your gallery engagements and bookings.';
+        ? 'Silakan lengkapi detail di bawah ini untuk bergabung sebagai seniman/kru.'
+        : 'Silakan isi form berikut untuk mendaftar sebagai klien kami.';
 
     // Toggle buttons style
     const btnP = document.getElementById('btn-personnel');

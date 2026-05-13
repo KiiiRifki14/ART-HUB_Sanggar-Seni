@@ -7,6 +7,7 @@
     
     <!-- Tailwind CSS (CDN for development) -->
     <script src="https://cdn.tailwindcss.com"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
     
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -93,6 +94,46 @@
 
                 {{-- User Menu --}}
                 <div class="flex items-center gap-4">
+                    {{-- Notification Bell --}}
+                    <div class="relative" x-data="{ open: false }">
+                        <button @click="open = !open" @click.outside="open = false" class="relative p-2 text-white/80 hover:text-white transition-colors">
+                            <i class="bi bi-bell-fill text-xl"></i>
+                            @if(Auth::user()->unreadNotifications->count() > 0)
+                                <span class="absolute top-1 right-1 flex h-3 w-3">
+                                    <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
+                                    <span class="relative inline-flex rounded-full h-3 w-3 bg-red-500"></span>
+                                </span>
+                            @endif
+                        </button>
+
+                        <div x-show="open" style="display: none;"
+                             class="absolute right-0 mt-2 w-80 bg-white rounded-xl shadow-lg py-2 border border-outline-variant/20 z-50">
+                            <div class="px-4 py-2 border-b border-outline-variant/20 flex justify-between items-center">
+                                <h3 class="font-headline font-bold text-primary text-sm">Notifikasi</h3>
+                                @if(Auth::user()->unreadNotifications->count() > 0)
+                                    <form action="{{ route('klien.notifications.read_all') }}" method="POST" class="m-0">
+                                        @csrf
+                                        <button type="submit" class="text-[10px] font-label font-bold uppercase tracking-widest text-secondary hover:text-secondary-container">Tandai Dibaca</button>
+                                    </form>
+                                @endif
+                            </div>
+                            <div class="max-h-64 overflow-y-auto">
+                                @forelse(Auth::user()->notifications as $notification)
+                                    <div class="px-4 py-3 border-b border-outline-variant/10 hover:bg-surface-container-low transition-colors {{ $notification->read_at ? 'opacity-60' : 'bg-secondary/5' }}">
+                                        <p class="font-bold text-xs text-primary mb-1">{{ $notification->data['title'] ?? 'Pemberitahuan' }}</p>
+                                        <p class="text-[11px] text-on-surface-variant leading-relaxed">{{ $notification->data['message'] ?? '' }}</p>
+                                        <p class="text-[9px] text-outline font-label uppercase tracking-widest mt-2">{{ $notification->created_at->diffForHumans() }}</p>
+                                    </div>
+                                @empty
+                                    <div class="px-4 py-6 text-center text-on-surface-variant">
+                                        <i class="bi bi-bell-slash text-2xl mb-2 block opacity-50"></i>
+                                        <p class="text-xs">Belum ada notifikasi.</p>
+                                    </div>
+                                @endforelse
+                            </div>
+                        </div>
+                    </div>
+
                     <div class="hidden sm:flex flex-col text-right">
                         <span class="font-label text-xs uppercase tracking-widest text-secondary font-bold">{{ Auth::user()->name }}</span>
                         <span class="font-label text-[0.65rem] text-white/60 uppercase tracking-widest">Client Portal</span>

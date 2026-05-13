@@ -14,7 +14,9 @@ use App\Http\Controllers\Personnel\AttendanceController;
 use App\Http\Controllers\ProfileController;
 
 Route::get('/', function () {
-    return view('welcome');
+    $contents = \App\Models\SiteContent::pluck('value', 'key')->toArray();
+    $personnels = \App\Models\Personnel::with('user')->where('is_active', true)->take(8)->get();
+    return view('welcome', compact('contents', 'personnels'));
 });
 
 // 👇 PENGATUR LALU LINTAS ROLE
@@ -37,6 +39,9 @@ Route::middleware('auth')->group(function () {
 // 👑 1. ADMIN ROUTES (Gudang Logika Pak Yat)
 // ══════════════════════════════════════════════════════════════════════════
 Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->group(function () {
+    Route::get('/cms', [\App\Http\Controllers\Admin\CmsController::class, 'index'])->name('cms.index');
+    Route::post('/cms', [\App\Http\Controllers\Admin\CmsController::class, 'update'])->name('cms.update');
+
     Route::get('/dashboard', function () {
         // ── STAT CARDS (data nyata)
         $lockedProfit  = \App\Models\FinancialRecord::where('profit_locked', true)->sum('fixed_profit');
@@ -152,6 +157,7 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
 
     // FINANCIAL
     Route::get('/financials', [FinancialController::class, 'index'])->name('financials.index');
+    Route::get('/financials/export-pdf', [FinancialController::class, 'exportPdf'])->name('financials.export_pdf');
     Route::get('/financials/post-event/{event}', [FinancialController::class, 'postEvent'])->name('financials.post_event');
     Route::post('/financials/operational-costs/{cost}', [FinancialController::class, 'updateOperationalCost'])->name('financials.operational_costs.update');
 
@@ -179,6 +185,9 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
 
     // KONFIRMASI DP TUNAI / CASH (Offline)
     Route::post('/bookings/{booking}/confirm-cash', [BookingController::class, 'confirmCashPayment'])->name('bookings.confirm_cash');
+
+    Route::post('/bookings/{booking}/reject-full-proof', [BookingController::class, 'rejectFullProof'])->name('bookings.reject_full_proof');
+    Route::post('/bookings/{booking}/full-cash-payment', [BookingController::class, 'confirmFullCashPayment'])->name('bookings.full_cash_payment');
 
     // POST-EVENT LIST (menu mandiri)
     Route::get('/post-event', [FinancialController::class, 'postEventList'])->name('financials.post_event_list');
@@ -219,6 +228,11 @@ Route::middleware(['auth', 'role:klien'])->prefix('klien')->name('klien.')->grou
     Route::post('/bookings', [\App\Http\Controllers\Klien\BookingController::class, 'store'])->name('bookings.store');
     Route::get('/bookings/{id}', [\App\Http\Controllers\Klien\BookingController::class, 'show'])->name('bookings.show');
     Route::post('/bookings/{id}/proof', [\App\Http\Controllers\Klien\BookingController::class, 'uploadProof'])->name('bookings.upload_proof');
+    Route::post('/bookings/{id}/full-proof', [\App\Http\Controllers\Klien\BookingController::class, 'uploadFullProof'])->name('bookings.upload_full_proof');
+    Route::post('/notifications/read-all', function () {
+        \Illuminate\Support\Facades\Auth::user()->unreadNotifications->markAsRead();
+        return redirect()->back();
+    })->name('notifications.read_all');
 });
 
 // Memuat Rute Login/Register yang dibuat oleh Breeze

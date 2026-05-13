@@ -3,12 +3,15 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Booking extends Model
 {
+    use SoftDeletes;
+
     protected $guarded = ['id'];
 
     protected $casts = [
@@ -44,10 +47,10 @@ class Booking extends Model
     }
 
     /**
-     * Relasi ke Feedback Klien
+     * Relasi ke Feedback Klien (Belum diimplementasikan)
      */
-    public function feedback(): HasOne
-    {
-        return $this->hasOne(ClientFeedback::class);
-    }
+    // public function feedback(): HasOne
+    // {
+    //     return $this->hasOne(ClientFeedback::class);
+    // }
 }

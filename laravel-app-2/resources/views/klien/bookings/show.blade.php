@@ -16,7 +16,7 @@
 @php
     $statusMap = [
         'pending'   => ['label' => 'Menunggu Konfirmasi',  'cls' => 'bg-orange-500/10 text-orange-600 border-orange-500/20',   'step' => 1],
-        'dp_paid'   => ['label' => 'DP Terkonfirmasi',     'cls' => 'bg-blue-500/10 text-blue-600 border-blue-500/20',        'step' => 2],
+        'dp_paid'   => ['label' => 'DP Terkonfirmasi',     'cls' => 'bg-blue-500/10 text-blue-600 border-blue-500/20',        'step' => 3],
         'confirmed' => ['label' => 'Jadwal Terkunci',      'cls' => 'bg-green-500/10 text-green-600 border-green-500/20', 'step' => 3],
         'paid_full' => ['label' => 'Pelunasan Lunas',      'cls' => 'bg-green-500/10 text-green-600 border-green-500/20',      'step' => 4],
         'completed' => ['label' => 'Pementasan Selesai',   'cls' => 'bg-surface-container-high text-on-surface-variant border-outline-variant/30',      'step' => 5],
@@ -24,6 +24,12 @@
     ];
     $st   = $statusMap[$booking->status] ?? ['label' => strtoupper($booking->status), 'cls' => 'bg-surface-container border-outline-variant/30 text-outline', 'step' => 0];
     $step = $st['step'];
+    
+    // Jika pending tapi sudah upload bukti, naikkan ke Step 2 (DP Masuk)
+    if ($booking->status === 'pending' && $booking->payment_proof) {
+        $step = 2;
+        $st['label'] = 'Memverifikasi DP';
+    }
 @endphp
 
 {{-- ═══════ PROGRESS TRACKER ═══════ --}}
@@ -251,11 +257,51 @@
                     </div>
                 </div>
 
-                <div class="p-8 text-center bg-green-500/5">
-                    <i class="bi bi-check-circle-fill text-5xl text-green-500 mb-4 block"></i>
-                    <div class="font-headline font-bold text-lg text-primary mb-2">DP Terkonfirmasi ✓</div>
-                    <div class="font-body text-sm text-on-surface-variant leading-relaxed">Pembayaran DP sudah diterima sanggar. Tanggal Anda telah terkunci dengan aman!</div>
-                </div>
+                @if($booking->status === 'paid_full')
+                    <div class="p-8 text-center bg-green-500/10">
+                        <i class="bi bi-check-all text-5xl text-green-600 mb-4 block"></i>
+                        <div class="font-headline font-bold text-lg text-primary mb-2">Pesanan Lunas 100% ✓</div>
+                        <div class="font-body text-sm text-on-surface-variant leading-relaxed">Terima kasih! Pembayaran Anda sudah lunas sepenuhnya.</div>
+                    </div>
+                @else
+                    <div class="p-8 text-center bg-green-500/5 mb-4">
+                        <i class="bi bi-check-circle-fill text-5xl text-green-500 mb-4 block"></i>
+                        <div class="font-headline font-bold text-lg text-primary mb-2">DP Terkonfirmasi ✓</div>
+                        <div class="font-body text-sm text-on-surface-variant leading-relaxed">Pembayaran DP sudah diterima sanggar. Tanggal Anda telah terkunci dengan aman!</div>
+                    </div>
+
+                    @if(!$booking->full_payment_proof)
+                        {{-- Pelunasan Tagihan --}}
+                        <div class="p-5 border-t border-outline-variant/30">
+                            <div class="font-label text-[0.65rem] text-center text-outline uppercase tracking-widest font-bold mb-4">Pelunasan Sisa Tagihan (Rp {{ number_format($booking->total_price - $booking->dp_amount, 0, ',', '.') }})</div>
+                            <form action="{{ route('klien.bookings.upload_full_proof', $booking->id) }}" method="POST" enctype="multipart/form-data">
+                                @csrf
+                                <div id="fullUploadArea" onclick="document.getElementById('fullProofInput').click()" class="border-2 border-dashed border-outline-variant/50 rounded-xl p-6 text-center cursor-pointer hover:border-primary hover:bg-surface-container-low transition-all mb-4">
+                                    <i class="bi bi-cloud-arrow-up text-3xl text-outline mb-2 block"></i>
+                                    <div class="font-body font-bold text-sm text-on-surface mb-1">Upload Bukti Pelunasan</div>
+                                    <div class="font-body text-[0.65rem] text-outline">JPG, PNG – Maks. 5MB</div>
+                                </div>
+                                <input type="file" id="fullProofInput" name="full_payment_proof" accept="image/*" required
+                                       onchange="previewFullFile(this)" class="hidden">
+                                
+                                <div id="fullPreviewWrap" class="hidden mb-4 relative">
+                                    <img id="fullPreviewImg" src="" alt="Preview" class="w-full rounded-xl border border-outline-variant/30 shadow-sm">
+                                    <button type="button" onclick="document.getElementById('fullProofInput').click()" class="absolute top-2 right-2 w-8 h-8 rounded-lg bg-black/50 text-white flex items-center justify-center hover:bg-black/70 backdrop-blur-sm"><i class="bi bi-pencil"></i></button>
+                                </div>
+
+                                <button type="submit" class="w-full flex justify-center items-center gap-2 bg-primary text-white px-4 py-3 rounded-xl font-label text-xs font-bold uppercase tracking-widest hover:bg-primary-container transition-all">
+                                    <i class="bi bi-send-fill"></i> Kirim Bukti Pelunasan
+                                </button>
+                            </form>
+                        </div>
+                    @else
+                        <div class="p-5 border-t border-outline-variant/30 text-center bg-blue-500/5">
+                            <i class="bi bi-hourglass-split text-4xl text-blue-500 mb-3 block"></i>
+                            <div class="font-headline font-bold text-md text-primary mb-1">Verifikasi Pelunasan</div>
+                            <div class="font-body text-xs text-on-surface-variant leading-relaxed">Bukti pelunasan Anda sedang diperiksa oleh pimpinan sanggar.</div>
+                        </div>
+                    @endif
+                @endif
 
             @elseif($booking->status === 'completed')
                 <div class="p-8 text-center bg-secondary/10">
@@ -278,6 +324,17 @@ function previewFile(input) {
             document.getElementById('previewWrap').classList.remove('hidden');
             document.getElementById('uploadArea').classList.add('hidden');
             document.getElementById('payNowSection').classList.add('animate-fade-up');
+        };
+        reader.readAsDataURL(input.files[0]);
+    }
+}
+function previewFullFile(input) {
+    if (input.files && input.files[0]) {
+        var reader = new FileReader();
+        reader.onload = function(e) {
+            document.getElementById('fullPreviewImg').src = e.target.result;
+            document.getElementById('fullPreviewWrap').classList.remove('hidden');
+            document.getElementById('fullUploadArea').classList.add('hidden');
         };
         reader.readAsDataURL(input.files[0]);
     }

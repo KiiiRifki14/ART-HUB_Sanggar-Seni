@@ -8,6 +8,7 @@ use App\Models\Event;
 use App\Models\FinancialRecord;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
+use App\Notifications\BookingStatusChanged;
 use Illuminate\Http\Request;
 use Carbon\Carbon;
 
@@ -94,6 +95,11 @@ class BookingController extends Controller
             'payment_receipt' => null,
         ]);
 
+        $user = \App\Models\User::find($booking->user_id);
+        if ($user) {
+            $user->notify(new BookingStatusChanged($booking, 'Bukti pembayaran ditolak. Silakan upload ulang bukti yang valid.'));
+        }
+
         return redirect()->back()->with('warning',
             '⚠️ Bukti Transfer dari ' . $booking->client_name . ' telah DITOLAK dan dihapus. Klien dapat melakukan upload ulang.');
     }
@@ -112,12 +118,88 @@ class BookingController extends Controller
             'full_paid_at' => now(),
         ]);
 
+        // Jika sebelumnya partial_lock, maka ubah ke locked
+        if ($booking->event && $booking->event->financialRecord) {
+            $record = $booking->event->financialRecord;
+            if ($record->status === 'draft') {
+                $record->update(['status' => 'locked', 'warning_message' => null, 'budget_warning' => false]);
+            }
+        }
+
         // Update status event terkait jika ada
         if ($booking->event) {
             $booking->event->update(['status' => 'ready']);
         }
 
+        $user = \App\Models\User::find($booking->user_id);
+        if ($user) {
+            $user->notify(new BookingStatusChanged($booking, 'telah LUNAS 100%. Terima kasih!'));
+        }
+
         return redirect()->back()->with('success', 'Pelunasan 100% berhasil dikonfirmasi! Status booking: PAID (Lunas).');
+    }
+
+    /**
+     * Tolak Bukti Pelunasan
+     */
+    public function rejectFullProof(Request $request, Booking $booking)
+    {
+        if (!in_array($booking->status, ['dp_paid', 'confirmed'])) {
+            return redirect()->back()->with('error', 'Status booking tidak valid untuk menolak pelunasan.');
+        }
+
+        if ($booking->full_payment_proof && Storage::disk('public')->exists($booking->full_payment_proof)) {
+            Storage::disk('public')->delete($booking->full_payment_proof);
+        }
+
+        $booking->update([
+            'full_payment_proof' => null,
+        ]);
+
+        $user = \App\Models\User::find($booking->user_id);
+        if ($user) {
+            $user->notify(new BookingStatusChanged($booking, 'Bukti pelunasan ditolak. Silakan upload ulang bukti yang valid.'));
+        }
+
+        return redirect()->back()->with('warning', '⚠️ Bukti Pelunasan dari ' . $booking->client_name . ' telah DITOLAK dan dihapus.');
+    }
+
+    /**
+     * Pelunasan Tunai (CASH)
+     */
+    public function confirmFullCashPayment(Request $request, Booking $booking)
+    {
+        if (!in_array($booking->status, ['dp_paid', 'confirmed'])) {
+            return redirect()->back()->with('error', 'Status booking tidak valid untuk pelunasan.');
+        }
+
+        $request->validate([
+            'cash_note' => 'nullable|string|max:255',
+        ]);
+
+        $booking->update([
+            'status'             => 'paid_full',
+            'full_paid_at'       => now(),
+            'full_payment_proof' => 'CASH_OFFLINE: ' . ($request->cash_note ?? 'Dibayar tunai pelunasan di sanggar'),
+        ]);
+
+        if ($booking->event) {
+            $booking->event->update(['status' => 'ready']);
+            
+            if ($booking->event->financialRecord) {
+                $record = $booking->event->financialRecord;
+                if ($record->status === 'draft') {
+                    $record->update(['status' => 'locked', 'warning_message' => null, 'budget_warning' => false]);
+                }
+            }
+        }
+
+        $user = \App\Models\User::find($booking->user_id);
+        if ($user) {
+            $user->notify(new BookingStatusChanged($booking, 'telah LUNAS 100% secara TUNAI (Cash). Terima kasih!'));
+        }
+
+        return redirect()->back()->with('success', '✅ Pelunasan Tunai (CASH) berhasil dikonfirmasi! Status booking: PAID (Lunas).');
     }
 
     /**
@@ -125,6 +207,9 @@ class BookingController extends Controller
      */
     public function updatePrice(Request $request, Booking $booking)
     {
+        if ($booking->status !== 'pending') {
+            return redirect()->back()->with('error', 'Celah keamanan: Harga tidak dapat dimodifikasi karena laba sudah dikunci (Status: ' . strtoupper($booking->status) . ').');
+        }
         $request->validate([
             'total_price' => 'required|numeric|min:0',
         ]);
@@ -138,6 +223,11 @@ class BookingController extends Controller
             // Re-adjust DP minimum based on new total
             'dp_amount' => $request->total_price * 0.50,
         ]);
+
+        $user = \App\Models\User::find($booking->user_id);
+        if ($user) {
+            $user->notify(new BookingStatusChanged($booking, 'harganya telah diperbarui menjadi Rp ' . number_format($request->total_price, 0, ',', '.')));
+        }
 
         return redirect()->back()->with('success', 'Harga akhir kontrak (Nego) berhasil diupdate menjadi Rp ' . number_format($request->total_price, 0, ',', '.'));
     }
@@ -255,6 +345,10 @@ class BookingController extends Controller
             $successMsg = $profitStatus === 'partial_lock'
                 ? '⚠️ DP Dikonfirmasi (Mode Cicil Laba). DP lebih kecil dari target laba — seluruh DP dikunci. Dana operasional menunggu pelunasan!'
                 : '✅ DP Berhasil Dikonfirmasi. Laba Pimpinan '  . number_format($targetProfit, 0, ',', '.') . ' Telah Dikunci & Event Telah Dibuat!';
+            $user = \App\Models\User::find($booking->user_id);
+            if ($user) {
+                $user->notify(new BookingStatusChanged($booking, 'telah dikonfirmasi (DP Masuk).'));
+            }
 
             return redirect()->back()->with('success', $successMsg);
 
@@ -335,6 +429,11 @@ class BookingController extends Controller
                 );
             });
 
+            $user = \App\Models\User::find($booking->user_id);
+            if ($user) {
+                $user->notify(new BookingStatusChanged($booking, 'pembayaran tunai (Cash) telah dikonfirmasi (DP Masuk).'));
+            }
+
             return redirect()->back()->with('success',
                 '✅ [TUNAI] DP Dikonfirmasi! Laba Rp ' . number_format($targetProfit, 0, ',', '.') . ' telah dikunci. Event berhasil dibuat.');
 
@@ -360,7 +459,18 @@ class BookingController extends Controller
             'client_name' => 'required|string|max:255',
             'client_phone' => 'required|string|max:20',
             'event_type' => 'required|string',
-            'event_date' => 'required|date',
+            'event_date' => [
+                'required',
+                'date',
+                function ($attribute, $value, $fail) {
+                    $exists = Booking::where('event_date', $value)
+                        ->whereIn('status', ['dp_paid', 'confirmed', 'paid_full', 'completed'])
+                        ->exists();
+                    if ($exists) {
+                        $fail('Tanggal ' . Carbon::parse($value)->format('d M Y') . ' sudah penuh/di-booking dan dikunci oleh klien lain.');
+                    }
+                },
+            ],
             'event_start' => 'required',
             'event_end' => 'required',
             'venue' => 'required|string',
