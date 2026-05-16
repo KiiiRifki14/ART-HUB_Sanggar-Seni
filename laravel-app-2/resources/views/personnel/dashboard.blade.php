@@ -1,337 +1,361 @@
 @extends('layouts.personnel')
-@section('title', 'Dashboard – Portal Kru ART-HUB')
+@section('title', 'Jadwal – Portal Kru ART-HUB')
 
 @section('content')
-@php
-    $personnel     = Auth::user()->personnelProfile;
-    $now           = now();
-    $upcomingEvents = $personnel
-        ? $personnel->events()->where('event_date','>=', $now->toDateString())->orderBy('event_date','asc')->get()
-        : collect();
 
-    // Calendar logic
-    $thisMonth = $now->month; $thisYear = $now->year;
-    $firstDay  = \Carbon\Carbon::create($thisYear, $thisMonth, 1);
-    $daysInMonth = $firstDay->daysInMonth;
-    $startDow    = $firstDay->dayOfWeek;
-    $eventDates  = $upcomingEvents->pluck('event_date')->map(fn($d)=>\Carbon\Carbon::parse($d)->format('Y-m-d'))->toArray();
-    $urgentDates = $upcomingEvents->filter(function($e) use($now){
-        $d = \Carbon\Carbon::parse($e->event_date)->startOfDay()->diffInDays($now->startOfDay(), false);
-        return $d >= -3 && $d <= 0;
-    })->pluck('event_date')->map(fn($d)=>\Carbon\Carbon::parse($d)->format('Y-m-d'))->toArray();
-@endphp
+{{-- FLASH --}}
+@foreach(['success'=>'green','warning'=>'orange','error'=>'red','info'=>'blue'] as $type => $color)
+@if(session($type))
+<div class="fu flex items-start gap-3 p-3.5 rounded-2xl mb-4 border"
+     style="background:rgba({{ ['success'=>'34,197,94','warning'=>'251,146,60','error'=>'239,68,68','info'=>'96,165,250'][$type] }},0.08);border-color:rgba({{ ['success'=>'34,197,94','warning'=>'251,146,60','error'=>'239,68,68','info'=>'96,165,250'][$type] }},0.25)">
+    <i class="bi bi-{{ ['success'=>'check-circle-fill','warning'=>'exclamation-triangle-fill','error'=>'x-circle-fill','info'=>'info-circle-fill'][$type] }} text-lg mt-0.5" style="color:{{ ['success'=>'#4ade80','warning'=>'#fb923c','error'=>'#f87171','info'=>'#60a5fa'][$type] }}"></i>
+    <span class="text-sm" style="color:{{ ['success'=>'#4ade80','warning'=>'#fb923c','error'=>'#f87171','info'=>'#60a5fa'][$type] }}">{{ session($type) }}</span>
+</div>
+@endif
+@endforeach
 
 @if(!$personnel)
-<div style="text-align:center; padding:60px 24px;">
-    <i class="bi bi-person-x" style="font-size:3rem; color:rgba(255,255,255,0.15); display:block; margin-bottom:16px;"></i>
-    <div style="font-size:1.1rem; font-weight:700; color:#fff; margin-bottom:6px;">Profil Tidak Ditemukan</div>
-    <div style="font-size:0.82rem; color:rgba(255,255,255,0.4);">Hubungi Admin untuk mengaktifkan akun Anda.</div>
+<div class="text-center py-16 px-6">
+    <i class="bi bi-person-x-fill text-5xl block mb-4" style="color:rgba(255,255,255,0.12)"></i>
+    <div class="font-bold text-white mb-2">Profil Tidak Ditemukan</div>
+    <div class="text-sm" style="color:rgba(255,255,255,0.4)">Hubungi Admin untuk mengaktifkan akun Anda.</div>
 </div>
 @else
 
-{{-- ═══════════════════════════════════════ --}}
-{{-- SECTION 1: HERO PROFIL --}}
-{{-- ═══════════════════════════════════════ --}}
-<div class="fu" style="
-    border-radius:20px;
-    padding:24px;
-    margin-bottom:16px;
-    position:relative;
-    overflow:hidden;
-    background: linear-gradient(135deg, rgba(139,26,42,0.6) 0%, rgba(92,14,25,0.8) 60%, rgba(12,8,6,0.9) 100%);
-    border: 1px solid rgba(197,160,40,0.25);
-    box-shadow: 0 8px 32px rgba(139,26,42,0.25);
-">
-    <!-- Decorative ring -->
-    <div style="position:absolute;right:-30px;top:-30px;width:120px;height:120px;border-radius:50%;background:radial-gradient(circle,rgba(197,160,40,0.15),transparent);pointer-events:none;"></div>
+{{-- ═══ HERO BANNER ═══ --}}
+<div class="fu relative rounded-3xl overflow-hidden mb-4 p-5"
+     style="background:linear-gradient(135deg,rgba(139,26,42,0.9) 0%,rgba(92,14,25,1) 50%,rgba(12,8,6,1) 100%);border:1px solid rgba(197,160,40,0.2);box-shadow:0 8px 32px rgba(0,0,0,0.4)">
+    {{-- Decorative --}}
+    <div class="absolute" style="width:200px;height:200px;border-radius:50%;background:radial-gradient(circle,rgba(197,160,40,0.12),transparent);top:-60px;right:-60px;pointer-events:none"></div>
+    <div class="absolute" style="width:100px;height:100px;border-radius:50%;background:radial-gradient(circle,rgba(197,160,40,0.08),transparent);bottom:-20px;left:20px;pointer-events:none"></div>
 
-    <div style="display:flex; align-items:center; gap:16px; position:relative;">
-        <!-- Avatar -->
-        <div style="position:relative; flex-shrink:0;">
-            <div style="width:64px;height:64px;border-radius:16px;background:linear-gradient(135deg,rgba(197,160,40,0.3),rgba(197,160,40,0.1));border:1.5px solid rgba(197,160,40,0.4);display:flex;align-items:center;justify-content:center;font-family:'Cormorant Garamond',serif;font-size:1.8rem;font-weight:700;color:#C5A028;">
-                {{ strtoupper(substr(Auth::user()->name,0,1)) }}
+    <div class="flex items-center gap-4 relative">
+        {{-- Avatar --}}
+        <div class="relative shrink-0">
+            <div style="width:72px;height:72px;border-radius:20px;overflow:hidden;border:2px solid rgba(197,160,40,0.5);box-shadow:0 4px 20px rgba(139,26,42,0.5)">
+                @if($personnel->photo)
+                    <img src="{{ asset('storage/'.$personnel->photo) }}" style="width:100%;height:100%;object-fit:cover">
+                @else
+                    <div class="w-full h-full flex items-center justify-center font-head font-bold text-gold" style="background:linear-gradient(135deg,rgba(197,160,40,0.2),rgba(139,26,42,0.4));font-size:1.8rem">
+                        {{ strtoupper(substr(Auth::user()->name,0,1)) }}
+                    </div>
+                @endif
             </div>
-            <div style="position:absolute;bottom:-3px;right:-3px;width:14px;height:14px;border-radius:50%;background:#22c55e;border:2px solid #0C0806;"></div>
+            <div class="absolute -bottom-1 -right-1 w-4 h-4 rounded-full bg-green-500 border-2" style="border-color:#0C0806"></div>
         </div>
-        <!-- Info -->
-        <div style="flex:1; min-width:0;">
-            <div style="font-size:1.15rem;font-weight:800;color:#fff;margin-bottom:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">
+
+        {{-- Info --}}
+        <div class="flex-1 min-w-0">
+            <div class="font-bold text-white truncate mb-0.5" style="font-size:1.1rem">
                 {{ $personnel->stage_name ?? Auth::user()->name }}
             </div>
-            <div style="display:flex;flex-wrap:wrap;gap:6px;align-items:center;">
-                <span style="display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:99px;font-size:0.62rem;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;background:rgba(197,160,40,0.15);color:#C5A028;border:1px solid rgba(197,160,40,0.3);">
-                    <i class="bi bi-music-note-list"></i> {{ ucfirst($personnel->specialty ?? 'Personel') }}
+            @if($personnel->stage_name && $personnel->stage_name !== Auth::user()->name)
+            <div class="text-xs mb-1.5" style="color:rgba(255,255,255,0.4)">{{ Auth::user()->name }}</div>
+            @endif
+            <div class="flex flex-wrap gap-1.5">
+                <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[0.6rem] font-bold uppercase tracking-widest" style="background:rgba(197,160,40,0.15);color:#C5A028;border:1px solid rgba(197,160,40,0.3)">
+                    <i class="bi bi-music-note-list"></i> {{ ucfirst(str_replace('_',' ',$personnel->specialty ?? 'Personel')) }}
                 </span>
                 @if($personnel->is_backup)
-                <span style="display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:99px;font-size:0.62rem;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;background:rgba(255,255,255,0.06);color:rgba(255,255,255,0.4);border:1px solid rgba(255,255,255,0.1);">
-                    Cadangan
-                </span>
+                <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[0.6rem] font-bold uppercase tracking-widest" style="background:rgba(255,255,255,0.05);color:rgba(255,255,255,0.35);border:1px solid rgba(255,255,255,0.1)">Cadangan</span>
                 @endif
             </div>
         </div>
+
+        {{-- Edit Profil --}}
+        <a href="{{ route('personnel.profile.edit') }}" class="shrink-0 flex items-center justify-center w-9 h-9 rounded-xl transition-colors" style="background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);color:rgba(255,255,255,0.5)">
+            <i class="bi bi-pencil-square text-sm"></i>
+        </a>
     </div>
 
-    <!-- Stats Row -->
-    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:0;margin-top:20px;padding-top:16px;border-top:1px solid rgba(255,255,255,0.08);">
-        <div style="text-align:center;">
-            <div style="font-family:'Cormorant Garamond',serif;font-size:1.6rem;font-weight:700;color:#C5A028;line-height:1;">{{ $upcomingEvents->count() }}</div>
-            <div style="font-size:0.6rem;text-transform:uppercase;letter-spacing:0.09em;color:rgba(255,255,255,0.4);margin-top:3px;">Event Mendatang</div>
+    {{-- Stat Row --}}
+    <div class="grid grid-cols-3 mt-4 pt-4" style="border-top:1px solid rgba(255,255,255,0.08)">
+        <div class="text-center">
+            <div class="font-head font-bold text-gold" style="font-size:1.8rem;line-height:1">{{ $upcomingEvents->count() }}</div>
+            <div class="text-[0.58rem] uppercase tracking-widest mt-1" style="color:rgba(255,255,255,0.4)">Mendatang</div>
         </div>
-        <div style="text-align:center;border-left:1px solid rgba(255,255,255,0.08);border-right:1px solid rgba(255,255,255,0.08);">
-            <div style="font-family:'Cormorant Garamond',serif;font-size:1.6rem;font-weight:700;color:#fff;line-height:1;">{{ $upcomingEvents->where('pivot.checked_in_at','!=',null)->count() }}</div>
-            <div style="font-size:0.6rem;text-transform:uppercase;letter-spacing:0.09em;color:rgba(255,255,255,0.4);margin-top:3px;">Sudah Absen</div>
+        <div class="text-center" style="border-left:1px solid rgba(255,255,255,0.08);border-right:1px solid rgba(255,255,255,0.08)">
+            <div class="font-head font-bold text-white" style="font-size:1.8rem;line-height:1">{{ $upcomingEvents->where('pivot.checked_in_at','!=',null)->count() }}</div>
+            <div class="text-[0.58rem] uppercase tracking-widest mt-1" style="color:rgba(255,255,255,0.4)">Sudah Absen</div>
         </div>
-        <div style="text-align:center;">
+        <div class="text-center">
             @php $fee = $upcomingEvents->sum('pivot.fee'); @endphp
-            <div style="font-family:'Cormorant Garamond',serif;font-size:1.6rem;font-weight:700;color:#C5A028;line-height:1;">
-                {{ $fee > 0 ? number_format($fee/1000000,1).'jt' : '–' }}
-            </div>
-            <div style="font-size:0.6rem;text-transform:uppercase;letter-spacing:0.09em;color:rgba(255,255,255,0.4);margin-top:3px;">Est. Honor</div>
+            <div class="font-head font-bold text-gold" style="font-size:1.8rem;line-height:1">{{ $fee > 0 ? number_format($fee/1000000,1).'jt' : '–' }}</div>
+            <div class="text-[0.58rem] uppercase tracking-widest mt-1" style="color:rgba(255,255,255,0.4)">Est. Honor</div>
         </div>
     </div>
 </div>
 
-{{-- ═══════════════════════════════════════ --}}
-{{-- SECTION 2: KALENDER --}}
-{{-- ═══════════════════════════════════════ --}}
-<div class="fu1 glass" style="padding:20px; margin-bottom:16px;">
-    <!-- Header Kalender -->
-    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
-        <div>
-            <div style="font-family:'Cormorant Garamond',serif;font-size:1.1rem;font-weight:700;color:#fff;">Kalender Jadwal</div>
-            <div style="font-size:0.6rem;text-transform:uppercase;letter-spacing:0.1em;color:rgba(255,255,255,0.35);margin-top:1px;">{{ $firstDay->translatedFormat('F Y') }}</div>
+{{-- ═══ KALENDER + JADWAL: SIDE BY SIDE ═══ --}}
+<div class="fu1 grid gap-4 mb-4" style="grid-template-columns:1fr 1.4fr">
+
+    {{-- Kalender Mini --}}
+    <div class="rounded-2xl p-4" style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08)">
+        <div class="text-[0.65rem] font-bold uppercase tracking-widest mb-3" style="color:rgba(255,255,255,0.4)">
+            {{ $firstDay->translatedFormat('F Y') }}
         </div>
-        <div style="display:flex;gap:12px;font-size:0.6rem;text-transform:uppercase;letter-spacing:0.08em;color:rgba(255,255,255,0.35);">
-            <span style="display:flex;align-items:center;gap:5px;"><span style="width:6px;height:6px;border-radius:50%;background:#C5A028;display:inline-block;"></span>Event</span>
-            <span style="display:flex;align-items:center;gap:5px;"><span style="width:6px;height:6px;border-radius:50%;background:#ef4444;display:inline-block;"></span>Mepet</span>
+        <div class="grid grid-cols-7 mb-1">
+            @foreach(['M','S','S','R','K','J','S'] as $d)
+            <div class="text-center text-[0.55rem] font-bold" style="color:rgba(255,255,255,0.2)">{{ $d }}</div>
+            @endforeach
+        </div>
+        <div class="grid grid-cols-7 gap-px">
+            @for($i=0;$i<$startDow;$i++)<div></div>@endfor
+            @for($day=1; $day<=$daysInMonth; $day++)
+            @php
+                $ds = \Carbon\Carbon::create($thisYear,$thisMonth,$day)->format('Y-m-d');
+                $isTd  = $ds === $now->toDateString();
+                $hasEv = in_array($ds,$eventDates);
+                $isUrg = in_array($ds,$urgentDates);
+                $isUnavail = in_array($ds, $unavailabilityDates);
+            @endphp
+            <div onclick="{{ $hasEv ? "scrollToEvent('$ds')" : "openUnavailModal('$ds')" }}"
+                 class="aspect-square flex flex-col items-center justify-center rounded-full relative text-[0.7rem] font-{{ $isTd||$hasEv?'bold':'medium' }} {{ $hasEv||!$isUnavail?'cursor-pointer':'' }} transition-all"
+                 style="color:{{ $isTd?'#0C0806':($hasEv?'#fff':($isUnavail?'rgba(239,68,68,0.5)':'rgba(255,255,255,0.35)')) }};background:{{ $isTd?'#C5A028':($hasEv&&!$isTd?'rgba(197,160,40,0.1)':($isUnavail?'rgba(239,68,68,0.1)':'transparent')) }}">
+                {{ $day }}
+                @if($hasEv && !$isTd)
+                <span class="absolute w-1 h-1 rounded-full" style="bottom:2px;background:{{ $isUrg?'#ef4444':'#C5A028' }}"></span>
+                @elseif($isUnavail && !$isTd)
+                <span class="absolute w-1 h-1 rounded-full" style="bottom:2px;background:rgba(239,68,68,0.4)"></span>
+                @endif
+            </div>
+            @endfor
         </div>
     </div>
 
-    <!-- Day Headers -->
-    <div style="display:grid;grid-template-columns:repeat(7,1fr);margin-bottom:6px;">
-        @foreach(['Min','Sen','Sel','Rab','Kam','Jum','Sab'] as $d)
-        <div style="text-align:center;font-size:0.6rem;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:rgba(255,255,255,0.25);padding:4px 0;">{{ $d }}</div>
-        @endforeach
-    </div>
+    {{-- Tugas Mendatang Compact --}}
+    <div class="flex flex-col gap-2">
+        <div class="flex items-center justify-between mb-1">
+            <div class="font-head font-bold text-white text-lg">Jadwal</div>
+            <span class="px-2.5 py-1 rounded-full text-[0.58rem] font-bold uppercase tracking-widest" style="background:rgba(197,160,40,0.1);color:#C5A028;border:1px solid rgba(197,160,40,0.2)">{{ $upcomingEvents->count() }}</span>
+        </div>
 
-    <!-- Calendar Days -->
-    <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:2px;">
-        @for($i=0;$i<$startDow;$i++)<div></div>@endfor
-
-        @for($day=1; $day<=$daysInMonth; $day++)
+        @forelse($upcomingEvents->take(3) as $event)
         @php
-            $dateStr = \Carbon\Carbon::create($thisYear,$thisMonth,$day)->format('Y-m-d');
-            $isToday    = $dateStr === $now->toDateString();
-            $hasEvent   = in_array($dateStr,$eventDates);
-            $isUrgent   = in_array($dateStr,$urgentDates);
+            $eDate   = \Carbon\Carbon::parse($event->event_date);
+            $dL      = $now->startOfDay()->diffInDays($eDate->startOfDay(), false);
+            $urgent  = ($dL >= 0 && $dL <= 3);
+            $isToday = $eDate->isToday();
+            $chk     = !empty($event->pivot->checked_in_at);
         @endphp
-        <div onclick="scrollToEvent('{{ $dateStr }}')"
-             {!! 'style="aspect-ratio:1/1;display:flex;flex-direction:column;align-items:center;justify-content:center;border-radius:50%;font-size:0.78rem;font-weight:' . ($isToday || $hasEvent ? '700' : '500') . ';cursor:' . ($hasEvent ? 'pointer' : 'default') . ';position:relative;transition:all 0.15s;color:' . ($isToday ? '#0C0806' : ($hasEvent ? '#fff' : 'rgba(255,255,255,0.4)')) . ';background:' . ($isToday ? '#C5A028' : ($hasEvent && !$isToday ? 'rgba(197,160,40,0.12)' : 'transparent')) . ';"' !!}>
-            {{ $day }}
-            @if($hasEvent && !$isToday)
-            <span {!! 'style="position:absolute;bottom:3px;width:4px;height:4px;border-radius:50%;background:' . ($isUrgent ? '#ef4444' : '#C5A028') . ';"' !!}></span>
-            @endif
+        <div class="event-card rounded-2xl p-3" id="evt-{{ $event->event_date }}"
+             style="background:rgba(255,255,255,0.04);border:1px solid {{ $urgent?'rgba(239,68,68,0.3)':'rgba(255,255,255,0.08)' }};{{ $urgent?'box-shadow:0 4px 16px rgba(239,68,68,0.08)':'' }}">
+            <div class="flex items-start justify-between gap-2">
+                <div>
+                    <div class="font-bold text-white text-sm leading-tight mb-0.5">{{ Str::limit($event->booking->client_name ?? 'Event',20) }}</div>
+                    <div class="text-[0.62rem] font-bold flex items-center gap-1" style="color:{{ $urgent?'#fca5a5':'rgba(197,160,40,0.75)' }}">
+                        <i class="bi bi-{{ $isToday?'fire':'calendar3' }}"></i>
+                        @if($isToday) Hari Ini! @elseif($dL==1) Besok! @elseif($dL>0) H-{{ $dL }} @else {{ $eDate->format('d M') }} @endif
+                    </div>
+                </div>
+                @if($chk)
+                <span class="shrink-0 w-6 h-6 rounded-full flex items-center justify-center" style="background:rgba(34,197,94,0.12)"><i class="bi bi-check-lg text-xs text-green-400"></i></span>
+                @elseif($isToday)
+                <span class="shrink-0 px-1.5 py-0.5 rounded-full text-[0.5rem] font-bold uppercase" style="background:rgba(197,160,40,0.15);color:#C5A028;border:1px solid rgba(197,160,40,0.3)">Tap ↓</span>
+                @else
+                <span class="shrink-0 w-6 h-6 rounded-full flex items-center justify-center" style="background:rgba(255,255,255,0.04)"><i class="bi bi-lock-fill" style="font-size:0.6rem;color:rgba(255,255,255,0.2)"></i></span>
+                @endif
+            </div>
+            <div class="flex items-center gap-1.5 mt-2 text-[0.58rem]" style="color:rgba(255,255,255,0.35)">
+                <i class="bi bi-geo-alt-fill text-gold text-xs"></i>
+                <span class="truncate">{{ Str::limit($event->venue,22) }}</span>
+            </div>
         </div>
-        @endfor
-    </div>
-
-    <div style="text-align:center;margin-top:14px;font-size:0.6rem;text-transform:uppercase;letter-spacing:0.09em;color:rgba(255,255,255,0.22);">
-        Klik tanggal bertanda untuk melihat detail tugas
+        @empty
+        <div class="rounded-2xl p-4 text-center" style="background:rgba(255,255,255,0.025);border:1px dashed rgba(255,255,255,0.08)">
+            <i class="bi bi-calendar-x text-2xl block mb-2" style="color:rgba(255,255,255,0.1)"></i>
+            <div class="text-xs" style="color:rgba(255,255,255,0.3)">Belum ada jadwal</div>
+        </div>
+        @endforelse
     </div>
 </div>
 
-{{-- ═══════════════════════════════════════ --}}
-{{-- SECTION 3: BANNER PENGUMUMAN --}}
-{{-- ═══════════════════════════════════════ --}}
-<div class="fu2" style="
-    display:flex;align-items:center;gap:12px;
-    padding:14px 16px;
-    border-radius:14px;
-    background:rgba(197,160,40,0.07);
-    border:1px solid rgba(197,160,40,0.2);
-    margin-bottom:16px;
-">
-    <i class="bi bi-megaphone-fill" style="color:#C5A028;font-size:1.1rem;flex-shrink:0;"></i>
-    <p style="flex:1;font-size:0.8rem;color:rgba(255,255,255,0.65);margin:0;line-height:1.5;">
-        <span style="color:#C5A028;font-weight:700;">Pengumuman:</span>
-        Konfirmasi kehadiran sebelum H-3. Absensi GPS wajib dilakukan di lokasi acara.
-    </p>
-    <a href="https://wa.me/6281234567890?text=Halo+Pak+Yat" target="_blank"
-       style="flex-shrink:0;display:inline-flex;align-items:center;gap:5px;padding:7px 12px;border-radius:10px;font-size:0.6rem;font-weight:700;text-transform:uppercase;letter-spacing:0.09em;text-decoration:none;background:rgba(34,197,94,0.15);border:1px solid rgba(34,197,94,0.3);color:#4ade80;white-space:nowrap;">
-        <i class="bi bi-whatsapp"></i> Chat
-    </a>
+{{-- ═══ DETAIL TUGAS (Full Width Cards) ═══ --}}
+@if($upcomingEvents->count() > 0)
+<div class="fu2 mb-2">
+    <div class="flex items-center gap-2 mb-3">
+        <div style="width:3px;height:18px;background:linear-gradient(to bottom,#C5A028,rgba(197,160,40,0.2));border-radius:99px"></div>
+        <div class="font-head font-bold text-white">Detail Tugas</div>
+    </div>
 </div>
 
-{{-- ═══════════════════════════════════════ --}}
-{{-- SECTION 4: TUGAS MENDATANG --}}
-{{-- ═══════════════════════════════════════ --}}
-<div class="fu3">
-    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;">
-        <div style="font-family:'Cormorant Garamond',serif;font-size:1.2rem;font-weight:700;color:#fff;">Tugas Mendatang</div>
-        <span style="padding:4px 12px;border-radius:99px;font-size:0.6rem;font-weight:700;text-transform:uppercase;letter-spacing:0.09em;background:rgba(197,160,40,0.1);color:#C5A028;border:1px solid rgba(197,160,40,0.2);">
-            {{ $upcomingEvents->count() }} Event
+@foreach($upcomingEvents as $event)
+@php
+    $eDate     = \Carbon\Carbon::parse($event->event_date);
+    $daysLeft  = $now->startOfDay()->diffInDays($eDate->startOfDay(), false);
+    $urgent    = ($daysLeft >= 0 && $daysLeft <= 3);
+    $isToday   = $eDate->isToday();
+    $checkedIn = !empty($event->pivot->checked_in_at);
+    $hasCoords = $event->latitude && $event->longitude;
+    $canCheckIn = $isToday && !$checkedIn;
+    $cardAnim  = ['fu2','fu3','fu4','fu5'][$loop->index % 4];
+@endphp
+
+<div id="evt-{{ $event->event_date }}" class="{{ $cardAnim }} event-card rounded-3xl overflow-hidden mb-4"
+     style="background:rgba(255,255,255,0.04);border:1px solid {{ $urgent?'rgba(239,68,68,0.3)':'rgba(255,255,255,0.09)' }};{{ $urgent?'box-shadow:0 4px 24px rgba(239,68,68,0.1)':'' }}">
+
+    {{-- Card Header --}}
+    <div class="flex items-center gap-3 p-4 pb-3" style="border-bottom:1px solid rgba(255,255,255,0.06)">
+        {{-- Date badge --}}
+        <div class="shrink-0 w-14 h-14 rounded-2xl flex flex-col items-center justify-center" style="background:{{ $urgent?'rgba(239,68,68,0.12)':'rgba(197,160,40,0.1)' }};border:1px solid {{ $urgent?'rgba(239,68,68,0.3)':'rgba(197,160,40,0.25)' }}">
+            <span class="font-head font-bold leading-none" style="font-size:1.4rem;color:{{ $urgent?'#fca5a5':'#C5A028' }}">{{ $eDate->format('d') }}</span>
+            <span class="text-[0.5rem] font-bold uppercase tracking-widest" style="color:{{ $urgent?'#fca5a5':'#C5A028' }}">{{ $eDate->format('M') }}</span>
+        </div>
+
+        <div class="flex-1 min-w-0">
+            <div class="font-bold text-white mb-0.5" style="font-size:0.95rem">{{ $event->booking->client_name ?? 'Event Sanggar' }}</div>
+            <div class="flex items-center gap-1.5 text-[0.62rem] font-bold uppercase tracking-wide" style="color:{{ $urgent?'#fca5a5':'rgba(197,160,40,0.75)' }}">
+                <i class="bi bi-{{ $isToday?'fire':($urgent?'exclamation-diamond-fill':'calendar3') }}"></i>
+                @if($isToday) Hari Ini! @elseif($daysLeft==1) Besok! @elseif($daysLeft>0) H-{{ $daysLeft }} @else {{ $eDate->translatedFormat('d F Y') }} @endif
+            </div>
+        </div>
+
+        {{-- Status pill --}}
+        @if($checkedIn)
+        <span class="shrink-0 px-2.5 py-1 rounded-full text-[0.58rem] font-bold uppercase tracking-widest" style="background:rgba(34,197,94,0.1);color:#4ade80;border:1px solid rgba(34,197,94,0.2)">
+            <i class="bi bi-check-circle-fill"></i> Hadir
         </span>
+        @else
+        <span class="shrink-0 px-2.5 py-1 rounded-full text-[0.58rem] font-bold uppercase tracking-widest" style="background:rgba(255,255,255,0.04);color:rgba(255,255,255,0.3);border:1px solid rgba(255,255,255,0.08)">
+            <i class="bi bi-clock"></i> Belum
+        </span>
+        @endif
     </div>
 
-    @forelse($upcomingEvents as $event)
-    @php
-        $eDate     = \Carbon\Carbon::parse($event->event_date);
-        $daysLeft  = $now->startOfDay()->diffInDays($eDate->startOfDay(), false);
-        $urgent    = ($daysLeft >= 0 && $daysLeft <= 3);
-        $checkedIn = !empty($event->pivot->checked_in_at);
-        $hasCoords = $event->latitude && $event->longitude;
-    @endphp
-
-    <div id="evt-{{ $event->event_date }}"
-         @php echo 'style="border-radius:18px;overflow:hidden;margin-bottom:14px;background:rgba(255,255,255,0.04);border:1px solid ' . ($urgent ? 'rgba(239,68,68,0.3)' : 'rgba(255,255,255,0.08)') . ';transition:all 0.25s;' . ($urgent ? 'box-shadow:0 4px 24px rgba(239,68,68,0.1);' : '') . '"'; @endphp>
-        <!-- Card Top Bar -->
-        <div style="
-            padding:14px 18px;
-            display:flex;align-items:center;justify-content:space-between;gap:10px;
-            border-bottom:1px solid rgba(255,255,255,0.05);
-        ">
-            <div style="display:flex;align-items:center;gap:14px;">
-                <!-- Date Pill -->
-                <div {!! 'style="flex-shrink:0;width:52px;height:52px;border-radius:13px;background:' . ($urgent ? 'rgba(239,68,68,0.12)' : 'rgba(197,160,40,0.1)') . ';border:1px solid ' . ($urgent ? 'rgba(239,68,68,0.3)' : 'rgba(197,160,40,0.25)') . ';display:flex;flex-direction:column;align-items:center;justify-content:center;"' !!}>
-                    <span {!! 'style="font-family:Cormorant Garamond,serif;font-size:1.3rem;font-weight:700;line-height:1;color:' . ($urgent ? '#fca5a5' : '#C5A028') . ';"' !!}>{{ $eDate->format('d') }}</span>
-                    <span {!! 'style="font-size:0.52rem;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:' . ($urgent ? '#fca5a5' : '#C5A028') . ';"' !!}>{{ $eDate->format('M') }}</span>
-                </div>
-                <div>
-                    <div style="font-size:1rem;font-weight:800;color:#fff;margin-bottom:4px;">
-                        {{ $event->booking->client_name ?? 'Event Sanggar' }}
-                    </div>
-                    <div {!! 'style="font-size:0.65rem;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:' . ($urgent ? '#fca5a5' : 'rgba(197,160,40,0.75)') . ';display:flex;align-items:center;gap:5px;"' !!}>
-                        @if($urgent)
-                            <i class="bi bi-fire"></i>
-                            @if($daysLeft==0) Hari Ini! @elseif($daysLeft==1) Besok! @else H-{{ $daysLeft }} @endif
-                        @else
-                            <i class="bi bi-calendar3"></i>
-                            {{ $eDate->translatedFormat('l, d F Y') }}
-                        @endif
-                    </div>
-                </div>
-            </div>
-            <!-- Status Badge -->
-            @if($checkedIn)
-            <span style="flex-shrink:0;padding:5px 10px;border-radius:99px;font-size:0.58rem;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;background:rgba(34,197,94,0.1);color:#4ade80;border:1px solid rgba(34,197,94,0.2);">
-                <i class="bi bi-check-circle-fill"></i> Hadir
-            </span>
-            @else
-            <span style="flex-shrink:0;padding:5px 10px;border-radius:99px;font-size:0.58rem;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;background:rgba(255,255,255,0.04);color:rgba(255,255,255,0.3);border:1px solid rgba(255,255,255,0.08);">
-                <i class="bi bi-clock"></i> Belum
-            </span>
-            @endif
+    {{-- Detail Grid --}}
+    <div class="p-4 grid grid-cols-2 gap-3">
+        <div class="col-span-2">
+            <div class="text-[0.57rem] font-bold uppercase tracking-widest mb-1.5 flex items-center gap-1" style="color:rgba(255,255,255,0.28)"><i class="bi bi-geo-alt-fill text-gold text-xs"></i> Lokasi</div>
+            <a href="https://maps.google.com/?q={{ urlencode($event->venue) }}" target="_blank" class="flex items-start gap-1.5 no-underline transition-colors hover:text-white" style="color:rgba(255,255,255,0.7);font-size:0.85rem;font-weight:600">
+                <span>{{ $event->venue }}</span><i class="bi bi-box-arrow-up-right shrink-0 mt-1" style="font-size:0.55rem;color:rgba(255,255,255,0.25)"></i>
+            </a>
         </div>
-
-        <!-- Card Details Grid -->
-        <div style="padding:16px 18px;display:grid;grid-template-columns:1fr 1fr;gap:14px;">
-            <!-- Lokasi -->
-            <div style="grid-column:1/-1;">
-                <div style="font-size:0.58rem;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:rgba(255,255,255,0.28);margin-bottom:5px;display:flex;align-items:center;gap:4px;">
-                    <i class="bi bi-geo-alt-fill" style="color:#C5A028;"></i> Lokasi
-                </div>
-                <a href="https://maps.google.com/?q={{ urlencode($event->venue) }}" target="_blank"
-                   style="font-size:0.85rem;font-weight:600;color:rgba(255,255,255,0.75);text-decoration:none;display:flex;align-items:flex-start;gap:5px;transition:color 0.2s;">
-                    <span>{{ $event->venue }}</span>
-                    <i class="bi bi-box-arrow-up-right" style="font-size:0.6rem;color:rgba(255,255,255,0.3);margin-top:3px;flex-shrink:0;"></i>
-                </a>
-            </div>
-
-            <!-- Jam -->
+        <div>
+            <div class="text-[0.57rem] font-bold uppercase tracking-widest mb-1.5 flex items-center gap-1" style="color:rgba(255,255,255,0.28)"><i class="bi bi-clock-fill text-gold text-xs"></i> Waktu</div>
+            <div class="font-bold text-white" style="font-size:0.85rem">{{ \Carbon\Carbon::parse($event->event_start)->format('H:i') }} <span style="color:rgba(255,255,255,0.3)">–</span> {{ \Carbon\Carbon::parse($event->event_end)->format('H:i') }} <span class="text-xs font-medium" style="color:rgba(255,255,255,0.35)">WIB</span></div>
+        </div>
+        <div>
+            <div class="text-[0.57rem] font-bold uppercase tracking-widest mb-1.5 flex items-center gap-1" style="color:rgba(255,255,255,0.28)"><i class="bi bi-person-badge-fill text-gold text-xs"></i> Jobdesk</div>
+            <div class="font-bold text-white capitalize" style="font-size:0.85rem">{{ str_replace('_',' ',$event->pivot->role_in_event ?? '–') }}</div>
+        </div>
+        @if($event->pivot->fee > 0)
+        <div class="col-span-2 rounded-xl p-3 flex items-center gap-3" style="background:rgba(197,160,40,0.06);border:1px solid rgba(197,160,40,0.15)">
+            <i class="bi bi-cash-stack text-gold text-lg"></i>
             <div>
-                <div style="font-size:0.58rem;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:rgba(255,255,255,0.28);margin-bottom:5px;display:flex;align-items:center;gap:4px;">
-                    <i class="bi bi-clock-fill" style="color:#C5A028;"></i> Jam
-                </div>
-                <div style="font-size:0.9rem;font-weight:700;color:#fff;">
-                    {{ \Carbon\Carbon::parse($event->event_start)->format('H:i') }}<span style="color:rgba(255,255,255,0.3);"> – </span>{{ \Carbon\Carbon::parse($event->event_end)->format('H:i') }}<span style="font-size:0.7rem;font-weight:500;color:rgba(255,255,255,0.4);"> WIB</span>
-                </div>
+                <div class="text-[0.57rem] font-bold uppercase tracking-widest" style="color:rgba(197,160,40,0.6)">Estimasi Honor</div>
+                <div class="font-bold text-gold" style="font-size:0.95rem">Rp {{ number_format($event->pivot->fee,0,',','.') }}</div>
             </div>
+        </div>
+        @endif
+    </div>
 
-            <!-- Jobdesk -->
+    {{-- CTA Check-in --}}
+    <div class="px-4 pb-4">
+        @if($checkedIn)
+        <div class="flex items-center justify-center gap-2.5 p-3.5 rounded-2xl" style="background:rgba(34,197,94,0.07);border:1px solid rgba(34,197,94,0.18)">
+            <i class="bi bi-shield-check text-green-400 text-xl"></i>
             <div>
-                <div style="font-size:0.58rem;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:rgba(255,255,255,0.28);margin-bottom:5px;display:flex;align-items:center;gap:4px;">
-                    <i class="bi bi-person-badge-fill" style="color:#C5A028;"></i> Jobdesk
-                </div>
-                <div style="font-size:0.85rem;font-weight:700;color:#fff;text-transform:capitalize;">
-                    {{ str_replace('_', ' ', $event->pivot->role_in_event ?? '–') }}
+                <div class="text-sm font-bold text-green-400">Check-in Berhasil</div>
+                <div class="text-xs" style="color:rgba(255,255,255,0.38)">
+                    Pukul {{ \Carbon\Carbon::parse($event->pivot->checked_in_at)->format('H:i') }} WIB
+                    @if(($event->pivot->attendance_status ?? '') === 'late')
+                        · <span style="color:#fb923c">Telat {{ $event->pivot->late_minutes ?? 0 }} mnt</span>
+                    @endif
                 </div>
             </div>
         </div>
-
-        <!-- Ghosting Guard CTA -->
-        <div style="padding:0 16px 16px;">
-            @if($checkedIn)
-            <div style="
-                display:flex;align-items:center;justify-content:center;gap:10px;
-                padding:14px;border-radius:13px;
-                background:rgba(34,197,94,0.08);border:1px solid rgba(34,197,94,0.2);
-            ">
-                <i class="bi bi-shield-check" style="font-size:1.2rem;color:#4ade80;"></i>
-                <div>
-                    <div style="font-size:0.85rem;font-weight:700;color:#4ade80;">Check-in Berhasil</div>
-                    <div style="font-size:0.7rem;color:rgba(255,255,255,0.4);">
-                        Pukul {{ \Carbon\Carbon::parse($event->pivot->checked_in_at)->format('H:i') }} WIB
-                        @if(isset($event->pivot->attendance_status) && $event->pivot->attendance_status === 'late')
-                            · <span style="color:#fb923c;">Telat {{ $event->pivot->late_minutes ?? 0 }} mnt</span>
-                        @endif
-                    </div>
-                </div>
+        @elseif($canCheckIn)
+        <button type="button" onclick="doCheckIn('{{ $event->id }}',this)"
+                class="w-full flex items-center justify-center gap-2.5 p-3.5 rounded-2xl font-bold transition-all cursor-pointer hover:-translate-y-px"
+                style="background:linear-gradient(135deg,#8B1A2A,#5C0E19);border:1px solid rgba(197,160,40,0.35);color:#C5A028;font-size:0.85rem;box-shadow:0 4px 20px rgba(139,26,42,0.35);hover:box-shadow:0 8px 28px rgba(139,26,42,0.5)">
+            <i class="bi bi-geo-alt-fill text-lg"></i>
+            <div class="text-left">
+                <div>Ghosting Guard – Check-in Lokasi</div>
+                <div class="text-[0.62rem] font-medium" style="color:rgba(197,160,40,0.6)">{{ $hasCoords ? 'Validasi GPS · Radius 200m' : 'GPS belum diset Admin' }}</div>
             </div>
-            @else
-            <button type="button"
-                    onclick="doCheckIn('{{ $event->id }}', this)"
-                    style="
-                        width:100%;display:flex;align-items:center;justify-content:center;gap:10px;
-                        padding:14px;border-radius:13px;
-                        background:linear-gradient(135deg,#8B1A2A,#5C0E19);
-                        border:1px solid rgba(197,160,40,0.35);
-                        color:#C5A028;font-size:0.85rem;font-weight:700;
-                        cursor:pointer;transition:all 0.25s;
-                        box-shadow:0 4px 20px rgba(139,26,42,0.3);
-                    "
-                    onmouseover="this.style.transform='translateY(-1px)'; this.style.boxShadow='0 8px 28px rgba(139,26,42,0.4)'"
-                    onmouseout="this.style.transform=''; this.style.boxShadow='0 4px 20px rgba(139,26,42,0.3)'">
-                <i class="bi bi-geo-alt-fill" style="font-size:1.1rem;"></i>
-                <div style="text-align:left;">
-                    <div>Ghosting Guard – Check-in Lokasi</div>
-                    <div style="font-size:0.65rem;font-weight:500;color:rgba(197,160,40,0.6);">{{ $hasCoords ? 'Validasi GPS Aktif · Radius 100m' : 'Lokasi GPS belum diset Admin' }}</div>
-                </div>
-            </button>
-            <form id="cf-{{ $event->id }}" action="{{ route('personnel.attendance.check_in', $event->id) }}" method="POST" style="display:none;">
-                @csrf
-                <input type="hidden" name="latitude"  id="lat-{{ $event->id }}">
-                <input type="hidden" name="longitude" id="lng-{{ $event->id }}">
-            </form>
-            @endif
+        </button>
+        <form id="cf-{{ $event->id }}" action="{{ route('personnel.attendance.check_in',$event->id) }}" method="POST" class="hidden">
+            @csrf<input type="hidden" name="latitude" id="lat-{{ $event->id }}"><input type="hidden" name="longitude" id="lng-{{ $event->id }}">
+        </form>
+        @else
+        <div class="flex items-center justify-center gap-2.5 p-3.5 rounded-2xl cursor-not-allowed" style="background:rgba(255,255,255,0.025);border:1px dashed rgba(255,255,255,0.08)">
+            <i class="bi bi-lock-fill text-lg" style="color:rgba(255,255,255,0.18)"></i>
+            <div class="text-left">
+                <div class="text-sm font-bold" style="color:rgba(255,255,255,0.25)">Check-in Terkunci</div>
+                <div class="text-xs" style="color:rgba(255,255,255,0.18)">Dibuka {{ $eDate->translatedFormat('d F Y') }}</div>
+            </div>
         </div>
+        @endif
     </div>
-    @empty
-    <div style="text-align:center;padding:56px 24px;border-radius:18px;background:rgba(255,255,255,0.025);border:1px dashed rgba(255,255,255,0.08);">
-        <i class="bi bi-calendar-x" style="font-size:3rem;color:rgba(255,255,255,0.12);display:block;margin-bottom:14px;"></i>
-        <div style="font-size:1.05rem;font-weight:700;color:#fff;margin-bottom:6px;">Belum Ada Tugas</div>
-        <div style="font-size:0.8rem;color:rgba(255,255,255,0.35);">Tunggu instruksi dari Admin Sanggar Cahaya Gumilang.</div>
-    </div>
-    @endforelse
 </div>
+@endforeach
+@endif
 
 @endif
 @endsection
+
+{{-- MODAL BERHALANGAN --}}
+<div id="unavailModal" class="fixed inset-0 z-[100] hidden items-center justify-center p-4">
+    <div class="absolute inset-0 bg-black/60 backdrop-blur-sm" onclick="closeUnavailModal()"></div>
+    <div class="relative w-full max-w-sm rounded-3xl p-5 border shadow-2xl transition-all scale-95 opacity-0" id="unavailModalContent"
+         style="background:rgba(12,8,6,0.95);border-color:rgba(255,255,255,0.1)">
+        
+        <div class="flex items-center justify-between mb-4 pb-3" style="border-bottom:1px solid rgba(255,255,255,0.06)">
+            <div class="flex items-center gap-2 text-white font-bold font-head text-lg">
+                <i class="bi bi-calendar-x text-red-400"></i> Tandai Berhalangan
+            </div>
+            <button type="button" onclick="closeUnavailModal()" class="text-white/40 hover:text-white transition-colors">
+                <i class="bi bi-x-lg"></i>
+            </button>
+        </div>
+
+        <form action="{{ route('personnel.unavailability.store') }}" method="POST">
+            @csrf
+            
+            <div class="mb-3">
+                <label class="block text-[0.65rem] font-bold uppercase tracking-widest mb-1.5" style="color:rgba(255,255,255,0.4)">Tanggal Mulai</label>
+                <input type="date" name="start_date" id="unavail_start_date" required readonly
+                       class="w-full px-3 py-2.5 rounded-xl text-sm font-medium text-white outline-none bg-white/5 border border-white/10">
+            </div>
+
+            <div class="mb-3">
+                <label class="block text-[0.65rem] font-bold uppercase tracking-widest mb-1.5" style="color:rgba(255,255,255,0.4)">Tanggal Selesai <span class="normal-case text-white/30 text-[0.55rem] tracking-normal">(opsional)</span></label>
+                <input type="date" name="end_date" id="unavail_end_date"
+                       class="w-full px-3 py-2.5 rounded-xl text-sm font-medium text-white outline-none bg-white/5 border border-white/10 focus:border-gold/50 transition-colors">
+                <div class="mt-1 text-[0.6rem] text-white/30">Jika hanya 1 hari, biarkan kosong atau samakan dengan tanggal mulai.</div>
+            </div>
+
+            <div class="mb-5">
+                <label class="block text-[0.65rem] font-bold uppercase tracking-widest mb-1.5" style="color:rgba(255,255,255,0.4)">Alasan <span class="text-red-400">*</span></label>
+                <input type="text" name="reason" required placeholder="Contoh: Sakit, Cuti Keluarga, dll."
+                       class="w-full px-3 py-2.5 rounded-xl text-sm font-medium text-white outline-none bg-white/5 border border-white/10 focus:border-gold/50 transition-colors">
+            </div>
+
+            <div class="flex gap-2">
+                <button type="button" onclick="closeUnavailModal()" class="flex-1 py-3 rounded-xl font-bold text-sm text-white/60 bg-white/5 hover:bg-white/10 transition-colors border border-white/10">Batal</button>
+                <button type="submit" class="flex-1 py-3 rounded-xl font-bold text-sm transition-all"
+                        style="background:linear-gradient(135deg,#8B1A2A,#5C0E19);border:1px solid rgba(197,160,40,0.35);color:#C5A028;box-shadow:0 4px 12px rgba(139,26,42,0.3)">
+                    Simpan
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
 
 @push('scripts')
 <script>
 function doCheckIn(eventId, btn) {
     if (!navigator.geolocation) { alert('GPS tidak didukung browser ini.'); return; }
     const orig = btn.innerHTML;
-    btn.disabled = true;
-    btn.style.opacity = '0.65';
-    btn.innerHTML = '<i class="bi bi-arrow-repeat" style="animation:spin 1s linear infinite;font-size:1.1rem;"></i> <div style="text-align:left;"><div>Mendeteksi GPS...</div><div style="font-size:0.65rem;color:rgba(197,160,40,0.6);">Pastikan izin lokasi diizinkan</div></div>';
+    btn.disabled = true; btn.style.opacity = '0.6';
+    btn.innerHTML = '<i class="bi bi-arrow-repeat animate-spin text-lg"></i><div class="text-left"><div>Mendeteksi GPS...</div><div class="text-[0.62rem]" style="color:rgba(197,160,40,0.6)">Pastikan izin lokasi disetujui</div></div>';
     navigator.geolocation.getCurrentPosition(
         function(pos) {
             if (!navigator.onLine) {
                 let pend = JSON.parse(localStorage.getItem('pendingCheckins')||'[]');
                 pend.push({ eventId, latitude:pos.coords.latitude, longitude:pos.coords.longitude, timestamp:new Date().toISOString() });
                 localStorage.setItem('pendingCheckins', JSON.stringify(pend));
-                btn.innerHTML = '<i class="bi bi-clock-history" style="font-size:1.1rem;"></i><div style="text-align:left;"><div>Tersimpan Offline</div><div style="font-size:0.65rem;color:rgba(197,160,40,0.6);">Akan disinkronkan saat online</div></div>';
+                btn.innerHTML = '<i class="bi bi-clock-history text-lg"></i><div class="text-left"><div>Tersimpan Offline</div><div class="text-[0.62rem]" style="color:rgba(197,160,40,0.6)">Akan disinkronkan saat online</div></div>';
                 btn.style.opacity = '1';
             } else {
                 document.getElementById('lat-'+eventId).value = pos.coords.latitude;
@@ -339,24 +363,54 @@ function doCheckIn(eventId, btn) {
                 document.getElementById('cf-'+eventId).submit();
             }
         },
-        function(err) {
-            btn.innerHTML = orig; btn.disabled = false; btn.style.opacity = '1';
-            alert('❌ Gagal mendapatkan lokasi GPS.\nPastikan GPS aktif dan izin lokasi disetujui.');
-        },
+        function() { btn.innerHTML = orig; btn.disabled = false; btn.style.opacity = '1'; alert('❌ Gagal GPS. Pastikan GPS aktif dan izin lokasi disetujui.'); },
         { enableHighAccuracy:true, timeout:12000, maximumAge:0 }
     );
 }
-
-function scrollToEvent(dateStr) {
-    const el = document.getElementById('evt-'+dateStr);
+function scrollToEvent(ds) {
+    const el = document.getElementById('evt-'+ds);
     if (!el) return;
     el.scrollIntoView({ behavior:'smooth', block:'center' });
-    el.style.outline = '2px solid rgba(197,160,40,0.6)';
-    el.style.outlineOffset = '2px';
+    el.style.outline = '2px solid rgba(197,160,40,0.5)'; el.style.outlineOffset = '2px';
     setTimeout(() => { el.style.outline = ''; el.style.outlineOffset = ''; }, 2000);
 }
+
+function openUnavailModal(ds) {
+    const today = new Date().toISOString().split('T')[0];
+    if (ds < today) {
+        alert('Tidak bisa menandai tanggal yang sudah lewat.');
+        return;
+    }
+    
+    document.getElementById('unavail_start_date').value = ds;
+    document.getElementById('unavail_end_date').value = ds;
+    document.getElementById('unavail_end_date').min = ds;
+    
+    const modal = document.getElementById('unavailModal');
+    const content = document.getElementById('unavailModalContent');
+    
+    modal.classList.remove('hidden');
+    modal.classList.add('flex');
+    
+    // Animate in
+    setTimeout(() => {
+        content.classList.remove('scale-95', 'opacity-0');
+        content.classList.add('scale-100', 'opacity-100');
+    }, 10);
+}
+
+function closeUnavailModal() {
+    const modal = document.getElementById('unavailModal');
+    const content = document.getElementById('unavailModalContent');
+    
+    // Animate out
+    content.classList.remove('scale-100', 'opacity-100');
+    content.classList.add('scale-95', 'opacity-0');
+    
+    setTimeout(() => {
+        modal.classList.add('hidden');
+        modal.classList.remove('flex');
+    }, 200);
+}
 </script>
-<style>
-@keyframes spin { from { transform:rotate(0deg); } to { transform:rotate(360deg); } }
-</style>
 @endpush

@@ -1,7 +1,7 @@
 @extends('layouts.admin')
 
-@section('title', 'CMS Landing Page – ART-HUB')
-@section('page_title', 'CMS Landing Page')
+@section('title', 'CMS Halaman Depan – ART-HUB')
+@section('page_title', 'CMS Halaman Depan')
 @section('page_subtitle', 'Atur konten dinamis untuk halaman depan website Sanggar.')
 
 @section('content')

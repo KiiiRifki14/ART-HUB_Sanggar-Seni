@@ -1,7 +1,7 @@
 @extends('layouts.admin')
 
-@section('title', 'Post-Event Update – ART-HUB')
-@section('page_title', 'Post-Event Update')
+@section('title', 'Pembaruan Pasca-Acara – ART-HUB')
+@section('page_title', 'Pembaruan Pasca-Acara')
 @section('page_subtitle', 'Audit biaya operasional lapangan ' . ($event->event_code ?? ''))
 
 @section('content')
@@ -10,7 +10,7 @@
 {{-- Back Nav --}}
 <div class="flex items-center gap-2 mb-6 font-label text-xs uppercase tracking-widest font-bold">
     <a href="{{ route('admin.financials.post_event_list') }}" class="text-on-surface-variant hover:text-secondary transition-colors flex items-center gap-1.5">
-        <i class="bi bi-arrow-left"></i> Post-Event List
+        <i class="bi bi-arrow-left"></i> Daftar Pasca-Acara
     </a>
     <span class="text-outline-variant">/</span>
     <span class="text-outline">Detail Audit</span>
@@ -40,7 +40,7 @@
         
         <div class="bg-surface-container-lowest rounded-xl p-6 border border-green-500/30 shadow-[0_8px_20px_rgba(34,197,94,0.05)] flex items-center justify-between">
             <div>
-                <div class="font-label text-[0.65rem] uppercase tracking-widest font-bold mb-1 text-green-600">Safety Buffer Area</div>
+                <div class="font-label text-[0.65rem] uppercase tracking-widest font-bold mb-1 text-green-600">Dana Cadangan</div>
                 <div class="font-headline text-3xl font-bold text-green-600">Rp {{ number_format($fr->safety_buffer_amt, 0, ',', '.') }}</div>
             </div>
             <i class="bi bi-shield-check text-4xl text-green-500/10"></i>

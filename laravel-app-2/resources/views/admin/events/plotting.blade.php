@@ -148,9 +148,9 @@
                                     @if($isColliding)
                                         <span class="inline-block px-2 py-0.5 rounded bg-red-500/10 border border-red-500/20 text-red-600 font-label text-[0.6rem] font-bold uppercase tracking-wider shadow-sm">KONFLIK</span>
                                     @elseif($alreadyPlotted)
-                                        <span class="inline-block px-2 py-0.5 rounded bg-secondary/10 border border-secondary/20 text-secondary-container font-label text-[0.6rem] font-bold uppercase tracking-wider shadow-sm">ASSIGNED</span>
+                                        <span class="inline-block px-2 py-0.5 rounded bg-secondary/10 border border-secondary/20 text-secondary-container font-label text-[0.6rem] font-bold uppercase tracking-wider shadow-sm">DITUGASKAN</span>
                                     @else
-                                        <span class="inline-block px-2 py-0.5 rounded bg-green-500/10 border border-green-500/20 text-green-600 font-label text-[0.6rem] font-bold uppercase tracking-wider shadow-sm">AVAILABLE</span>
+                                        <span class="inline-block px-2 py-0.5 rounded bg-green-500/10 border border-green-500/20 text-green-600 font-label text-[0.6rem] font-bold uppercase tracking-wider shadow-sm">TERSEDIA</span>
                                     @endif
                                 </td>
                             </tr>

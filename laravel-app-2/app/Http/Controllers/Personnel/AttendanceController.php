@@ -38,6 +38,12 @@ class AttendanceController extends Controller
             return redirect()->back()->with('info', 'Anda sudah melakukan Check-in sebelumnya.');
         }
 
+        // VALIDASI H-0: Check-in hanya boleh dilakukan pada hari acara berlangsung
+        if (!Carbon::parse($event->event_date)->isToday()) {
+            $tglAcara = Carbon::parse($event->event_date)->isoFormat('D MMMM Y');
+            return redirect()->back()->with('error', "Check-in hanya dapat dilakukan pada hari acara berlangsung ({$tglAcara}).");
+        }
+
         // Logic Radius Haversine
         $lat = $request->input('latitude');
         $lon = $request->input('longitude');

@@ -138,7 +138,7 @@
                     <span id="previewPkgName" class="font-semibold text-secondary text-right max-w-[140px] leading-tight">—</span>
                 </div>
                 <div class="flex justify-between font-body text-sm text-white/70 mb-4">
-                    <span>Base Price</span>
+                    <span>Harga Dasar</span>
                     <span id="previewBasePrice" class="font-semibold">Rp 0</span>
                 </div>
                 

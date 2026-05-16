@@ -1,7 +1,7 @@
 @extends('layouts.admin')
 
 @section('title', 'Jadwal Latihan – ART-HUB')
-@section('page_title', 'Jadwal Latihan (Rehearsals)')
+@section('page_title', 'Jadwal Latihan')
 @section('page_subtitle', 'Kalender & plotting sesi latihan sanggar.')
 
 @section('content')

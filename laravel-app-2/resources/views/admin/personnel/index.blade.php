@@ -1,7 +1,7 @@
 @extends('layouts.admin')
 
-@section('title', 'Personnel – ART-HUB')
-@section('page_title', 'Personnel Management')
+@section('title', 'Personel – ART-HUB')
+@section('page_title', 'Manajemen Personel')
 @section('page_subtitle', 'Kelola kru dan personel Sanggar Cahaya Gumilang.')
 
 @section('content')
@@ -38,7 +38,7 @@
     <div class="bg-surface-container-lowest rounded-xl p-5 border border-orange-500/20 shadow-[0_8px_20px_rgba(54,31,26,0.03)] text-center">
         <i class="bi bi-briefcase-fill text-2xl text-orange-500 mb-2 block"></i>
         <div class="font-headline text-3xl font-bold text-orange-600 mb-1">{{ $dayJob }}</div>
-        <div class="font-label text-[0.65rem] uppercase tracking-widest text-outline font-bold">Punya Day-Job</div>
+        <div class="font-label text-[0.65rem] uppercase tracking-widest text-outline font-bold">Punya Kerja Utama</div>
     </div>
 </div>
 
@@ -62,7 +62,7 @@
                 <th class="font-label text-[0.65rem] uppercase tracking-widest text-outline font-bold px-6 py-4 text-left">Personel</th>
                 <th class="font-label text-[0.65rem] uppercase tracking-widest text-outline font-bold px-6 py-4 text-left">Spesialisasi</th>
                 <th class="font-label text-[0.65rem] uppercase tracking-widest text-outline font-bold px-6 py-4 text-left">Kontak</th>
-                <th class="font-label text-[0.65rem] uppercase tracking-widest text-outline font-bold px-6 py-4 text-left">Day-Job</th>
+                <th class="font-label text-[0.65rem] uppercase tracking-widest text-outline font-bold px-6 py-4 text-left">Pekerjaan Utama</th>
                 <th class="font-label text-[0.65rem] uppercase tracking-widest text-outline font-bold px-6 py-4 text-center">Status</th>
                 <th class="font-label text-[0.65rem] uppercase tracking-widest text-outline font-bold px-6 py-4 text-center">Aksi</th>
             </tr>
@@ -127,7 +127,7 @@
                     @else
                     <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded bg-orange-500/10 text-orange-600 border border-orange-500/20 font-label text-[0.65rem] font-bold uppercase tracking-wider"
                           title="Edit untuk mengaktifkan">
-                        <i class="bi bi-hourglass-split"></i> Pending
+                        <i class="bi bi-hourglass-split"></i> Menunggu
                     </span>
                     @endif
                 </td>

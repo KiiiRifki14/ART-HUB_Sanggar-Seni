@@ -1,7 +1,7 @@
 @extends('layouts.admin')
 
-@section('title', 'Event Management – ART-HUB')
-@section('page_title', 'Event Management')
+@section('title', 'Manajemen Acara – ART-HUB')
+@section('page_title', 'Manajemen Acara')
 @section('page_subtitle', 'Kelola seluruh event pementasan sanggar.')
 
 @section('content')
@@ -34,7 +34,7 @@
             @php
                 $statusMap = [
                     'planning'  => ['bg-orange-500/10 text-orange-600 border-orange-500/20', 'PLANNING'],
-                    'rehearsal' => ['bg-blue-500/10 text-blue-600 border-blue-500/20', 'REHEARSAL'],
+                    'rehearsal' => ['bg-blue-500/10 text-blue-600 border-blue-500/20', 'LATIHAN'],
                     'ready'     => ['bg-green-500/10 text-green-600 border-green-500/20', 'SIAP'],
                     'ongoing'   => ['bg-secondary/10 text-secondary border-secondary/20', 'BERLANGSUNG'],
                     'completed' => ['bg-surface-container-highest text-on-surface-variant border-outline-variant/30', 'SELESAI'],

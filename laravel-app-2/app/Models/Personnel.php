@@ -39,4 +39,9 @@ class Personnel extends Model
     // {
     //     return $this->hasMany(PersonnelSchedule::class);
     // }
+
+    public function unavailabilities(): HasMany
+    {
+        return $this->hasMany(PersonnelUnavailability::class);
+    }
 }

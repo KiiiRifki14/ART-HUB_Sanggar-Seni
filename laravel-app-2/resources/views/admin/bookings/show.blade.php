@@ -22,7 +22,7 @@
         <div class="bg-surface-container-lowest rounded-xl border border-outline-variant/30 shadow-[0_12px_24px_rgba(54,31,26,0.03)] overflow-hidden">
             <div class="px-6 py-5 border-b border-outline-variant/20 flex items-center justify-between">
                 <h3 class="font-headline text-lg font-bold text-primary flex items-center gap-2">
-                    <i class="bi bi-receipt text-secondary"></i> Detail Booking
+                    <i class="bi bi-receipt text-secondary"></i> Detail Pesanan
                 </h3>
             </div>
             
@@ -71,10 +71,10 @@
                     @php
                         $statusMap = [
                             'pending'   => ['label'=>'PENDING',   'cls'=>'bg-orange-500/10 text-orange-600 border-orange-500/20'],
-                            'dp_paid'   => ['label'=>'DP PAID',   'cls'=>'bg-blue-500/10 text-blue-600 border-blue-500/20'],
-                            'confirmed' => ['label'=>'CONFIRMED', 'cls'=>'bg-green-500/10 text-green-600 border-green-500/20'],
-                            'completed' => ['label'=>'COMPLETED', 'cls'=>'bg-green-500/10 text-green-600 border-green-500/20'],
-                            'cancelled' => ['label'=>'CANCELLED', 'cls'=>'bg-red-500/10 text-red-600 border-red-500/20'],
+                            'dp_paid'   => ['label'=>'DP DIBAYAR',   'cls'=>'bg-blue-500/10 text-blue-600 border-blue-500/20'],
+                            'confirmed' => ['label'=>'DIKONFIRMASI', 'cls'=>'bg-green-500/10 text-green-600 border-green-500/20'],
+                            'completed' => ['label'=>'SELESAI', 'cls'=>'bg-green-500/10 text-green-600 border-green-500/20'],
+                            'cancelled' => ['label'=>'BATAL', 'cls'=>'bg-red-500/10 text-red-600 border-red-500/20'],
                         ];
                         $st = $statusMap[$booking->status] ?? ['label'=>strtoupper($booking->status),'cls'=>'bg-surface-container text-outline border-outline-variant/30'];
                     @endphp
@@ -161,29 +161,18 @@
                 @if(in_array($booking->status, ['dp_paid', 'confirmed']))
                     @if($booking->full_payment_proof)
                         <div class="p-4 rounded-xl border border-blue-500/30 bg-blue-500/5 mb-4 text-center">
-                            <div class="font-label text-xs uppercase tracking-widest text-primary font-bold mb-2">Bukti Pelunasan Klien</div>
+                            <div class="font-label text-xs uppercase tracking-widest text-primary font-bold mb-2">Bukti Pelunasan Klien Menunggu Konfirmasi</div>
                             <a href="{{ asset('storage/' . $booking->full_payment_proof) }}" target="_blank" class="block mb-3">
                                 <img src="{{ asset('storage/' . $booking->full_payment_proof) }}" alt="Bukti Pelunasan" class="w-full h-32 object-cover rounded-lg border border-outline-variant/30 hover:opacity-80 transition-opacity">
                             </a>
-                            <div class="flex flex-col gap-2">
-                                <form action="{{ route('admin.bookings.confirm_full_payment', $booking->id) }}" method="POST">
-                                    @csrf
-                                    @method('PATCH')
-                                    <button type="submit" class="w-full py-2 bg-green-600 text-white rounded-lg font-label text-xs uppercase tracking-widest font-bold hover:bg-green-700 transition-colors" onclick="return confirm('Yakin ingin verifikasi bahwa pelunasan sudah valid?')">Verifikasi Lunas</button>
-                                </form>
-                                <form action="{{ route('admin.bookings.reject_full_proof', $booking->id) }}" method="POST">
-                                    @csrf
-                                    <button type="submit" class="w-full py-2 bg-red-100 text-red-600 rounded-lg font-label text-xs uppercase tracking-widest font-bold hover:bg-red-200 transition-colors" onclick="return confirm('Yakin ingin menolak bukti pelunasan ini?')">Tolak Bukti</button>
-                                </form>
-                            </div>
+                            <div class="font-body text-xs text-on-surface-variant">Silakan proses pelunasan ini di menu <strong>Pelacakan Pembayaran</strong>.</div>
                         </div>
                     @else
                         <div class="p-4 rounded-xl border border-outline-variant/30 bg-surface-container mb-4 text-center">
-                            <div class="font-body text-xs text-on-surface-variant mb-3">Belum ada bukti pelunasan dari Klien. Jika Klien membayar secara tunai di sanggar, klik tombol di bawah.</div>
-                            <button type="button" class="w-full py-2 border-2 border-primary text-primary bg-transparent rounded-lg font-label text-xs uppercase tracking-widest font-bold hover:bg-primary hover:text-white transition-colors" data-bs-toggle="modal" data-bs-target="#modalLunasTunai">Pelunasan Tunai</button>
+                            <div class="font-body text-xs text-on-surface-variant">Sisa pembayaran / pelunasan klien dipantau di menu <strong>Pelacakan Pembayaran</strong>.</div>
                         </div>
                     @endif
-                @elseif($booking->status === 'paid_full')
+                @elseif($booking->status === 'paid_full' || $booking->status === 'completed')
                     <div class="p-4 text-center rounded-xl bg-secondary/10 border border-secondary/20 text-primary">
                         <i class="bi bi-check-all text-3xl mb-2 block text-secondary"></i>
                         <div class="font-headline font-bold text-sm mb-1">Pesanan Telah Lunas 100%</div>
@@ -222,38 +211,6 @@
                 <div class="px-6 py-4 border-t border-outline-variant/20 bg-surface-container-low flex justify-end gap-3">
                     <button type="button" class="px-5 py-2.5 rounded-lg border border-outline-variant/50 font-label text-xs font-bold uppercase tracking-widest text-on-surface-variant hover:bg-surface-container transition-colors" data-bs-dismiss="modal">Batal</button>
                     <button type="submit" class="px-5 py-2.5 rounded-lg bg-primary text-white font-label text-xs font-bold uppercase tracking-widest hover:bg-primary-container transition-colors">Simpan Harga Nego</button>
-                </div>
-            </form>
-        </div>
-    </div>
-</div>
-@endif
-
-{{-- Modal Pelunasan Tunai --}}
-@if(in_array($booking->status, ['dp_paid', 'confirmed']))
-<div class="modal fade" id="modalLunasTunai" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content border-0 rounded-2xl overflow-hidden shadow-2xl bg-surface-container-lowest">
-            <div class="px-6 py-5 border-b border-outline-variant/20 flex justify-between items-center bg-surface-container-low">
-                <h5 class="font-headline font-bold text-lg text-primary flex items-center gap-2">
-                    <i class="bi bi-cash-stack text-secondary"></i> Pelunasan Tunai (Offline)
-                </h5>
-                <button type="button" class="text-on-surface-variant hover:text-primary transition-colors" data-bs-dismiss="modal">
-                    <i class="bi bi-x-lg"></i>
-                </button>
-            </div>
-            <form action="{{ route('admin.bookings.full_cash_payment', $booking->id) }}" method="POST">
-                @csrf
-                <div class="p-6">
-                    <p class="font-body text-sm text-on-surface-variant leading-relaxed mb-5">Gunakan opsi ini jika Klien membayar sisa tagihan secara langsung (tunai) di sanggar tanpa melalui transfer/upload bukti.</p>
-                    <div>
-                        <label class="block font-label text-xs uppercase tracking-widest text-on-surface-variant font-bold mb-1.5">Catatan Pembayaran (Opsional)</label>
-                        <input type="text" name="cash_note" class="w-full bg-surface-container-low border border-outline-variant/50 rounded-lg px-4 py-2.5 font-body text-sm text-on-surface focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all" placeholder="Misal: Diterima oleh staf kasir tanggal sekian">
-                    </div>
-                </div>
-                <div class="px-6 py-4 border-t border-outline-variant/20 bg-surface-container-low flex justify-end gap-3">
-                    <button type="button" class="px-5 py-2.5 rounded-lg border border-outline-variant/50 font-label text-xs font-bold uppercase tracking-widest text-on-surface-variant hover:bg-surface-container transition-colors" data-bs-dismiss="modal">Batal</button>
-                    <button type="submit" class="px-5 py-2.5 rounded-lg bg-primary text-white font-label text-xs font-bold uppercase tracking-widest hover:bg-primary-container transition-colors" onclick="return confirm('Konfirmasi bahwa uang tunai pelunasan telah diterima?')">Konfirmasi Lunas</button>
                 </div>
             </form>
         </div>

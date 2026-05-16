@@ -261,22 +261,26 @@
 </div>
 <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
 @foreach($personnels as $index => $person)
-    @php
-        // Fallback images since we don't have real profile pictures in DB
-        $images = [
-            'https://lh3.googleusercontent.com/aida-public/AB6AXuAF41nW0SEyv9O4aqM0b3R4kEgaL2Jyu2bCR7cp0LMScBbObqoS-YBORfi-yqZWisee8QnW7u2fLJcf_nql0YcGBTOeo0v6_NxugDIUkZys71Wt91M-oTt4dZAFDnEDCUQwxMJY5NlXBK9wskjMlMAadK07XEuZbXrDRlgTRXjp-SC4S5hoXgyu2mMDCmxYU7zKUMDLbhw1jXQv558pROaDVWXntuMcc-5WadhGwOUrqByv3bbfeWwR91tL-9EiAgbdPRjbHRyGgA',
-            'https://lh3.googleusercontent.com/aida-public/AB6AXuD71OTocZUH9eFF4ePBkSLAaXrIEk7ylHj7oAMoze4pDrNZpsP7nyvYN8df3Of-q1uluCVCbjwiifRAPSFGRnx5YNG6W09EJXht0-0GagEFGMra7k21x1GBGNXZjyeUogInhx1hBQk4O8l2k9pnPscBDZIwcI9cE5lTY-jxbtPYUBFOCBWWHcTXoNpO3ya3mBF0npiG7PSbleLRQ-yk4ySxB35mE8lQTRrjRR0iPAIjghuxy4CT9JyYOyjdynCSiZ_4o5h-l6hqfw',
-            'https://lh3.googleusercontent.com/aida-public/AB6AXuAJPyCghH9erUQyj5Tq1PBTLJgrhSmN9WN-wh3FXJg7ev9AymEqBoW7J8iN0TzrhftCDPbg2J6o777zegiYDiTYfWwNpMsiEQifdL5xyu9jkYMI9DWO94KNlI40SiZl4UUpVMQ5sDl-_dnSERRSRykhT7vre3LCJQ3R1b325CRW-N4JXX3lwJayyNfm10MArim6Mol6b4zHyt2S09dGWLeGkOZaLQ_SRgWAlzuq6k8ZnGOOgM7t9dJFlaPOc9wdkcwkOxklauMVjQ',
-            'https://lh3.googleusercontent.com/aida-public/AB6AXuCTox9iuu0JGUWEz25Dkf9WYWLSkLAg8M6xNFbQ_AQNm-4EXgE0ftmo3pQf4Cu06MW9cMdoQfhH8IXdkTp5LP63EQXmToQfda0fby8LTQGdL4GfDVOc0nxdf7Lccsw1yh3d6TJQiO5VWxHzfwCHDwxUUvsF-8JYMZ1y2aW7oTJsj5s0QYWESyxNIHByLiUVfRFtyn7hacrwWXWaI1JVnevhJKhWSl_oj69iRJxUn3dX26PNv2RqiDSZi7Si_2qT_IaCrOWTFqQymw',
-        ];
-        $img = $images[$index % 4];
-    @endphp
     <div class="group text-center">
         <div class="aspect-square mb-4 overflow-hidden rounded-xl bg-surface-container">
-            <img alt="{{ $person->user->name }}" class="w-full h-full object-cover grayscale hover:grayscale-0 transition-all duration-500" src="{{ $img }}"/>
+            @if($person->photo)
+                <img alt="{{ $person->user->name }}" class="w-full h-full object-cover grayscale hover:grayscale-0 transition-all duration-500" src="{{ asset('storage/'.$person->photo) }}"/>
+            @else
+                @php
+                    // Fallback images since we don't have real profile pictures in DB
+                    $images = [
+                        'https://lh3.googleusercontent.com/aida-public/AB6AXuAF41nW0SEyv9O4aqM0b3R4kEgaL2Jyu2bCR7cp0LMScBbObqoS-YBORfi-yqZWisee8QnW7u2fLJcf_nql0YcGBTOeo0v6_NxugDIUkZys71Wt91M-oTt4dZAFDnEDCUQwxMJY5NlXBK9wskjMlMAadK07XEuZbXrDRlgTRXjp-SC4S5hoXgyu2mMDCmxYU7zKUMDLbhw1jXQv558pROaDVWXntuMcc-5WadhGwOUrqByv3bbfeWwR91tL-9EiAgbdPRjbHRyGgA',
+                        'https://lh3.googleusercontent.com/aida-public/AB6AXuD71OTocZUH9eFF4ePBkSLAaXrIEk7ylHj7oAMoze4pDrNZpsP7nyvYN8df3Of-q1uluCVCbjwiifRAPSFGRnx5YNG6W09EJXht0-0GagEFGMra7k21x1GBGNXZjyeUogInhx1hBQk4O8l2k9pnPscBDZIwcI9cE5lTY-jxbtPYUBFOCBWWHcTXoNpO3ya3mBF0npiG7PSbleLRQ-yk4ySxB35mE8lQTRrjRR0iPAIjghuxy4CT9JyYOyjdynCSiZ_4o5h-l6hqfw',
+                        'https://lh3.googleusercontent.com/aida-public/AB6AXuAJPyCghH9erUQyj5Tq1PBTLJgrhSmN9WN-wh3FXJg7ev9AymEqBoW7J8iN0TzrhftCDPbg2J6o777zegiYDiTYfWwNpMsiEQifdL5xyu9jkYMI9DWO94KNlI40SiZl4UUpVMQ5sDl-_dnSERRSRykhT7vre3LCJQ3R1b325CRW-N4JXX3lwJayyNfm10MArim6Mol6b4zHyt2S09dGWLeGkOZaLQ_SRgWAlzuq6k8ZnGOOgM7t9dJFlaPOc9wdkcwkOxklauMVjQ',
+                        'https://lh3.googleusercontent.com/aida-public/AB6AXuCTox9iuu0JGUWEz25Dkf9WYWLSkLAg8M6xNFbQ_AQNm-4EXgE0ftmo3pQf4Cu06MW9cMdoQfhH8IXdkTp5LP63EQXmToQfda0fby8LTQGdL4GfDVOc0nxdf7Lccsw1yh3d6TJQiO5VWxHzfwCHDwxUUvsF-8JYMZ1y2aW7oTJsj5s0QYWESyxNIHByLiUVfRFtyn7hacrwWXWaI1JVnevhJKhWSl_oj69iRJxUn3dX26PNv2RqiDSZi7Si_2qT_IaCrOWTFqQymw',
+                    ];
+                    $img = $images[$index % 4];
+                @endphp
+                <img alt="{{ $person->user->name }}" class="w-full h-full object-cover grayscale hover:grayscale-0 transition-all duration-500" src="{{ $img }}"/>
+            @endif
         </div>
-        <h3 class="font-headline text-lg text-primary font-bold">{{ $person->user->name }}</h3>
-        <p class="text-xs font-label uppercase tracking-widest text-on-surface-variant">{{ ucwords($person->specialty) }}</p>
+        <h3 class="font-headline text-lg text-primary font-bold">{{ $person->stage_name ?? $person->user->name }}</h3>
+        <p class="text-xs font-label uppercase tracking-widest text-on-surface-variant">{{ ucwords(str_replace('_', ' ', $person->specialty)) }}</p>
     </div>
 @endforeach
 </div>

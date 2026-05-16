@@ -179,7 +179,7 @@
         #sidebar.mini .arh-logout { justify-content: center; padding: 10px 0; }
         #sidebar.mini .arh-logout-label { display: none; }
         #sidebar.mini .arh-logout::after {
-            content: 'Logout'; position: fixed; left: calc(var(--sidebar-mini) + 10px);
+            content: 'Keluar'; position: fixed; left: calc(var(--sidebar-mini) + 10px);
             background: #2a1713; color: #fca5a5; font-size: 0.78rem; font-weight: 500;
             padding: 5px 12px; border-radius: 6px; white-space: nowrap;
             pointer-events: none; opacity: 0; transition: opacity 0.15s; z-index: 9999;
@@ -364,9 +364,9 @@
     <div class="arh-logout-wrap">
         <form method="POST" action="{{ route('logout') }}">
             @csrf
-            <button type="submit" class="arh-logout" data-tooltip="Logout">
+            <button type="submit" class="arh-logout" data-tooltip="Keluar">
                 <i class="bi bi-box-arrow-left arh-nav-icon"></i>
-                <span class="arh-logout-label">Logout</span>
+                <span class="arh-logout-label">Keluar</span>
             </button>
         </form>
     </div>

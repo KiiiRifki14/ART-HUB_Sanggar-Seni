@@ -52,14 +52,14 @@
     <h2 class="font-headline text-xl text-primary font-semibold">Semua Permintaan</h2>
     <button @click="showNewBookingModal = true"
        class="bg-gradient-to-br from-primary-container to-primary text-white px-5 py-2.5 rounded-lg font-label text-xs font-bold uppercase tracking-widest hover:opacity-90 transition-all shadow-md flex items-center gap-2 self-start">
-        <i class="bi bi-plus-circle-fill"></i> New Booking
+        <i class="bi bi-plus-circle-fill"></i> Pesanan Baru
     </button>
 </div>
 
 {{-- Filter Tabs --}}
 <div class="flex gap-2 flex-wrap mb-4" id="filter-tabs">
     @php
-        $tabs = ['all'=>"Semua ({$total})",'pending'=>"Pending ({$pending})",'dp_paid'=>"DP Paid ({$dpPaid})",'completed'=>"Selesai ({$done})",'cancelled'=>"Batal ({$canceled})"];
+        $tabs = ['all'=>"Semua ({$total})",'pending'=>"Pending ({$pending})",'dp_paid'=>"DP Dibayar ({$dpPaid})",'completed'=>"Selesai ({$done})",'cancelled'=>"Batal ({$canceled})"];
     @endphp
     @foreach($tabs as $key => $label)
     <button class="px-4 py-2 rounded-lg font-label text-xs font-bold uppercase tracking-widest transition-all border filter-tab {{ $key === 'all' ? 'bg-primary text-white border-primary shadow-sm' : 'bg-surface-container-lowest text-on-surface-variant border-outline-variant/30 hover:border-primary/40 hover:text-primary' }}"
@@ -154,7 +154,7 @@
                     <p class="font-headline text-lg text-on-surface font-semibold mb-2">Belum ada data booking</p>
                     <a href="{{ route('admin.bookings.create') }}"
                        class="inline-block mt-2 bg-gradient-to-br from-primary-container to-primary text-white px-5 py-2.5 rounded-lg font-label text-xs font-bold uppercase tracking-widest hover:opacity-90 transition-all shadow-md">
-                        + Buat Booking Manual
+                        + Buat Pesanan Manual
                     </a>
                 </td>
             </tr>
@@ -291,7 +291,7 @@
                     </button>
                     <button type="submit"
                             class="px-5 py-2.5 rounded-lg bg-gradient-to-br from-primary-container to-primary text-white font-label text-xs font-bold uppercase tracking-widest hover:opacity-90 transition-all shadow-md flex items-center gap-2">
-                        <i class="bi bi-plus-circle-fill"></i> Simpan Booking
+                        <i class="bi bi-plus-circle-fill"></i> Simpan Pesanan
                     </button>
                 </div>
             </form>

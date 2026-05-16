@@ -136,11 +136,11 @@
 
                     <div class="hidden sm:flex flex-col text-right">
                         <span class="font-label text-xs uppercase tracking-widest text-secondary font-bold">{{ Auth::user()->name }}</span>
-                        <span class="font-label text-[0.65rem] text-white/60 uppercase tracking-widest">Client Portal</span>
+                        <span class="font-label text-[0.65rem] text-white/60 uppercase tracking-widest">Portal Klien</span>
                     </div>
                     <form action="{{ route('logout') }}" method="POST" class="m-0">
                         @csrf
-                        <button type="submit" class="p-2 rounded-lg text-white/80 hover:text-white hover:bg-white/10 transition-colors" title="Logout">
+                        <button type="submit" class="p-2 rounded-lg text-white/80 hover:text-white hover:bg-white/10 transition-colors" title="Keluar">
                             <i class="bi bi-box-arrow-right text-lg"></i>
                         </button>
                     </form>
@@ -174,7 +174,7 @@
     <footer class="bg-surface-container py-6 border-t border-outline-variant/30 mt-auto">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
             <p class="font-label text-xs text-on-surface-variant uppercase tracking-widest font-bold">
-                &copy; {{ date('Y') }} Sanggar Seni Cahaya Gumilang. All rights reserved.
+                &copy; {{ date('Y') }} Sanggar Seni Cahaya Gumilang. Hak Cipta Dilindungi.
             </p>
         </div>
     </footer>

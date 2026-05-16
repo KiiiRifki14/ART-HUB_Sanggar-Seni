@@ -11,6 +11,9 @@ use App\Http\Controllers\Admin\FinancialController;
 use App\Http\Controllers\Admin\PersonnelController;
 use App\Http\Controllers\Admin\PaymentController;
 use App\Http\Controllers\Personnel\AttendanceController;
+use App\Http\Controllers\Personnel\PersonnelProfileController;
+use App\Http\Controllers\Personnel\PersonnelUnavailabilityController;
+use App\Http\Controllers\Personnel\FinancialController as PersonnelFinancialController;
 use App\Http\Controllers\ProfileController;
 
 Route::get('/', function () {
@@ -211,11 +214,68 @@ Route::middleware(['auth', 'role:personel'])->prefix('personnel')->name('personn
 
     // Rute khusus Personel Aktif
     Route::middleware([\App\Http\Middleware\EnsurePersonnelIsActive::class])->group(function () {
+
+        // Dashboard – passing data
         Route::get('/dashboard', function () {
-            return view('personnel.dashboard');
+            $user      = Auth::user();
+            $personnel = $user->personnelProfile;
+            $now       = now();
+
+            $upcomingEvents = $personnel
+                ? $personnel->events()
+                    ->where('event_date', '>=', $now->toDateString())
+                    ->orderBy('event_date', 'asc')
+                    ->get()
+                : collect();
+
+            // Kalender logic
+            $thisMonth   = $now->month; $thisYear = $now->year;
+            $firstDay    = \Carbon\Carbon::create($thisYear, $thisMonth, 1);
+            $daysInMonth = $firstDay->daysInMonth;
+            $startDow    = $firstDay->dayOfWeek;
+            $eventDates  = $upcomingEvents->pluck('event_date')
+                ->map(fn($d) => \Carbon\Carbon::parse($d)->format('Y-m-d'))->toArray();
+            $urgentDates = $upcomingEvents->filter(function ($e) use ($now) {
+                $d = \Carbon\Carbon::parse($e->event_date)->startOfDay()->diffInDays($now->startOfDay(), false);
+                return $d >= -3 && $d <= 0;
+            })->pluck('event_date')->map(fn($d) => \Carbon\Carbon::parse($d)->format('Y-m-d'))->toArray();
+
+            // Unavailabilities
+            $unavailabilityDates = [];
+            if ($personnel) {
+                $unavailabilities = $personnel->unavailabilities()
+                    ->where(function($query) use ($now) {
+                        $query->where('start_date', '>=', $now->copy()->startOfMonth())
+                              ->orWhere('end_date', '>=', $now->copy()->startOfMonth());
+                    })->get();
+                foreach($unavailabilities as $unavail) {
+                    $start = \Carbon\Carbon::parse($unavail->start_date);
+                    $end = \Carbon\Carbon::parse($unavail->end_date);
+                    for($date = $start; $date->lte($end); $date->addDay()) {
+                        $unavailabilityDates[] = $date->format('Y-m-d');
+                    }
+                }
+            }
+
+            return view('personnel.dashboard', compact(
+                'personnel', 'now', 'upcomingEvents',
+                'firstDay', 'daysInMonth', 'startDow', 'thisMonth', 'thisYear',
+                'eventDates', 'urgentDates', 'unavailabilityDates'
+            ));
         })->name('dashboard');
 
+        // Check-in GPS
         Route::post('/events/{event}/check-in', [AttendanceController::class, 'checkIn'])->name('attendance.check_in');
+
+        // Profil Mandiri
+        Route::get('/profile', [PersonnelProfileController::class, 'edit'])->name('profile.edit');
+        Route::post('/profile', [PersonnelProfileController::class, 'update'])->name('profile.update');
+
+        // Keuangan
+        Route::get('/keuangan', [PersonnelFinancialController::class, 'index'])->name('keuangan');
+
+        // Berhalangan
+        Route::post('/unavailability', [PersonnelUnavailabilityController::class, 'store'])->name('unavailability.store');
     });
 });
 

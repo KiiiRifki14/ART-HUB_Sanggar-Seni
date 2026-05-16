@@ -71,7 +71,7 @@
 
                 {{-- Batas Pengembalian --}}
                 <div class="md:col-span-2">
-                    <label class="font-label text-sm font-bold text-on-surface block mb-1.5 ml-1">Batas Waktu Pengembalian (Due Date)</label>
+                    <label class="font-label text-sm font-bold text-on-surface block mb-1.5 ml-1">Batas Waktu Pengembalian</label>
                     <input type="date" name="due_date"
                            class="w-full bg-surface-container border border-outline-variant/50 rounded-xl px-4 py-3 font-body text-sm focus:outline-none focus:border-secondary focus:ring-1 focus:ring-secondary transition-colors" required>
                     <p class="text-[10px] text-on-surface-variant mt-2 ml-1 italic">*Keterlambatan akan dikenakan denda otomatis oleh sistem Rp 50.000/hari.</p>

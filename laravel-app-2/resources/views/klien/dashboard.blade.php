@@ -42,7 +42,7 @@
         </div>
         <div>
             <div class="font-headline text-2xl font-bold text-on-surface leading-none mb-1">{{ $aktif }}</div>
-            <div class="font-label text-[0.65rem] uppercase tracking-widest text-outline font-bold">Booking Aktif</div>
+            <div class="font-label text-[0.65rem] uppercase tracking-widest text-outline font-bold">Pesanan Aktif</div>
         </div>
     </div>
     

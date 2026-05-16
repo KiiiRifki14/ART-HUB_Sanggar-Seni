@@ -1,7 +1,7 @@
 @extends('layouts.admin')
 
-@section('title', 'Financial Report – ART-HUB')
-@section('page_title', 'Financial Report')
+@section('title', 'Laporan Keuangan – ART-HUB')
+@section('page_title', 'Laporan Keuangan')
 @section('page_subtitle', 'Ringkasan laba, anggaran, dan audit keuangan sanggar.')
 
 @section('content')
@@ -22,13 +22,13 @@
         <div class="relative z-10">
             <i class="bi bi-safe2-fill text-3xl text-secondary-container mb-3 block"></i>
             <h3 class="font-headline text-3xl font-bold text-secondary-container mb-1">Rp {{ number_format($totalProfit, 0, ',', '.') }}</h3>
-            <div class="font-label text-xs uppercase tracking-widest text-white/80 font-bold">Fixed Profit Total</div>
+            <div class="font-label text-xs uppercase tracking-widest text-white/80 font-bold">Total Laba Tetap</div>
         </div>
     </div>
     <div class="bg-surface-container-lowest rounded-xl p-6 border border-green-500/30 shadow-[0_8px_20px_rgba(54,31,26,0.03)] text-center">
         <i class="bi bi-shield-check text-3xl text-green-500 mb-3 block"></i>
         <h3 class="font-headline text-3xl font-bold text-green-600 mb-1">Rp {{ number_format($totalBuffer, 0, ',', '.') }}</h3>
-        <div class="font-label text-xs uppercase tracking-widest text-outline font-bold">Safety Buffer Area</div>
+        <div class="font-label text-xs uppercase tracking-widest text-outline font-bold">Dana Cadangan</div>
     </div>
     <div class="bg-surface-container-lowest rounded-xl p-6 border border-outline-variant/30 shadow-[0_8px_20px_rgba(54,31,26,0.03)] text-center">
         <i class="bi bi-graph-up-arrow text-3xl text-on-surface-variant mb-3 block"></i>
@@ -58,7 +58,7 @@
         <thead class="bg-surface-container-low">
             <tr>
                 <th class="font-label text-[0.65rem] uppercase tracking-widest text-outline font-bold px-6 py-4 text-left">Event</th>
-                <th class="font-label text-[0.65rem] uppercase tracking-widest text-outline font-bold px-6 py-4 text-right">Revenue</th>
+                <th class="font-label text-[0.65rem] uppercase tracking-widest text-outline font-bold px-6 py-4 text-right">Pendapatan</th>
                 <th class="font-label text-[0.65rem] uppercase tracking-widest text-outline font-bold px-6 py-4 text-right">Laba Pimpinan (Fixed)</th>
                 <th class="font-label text-[0.65rem] uppercase tracking-widest text-outline font-bold px-6 py-4 text-right">Honor Kru</th>
                 <th class="font-label text-[0.65rem] uppercase tracking-widest text-outline font-bold px-6 py-4 text-right">Budget Ops</th>
@@ -131,7 +131,7 @@
     <div class="w-24 h-24 rounded-full bg-red-500/10 flex items-center justify-center mx-auto mb-6">
         <i class="bi bi-shield-lock-fill text-5xl text-red-500"></i>
     </div>
-    <h3 class="font-headline text-2xl text-red-700 font-bold mb-3">Akses Ditolak (Requires Pimpinan)</h3>
+    <h3 class="font-headline text-2xl text-red-700 font-bold mb-3">Akses Ditolak (Hanya Pimpinan)</h3>
     <p class="font-body text-sm text-on-surface-variant leading-relaxed">
         Laporan finansial, fixed profit, dan buffer budget adalah area khusus Pimpinan Sanggar.<br> 
         Akun Anda tidak memiliki otoritas untuk melihat data sensitif ini.

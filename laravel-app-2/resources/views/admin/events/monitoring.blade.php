@@ -1,17 +1,17 @@
 @extends('layouts.admin')
-@section('title', 'Event Monitoring – ART-HUB')
-@section('page_title', 'Event Monitoring')
+@section('title', 'Monitoring Acara – ART-HUB')
+@section('page_title', 'Monitoring Acara')
 @section('page_subtitle', 'Pantau status & operasional lapangan seluruh pementasan secara real-time.')
 
 @section('content')
 @php
     $statusMap = [
-        'pending'   => ['label' => 'Negotiation',   'class' => 'bg-orange-500/10 text-orange-600 border-orange-500/20',     'icon' => 'bi-chat-dots-fill'],
-        'dp_paid'   => ['label' => 'Locked',        'class' => 'bg-secondary/10 text-secondary border-secondary/20',        'icon' => 'bi-lock-fill'],
+        'pending'   => ['label' => 'Negosiasi',    'class' => 'bg-orange-500/10 text-orange-600 border-orange-500/20',     'icon' => 'bi-chat-dots-fill'],
+        'dp_paid'   => ['label' => 'Terkunci',      'class' => 'bg-secondary/10 text-secondary border-secondary/20',        'icon' => 'bi-lock-fill'],
         'confirmed' => ['label' => 'DP 50%',        'class' => 'bg-blue-500/10 text-blue-600 border-blue-500/20',           'icon' => 'bi-receipt-cutoff'],
         'paid_full' => ['label' => 'Lunas',         'class' => 'bg-green-500/10 text-green-600 border-green-500/20',        'icon' => 'bi-check-circle-fill'],
-        'completed' => ['label' => 'Completed',     'class' => 'bg-surface-container text-on-surface-variant border-outline-variant/30', 'icon' => 'bi-patch-check-fill'],
-        'cancelled' => ['label' => 'Cancelled',     'class' => 'bg-red-500/10 text-red-600 border-red-500/20',              'icon' => 'bi-x-circle-fill'],
+        'completed' => ['label' => 'Selesai',       'class' => 'bg-surface-container text-on-surface-variant border-outline-variant/30', 'icon' => 'bi-patch-check-fill'],
+        'cancelled' => ['label' => 'Dibatalkan',    'class' => 'bg-red-500/10 text-red-600 border-red-500/20',              'icon' => 'bi-x-circle-fill'],
     ];
     $filters = [
         'all'       => ['label' => 'Semua',         'icon' => 'bi-grid-3x3-gap-fill'],

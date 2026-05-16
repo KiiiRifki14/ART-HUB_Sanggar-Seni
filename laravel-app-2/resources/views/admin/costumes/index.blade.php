@@ -1,7 +1,7 @@
 @extends('layouts.admin')
 
-@section('title', 'Costume & Logistik – ART-HUB')
-@section('page_title', 'Costume & Logistik')
+@section('title', 'Kostum & Logistik – ART-HUB')
+@section('page_title', 'Kostum & Logistik')
 @section('page_subtitle', 'Inventaris aset sanggar dan status persewaan vendor eksternal.')
 
 @section('content')
@@ -108,7 +108,7 @@
                     </td>
                     <td class="px-6 py-4 text-center">
                         @if($r->status === 'rented' && $isOverdue)
-                            <span class="inline-block px-2.5 py-1 rounded border border-red-500/20 bg-red-500/10 font-label text-[0.65rem] font-bold uppercase tracking-wider text-red-600">OVERDUE</span>
+                            <span class="inline-block px-2.5 py-1 rounded border border-red-500/20 bg-red-500/10 font-label text-[0.65rem] font-bold uppercase tracking-wider text-red-600">TERLAMBAT</span>
                         @elseif($r->status === 'rented')
                             <span class="inline-block px-2.5 py-1 rounded border border-orange-500/20 bg-orange-500/10 font-label text-[0.65rem] font-bold uppercase tracking-wider text-orange-600">DIPINJAM</span>
                         @else

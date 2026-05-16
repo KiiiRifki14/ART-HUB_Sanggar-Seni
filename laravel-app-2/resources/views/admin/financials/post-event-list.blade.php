@@ -1,6 +1,6 @@
 @extends('layouts.admin')
-@section('title', 'Post-Event Update – ART-HUB')
-@section('page_title', 'Post-Event Update')
+@section('title', 'Pembaruan Pasca-Acara – ART-HUB')
+@section('page_title', 'Pembaruan Pasca-Acara')
 @section('page_subtitle', 'Input biaya riil lapangan pasca pementasan')
 
 @section('content')

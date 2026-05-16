@@ -1,7 +1,7 @@
 @extends('layouts.admin')
 
-@section('title', 'Cancellation Handler – ART-HUB')
-@section('page_title', 'Cancellation Handler')
+@section('title', 'Penanganan Pembatalan – ART-HUB')
+@section('page_title', 'Penanganan Pembatalan')
 @section('page_subtitle', 'Riwayat pembatalan & pengembalian dana klien.')
 
 @section('content')
@@ -72,7 +72,7 @@
                     @elseif($c->status === 'processed')
                         <span class="inline-block px-2.5 py-1 rounded border border-secondary/20 bg-secondary/10 font-label text-[0.65rem] font-bold uppercase tracking-wider text-secondary">DIPROSES</span>
                     @else
-                        <span class="inline-block px-2.5 py-1 rounded border border-green-500/20 bg-green-500/10 font-label text-[0.65rem] font-bold uppercase tracking-wider text-green-600">REFUNDED</span>
+                        <span class="inline-block px-2.5 py-1 rounded border border-green-500/20 bg-green-500/10 font-label text-[0.65rem] font-bold uppercase tracking-wider text-green-600">DIKEMBALIKAN</span>
                     @endif
                 </td>
             </tr>

@@ -17,7 +17,7 @@
                 <i class="bi bi-lock-fill"></i> Terkunci
             </span>
         </div>
-        <div class="font-label text-xs uppercase tracking-widest text-outline font-bold mb-1">Fixed Profit Aman</div>
+        <div class="font-label text-xs uppercase tracking-widest text-outline font-bold mb-1">Laba Tetap Aman</div>
         <div class="font-headline text-2xl text-primary font-semibold">Rp {{ number_format($lockedProfit, 0, ',', '.') }}</div>
     </div>
 
@@ -27,7 +27,7 @@
                 <i class="bi bi-shield-check-fill text-green-600 text-xl"></i>
             </div>
         </div>
-        <div class="font-label text-xs uppercase tracking-widest text-outline font-bold mb-1">Safety Buffer Standby</div>
+        <div class="font-label text-xs uppercase tracking-widest text-outline font-bold mb-1">Dana Cadangan Siap</div>
         <div class="font-headline text-2xl text-green-600 font-semibold">Rp {{ number_format($safetyBuffer, 0, ',', '.') }}</div>
     </div>
 
@@ -57,8 +57,8 @@
             </span>
             @endif
         </div>
-        <div class="font-label text-xs uppercase tracking-widest text-outline font-bold mb-1">Event Bulan Ini</div>
-        <div class="font-headline text-2xl text-on-surface font-semibold">{{ $eventCount }} <span class="text-sm font-body text-outline font-normal">event</span></div>
+        <div class="font-label text-xs uppercase tracking-widest text-outline font-bold mb-1">Acara Bulan Ini</div>
+        <div class="font-headline text-2xl text-on-surface font-semibold">{{ $eventCount }} <span class="text-sm font-body text-outline font-normal">acara</span></div>
     </div>
 </div>
 
@@ -68,12 +68,12 @@
     <div class="lg:col-span-2 bg-surface-container-lowest rounded-xl p-6 border border-outline-variant/30 shadow-[0_12px_24px_rgba(54,31,26,0.03)]">
         <div class="flex flex-col sm:flex-row sm:justify-between sm:items-start mb-6 gap-4">
             <div>
-                <h3 class="font-headline text-lg text-primary font-semibold mb-1"><i class="bi bi-graph-up me-2 text-secondary"></i>Revenue & Profit Bersih</h3>
+                <h3 class="font-headline text-lg text-primary font-semibold mb-1"><i class="bi bi-graph-up me-2 text-secondary"></i>Pendapatan & Laba Bersih</h3>
                 <p class="font-label text-xs uppercase tracking-widest text-outline">Proyeksi 6 Bulan (Termasuk Acara Mendatang)</p>
             </div>
             <div class="flex gap-4 font-label text-xs font-bold uppercase tracking-wider text-on-surface-variant">
-                <span class="flex items-center gap-2"><span class="w-3 h-3 rounded bg-primary"></span> Revenue</span>
-                <span class="flex items-center gap-2"><span class="w-3 h-3 rounded bg-secondary"></span> Fixed Profit</span>
+                <span class="flex items-center gap-2"><span class="w-3 h-3 rounded bg-primary"></span> Pendapatan</span>
+                <span class="flex items-center gap-2"><span class="w-3 h-3 rounded bg-secondary"></span> Laba Tetap</span>
             </div>
         </div>
         <div class="relative h-[250px] w-full">
@@ -97,7 +97,7 @@
 <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
     <div class="lg:col-span-7 bg-surface-container-lowest rounded-xl p-6 border border-outline-variant/30 shadow-[0_12px_24px_rgba(54,31,26,0.03)]">
         <div class="flex justify-between items-center mb-6">
-            <h3 class="font-headline text-lg text-primary font-semibold"><i class="bi bi-radar me-2 text-secondary"></i>Upcoming Events</h3>
+            <h3 class="font-headline text-lg text-primary font-semibold"><i class="bi bi-radar me-2 text-secondary"></i>Acara Mendatang</h3>
             <a href="{{ route('admin.events.monitoring') }}" class="font-label text-xs font-bold uppercase tracking-widest text-secondary hover:text-primary transition-colors underline underline-offset-4 decoration-2 decoration-secondary/30">Lihat Semua</a>
         </div>
 
@@ -244,14 +244,14 @@
             labels: revenueData.map(d => d.label),
             datasets: [
                 {
-                    label: 'Revenue',
+                    label: 'Pendapatan',
                     data: revenueData.map(d => d.revenue),
                     backgroundColor: '#361f1a', // primary
                     borderRadius: 4, borderSkipped: false,
                     barPercentage: 0.6,
                 },
                 {
-                    label: 'Fixed Profit',
+                    label: 'Laba Tetap',
                     data: revenueData.map(d => d.profit),
                     backgroundColor: '#fcd400', // secondary container
                     borderRadius: 4, borderSkipped: false,

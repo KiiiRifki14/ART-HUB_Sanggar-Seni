@@ -109,15 +109,15 @@
             @if($event->financialRecord)
                 <div class="space-y-4">
                     <div class="flex justify-between items-center pb-3 border-b border-outline-variant/20">
-                        <span class="font-label text-[0.65rem] uppercase tracking-widest text-outline font-bold">Total Revenue</span>
+                        <span class="font-label text-[0.65rem] uppercase tracking-widest text-outline font-bold">Total Pendapatan</span>
                         <span class="font-body font-bold text-sm text-on-surface">Rp {{ number_format($event->financialRecord->total_revenue, 0, ',', '.') }}</span>
                     </div>
                     <div class="flex justify-between items-center pb-3 border-b border-outline-variant/20">
-                        <span class="font-label text-[0.65rem] uppercase tracking-widest text-secondary font-bold">Fixed Profit (Laba)</span>
+                        <span class="font-label text-[0.65rem] uppercase tracking-widest text-secondary font-bold">Laba Tetap (Profit)</span>
                         <span class="font-headline font-bold text-base text-secondary">Rp {{ number_format($event->financialRecord->fixed_profit, 0, ',', '.') }}</span>
                     </div>
                     <div class="flex justify-between items-center">
-                        <span class="font-label text-[0.65rem] uppercase tracking-widest text-outline font-bold">Budget Ops Default</span>
+                        <span class="font-label text-[0.65rem] uppercase tracking-widest text-outline font-bold">Anggaran Ops Default</span>
                         <span class="font-body font-bold text-sm text-on-surface-variant">Rp {{ number_format($event->financialRecord->operational_budget, 0, ',', '.') }}</span>
                     </div>
                 </div>
@@ -202,11 +202,26 @@
 </div>
 
 {{-- ── TOMBOL AKSI BAWAH ── --}}
+@php $eventDateCarbon = \Carbon\Carbon::parse($event->event_date); @endphp
 <div class="flex flex-wrap gap-3">
-    @if($event->financialRecord)
+    @if($event->financialRecord && in_array($event->status, ['completed']))
     <a href="{{ route('admin.financials.post_event', $event->id) }}" class="inline-flex items-center gap-1.5 px-5 py-2.5 rounded-lg border border-blue-500/30 text-blue-600 font-label text-[0.65rem] font-bold uppercase tracking-widest hover:bg-blue-500/10 transition-colors">
         <i class="bi bi-calculator"></i> Kalkulasi Post-Event (Biaya Riil)
     </a>
+    @endif
+
+    @if($eventDateCarbon->isPast() && !in_array($event->status, ['completed', 'cancelled']))
+    <form method="POST" action="{{ route('admin.events.mark_completed', $event->id) }}" onsubmit="return confirm('Tandai acara ini sebagai SELESAI? Langkah ini tidak dapat dibatalkan.')">
+        @csrf
+        @method('PATCH')
+        <button type="submit" class="inline-flex items-center gap-1.5 px-5 py-2.5 rounded-lg bg-green-600 text-white font-label text-[0.65rem] font-bold uppercase tracking-widest hover:bg-green-700 transition-colors shadow-md">
+            <i class="bi bi-check2-all"></i> Tandai Acara Selesai
+        </button>
+    </form>
+    @elseif($event->status === 'completed')
+    <span class="inline-flex items-center gap-1.5 px-5 py-2.5 rounded-lg bg-green-500/10 text-green-600 border border-green-500/20 font-label text-[0.65rem] font-bold uppercase tracking-widest">
+        <i class="bi bi-patch-check-fill"></i> Acara Telah Selesai
+    </span>
     @endif
 </div>
 

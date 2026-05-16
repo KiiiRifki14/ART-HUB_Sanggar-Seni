@@ -42,9 +42,9 @@
                     <div>
                         <label class="font-label text-[0.65rem] font-bold uppercase tracking-widest text-outline block mb-1.5 ml-1">Spesialisasi Utama <span class="text-red-500">*</span></label>
                         <select name="specialty" class="w-full bg-surface-container-low border {{ $errors->has('specialty') ? 'border-red-500' : 'border-outline-variant/50' }} rounded-xl px-4 py-3 font-body text-sm text-on-surface focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-colors appearance-none" required>
-                            <option value="penari" {{ old('specialty', $personnel->specialty) === 'penari' ? 'selected' : '' }}>Penari (Dancer)</option>
-                            <option value="pemusik" {{ old('specialty', $personnel->specialty) === 'pemusik' ? 'selected' : '' }}>Pemusik (Musician)</option>
-                            <option value="multi_talent" {{ old('specialty', $personnel->specialty) === 'multi_talent' ? 'selected' : '' }}>Multi-Talent / Crew</option>
+                            <option value="penari" {{ old('specialty', $personnel->specialty) === 'penari' ? 'selected' : '' }}>Penari</option>
+                            <option value="pemusik" {{ old('specialty', $personnel->specialty) === 'pemusik' ? 'selected' : '' }}>Pemusik</option>
+                            <option value="multi_talent" {{ old('specialty', $personnel->specialty) === 'multi_talent' ? 'selected' : '' }}>Multi-Talent / Kru</option>
                         </select>
                         @error('specialty')<p class="text-red-500 font-body text-xs mt-1 ml-1">{{ $message }}</p>@enderror
                     </div>
