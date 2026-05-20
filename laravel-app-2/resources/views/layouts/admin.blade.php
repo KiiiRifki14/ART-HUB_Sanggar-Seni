@@ -343,69 +343,6 @@
         [data-sidebar-mini="1"] #page-content { margin-left: var(--sidebar-mini) !important; }
     </style>
 
-    <style>
-        @media (max-width: 1024px) {
-            .mobile-card-table {
-                display: block;
-                width: 100%;
-                min-width: unset !important;
-            }
-            .mobile-card-table thead {
-                display: none;
-            }
-            .mobile-card-table tbody, .mobile-card-table tr {
-                display: block;
-                width: 100%;
-            }
-            .mobile-card-table tr {
-                margin-bottom: 1rem;
-                background-color: var(--surface-container-lowest, #fff);
-                border: 1px solid rgba(0,0,0,0.1);
-                border-radius: 1rem;
-                padding: 0.5rem;
-                box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
-            }
-            .mobile-card-table td {
-                display: flex;
-                justify-content: space-between;
-                align-items: center;
-                width: 100%;
-                padding: 0.75rem 0.5rem;
-                border: none !important;
-                border-bottom: 1px dashed rgba(0,0,0,0.1) !important;
-                text-align: right !important;
-            }
-            .mobile-card-table td:last-child {
-                border-bottom: none !important;
-            }
-            .mobile-card-table td::before {
-                content: attr(data-label);
-                font-weight: 800;
-                font-family: 'Inter', sans-serif;
-                font-size: 0.65rem;
-                text-transform: uppercase;
-                letter-spacing: 0.05em;
-                color: #64748b;
-                text-align: left;
-                margin-right: 1rem;
-                flex-shrink: 0;
-            }
-            .mobile-card-table td > * {
-                text-align: right;
-            }
-            .mobile-card-table td > .flex {
-                justify-content: flex-end;
-            }
-            /* Override whitespace/padding issues for cards */
-            .mobile-card-table td.px-6, .mobile-card-table td.py-4 {
-                padding-left: 0.5rem !important;
-                padding-right: 0.5rem !important;
-                padding-top: 0.75rem !important;
-                padding-bottom: 0.75rem !important;
-            }
-        }
-    </style>
-
     @yield('styles')
 </head>
 <body>
@@ -628,30 +565,7 @@
         });
     });
 
-    // Convert data tables to mobile cards (CSS media query akan mengatur kapan view card aktif)
-    document.addEventListener('DOMContentLoaded', function() {
-        const tables = document.querySelectorAll('#page-content main table');
-        tables.forEach(table => {
-            // Hanya target tabel yang memiliki thead (data table)
-            if (table.querySelector('thead') && !table.classList.contains('no-mobile-card')) {
-                table.classList.add('mobile-card-table');
-                
-                // Ambil teks dari th thead untuk dijadikan label
-                const headers = Array.from(table.querySelectorAll('thead th')).map(th => th.innerText.trim());
-                
-                // Terapkan attr data-label ke setiap td di tbody
-                const rows = table.querySelectorAll('tbody tr');
-                rows.forEach(row => {
-                    const cells = row.querySelectorAll('td');
-                    cells.forEach((cell, index) => {
-                        if (headers[index]) {
-                            cell.setAttribute('data-label', headers[index]);
-                        }
-                    });
-                });
-            }
-        });
-    });
+
 </script>
 @yield('scripts')
 @stack('scripts')

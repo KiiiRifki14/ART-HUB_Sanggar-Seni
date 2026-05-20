@@ -141,6 +141,7 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
     Route::get('/events/{event}/plotting', [EventController::class, 'plotting'])->name('events.plotting');
     Route::post('/events/{event}/plotting', [EventController::class, 'storePlotting'])->name('events.plotting.store');
     Route::patch('/events/{event}/coordinates', [EventController::class, 'updateCoordinates'])->name('events.update_coordinates');
+    Route::patch('/events/{event}/mark-completed', [EventController::class, 'markCompleted'])->name('events.mark_completed');
 
     // PERSONNEL MANAGEMENT (CRUD lengkap)
     Route::get('/personnel', [PersonnelController::class, 'index'])->name('personnel.index');

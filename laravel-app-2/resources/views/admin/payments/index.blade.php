@@ -50,8 +50,8 @@
     </h2>
 </div>
 
-{{-- Table --}}
-<div class="bg-surface-container-lowest rounded-xl border border-outline-variant/30 shadow-[0_12px_24px_rgba(54,31,26,0.03)] overflow-hidden">
+{{-- ══ TABLE (Desktop) ══ --}}
+<div class="hidden md:block bg-surface-container-lowest rounded-xl border border-outline-variant/30 shadow-[0_12px_24px_rgba(54,31,26,0.03)] overflow-hidden">
     <table class="w-full">
         <thead class="bg-surface-container-low">
             <tr>
@@ -176,6 +176,65 @@
             @endforelse
         </tbody>
     </table>
+</div>
+
+{{-- ══ MOBILE CARDS (Mobile only) ══ --}}
+<div class="md:hidden space-y-3 mb-6">
+    @forelse($bookings as $booking)
+    @php
+        $sisa = $booking->total_price - $booking->dp_amount;
+        $isLunas = !is_null($booking->full_paid_at) || ($booking->total_price > 0 && $sisa <= 0) || in_array($booking->status, ['paid_full']);
+        $isOverdue = !$isLunas && in_array($booking->status, ['completed']);
+        $sisaFormatted = number_format($sisa, 0, ',', '.');
+    @endphp
+    <div class="bg-surface-container-lowest rounded-xl border {{ $isOverdue ? 'border-l-4 border-l-red-500 border-outline-variant/30' : 'border-outline-variant/30' }} shadow-sm overflow-hidden">
+        <div class="flex items-center justify-between px-4 py-3 bg-surface-container-low border-b border-outline-variant/20">
+            <div>
+                <span class="inline-block px-2.5 py-1 rounded bg-secondary-container/40 text-on-secondary-container border border-secondary/20 font-label text-[0.65rem] font-bold tracking-wider">#{{ str_pad($booking->id, 4, '0', STR_PAD_LEFT) }}</span>
+                @if($booking->event)<div class="font-label text-[0.6rem] text-outline mt-0.5 font-bold">{{ $booking->event->event_code }}</div>@endif
+            </div>
+            @if($isLunas)
+                <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded bg-green-500/10 text-green-600 border border-green-500/20 font-label text-[0.6rem] font-bold uppercase tracking-wider"><i class="bi bi-check-circle-fill"></i> LUNAS</span>
+            @elseif($isOverdue)
+                <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded bg-red-500/10 text-red-600 border border-red-500/20 font-label text-[0.6rem] font-bold uppercase tracking-wider"><i class="bi bi-exclamation-triangle-fill"></i> BELUM LUNAS</span>
+            @else
+                <span class="inline-block px-2 py-0.5 rounded border border-outline-variant/30 bg-surface-container font-label text-[0.6rem] font-bold uppercase tracking-wider text-outline">{{ strtoupper($booking->status) }}</span>
+            @endif
+        </div>
+        <div class="px-4 py-3 space-y-2">
+            <div class="flex justify-between items-start">
+                <div>
+                    <div class="font-body font-bold text-sm text-on-surface">{{ $booking->client_name ?? ($booking->client->name ?? '-') }}</div>
+                    <div class="font-label text-[0.65rem] text-outline">{{ $booking->client_phone ?? '-' }}</div>
+                </div>
+            </div>
+            <div class="grid grid-cols-3 gap-2">
+                <div class="bg-surface-container rounded-lg p-2">
+                    <div class="font-label text-[0.55rem] uppercase tracking-widest text-outline mb-0.5">Total</div>
+                    <div class="font-headline font-bold text-xs text-primary">Rp {{ number_format($booking->total_price, 0, ',', '.') }}</div>
+                </div>
+                <div class="bg-green-500/5 border border-green-500/10 rounded-lg p-2">
+                    <div class="font-label text-[0.55rem] uppercase tracking-widest text-outline mb-0.5">DP</div>
+                    <div class="font-headline font-bold text-xs text-green-600">Rp {{ number_format($booking->dp_amount, 0, ',', '.') }}</div>
+                </div>
+                <div class="{{ $isOverdue ? 'bg-red-500/5 border border-red-500/10' : 'bg-surface-container' }} rounded-lg p-2">
+                    <div class="font-label text-[0.55rem] uppercase tracking-widest text-outline mb-0.5">Sisa</div>
+                    <div class="font-headline font-bold text-xs {{ $isOverdue ? 'text-red-600' : 'text-primary' }}">Rp {{ $sisaFormatted }}</div>
+                </div>
+            </div>
+            @if(!$isLunas && $booking->status !== 'cancelled' && (in_array($booking->status, ['completed']) || (\Carbon\Carbon::parse($booking->event_date)->isPast() && in_array($booking->status, ['dp_paid', 'confirmed']))))
+            <button type="button" onclick="openLunasModal({{ $booking->id }}, '{{ $sisaFormatted }}')" class="w-full flex items-center justify-center gap-1.5 py-2 rounded-lg border border-green-500 text-green-600 hover:bg-green-500 hover:text-white transition-all font-label text-[0.65rem] font-bold uppercase tracking-wider">
+                <i class="bi bi-check-circle"></i> Tandai Lunas
+            </button>
+            @endif
+        </div>
+    </div>
+    @empty
+    <div class="py-14 flex flex-col items-center justify-center bg-surface-container-lowest border border-dashed border-outline-variant/30 rounded-xl text-center">
+        <i class="bi bi-inbox text-4xl text-outline mb-3"></i>
+        <p class="font-headline text-base text-on-surface font-semibold">Belum ada tagihan</p>
+    </div>
+    @endforelse
 </div>
 
 @endsection

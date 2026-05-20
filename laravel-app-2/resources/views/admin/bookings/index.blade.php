@@ -69,8 +69,8 @@
     @endforeach
 </div>
 
-{{-- Table --}}
-<div class="bg-surface-container-lowest rounded-xl border border-outline-variant/30 shadow-[0_12px_24px_rgba(54,31,26,0.03)] overflow-hidden overflow-x-auto">
+{{-- ════ TABLE (Desktop) ════ --}}
+<div class="hidden md:block bg-surface-container-lowest rounded-xl border border-outline-variant/30 shadow-[0_12px_24px_rgba(54,31,26,0.03)] overflow-hidden overflow-x-auto">
     <table class="w-full min-w-[1000px]">
         <thead class="bg-surface-container-low">
             <tr>
@@ -119,45 +119,95 @@
                     @endif
                 </td>
                 <td class="px-6 py-4 text-center">
-                    <span class="inline-block px-2.5 py-1 rounded border font-label text-[0.65rem] font-bold uppercase tracking-wider {{ $stClass }}">
-                        {{ $stLabel }}
-                    </span>
+                    <span class="inline-block px-2.5 py-1 rounded border font-label text-[0.65rem] font-bold uppercase tracking-wider {{ $stClass }}">{{ $stLabel }}</span>
                     @if($booking->status === 'pending' && $daysLeft <= 7 && $daysLeft >= 0)
                     <div class="font-label text-[0.6rem] text-red-500 font-bold mt-1">⚠ H-{{ $daysLeft }}</div>
                     @endif
                 </td>
                 <td class="px-6 py-4 text-center">
                     <div class="flex items-center justify-center gap-2">
-                        <a href="{{ route('admin.bookings.show', $booking->id) }}"
-                           class="w-8 h-8 rounded-lg bg-surface-container flex items-center justify-center text-on-surface-variant hover:bg-primary hover:text-white transition-all"
-                           title="Detail">
-                            <i class="bi bi-eye-fill text-sm"></i>
-                        </a>
+                        <a href="{{ route('admin.bookings.show', $booking->id) }}" class="w-8 h-8 rounded-lg bg-surface-container flex items-center justify-center text-on-surface-variant hover:bg-primary hover:text-white transition-all" title="Detail"><i class="bi bi-eye-fill text-sm"></i></a>
                         @if($booking->status === 'pending')
-                        <button type="button"
-                                onclick="openKunciModal({{ $booking->id }}, '{{ addslashes($booking->client_name) }}', {{ $booking->total_price }}, {{ $booking->dp_amount }})"
-                                class="w-8 h-8 rounded-lg bg-surface-container flex items-center justify-center text-on-surface-variant hover:bg-secondary hover:text-white transition-all"
-                                title="Kunci Laba & Konfirmasi DP">
-                            <i class="bi bi-lock-fill text-sm"></i>
-                        </button>
+                        <button type="button" onclick="openKunciModal({{ $booking->id }}, '{{ addslashes($booking->client_name) }}', {{ $booking->total_price }}, {{ $booking->dp_amount }})" class="w-8 h-8 rounded-lg bg-surface-container flex items-center justify-center text-on-surface-variant hover:bg-secondary hover:text-white transition-all" title="Kunci Laba & Konfirmasi DP"><i class="bi bi-lock-fill text-sm"></i></button>
                         @endif
                     </div>
                 </td>
             </tr>
             @empty
-            <tr>
-                <td colspan="7" class="px-6 py-20 text-center">
-                    <i class="bi bi-inbox text-4xl text-outline mb-4 block"></i>
-                    <p class="font-headline text-lg text-on-surface font-semibold mb-2">Belum ada data booking</p>
-                    <a href="{{ route('admin.bookings.create') }}"
-                       class="inline-block mt-2 bg-gradient-to-br from-primary-container to-primary text-white px-5 py-2.5 rounded-lg font-label text-xs font-bold uppercase tracking-widest hover:opacity-90 transition-all shadow-md">
-                        + Buat Pesanan Manual
-                    </a>
-                </td>
-            </tr>
+            <tr><td colspan="7" class="px-6 py-20 text-center">
+                <i class="bi bi-inbox text-4xl text-outline mb-4 block"></i>
+                <p class="font-headline text-lg text-on-surface font-semibold mb-2">Belum ada data booking</p>
+                <a href="{{ route('admin.bookings.create') }}" class="inline-block mt-2 bg-gradient-to-br from-primary-container to-primary text-white px-5 py-2.5 rounded-lg font-label text-xs font-bold uppercase tracking-widest hover:opacity-90 transition-all shadow-md">+ Buat Pesanan Manual</a>
+            </td></tr>
             @endforelse
         </tbody>
     </table>
+</div>
+
+{{-- ════ MOBILE CARDS (Mobile only) ════ --}}
+<div class="md:hidden space-y-3" id="booking-tbody-mobile">
+    @forelse($bookings as $booking)
+    @php
+        [$stLabel, $stClass] = $statusMap[$booking->status] ?? [strtoupper($booking->status), 'bg-surface-container text-outline border-outline-variant/30'];
+        $daysLeft = (int) now()->startOfDay()->diffInDays(\Carbon\Carbon::parse($booking->event_date)->startOfDay(), false);
+    @endphp
+    <div data-status="{{ $booking->status }}" class="bg-surface-container-lowest rounded-xl border border-outline-variant/30 shadow-sm overflow-hidden">
+        {{-- Card Header --}}
+        <div class="flex items-center justify-between px-4 py-3 bg-surface-container-low border-b border-outline-variant/20">
+            <span class="inline-block px-2.5 py-1 rounded bg-secondary-container/40 text-on-secondary-container border border-secondary/20 font-label text-[0.65rem] font-bold tracking-wider">#{{ str_pad($booking->id, 4, '0', STR_PAD_LEFT) }}</span>
+            <span class="inline-block px-2.5 py-1 rounded border font-label text-[0.6rem] font-bold uppercase tracking-wider {{ $stClass }}">{{ $stLabel }}</span>
+        </div>
+        {{-- Card Body --}}
+        <div class="px-4 py-3 space-y-2.5">
+            <div class="flex justify-between items-start">
+                <div>
+                    <div class="font-body font-bold text-sm text-on-surface">{{ $booking->client_name ?? ($booking->client->name ?? 'Klien Manual') }}</div>
+                    <div class="font-label text-[0.65rem] text-outline">{{ $booking->client_phone ?? '—' }}</div>
+                </div>
+                <div class="text-right">
+                    <div class="font-label text-[0.6rem] uppercase tracking-widest text-outline">Tanggal</div>
+                    <div class="font-body text-xs font-bold text-on-surface">{{ \Carbon\Carbon::parse($booking->event_date)->format('d M Y') }}</div>
+                </div>
+            </div>
+            <div class="flex items-center gap-1.5 font-label text-[0.65rem] text-on-surface-variant">
+                <i class="bi bi-calendar-event text-secondary"></i>
+                <span class="capitalize font-bold">{{ $booking->event_type }}</span>
+                <span class="text-outline">•</span>
+                <span>{{ $booking->created_at->format('d M Y') }}</span>
+            </div>
+            <div class="grid grid-cols-2 gap-2">
+                <div class="bg-surface-container rounded-lg p-2.5">
+                    <div class="font-label text-[0.55rem] uppercase tracking-widest text-outline mb-0.5">Kontrak</div>
+                    <div class="font-headline font-bold text-sm text-primary">Rp {{ number_format($booking->total_price, 0, ',', '.') }}</div>
+                </div>
+                <div class="bg-surface-container rounded-lg p-2.5">
+                    <div class="font-label text-[0.55rem] uppercase tracking-widest text-outline mb-0.5">DP</div>
+                    <div class="font-headline font-bold text-sm text-secondary">Rp {{ number_format($booking->dp_amount, 0, ',', '.') }}</div>
+                    @if(!$booking->dp_paid_at)<div class="font-label text-[0.55rem] text-orange-500 font-bold">Belum bayar</div>@endif
+                </div>
+            </div>
+            @if($booking->status === 'pending' && $daysLeft <= 7 && $daysLeft >= 0)
+            <div class="font-label text-[0.6rem] text-red-500 font-bold flex items-center gap-1"><i class="bi bi-exclamation-triangle-fill"></i> Acara H-{{ $daysLeft }} — segera tindak lanjuti!</div>
+            @endif
+        </div>
+        {{-- Card Footer --}}
+        <div class="px-4 py-3 border-t border-outline-variant/20 bg-surface-container-low/30 flex gap-2">
+            <a href="{{ route('admin.bookings.show', $booking->id) }}" class="flex-1 flex items-center justify-center gap-1.5 py-2 rounded-lg bg-primary text-white font-label text-[0.65rem] font-bold uppercase tracking-widest hover:bg-primary-container transition-colors">
+                <i class="bi bi-eye-fill"></i> Detail
+            </a>
+            @if($booking->status === 'pending')
+            <button type="button" onclick="openKunciModal({{ $booking->id }}, '{{ addslashes($booking->client_name) }}', {{ $booking->total_price }}, {{ $booking->dp_amount }})" class="flex-1 flex items-center justify-center gap-1.5 py-2 rounded-lg bg-secondary/10 border border-secondary/30 text-secondary font-label text-[0.65rem] font-bold uppercase tracking-widest hover:bg-secondary hover:text-white transition-colors">
+                <i class="bi bi-lock-fill"></i> Kunci DP
+            </button>
+            @endif
+        </div>
+    </div>
+    @empty
+    <div class="py-16 flex flex-col items-center justify-center bg-surface-container-lowest border border-outline-variant/30 border-dashed rounded-xl">
+        <i class="bi bi-inbox text-4xl text-outline mb-3"></i>
+        <p class="font-headline text-base text-on-surface font-semibold">Belum ada data booking</p>
+    </div>
+    @endforelse
 </div>
 
 {{-- ══ MODAL: NEW BOOKING MANUAL ══ --}}

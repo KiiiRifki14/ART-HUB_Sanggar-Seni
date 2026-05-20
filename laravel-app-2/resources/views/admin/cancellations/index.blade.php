@@ -13,8 +13,8 @@
     </h2>
 </div>
 
-{{-- Table --}}
-<div class="bg-surface-container-lowest rounded-xl border border-outline-variant/30 shadow-[0_12px_24px_rgba(54,31,26,0.03)] overflow-hidden mb-8">
+{{-- ══ TABLE (Desktop) ══ --}}
+<div class="hidden md:block bg-surface-container-lowest rounded-xl border border-outline-variant/30 shadow-[0_12px_24px_rgba(54,31,26,0.03)] overflow-hidden mb-8">
     <table class="w-full">
         <thead class="bg-surface-container-low">
             <tr>
@@ -107,6 +107,60 @@
         </div>
         @endforeach
     </div>
+</div>
+
+{{-- ══ MOBILE CARDS (Mobile only) ══ --}}
+<div class="md:hidden space-y-3 mb-8">
+    @forelse($cancellations as $c)
+    @php
+        $days = $c->days_before_event;
+        $dayClass = $days <= 3 ? 'text-red-600 bg-red-500/10 border-red-500/20' : ($days <= 7 ? 'text-orange-600 bg-orange-500/10 border-orange-500/20' : 'text-on-surface-variant bg-surface-container border-outline-variant/30');
+    @endphp
+    <div class="bg-surface-container-lowest rounded-xl border border-outline-variant/30 shadow-sm overflow-hidden">
+        <div class="flex items-center justify-between px-4 py-3 bg-surface-container-low border-b border-outline-variant/20">
+            <span class="inline-block px-2.5 py-1 rounded bg-secondary-container/40 text-on-secondary-container border border-secondary/20 font-label text-[0.65rem] font-bold tracking-wider">#{{ str_pad($c->booking_id, 4, '0', STR_PAD_LEFT) }}</span>
+            @if($c->status === 'pending')
+                <span class="inline-block px-2 py-0.5 rounded border border-orange-500/20 bg-orange-500/10 font-label text-[0.6rem] font-bold uppercase tracking-wider text-orange-600">PENDING</span>
+            @elseif($c->status === 'processed')
+                <span class="inline-block px-2 py-0.5 rounded border border-secondary/20 bg-secondary/10 font-label text-[0.6rem] font-bold uppercase tracking-wider text-secondary">DIPROSES</span>
+            @else
+                <span class="inline-block px-2 py-0.5 rounded border border-green-500/20 bg-green-500/10 font-label text-[0.6rem] font-bold uppercase tracking-wider text-green-600">DIKEMBALIKAN</span>
+            @endif
+        </div>
+        <div class="px-4 py-3 space-y-2">
+            <div class="flex justify-between items-start">
+                <div>
+                    <div class="font-body font-bold text-sm text-on-surface">{{ $c->booking->client_name ?? '-' }}</div>
+                    <div class="font-label text-[0.65rem] text-outline flex items-center gap-1 mt-0.5"><i class="bi bi-calendar-x opacity-60"></i> {{ \Carbon\Carbon::parse($c->cancellation_date)->format('d M Y') }}</div>
+                </div>
+                <span class="inline-block px-2 py-0.5 rounded border font-label text-[0.6rem] font-bold uppercase tracking-wider {{ $dayClass }}">H-{{ $days }}</span>
+            </div>
+            <div class="grid grid-cols-2 gap-2">
+                <div class="bg-red-500/5 border border-red-500/10 rounded-lg p-2.5">
+                    <div class="font-label text-[0.55rem] uppercase tracking-widest text-outline mb-0.5">Penalti</div>
+                    <div class="font-headline font-bold text-sm text-red-600">Rp {{ number_format($c->penalty_amount, 0, ',', '.') }}</div>
+                    <div class="font-label text-[0.55rem] text-outline">{{ number_format($c->penalty_percentage, 0) }}% dari total</div>
+                </div>
+                <div class="bg-green-500/5 border border-green-500/10 rounded-lg p-2.5">
+                    <div class="font-label text-[0.55rem] uppercase tracking-widest text-outline mb-0.5">Refund</div>
+                    @if($c->refund_amount > 0)
+                        <div class="font-headline font-bold text-sm text-green-600">Rp {{ number_format($c->refund_amount, 0, ',', '.') }}</div>
+                    @else
+                        <div class="font-label text-xs text-outline italic">Rp 0 (Hangus)</div>
+                    @endif
+                </div>
+            </div>
+            @if($c->reason)
+            <div class="font-body text-[0.7rem] text-on-surface-variant leading-relaxed bg-surface-container rounded-lg px-3 py-2 italic">"{{ Str::limit($c->reason, 80) }}"</div>
+            @endif
+        </div>
+    </div>
+    @empty
+    <div class="py-14 flex flex-col items-center justify-center bg-surface-container-lowest border border-dashed border-outline-variant/30 rounded-xl text-center">
+        <i class="bi bi-emoji-smile text-4xl text-outline mb-3"></i>
+        <p class="font-headline text-base text-on-surface font-semibold">Belum ada pembatalan</p>
+    </div>
+    @endforelse
 </div>
 
 @endsection
