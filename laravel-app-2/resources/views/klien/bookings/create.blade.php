@@ -32,23 +32,52 @@
                 <div class="font-label text-xs uppercase tracking-widest text-secondary font-bold flex items-center gap-2 mb-6 pb-4 border-b border-outline-variant/30">
                     <i class="bi bi-grid-3x2-gap"></i> Pilih Paket Pementasan
                 </div>
+
+                @if($errors->has('service_catalog_id'))
+                    <div class="text-red-500 text-xs mb-3 font-body">{{ $errors->first('service_catalog_id') }}</div>
+                @endif
+
+                @if($catalogs->isEmpty())
+                    <div class="text-center py-10 text-on-surface-variant font-body text-sm">
+                        <i class="bi bi-collection text-3xl block mb-2 text-outline"></i>
+                        Belum ada paket jasa tersedia. Hubungi admin sanggar.
+                    </div>
+                @else
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    @foreach($packages as $key => $pkg)
+                    @foreach($catalogs as $catalog)
                     <div class="relative group">
-                        <input type="radio" class="peer absolute opacity-0 w-0 h-0 k-pkg-radio" name="event_type"
-                               id="pkg_{{ $key }}" value="{{ $key }}"
-                               data-price="{{ $pkg['base_price'] }}" required>
-                        <label for="pkg_{{ $key }}" class="block p-5 rounded-xl border-2 border-surface-container-high bg-surface-container-low cursor-pointer transition-all peer-checked:border-secondary peer-checked:bg-secondary/5 hover:border-outline-variant">
-                            <div class="font-headline font-bold text-lg text-primary mb-1">{{ $pkg['name'] }}</div>
-                            <div class="font-body font-bold text-secondary text-base">Rp {{ number_format($pkg['base_price'], 0, ',', '.') }}</div>
-                            <i class="bi bi-check-circle-fill absolute top-5 right-5 text-secondary opacity-0 scale-50 transition-all peer-checked:opacity-100 peer-checked:scale-100 text-xl"></i>
+                        <input type="radio" class="peer absolute opacity-0 w-0 h-0 k-pkg-radio"
+                               name="service_catalog_id"
+                               id="pkg_{{ $catalog->id }}"
+                               value="{{ $catalog->id }}"
+                               data-price="{{ $catalog->price }}"
+                               data-name="{{ $catalog->name }}"
+                               data-max="{{ $catalog->max_personnel }}"
+                               data-specialty="{{ $catalog->specialty_label }}"
+                               {{ old('service_catalog_id') == $catalog->id ? 'checked' : '' }}
+                               required>
+                        <label for="pkg_{{ $catalog->id }}" class="block p-5 rounded-xl border-2 border-surface-container-high bg-surface-container-low cursor-pointer transition-all peer-checked:border-secondary peer-checked:bg-secondary/5 hover:border-outline-variant relative">
+                            @if($catalog->badge)
+                                <span class="absolute top-3 right-3 px-2 py-0.5 rounded text-[0.6rem] font-bold uppercase tracking-wider bg-secondary-container text-on-secondary-container">{{ $catalog->badge }}</span>
+                            @endif
+                            <div class="font-headline font-bold text-lg text-primary mb-1 pr-16">{{ $catalog->name }}</div>
+                            <div class="font-body font-bold text-secondary text-base mb-2">{{ $catalog->price_formatted }}</div>
+                            <div class="flex flex-wrap gap-2">
+                                <span class="inline-flex items-center gap-1 text-[0.6rem] font-label font-bold uppercase tracking-wider text-on-surface-variant bg-surface-container rounded px-2 py-1">
+                                    <i class="bi bi-people-fill"></i>
+                                    {{ $catalog->max_personnel > 0 ? $catalog->max_personnel . ' Personel' : 'Personel Bebas' }}
+                                </span>
+                                <span class="inline-flex items-center gap-1 text-[0.6rem] font-label font-bold uppercase tracking-wider text-on-surface-variant bg-surface-container rounded px-2 py-1">
+                                    <i class="bi bi-music-note-beamed"></i>
+                                    {{ $catalog->specialty_label }}
+                                </span>
+                            </div>
+                            <i class="bi bi-check-circle-fill absolute bottom-4 right-4 text-secondary opacity-0 scale-50 transition-all peer-checked:opacity-100 peer-checked:scale-100 text-xl"></i>
                         </label>
                     </div>
                     @endforeach
                 </div>
-                @error('event_type')
-                <div class="text-red-500 text-xs mt-3 font-body">{{ $message }}</div>
-                @enderror
+                @endif
             </div>
 
             {{-- WAKTU & TANGGAL --}}
@@ -167,19 +196,24 @@
 </div>
 
 @push('scripts')
-<input type="hidden" id="packagesJson" value='{{ addslashes(json_encode($packages)) }}'>
 <script>
-var packages = JSON.parse(document.getElementById('packagesJson').value);
-
 document.querySelectorAll('.k-pkg-radio').forEach(function(radio) {
     radio.addEventListener('change', function() {
-        var price = parseInt(this.getAttribute('data-price'));
-        var name  = packages[this.value] ? packages[this.value].name : this.value;
+        var price    = parseInt(this.getAttribute('data-price'));
+        var name     = this.getAttribute('data-name') || this.value;
+        var maxPers  = this.getAttribute('data-max');
+        var specialty = this.getAttribute('data-specialty');
 
-        document.getElementById('previewPkgName').innerText   = name;
-        document.getElementById('previewBasePrice').innerText = 'Rp ' + price.toLocaleString('id-ID');
+        document.getElementById('previewPkgName').innerText    = name;
+        document.getElementById('previewBasePrice').innerText  = 'Rp ' + price.toLocaleString('id-ID');
         document.getElementById('previewTotalPrice').innerText = 'Rp ' + price.toLocaleString('id-ID');
-        document.getElementById('inputTotalPrice').value = price;
+        document.getElementById('inputTotalPrice').value       = price;
+
+        var infoEl = document.getElementById('previewPkgInfo');
+        if (infoEl) {
+            var pers = maxPers > 0 ? maxPers + ' Personel' : 'Bebas';
+            infoEl.innerText = specialty + ' · ' + pers;
+        }
     });
 });
 </script>

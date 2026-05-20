@@ -12,7 +12,7 @@ class Booking extends Model
 {
     use SoftDeletes;
 
-    protected $guarded = ['id'];
+    protected $guarded = [];
 
     protected $casts = [
         'event_date' => 'date',
@@ -20,6 +20,14 @@ class Booking extends Model
         'event_end' => 'datetime',
         'dp_paid_at' => 'datetime',
     ];
+
+    /**
+     * Relasi ke ServiceCatalog yang dipilih saat booking
+     */
+    public function serviceCatalog(): BelongsTo
+    {
+        return $this->belongsTo(ServiceCatalog::class);
+    }
 
     /**
      * Relasi ke User (Klien)

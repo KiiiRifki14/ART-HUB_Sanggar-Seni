@@ -5,7 +5,9 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Admin\BookingController;
 use App\Http\Controllers\Admin\EventController;
 use App\Http\Controllers\Admin\RehearsalController;
+use App\Http\Controllers\Admin\CmsController;
 use App\Http\Controllers\Admin\CancellationController;
+use App\Http\Controllers\Admin\ServiceCatalogController;
 use App\Http\Controllers\Admin\CostumeController;
 use App\Http\Controllers\Admin\FinancialController;
 use App\Http\Controllers\Admin\PersonnelController;
@@ -18,8 +20,9 @@ use App\Http\Controllers\ProfileController;
 
 Route::get('/', function () {
     $contents = \App\Models\SiteContent::pluck('value', 'key')->toArray();
-    $personnels = \App\Models\Personnel::with('user')->where('is_active', true)->take(8)->get();
-    return view('welcome', compact('contents', 'personnels'));
+    $personnels = \App\Models\Personnel::with('user')->where('is_active', true)->get();
+    $catalogs = \App\Models\ServiceCatalog::where('is_active', true)->orderBy('sort_order')->orderBy('id')->get();
+    return view('welcome', compact('contents', 'personnels', 'catalogs'));
 });
 
 // 👇 PENGATUR LALU LINTAS ROLE
@@ -42,8 +45,8 @@ Route::middleware('auth')->group(function () {
 // 👑 1. ADMIN ROUTES (Gudang Logika Pak Yat)
 // ══════════════════════════════════════════════════════════════════════════
 Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->group(function () {
-    Route::get('/cms', [\App\Http\Controllers\Admin\CmsController::class, 'index'])->name('cms.index');
-    Route::post('/cms', [\App\Http\Controllers\Admin\CmsController::class, 'update'])->name('cms.update');
+    Route::get('/cms', [CmsController::class, 'index'])->name('cms.index');
+    Route::post('/cms', [CmsController::class, 'update'])->name('cms.update');
 
     Route::get('/dashboard', function () {
         // ── STAT CARDS (data nyata)
@@ -62,6 +65,7 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
         // ── UPCOMING EVENTS (max 3)
         $upcomingEvents = \App\Models\Event::with('booking')
             ->where('event_date', '>=', now()->toDateString())
+            ->whereNotIn('status', ['completed', 'cancelled'])
             ->orderBy('event_date')
             ->limit(3)
             ->get();
@@ -112,10 +116,13 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
             'stColors' => $stColors,
         ]);
 
+        $pendingPersonnel = \App\Models\Personnel::where('is_active', false)->count();
+
         return view('admin.dashboard', compact(
             'lockedProfit', 'safetyBuffer', 'totalPenalty', 'lateCount',
             'eventCount', 'needPlotting', 'upcomingEvents',
-            'revenueChart', 'statusChart', 'statusInfo', 'chartPayload'
+            'revenueChart', 'statusChart', 'statusInfo', 'chartPayload',
+            'pendingPersonnel'
         ));
     })->name('dashboard');
 
@@ -126,6 +133,7 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
     Route::post('/bookings/manual', [BookingController::class, 'storeManual'])->name('bookings.manual.store');
     Route::post('/bookings/{booking}/confirm', [BookingController::class, 'confirmPayment'])->name('bookings.confirm');
     Route::patch('/bookings/{booking}/price', [BookingController::class, 'updatePrice'])->name('bookings.update_price');
+    Route::patch('/bookings/{booking}/update-price', [BookingController::class, 'updatePrice']);
 
     // EVENTS
     Route::get('/events', [EventController::class, 'index'])->name('events.index');
@@ -141,6 +149,8 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
     Route::get('/personnel/{personnel}/edit', [PersonnelController::class, 'edit'])->name('personnel.edit');
     Route::put('/personnel/{personnel}', [PersonnelController::class, 'update'])->name('personnel.update');
     Route::delete('/personnel/{personnel}', [PersonnelController::class, 'destroy'])->name('personnel.destroy');
+    Route::post('/personnel/{personnel}/approve', [PersonnelController::class, 'approve'])->name('personnel.approve');
+    Route::delete('/personnel/{personnel}/reject', [PersonnelController::class, 'reject'])->name('personnel.reject');
 
 
     // PAYMENT TRACKING
@@ -150,13 +160,13 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
     Route::get('/costumes', [CostumeController::class, 'index'])->name('costumes.index');
     Route::post('/costume-usages/{usage}/return', [CostumeController::class, 'returnSanggarCostume'])->name('costumes.usage.return');
     Route::post('/costume-rentals/{rental}/return', [CostumeController::class, 'returnVendorRental'])->name('costumes.rental.return');
-    Route::get('/costumes/create-asset', [\App\Http\Controllers\Admin\CostumeController::class, 'createAsset'])->name('costumes.create-asset');
-    Route::post('/costumes/store-asset', [\App\Http\Controllers\Admin\CostumeController::class, 'storeAsset'])->name('costumes.store-asset');
+    Route::get('/costumes/create-asset', [CostumeController::class, 'createAsset'])->name('costumes.create-asset');
+    Route::post('/costumes/store-asset', [CostumeController::class, 'storeAsset'])->name('costumes.store-asset');
     // Rute API untuk Tambah Vendor (AJAX)
-    Route::post('/costumes/vendor/api', [\App\Http\Controllers\Admin\CostumeController::class, 'storeVendorApi'])->name('costumes.store-vendor-api');
+    Route::post('/costumes/vendor/api', [CostumeController::class, 'storeVendorApi'])->name('costumes.store-vendor-api');
 
-    Route::get('/costumes/create-rental', [\App\Http\Controllers\Admin\CostumeController::class, 'createRental'])->name('costumes.create-rental');
-    Route::post('/costumes/store-rental', [\App\Http\Controllers\Admin\CostumeController::class, 'storeRental'])->name('costumes.store-rental');
+    Route::get('/costumes/create-rental', [CostumeController::class, 'createRental'])->name('costumes.create-rental');
+    Route::post('/costumes/store-rental', [CostumeController::class, 'storeRental'])->name('costumes.store-rental');
 
     // FINANCIAL
     Route::get('/financials', [FinancialController::class, 'index'])->name('financials.index');
@@ -198,8 +208,14 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
     // TAMBAH BIAYA OPERASIONAL BARU (Post-Event)
     Route::post('/financials/post-event/{event}/costs', [FinancialController::class, 'storeOperationalCost'])->name('financials.operational_costs.store');
 
-    // TANDAI EVENT SELESAI (Fix Bug Status Gantung)
-    Route::patch('/events/{event}/complete', [EventController::class, 'markCompleted'])->name('events.mark_completed');
+    // CMS LANDING PAGE
+    Route::get('/cms', [CmsController::class, 'index'])->name('cms.index');
+    Route::post('/cms', [CmsController::class, 'update'])->name('cms.update');
+
+    // KATALOG JASA
+    Route::resource('catalogs', ServiceCatalogController::class)->except(['show']);
+    Route::patch('/catalogs/{catalog}/toggle', [ServiceCatalogController::class, 'toggleActive'])->name('catalogs.toggle');
+
 });
 
 // ══════════════════════════════════════════════════════════════════════════
@@ -290,7 +306,7 @@ Route::middleware(['auth', 'role:klien'])->prefix('klien')->name('klien.')->grou
     Route::post('/bookings/{id}/proof', [\App\Http\Controllers\Klien\BookingController::class, 'uploadProof'])->name('bookings.upload_proof');
     Route::post('/bookings/{id}/full-proof', [\App\Http\Controllers\Klien\BookingController::class, 'uploadFullProof'])->name('bookings.upload_full_proof');
     Route::post('/notifications/read-all', function () {
-        \Illuminate\Support\Facades\Auth::user()->unreadNotifications->markAsRead();
+        Auth::user()->unreadNotifications->markAsRead();
         return redirect()->back();
     })->name('notifications.read_all');
 });

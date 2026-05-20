@@ -64,7 +64,7 @@
             <h3 class="font-headline text-lg font-bold text-primary flex items-center gap-2">
                 <i class="bi bi-list-check text-secondary"></i> Rincian Biaya Operasional
             </h3>
-            <button type="button" data-bs-toggle="modal" data-bs-target="#modalAddCost" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-primary text-white font-label text-[0.65rem] font-bold uppercase tracking-widest hover:bg-primary-container transition-colors shadow-sm">
+            <button type="button" onclick="document.getElementById('modalAddCost').classList.remove('hidden');document.getElementById('modalAddCost').classList.add('flex');" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-primary text-white font-label text-[0.65rem] font-bold uppercase tracking-widest hover:bg-primary-container transition-colors shadow-sm">
                 <i class="bi bi-plus-lg"></i> Tambah Biaya
             </button>
         </div>
@@ -170,51 +170,52 @@
 
 {{-- MODAL TAMBAH BIAYA OPERASIONAL --}}
 @if($fr)
-<div class="modal fade" id="modalAddCost" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content border-0 rounded-2xl overflow-hidden shadow-2xl bg-surface-container-lowest">
-            <div class="px-6 py-5 border-b border-outline-variant/20 flex justify-between items-center bg-surface-container-low">
-                <h5 class="font-headline font-bold text-lg text-primary flex items-center gap-2">
-                    <i class="bi bi-plus-circle-fill text-secondary"></i> Tambah Biaya Baru
-                </h5>
-                <button type="button" class="text-on-surface-variant hover:text-primary transition-colors" data-bs-dismiss="modal">
-                    <i class="bi bi-x-lg"></i>
-                </button>
-            </div>
-            <form action="{{ route('admin.financials.operational_costs.store', $event->id) }}" method="POST">
-                @csrf
-                <div class="p-6 space-y-4">
-                    <div>
-                        <label class="block font-label text-[0.65rem] uppercase tracking-widest text-on-surface-variant font-bold mb-1.5">Kategori</label>
-                        <select name="category" class="w-full bg-surface-container border border-outline-variant/50 rounded-lg px-4 py-2.5 font-body text-sm text-on-surface focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all" required>
-                            <option value="konsumsi">Konsumsi</option>
-                            <option value="transportasi">Transportasi / Bensin</option>
-                            <option value="honor_kru">Honor Tambahan Kru</option>
-                            <option value="logistik">Sewa Alat / Logistik</option>
-                            <option value="lainnya">Lainnya</option>
-                        </select>
-                    </div>
-                    <div>
-                        <label class="block font-label text-[0.65rem] uppercase tracking-widest text-on-surface-variant font-bold mb-1.5">Keterangan / Deskripsi</label>
-                        <input type="text" name="description" placeholder="Contoh: Beli rokok & kopi, Uang tol..." class="w-full bg-surface-container border border-outline-variant/50 rounded-lg px-4 py-2.5 font-body text-sm text-on-surface focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all" required>
-                    </div>
-                    <div class="grid grid-cols-2 gap-4">
-                        <div>
-                            <label class="block font-label text-[0.65rem] uppercase tracking-widest text-on-surface-variant font-bold mb-1.5">Estimasi Awal (Rp)</label>
-                            <input type="number" name="estimated_amount" value="0" min="0" class="w-full bg-surface-container border border-outline-variant/50 rounded-lg px-4 py-2.5 font-headline font-bold text-on-surface focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all" required>
-                        </div>
-                        <div>
-                            <label class="block font-label text-[0.65rem] uppercase tracking-widest text-primary font-bold mb-1.5">Realisasi Lapangan (Rp)</label>
-                            <input type="number" name="actual_amount" min="0" placeholder="Nominal Rp" class="w-full bg-primary/5 border border-primary/30 rounded-lg px-4 py-2.5 font-headline font-bold text-primary focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all" required>
-                        </div>
-                    </div>
-                </div>
-                <div class="px-6 py-4 border-t border-outline-variant/20 bg-surface-container-low flex justify-end gap-3">
-                    <button type="button" class="px-5 py-2.5 rounded-lg border border-outline-variant/50 font-label text-xs font-bold uppercase tracking-widest text-on-surface-variant hover:bg-surface-container transition-colors" data-bs-dismiss="modal">Batal</button>
-                    <button type="submit" class="px-5 py-2.5 rounded-lg bg-primary text-white font-label text-xs font-bold uppercase tracking-widest hover:bg-primary-container transition-colors">Simpan Biaya</button>
-                </div>
-            </form>
+<div id="modalAddCost" class="fixed inset-0 z-[100] hidden items-center justify-center p-4">
+    <div class="absolute inset-0 bg-black/50 backdrop-blur-sm" onclick="this.parentElement.classList.add('hidden');this.parentElement.classList.remove('flex');"></div>
+    <div class="relative w-full max-w-lg bg-surface-container-lowest rounded-2xl shadow-2xl border border-outline-variant/30 overflow-hidden">
+        <div class="px-6 py-5 border-b border-outline-variant/20 flex justify-between items-center bg-surface-container-low">
+            <h5 class="font-headline font-bold text-lg text-primary flex items-center gap-2">
+                <i class="bi bi-plus-circle-fill text-secondary"></i> Tambah Biaya Baru
+            </h5>
+            <button type="button" class="text-on-surface-variant hover:text-primary transition-colors"
+                onclick="document.getElementById('modalAddCost').classList.add('hidden');document.getElementById('modalAddCost').classList.remove('flex');">
+                <i class="bi bi-x-lg"></i>
+            </button>
         </div>
+        <form action="{{ route('admin.financials.operational_costs.store', $event->id) }}" method="POST">
+            @csrf
+            <div class="p-6 space-y-4">
+                <div>
+                    <label class="block font-label text-[0.65rem] uppercase tracking-widest text-on-surface-variant font-bold mb-1.5">Kategori</label>
+                    <select name="category" class="w-full bg-surface-container border border-outline-variant/50 rounded-lg px-4 py-2.5 font-body text-sm text-on-surface focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all" required>
+                        <option value="konsumsi">Konsumsi</option>
+                        <option value="transportasi">Transportasi / Bensin</option>
+                        <option value="honor_kru">Honor Tambahan Kru</option>
+                        <option value="logistik">Sewa Alat / Logistik</option>
+                        <option value="lainnya">Lainnya</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block font-label text-[0.65rem] uppercase tracking-widest text-on-surface-variant font-bold mb-1.5">Keterangan / Deskripsi</label>
+                    <input type="text" name="description" placeholder="Contoh: Beli rokok & kopi, Uang tol..." class="w-full bg-surface-container border border-outline-variant/50 rounded-lg px-4 py-2.5 font-body text-sm text-on-surface focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all" required>
+                </div>
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block font-label text-[0.65rem] uppercase tracking-widest text-on-surface-variant font-bold mb-1.5">Estimasi Awal (Rp)</label>
+                        <input type="number" name="estimated_amount" value="0" min="0" class="w-full bg-surface-container border border-outline-variant/50 rounded-lg px-4 py-2.5 font-headline font-bold text-on-surface focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all" required>
+                    </div>
+                    <div>
+                        <label class="block font-label text-[0.65rem] uppercase tracking-widest text-primary font-bold mb-1.5">Realisasi Lapangan (Rp)</label>
+                        <input type="number" name="actual_amount" min="0" placeholder="Nominal Rp" class="w-full bg-primary/5 border border-primary/30 rounded-lg px-4 py-2.5 font-headline font-bold text-primary focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all" required>
+                    </div>
+                </div>
+            </div>
+            <div class="px-6 py-4 border-t border-outline-variant/20 bg-surface-container-low flex justify-end gap-3">
+                <button type="button" class="px-5 py-2.5 rounded-lg border border-outline-variant/50 font-label text-xs font-bold uppercase tracking-widest text-on-surface-variant hover:bg-surface-container transition-colors"
+                    onclick="document.getElementById('modalAddCost').classList.add('hidden');document.getElementById('modalAddCost').classList.remove('flex');">Batal</button>
+                <button type="submit" class="px-5 py-2.5 rounded-lg bg-primary text-white font-label text-xs font-bold uppercase tracking-widest hover:bg-primary-container transition-colors">Simpan Biaya</button>
+            </div>
+        </form>
     </div>
 </div>
 @endif

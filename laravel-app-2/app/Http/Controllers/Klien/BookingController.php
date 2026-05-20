@@ -20,18 +20,13 @@ class BookingController extends Controller
     }
 
     /**
-     * Form Pendaftaran Booking Baru (Self-Service)
+     * Form Pendaftaran Booking Baru (Self-Service) – Dynamic dari ServiceCatalog
      */
     public function create()
     {
-        $packages = [
-            'jaipong' => ['name' => 'Tari Jaipong', 'base_price' => 3500000],
-            'rampak_gendang' => ['name' => 'Rampak Gendang', 'base_price' => 4500000],
-            'mapag_panganten' => ['name' => 'Mapag Panganten', 'base_price' => 5000000],
-            'kacapi_suling' => ['name' => 'Kacapi Suling', 'base_price' => 2500000],
-        ];
-
-        return view('klien.bookings.create', compact('packages'));
+        $catalogs = \App\Models\ServiceCatalog::where('is_active', true)
+                        ->orderBy('sort_order')->orderBy('id')->get();
+        return view('klien.bookings.create', compact('catalogs'));
     }
 
     /**
@@ -39,16 +34,14 @@ class BookingController extends Controller
      */
     public function store(Request $request)
     {
-        // Daftar harga paket (sumber kebenaran di server, bukan dari JS)
-        $packages = [
-            'jaipong'          => ['name' => 'Tari Jaipong',     'base_price' => 3500000],
-            'rampak_gendang'   => ['name' => 'Rampak Gendang',   'base_price' => 4500000],
-            'mapag_panganten'  => ['name' => 'Mapag Panganten',  'base_price' => 5000000],
-            'kacapi_suling'    => ['name' => 'Kacapi Suling',    'base_price' => 2500000],
-        ];
+        // Validasi catalog ID dari DB (aman dari manipulasi)
+        $catalog = \App\Models\ServiceCatalog::where('is_active', true)->find($request->service_catalog_id);
+        if (!$catalog) {
+            return back()->withErrors(['service_catalog_id' => 'Paket yang dipilih tidak valid.'])->withInput();
+        }
 
         $request->validate([
-            'event_type'   => 'required|in:' . implode(',', array_keys($packages)),
+            'service_catalog_id' => 'required|exists:service_catalogs,id',
             'event_date'   => [
                 'required',
                 'date',
@@ -58,7 +51,7 @@ class BookingController extends Controller
                         ->whereIn('status', ['dp_paid', 'confirmed', 'paid_full', 'completed'])
                         ->exists();
                     if ($exists) {
-                        $fail('Tanggal ' . \Carbon\Carbon::parse($value)->format('d M Y') . ' sudah penuh/di-booking oleh klien lain. Silakan pilih tanggal lain.');
+                        $fail('Tanggal ' . \Carbon\Carbon::parse($value)->format('d M Y') . ' sudah penuh/di-booking. Silakan pilih tanggal lain.');
                     }
                 },
             ],
@@ -68,24 +61,25 @@ class BookingController extends Controller
             'client_phone' => 'required|string',
         ]);
 
-        // Ambil harga resmi dari server — immune terhadap manipulasi JS/form tampering
-        $basePrice = $packages[$request->event_type]['base_price'];
+        // Harga dari catalog di server — immune dari manipulasi
+        $basePrice = $catalog->price;
         $dpAmount  = $basePrice * 0.50;
 
         $booking = Booking::create([
-            'client_id'     => Auth::id(),
-            'client_name'   => Auth::user()->name,
-            'client_phone'  => $request->client_phone,
-            'event_type'    => $request->event_type,
-            'event_date'    => $request->event_date,
-            'event_start'   => $request->event_start,
-            'event_end'     => $request->event_end,
-            'venue'         => $request->venue,
-            'venue_address' => $request->venue_address,
-            'booking_source'=> 'web',
-            'status'        => 'pending',
-            'total_price'   => $basePrice,
-            'dp_amount'     => $dpAmount,
+            'client_id'          => Auth::id(),
+            'client_name'        => Auth::user()->name,
+            'client_phone'       => $request->client_phone,
+            'event_type'         => $catalog->name,
+            'service_catalog_id' => $catalog->id,
+            'event_date'         => $request->event_date,
+            'event_start'        => $request->event_start,
+            'event_end'          => $request->event_end,
+            'venue'              => $request->venue,
+            'venue_address'      => $request->venue_address,
+            'booking_source'     => 'web',
+            'status'             => 'pending',
+            'total_price'        => $basePrice,
+            'dp_amount'          => $dpAmount,
         ]);
 
         return redirect()->route('klien.bookings.show', $booking->id)

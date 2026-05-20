@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>@yield('title', 'Admin | ART-HUB Sanggar Cahaya Gumilang')</title>
 
     <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Noto+Serif:ital,wght@0,400;0,600;0,700;1,400&display=swap" rel="stylesheet">
@@ -62,9 +63,9 @@
 
     <style>
         :root {
-            --sidebar-w: 240px;
-            --sidebar-mini: 60px;
-            --topbar-h: 56px;
+            --sidebar-w: 260px;
+            --sidebar-mini: 64px;
+            --topbar-h: 60px;
         }
         * { box-sizing: border-box; }
         body { font-family: 'Manrope', sans-serif; background: #faf9f6; color: #1a1c1a; margin: 0; }
@@ -74,12 +75,14 @@
         /* ── SIDEBAR ── */
         #sidebar {
             width: var(--sidebar-w);
-            min-height: 100vh;
-            background: linear-gradient(180deg, #361f1a 0%, #2a1713 100%);
+            height: 100vh;            /* fixed height, bukan min-height */
+            background: linear-gradient(180deg, #2b1915 0%, #1f0f0c 100%);
+            border-right: 1px solid rgba(255,255,255,0.04);
             display: flex; flex-direction: column;
             position: fixed; top: 0; left: 0; z-index: 1040;
-            transition: width 0.28s cubic-bezier(0.4,0,0.2,1);
-            overflow: hidden;
+            transition: width 0.3s cubic-bezier(0.2, 0, 0, 1);
+            overflow: hidden;         /* clip horizontal saja */
+            box-shadow: 4px 0 24px rgba(0,0,0,0.1);
         }
         #sidebar.mini { width: var(--sidebar-mini); }
 
@@ -129,63 +132,116 @@
         #sidebar.mini .arh-user { justify-content: center; padding: 10px 0; }
         #sidebar.mini .arh-user-info { display: none; }
 
-        /* Nav */
-        .arh-nav { list-style: none; padding: 8px 8px 0; margin: 0; overflow-y: auto; flex: 1; }
+        /* Nav — scrollable, selalu menyisakan ruang untuk footer sidebar */
+        .arh-nav { list-style: none; padding: 16px 16px 0; margin: 0; overflow-y: auto; flex: 1; min-height: 0; }
+        
+        /* Custom Scrollbar for Nav */
+        .arh-nav::-webkit-scrollbar { width: 4px; }
+        .arh-nav::-webkit-scrollbar-track { background: transparent; }
+        .arh-nav::-webkit-scrollbar-thumb { background: rgba(252,212,0,0.15); border-radius: 10px; }
+        .arh-nav::-webkit-scrollbar-thumb:hover { background: rgba(252,212,0,0.3); }
+
         .arh-nav-section {
-            font-size: 0.58rem; color: rgba(252,212,0,0.5); text-transform: uppercase;
-            letter-spacing: 1.2px; padding: 14px 6px 4px; font-weight: 700; white-space: nowrap;
+            font-size: 0.62rem; color: rgba(255,255,255,0.35); text-transform: uppercase;
+            letter-spacing: 1.5px; padding: 18px 8px 8px; font-weight: 700; white-space: nowrap;
         }
-        #sidebar.mini .arh-nav-section { height: 1px; background: rgba(255,255,255,0.06); margin: 8px 8px 4px; padding: 0; font-size: 0; }
+        #sidebar.mini .arh-nav-section { height: 1px; background: rgba(255,255,255,0.06); margin: 12px 8px 8px; padding: 0; font-size: 0; }
 
         .arh-nav-link {
-            display: flex; align-items: center; gap: 10px;
-            padding: 9px 10px; border-radius: 8px; margin-bottom: 2px;
-            color: rgba(255,255,255,0.65); text-decoration: none;
-            font-size: 0.82rem; font-weight: 500;
-            transition: all 0.18s; white-space: nowrap; overflow: hidden;
+            display: flex; align-items: center; gap: 12px;
+            padding: 10px 12px; border-radius: 10px; margin-bottom: 6px;
+            color: rgba(255,255,255,0.6); text-decoration: none;
+            font-size: 0.85rem; font-weight: 500;
+            transition: all 0.2s ease; white-space: nowrap; overflow: hidden;
+            border: 1px solid transparent;
         }
-        .arh-nav-link:hover { background: rgba(252,212,0,0.1); color: #fcd400; }
+        .arh-nav-link:hover { background: rgba(255,255,255,0.04); color: #fff; border-color: rgba(255,255,255,0.08); }
         .arh-nav-link.active {
-            background: rgba(252,212,0,0.12);
-            color: #fcd400; font-weight: 700;
-            box-shadow: inset 3px 0 0 #fcd400;
+            background: rgba(252,212,0,0.1);
+            border-color: rgba(252,212,0,0.2);
+            color: #fcd400; font-weight: 600;
         }
-        .arh-nav-icon { width: 20px; text-align: center; flex-shrink: 0; font-size: 1rem; }
-        #sidebar.mini .arh-nav { padding: 8px 4px 0; }
-        #sidebar.mini .arh-nav-link { justify-content: center; padding: 10px 0; box-shadow: none !important; }
+        .arh-nav-icon { 
+            width: 26px; height: 26px; text-align: center; flex-shrink: 0; font-size: 1.1rem;
+            display: flex; align-items: center; justify-content: center;
+            border-radius: 6px; background: rgba(0,0,0,0.2); transition: all 0.2s ease;
+        }
+        .arh-nav-link:hover .arh-nav-icon { background: rgba(255,255,255,0.1); color: #fff; }
+        .arh-nav-link.active .arh-nav-icon { background: #fcd400; color: #2b1915; box-shadow: 0 4px 12px rgba(252,212,0,0.3); }
+
+        #sidebar.mini .arh-nav { padding: 16px 8px 0; }
+        #sidebar.mini .arh-nav-link { justify-content: center; padding: 12px 0; border-color: transparent; }
+        #sidebar.mini .arh-nav-icon { background: transparent; width: 32px; height: 32px; font-size: 1.25rem; }
+        #sidebar.mini .arh-nav-link.active .arh-nav-icon { background: #fcd400; color: #2b1915; }
         #sidebar.mini .arh-nav-label { display: none; }
 
         /* Tooltip mini */
         #sidebar.mini .arh-nav-link::after {
             content: attr(data-tooltip); position: fixed;
-            left: calc(var(--sidebar-mini) + 10px);
-            background: #2a1713; color: #faf9f6; font-size: 0.78rem; font-weight: 500;
-            padding: 5px 12px; border-radius: 6px; white-space: nowrap;
-            pointer-events: none; opacity: 0; transition: opacity 0.15s; z-index: 9999;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.3); border: 1px solid rgba(252,212,0,0.2);
+            left: calc(var(--sidebar-mini) + 12px);
+            background: #21120f; color: #faf9f6; font-size: 0.8rem; font-weight: 500;
+            padding: 6px 14px; border-radius: 8px; white-space: nowrap;
+            pointer-events: none; opacity: 0; transition: opacity 0.2s; z-index: 9999;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.4); border: 1px solid rgba(252,212,0,0.15);
         }
         #sidebar.mini .arh-nav-link:hover::after { opacity: 1; }
 
-        /* Logout */
-        .arh-logout-wrap { padding: 8px 8px 16px; flex-shrink: 0; }
+        /* Logout – selalu nempel di bawah sidebar, tidak ikut scroll */
+        .arh-logout-wrap { padding: 16px; flex-shrink: 0; border-top: 1px solid rgba(255,255,255,0.04); margin-top: auto; }
         .arh-logout {
-            display: flex; align-items: center; gap: 10px;
-            padding: 9px 10px; border-radius: 8px; width: 100%;
-            color: rgba(255,255,255,0.5); font-size: 0.82rem; font-weight: 500;
-            background: none; border: none; cursor: pointer;
-            transition: all 0.18s; white-space: nowrap; overflow: hidden;
+            display: flex; align-items: center; gap: 12px;
+            padding: 10px 12px; border-radius: 10px; width: 100%;
+            color: rgba(255,255,255,0.5); font-size: 0.85rem; font-weight: 500;
+            background: none; border: 1px solid transparent; cursor: pointer;
+            transition: all 0.2s ease; white-space: nowrap; overflow: hidden;
         }
-        .arh-logout:hover { background: rgba(186,26,26,0.15); color: #fca5a5; }
-        #sidebar.mini .arh-logout { justify-content: center; padding: 10px 0; }
+        .arh-logout:hover { background: rgba(239,68,68,0.1); color: #fca5a5; border-color: rgba(239,68,68,0.2); }
+        .arh-logout .arh-nav-icon {
+            width: 26px; height: 26px; text-align: center; flex-shrink: 0; font-size: 1.1rem;
+            display: flex; align-items: center; justify-content: center;
+            border-radius: 6px; background: rgba(0,0,0,0.2); transition: all 0.2s ease;
+        }
+        .arh-logout:hover .arh-nav-icon { background: rgba(239,68,68,0.2); color: #fca5a5; }
+
+        #sidebar.mini .arh-logout { justify-content: center; padding: 12px 0; border-color: transparent; }
+        #sidebar.mini .arh-logout .arh-nav-icon { background: transparent; width: 32px; height: 32px; font-size: 1.25rem; }
         #sidebar.mini .arh-logout-label { display: none; }
         #sidebar.mini .arh-logout::after {
-            content: 'Keluar'; position: fixed; left: calc(var(--sidebar-mini) + 10px);
-            background: #2a1713; color: #fca5a5; font-size: 0.78rem; font-weight: 500;
-            padding: 5px 12px; border-radius: 6px; white-space: nowrap;
-            pointer-events: none; opacity: 0; transition: opacity 0.15s; z-index: 9999;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+            content: 'Keluar'; position: fixed; left: calc(var(--sidebar-mini) + 12px);
+            background: #21120f; color: #fca5a5; font-size: 0.8rem; font-weight: 500;
+            padding: 6px 14px; border-radius: 8px; white-space: nowrap;
+            pointer-events: none; opacity: 0; transition: opacity 0.2s; z-index: 9999;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.4); border: 1px solid rgba(239,68,68,0.2);
         }
         #sidebar.mini .arh-logout:hover::after { opacity: 1; }
+
+        /* Landing Page Link */
+        .arh-landing {
+            display: flex; align-items: center; gap: 12px;
+            padding: 10px 12px; border-radius: 10px; width: 100%;
+            color: rgba(255,255,255,0.7); font-size: 0.85rem; font-weight: 500;
+            text-decoration: none; transition: all 0.2s ease; white-space: nowrap; overflow: hidden;
+            border: 1px solid transparent;
+        }
+        .arh-landing:hover { background: rgba(255,255,255,0.04); color: #ffffff; border-color: rgba(255,255,255,0.08); }
+        .arh-landing .arh-nav-icon {
+            width: 26px; height: 26px; text-align: center; flex-shrink: 0; font-size: 1.1rem;
+            display: flex; align-items: center; justify-content: center;
+            border-radius: 6px; background: rgba(0,0,0,0.2); transition: all 0.2s ease;
+        }
+        .arh-landing:hover .arh-nav-icon { background: rgba(255,255,255,0.1); color: #fff; }
+
+        #sidebar.mini .arh-landing { justify-content: center; padding: 12px 0; border-color: transparent; }
+        #sidebar.mini .arh-landing .arh-nav-icon { background: transparent; width: 32px; height: 32px; font-size: 1.25rem; }
+        #sidebar.mini .arh-landing-label { display: none; }
+        #sidebar.mini .arh-landing::after {
+            content: 'Landing Page'; position: fixed; left: calc(var(--sidebar-mini) + 12px);
+            background: #21120f; color: #ffffff; font-size: 0.8rem; font-weight: 500;
+            padding: 6px 14px; border-radius: 8px; white-space: nowrap;
+            pointer-events: none; opacity: 0; transition: opacity 0.2s; z-index: 9999;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.4); border: 1px solid rgba(255,255,255,0.15);
+        }
+        #sidebar.mini .arh-landing:hover::after { opacity: 1; }
 
         /* ── TOPBAR ── */
         #topbar {
@@ -217,7 +273,9 @@
             #sidebar { transform: translateX(-100%); width: var(--sidebar-w) !important; transition: transform 0.28s ease; }
             #sidebar.mobile-open { transform: translateX(0) !important; }
             #topbar, #topbar.mini { left: 0 !important; }
-            #page-content, #page-content.mini { margin-left: 0 !important; }
+            #page-content, #page-content.mini { margin-left: 0 !important; padding-bottom: 0; }
+            #page-content main { padding: 16px !important; }
+            .mobile-menu-btn { display: flex !important; }
         }
 
         /* ── ALERT HERITAGE ── */
@@ -285,6 +343,69 @@
         [data-sidebar-mini="1"] #page-content { margin-left: var(--sidebar-mini) !important; }
     </style>
 
+    <style>
+        @media (max-width: 1024px) {
+            .mobile-card-table {
+                display: block;
+                width: 100%;
+                min-width: unset !important;
+            }
+            .mobile-card-table thead {
+                display: none;
+            }
+            .mobile-card-table tbody, .mobile-card-table tr {
+                display: block;
+                width: 100%;
+            }
+            .mobile-card-table tr {
+                margin-bottom: 1rem;
+                background-color: var(--surface-container-lowest, #fff);
+                border: 1px solid rgba(0,0,0,0.1);
+                border-radius: 1rem;
+                padding: 0.5rem;
+                box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+            }
+            .mobile-card-table td {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                width: 100%;
+                padding: 0.75rem 0.5rem;
+                border: none !important;
+                border-bottom: 1px dashed rgba(0,0,0,0.1) !important;
+                text-align: right !important;
+            }
+            .mobile-card-table td:last-child {
+                border-bottom: none !important;
+            }
+            .mobile-card-table td::before {
+                content: attr(data-label);
+                font-weight: 800;
+                font-family: 'Inter', sans-serif;
+                font-size: 0.65rem;
+                text-transform: uppercase;
+                letter-spacing: 0.05em;
+                color: #64748b;
+                text-align: left;
+                margin-right: 1rem;
+                flex-shrink: 0;
+            }
+            .mobile-card-table td > * {
+                text-align: right;
+            }
+            .mobile-card-table td > .flex {
+                justify-content: flex-end;
+            }
+            /* Override whitespace/padding issues for cards */
+            .mobile-card-table td.px-6, .mobile-card-table td.py-4 {
+                padding-left: 0.5rem !important;
+                padding-right: 0.5rem !important;
+                padding-top: 0.75rem !important;
+                padding-bottom: 0.75rem !important;
+            }
+        }
+    </style>
+
     @yield('styles')
 </head>
 <body>
@@ -301,9 +422,6 @@
             <div class="arh-brand-title">ART-HUB</div>
             <div class="arh-brand-sub">Sanggar Cahaya Gumilang</div>
         </div>
-        <button id="sidebarToggle" title="Collapse sidebar">
-            <i class="bi bi-layout-sidebar-reverse" style="font-size:0.95rem;pointer-events:none;"></i>
-        </button>
     </div>
 
     {{-- User --}}
@@ -320,26 +438,28 @@
     {{-- Nav --}}
     @php
         $r = request();
+        $pendingBadge = \App\Models\Personnel::where('is_active', false)->count();
         $menuGroups = [
             'UTAMA' => [
-                ['Dashboard',         'bi-grid-1x2-fill',         'admin.dashboard',                  $r->routeIs('admin.dashboard')],
-                ['Event Management',  'bi-calendar-check-fill',   'admin.events.index',               $r->routeIs('admin.events.*') && !$r->routeIs('admin.events.monitoring*')],
-                ['Event Monitoring',  'bi-binoculars-fill',       'admin.events.monitoring',          $r->routeIs('admin.events.monitoring*')],
+                ['Dashboard',         'bi-grid-1x2-fill',         'admin.dashboard',                  $r->routeIs('admin.dashboard'),                  0],
+                ['Event Management',  'bi-calendar-check-fill',   'admin.events.index',               $r->routeIs('admin.events.*') && !$r->routeIs('admin.events.monitoring*'), 0],
+                ['Event Monitoring',  'bi-binoculars-fill',       'admin.events.monitoring',          $r->routeIs('admin.events.monitoring*'),          0],
             ],
             'SDM & PRODUKSI' => [
-                ['Personnel',         'bi-people-fill',           'admin.personnel.index',            $r->routeIs('admin.personnel.*')],
-                ['Costume & Logistik','bi-bag-fill',              'admin.costumes.index',             $r->routeIs('admin.costumes.*')],
+                ['Personnel',         'bi-people-fill',           'admin.personnel.index',            $r->routeIs('admin.personnel.*'),                 $pendingBadge],
+                ['Costume & Logistik','bi-bag-fill',              'admin.costumes.index',             $r->routeIs('admin.costumes.*'),                  0],
             ],
             'KEUANGAN' => [
-                ['Daftar Booking',    'bi-journal-text',          'admin.bookings.index',             $r->routeIs('admin.bookings.index')],
-                ['DP Verification',   'bi-patch-check-fill',      'admin.bookings.dp_verification',   $r->routeIs('admin.bookings.dp_verification')],
-                ['Payment Tracking',  'bi-receipt-cutoff',        'admin.payments.index',             $r->routeIs('admin.payments.*')],
-                ['Financial Report',  'bi-graph-up-arrow',        'admin.financials.index',           $r->routeIs('admin.financials.index')],
-                ['Post-Event Update', 'bi-clipboard2-check-fill', 'admin.financials.post_event_list', $r->routeIs('admin.financials.post_event_list')],
+                ['Daftar Booking',    'bi-journal-text',          'admin.bookings.index',             $r->routeIs('admin.bookings.index'),              0],
+                ['DP Verification',   'bi-patch-check-fill',      'admin.bookings.dp_verification',   $r->routeIs('admin.bookings.dp_verification'),    0],
+                ['Payment Tracking',  'bi-receipt-cutoff',        'admin.payments.index',             $r->routeIs('admin.payments.*'),                  0],
+                ['Financial Report',  'bi-graph-up-arrow',        'admin.financials.index',           $r->routeIs('admin.financials.index'),            0],
+                ['Post-Event Update', 'bi-clipboard2-check-fill', 'admin.financials.post_event_list', $r->routeIs('admin.financials.post_event_list'),  0],
             ],
             'MANAJEMEN' => [
-                ['Cancellation',      'bi-shield-exclamation',    'admin.cancellations.index',        $r->routeIs('admin.cancellations.*')],
-                ['CMS Landing Page',  'bi-window-sidebar',        'admin.cms.index',                  $r->routeIs('admin.cms.*')],
+                ['Cancellation',      'bi-shield-exclamation',    'admin.cancellations.index',        $r->routeIs('admin.cancellations.*'),             0],
+                ['Katalog Jasa',      'bi-collection-fill',       'admin.catalogs.index',             $r->routeIs('admin.catalogs.*'),                  0],
+                ['CMS Landing Page',  'bi-window-sidebar',        'admin.cms.index',                  $r->routeIs('admin.cms.*'),                       0],
             ],
         ];
     @endphp
@@ -347,21 +467,35 @@
     <ul class="arh-nav">
         @foreach($menuGroups as $section => $menus)
             <li><div class="arh-nav-section">{{ $section }}</div></li>
-            @foreach($menus as [$label, $icon, $routeName, $isActive])
+            @foreach($menus as [$label, $icon, $routeName, $isActive, $badge])
             <li>
                 <a href="{{ route($routeName) }}"
                    class="arh-nav-link {{ $isActive ? 'active' : '' }}"
                    data-tooltip="{{ $label }}">
                     <i class="bi {{ $icon }} arh-nav-icon"></i>
                     <span class="arh-nav-label">{{ $label }}</span>
+                    @if($badge > 0)
+                    <span style="
+                        margin-left:auto; flex-shrink:0;
+                        min-width:18px; height:18px; padding: 0 5px;
+                        border-radius:9px; background:#f97316;
+                        color:#fff; font-size:0.6rem; font-weight:800;
+                        display:flex; align-items:center; justify-content:center;
+                        line-height:1; font-family:'Manrope',sans-serif;
+                    ">{{ $badge }}</span>
+                    @endif
                 </a>
             </li>
             @endforeach
         @endforeach
     </ul>
 
-    {{-- Logout --}}
-    <div class="arh-logout-wrap">
+    {{-- Footer Actions (Landing Page & Logout) --}}
+    <div class="arh-logout-wrap" style="display:flex; flex-direction:column; gap:4px;">
+        <a href="{{ url('/') }}" class="arh-landing" data-tooltip="Lihat Landing Page">
+            <i class="bi bi-window-desktop arh-nav-icon"></i>
+            <span class="arh-landing-label">Landing Page</span>
+        </a>
         <form method="POST" action="{{ route('logout') }}">
             @csrf
             <button type="submit" class="arh-logout" data-tooltip="Keluar">
@@ -374,29 +508,29 @@
 
 {{-- ════ TOPBAR ════ --}}
 <nav id="topbar">
-    {{-- Mobile hamburger --}}
-    <button onclick="openSidebarMobile()"
-        style="width:34px;height:34px;border-radius:8px;border:1px solid #efeeeb;background:#faf9f6;color:#361f1a;cursor:pointer;flex-shrink:0;display:none;"
-        class="mobile-menu-btn" id="mobileMenuBtn">
-        <i class="bi bi-list" style="font-size:1.1rem;"></i>
-    </button>
-
-    <div style="flex:1;">
-        <div style="font-family:'Noto Serif',serif;font-size:1rem;font-weight:600;color:#361f1a;line-height:1.2;">
+    <div style="flex:1; min-width:0;">
+        <div style="font-family:'Noto Serif',serif;font-size:1rem;font-weight:600;color:#361f1a;line-height:1.2; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">
             @yield('page_title', 'Admin Panel')
         </div>
-        <div style="font-size:0.68rem;color:#827471;font-family:'Manrope',sans-serif;text-transform:uppercase;letter-spacing:0.05em;">
+        <div style="font-size:0.68rem;color:#827471;font-family:'Manrope',sans-serif;text-transform:uppercase;letter-spacing:0.05em; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">
             @yield('page_subtitle')
         </div>
     </div>
 
     <div style="display:flex;align-items:center;gap:12px;">
-        <span style="background:rgba(252,212,0,0.12);color:#705d00;font-size:0.68rem;font-weight:700;padding:4px 10px;border-radius:99px;font-family:'Manrope',sans-serif;text-transform:uppercase;letter-spacing:0.08em;">
+        <span class="hidden md:inline-flex" style="background:rgba(252,212,0,0.12);color:#705d00;font-size:0.68rem;font-weight:700;padding:4px 10px;border-radius:99px;font-family:'Manrope',sans-serif;text-transform:uppercase;letter-spacing:0.08em;align-items:center;">
             Admin
         </span>
-        <span style="font-size:0.72rem;color:#827471;font-family:'Manrope',sans-serif;">
+        <span class="hidden md:inline-block" style="font-size:0.72rem;color:#827471;font-family:'Manrope',sans-serif;">
             {{ now()->translatedFormat('d M Y') }}
         </span>
+
+        {{-- Mobile hamburger moved to right --}}
+        <button onclick="openSidebarMobile()"
+            style="width:36px;height:36px;border-radius:8px;border:1px solid #e9e8e5;background:#f4f3f1;color:#361f1a;cursor:pointer;flex-shrink:0;display:none;align-items:center;justify-content:center;"
+            class="mobile-menu-btn" id="mobileMenuBtn">
+            <i class="bi bi-list" style="font-size:1.3rem;"></i>
+        </button>
     </div>
 </nav>
 
@@ -439,13 +573,6 @@
     const toggleBtn = document.getElementById('sidebarToggle');
     const isMobile  = () => window.innerWidth <= 768;
 
-    // Mobile menu btn visibility
-    const mobileBtn = document.getElementById('mobileMenuBtn');
-    if (mobileBtn) mobileBtn.style.display = isMobile() ? 'flex' : 'none';
-    window.addEventListener('resize', () => {
-        if (mobileBtn) mobileBtn.style.display = isMobile() ? 'flex' : 'none';
-    });
-
     function applyMiniState(mini) {
         sidebar.classList.toggle('mini', mini);
         topbar.classList.toggle('mini', mini);
@@ -465,13 +592,23 @@
         localStorage.setItem('arh_sidebar_mini', String(nowMini));
     });
 
+    // Close sidebar when resizing from mobile → desktop
+    window.addEventListener('resize', () => {
+        if (!isMobile()) {
+            closeSidebarMobile();
+            applyMiniState(localStorage.getItem('arh_sidebar_mini') === 'true');
+        }
+    });
+
     function openSidebarMobile() {
         sidebar.classList.add('mobile-open');
         overlay.style.display = 'block';
+        document.body.style.overflow = 'hidden'; // prevent background scroll
     }
     function closeSidebarMobile() {
         sidebar.classList.remove('mobile-open');
         overlay.style.display = 'none';
+        document.body.style.overflow = '';
     }
 
     // Auto-dismiss alerts after 5s
@@ -490,7 +627,33 @@
             }
         });
     });
+
+    // Convert data tables to mobile cards (CSS media query akan mengatur kapan view card aktif)
+    document.addEventListener('DOMContentLoaded', function() {
+        const tables = document.querySelectorAll('#page-content main table');
+        tables.forEach(table => {
+            // Hanya target tabel yang memiliki thead (data table)
+            if (table.querySelector('thead') && !table.classList.contains('no-mobile-card')) {
+                table.classList.add('mobile-card-table');
+                
+                // Ambil teks dari th thead untuk dijadikan label
+                const headers = Array.from(table.querySelectorAll('thead th')).map(th => th.innerText.trim());
+                
+                // Terapkan attr data-label ke setiap td di tbody
+                const rows = table.querySelectorAll('tbody tr');
+                rows.forEach(row => {
+                    const cells = row.querySelectorAll('td');
+                    cells.forEach((cell, index) => {
+                        if (headers[index]) {
+                            cell.setAttribute('data-label', headers[index]);
+                        }
+                    });
+                });
+            }
+        });
+    });
 </script>
 @yield('scripts')
+@stack('scripts')
 </body>
 </html>

@@ -66,7 +66,7 @@
                     <div class="bg-surface-container-low border border-outline-variant/50 rounded-xl p-4 flex gap-4">
                         <div class="flex items-center h-5 mt-1">
                             <input type="hidden" name="is_active" value="0">
-                            <input type="checkbox" name="is_active" id="is_active" {{ old('is_active', $personnel->is_active) ? 'checked' : '' }} class="w-4 h-4 text-green-600 bg-surface-container border-outline-variant rounded focus:ring-green-600 focus:ring-2">
+                            <input type="checkbox" name="is_active" id="is_active" value="1" {{ old('is_active', $personnel->is_active) ? 'checked' : '' }} class="w-4 h-4 text-green-600 bg-surface-container border-outline-variant rounded focus:ring-green-600 focus:ring-2">
                         </div>
                         <div>
                             <label for="is_active" class="font-body text-sm font-bold text-on-surface block cursor-pointer">Status Personel Aktif?</label>
@@ -77,7 +77,7 @@
                     <div class="bg-surface-container-low border border-outline-variant/50 rounded-xl p-4 flex gap-4">
                         <div class="flex items-center h-5 mt-1">
                             <input type="hidden" name="is_backup" value="0">
-                            <input type="checkbox" name="is_backup" id="is_backup" {{ old('is_backup', $personnel->is_backup) ? 'checked' : '' }} class="w-4 h-4 text-primary bg-surface-container border-outline-variant rounded focus:ring-primary focus:ring-2">
+                            <input type="checkbox" name="is_backup" id="is_backup" value="1" {{ old('is_backup', $personnel->is_backup) ? 'checked' : '' }} class="w-4 h-4 text-primary bg-surface-container border-outline-variant rounded focus:ring-primary focus:ring-2">
                         </div>
                         <div>
                             <label for="is_backup" class="font-body text-sm font-bold text-on-surface block cursor-pointer">Personel Cadangan?</label>
@@ -97,7 +97,7 @@
                     <div class="flex gap-4 mb-4">
                         <div class="flex items-center h-5 mt-0.5">
                             <input type="hidden" name="has_day_job" value="0">
-                            <input type="checkbox" name="has_day_job" id="has_day_job" x-model="hasDayJob" class="w-4 h-4 text-primary bg-surface-container border-outline-variant rounded focus:ring-primary focus:ring-2">
+                            <input type="checkbox" name="has_day_job" id="has_day_job" value="1" x-model="hasDayJob" class="w-4 h-4 text-primary bg-surface-container border-outline-variant rounded focus:ring-primary focus:ring-2">
                         </div>
                         <div>
                             <label for="has_day_job" class="font-body text-sm font-bold text-on-surface block cursor-pointer">Personel memiliki pekerjaan tetap di luar sanggar?</label>

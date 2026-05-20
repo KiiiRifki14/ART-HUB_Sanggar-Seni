@@ -70,8 +70,8 @@
 </div>
 
 {{-- Table --}}
-<div class="bg-surface-container-lowest rounded-xl border border-outline-variant/30 shadow-[0_12px_24px_rgba(54,31,26,0.03)] overflow-hidden">
-    <table class="w-full">
+<div class="bg-surface-container-lowest rounded-xl border border-outline-variant/30 shadow-[0_12px_24px_rgba(54,31,26,0.03)] overflow-hidden overflow-x-auto">
+    <table class="w-full min-w-[1000px]">
         <thead class="bg-surface-container-low">
             <tr>
                 <th class="font-label text-[0.65rem] uppercase tracking-widest text-outline font-bold px-6 py-4 text-left">#Booking</th>
@@ -134,15 +134,12 @@
                             <i class="bi bi-eye-fill text-sm"></i>
                         </a>
                         @if($booking->status === 'pending')
-                        <form method="POST" action="{{ route('admin.bookings.confirm', $booking->id) }}" class="m-0"
-                              onsubmit="return confirm('Kunci laba untuk booking #{{ $booking->id }}? Aksi ini tidak bisa dibatalkan.')">
-                            @csrf
-                            <button type="submit"
-                                    class="w-8 h-8 rounded-lg bg-surface-container flex items-center justify-center text-on-surface-variant hover:bg-secondary hover:text-white transition-all"
-                                    title="Kunci Laba">
-                                <i class="bi bi-lock-fill text-sm"></i>
-                            </button>
-                        </form>
+                        <button type="button"
+                                onclick="openKunciModal({{ $booking->id }}, '{{ addslashes($booking->client_name) }}', {{ $booking->total_price }}, {{ $booking->dp_amount }})"
+                                class="w-8 h-8 rounded-lg bg-surface-container flex items-center justify-center text-on-surface-variant hover:bg-secondary hover:text-white transition-all"
+                                title="Kunci Laba & Konfirmasi DP">
+                            <i class="bi bi-lock-fill text-sm"></i>
+                        </button>
                         @endif
                     </div>
                 </td>
@@ -299,6 +296,61 @@
     </div>
 </div>
 
+{{-- ══ MODAL: KUNCI LABA (Konfirmasi DP) ══ --}}
+<div id="modalKunciLaba" class="fixed inset-0 z-[100] hidden items-center justify-center p-4">
+    <div class="absolute inset-0 bg-black/50 backdrop-blur-sm" onclick="closeKunciModal()"></div>
+    <div id="modalKunciContent" class="relative w-full max-w-sm bg-surface-container-lowest rounded-2xl shadow-2xl border border-outline-variant/30 p-6 transition-all scale-95 opacity-0">
+
+        <div class="flex items-center justify-between mb-4 pb-3 border-b border-outline-variant/20">
+            <h5 class="font-headline font-bold text-lg text-primary flex items-center gap-2">
+                <i class="bi bi-lock-fill text-secondary"></i> Kunci Laba & Konfirmasi DP
+            </h5>
+            <button onclick="closeKunciModal()" class="text-on-surface-variant hover:text-primary"><i class="bi bi-x-lg"></i></button>
+        </div>
+
+        <form id="formKunciLaba" method="POST">
+            @csrf
+            <div class="mb-5 space-y-4">
+                <div class="p-3 bg-surface-container-low rounded-lg">
+                    <div class="font-label text-[0.65rem] font-bold uppercase tracking-widest text-outline mb-1">Klien</div>
+                    <div id="kunci_client" class="font-body font-semibold text-on-surface text-sm"></div>
+                </div>
+                <div class="grid grid-cols-2 gap-3">
+                    <div class="p-3 bg-surface-container-low rounded-lg text-center">
+                        <div class="font-label text-[0.65rem] font-bold uppercase tracking-widest text-outline mb-1">Total Kontrak</div>
+                        <div id="kunci_total" class="font-headline font-bold text-primary text-base"></div>
+                    </div>
+                    <div class="p-3 bg-secondary/5 border border-secondary/20 rounded-lg text-center">
+                        <div class="font-label text-[0.65rem] font-bold uppercase tracking-widest text-outline mb-1">DP Masuk</div>
+                        <div id="kunci_dp" class="font-headline font-bold text-secondary text-base"></div>
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block font-label text-[0.65rem] uppercase tracking-widest text-on-surface-variant font-bold mb-1.5">
+                        Fixed Profit (Laba Bersih Sanggar) <span class="text-red-500">*</span>
+                    </label>
+                    <div class="relative">
+                        <span class="absolute left-3 top-1/2 -translate-y-1/2 font-body text-sm text-outline">Rp</span>
+                        <input type="number" name="fixed_profit_nominal" id="kunci_profit_input"
+                               required min="0"
+                               class="w-full bg-surface-container-low border border-outline-variant/50 rounded-lg pl-10 pr-4 py-2.5 font-body text-sm text-on-surface focus:border-primary outline-none transition-all"
+                               placeholder="Misal: 2000000">
+                    </div>
+                    <p id="kunci_profit_hint" class="text-[0.65rem] text-outline mt-1.5"></p>
+                </div>
+            </div>
+
+            <div class="flex gap-2">
+                <button type="button" onclick="closeKunciModal()" class="flex-1 py-2.5 rounded-lg border border-outline-variant/50 font-label text-xs font-bold uppercase tracking-widest text-on-surface-variant hover:bg-surface-container transition-colors">Batal</button>
+                <button type="submit" class="flex-1 py-2.5 rounded-lg bg-secondary text-primary font-label text-xs font-bold uppercase tracking-widest hover:opacity-90 transition-all shadow-sm flex items-center justify-center gap-1.5">
+                    <i class="bi bi-lock-fill"></i> Kunci Laba
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
 @endsection
 
 @section('scripts')
@@ -318,6 +370,43 @@ function filterBooking(status, btn) {
             || (status === 'completed' && (s === 'confirmed' || s === 'completed'));
         row.style.display = show ? '' : 'none';
     });
+}
+
+function openKunciModal(bookingId, clientName, totalPrice, dpAmount) {
+    // Set form action
+    document.getElementById('formKunciLaba').action = `/admin/bookings/${bookingId}/confirm`;
+
+    // Fill info
+    document.getElementById('kunci_client').textContent = clientName;
+    document.getElementById('kunci_total').textContent = 'Rp ' + totalPrice.toLocaleString('id-ID');
+    document.getElementById('kunci_dp').textContent = 'Rp ' + dpAmount.toLocaleString('id-ID');
+
+    // Suggest 30% of total as default profit
+    const suggested = Math.round(totalPrice * 0.30);
+    document.getElementById('kunci_profit_input').value = suggested;
+    document.getElementById('kunci_profit_hint').textContent =
+        `Saran otomatis 30%: Rp ${suggested.toLocaleString('id-ID')}. Bisa diubah sesuai negosiasi.`;
+
+    // Show modal
+    const modal = document.getElementById('modalKunciLaba');
+    const content = document.getElementById('modalKunciContent');
+    modal.classList.remove('hidden');
+    modal.classList.add('flex');
+    setTimeout(() => {
+        content.classList.remove('scale-95', 'opacity-0');
+        content.classList.add('scale-100', 'opacity-100');
+    }, 10);
+}
+
+function closeKunciModal() {
+    const modal = document.getElementById('modalKunciLaba');
+    const content = document.getElementById('modalKunciContent');
+    content.classList.remove('scale-100', 'opacity-100');
+    content.classList.add('scale-95', 'opacity-0');
+    setTimeout(() => {
+        modal.classList.add('hidden');
+        modal.classList.remove('flex');
+    }, 200);
 }
 </script>
 @endsection

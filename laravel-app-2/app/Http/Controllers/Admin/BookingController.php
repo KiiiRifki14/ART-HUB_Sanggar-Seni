@@ -267,7 +267,13 @@ class BookingController extends Controller
                 ]);
 
                 // 2. BUAT ENTRI EVENT OTOMATIS
-                $eventCode = 'EVT-' . date('Y') . '-' . str_pad($booking->id, 3, '0', STR_PAD_LEFT);
+                $baseCode = 'EVT-' . date('Y') . '-' . str_pad($booking->id, 3, '0', STR_PAD_LEFT);
+                $eventCode = $baseCode;
+                $counter = 1;
+                while (Event::where('event_code', $eventCode)->exists()) {
+                    $eventCode = $baseCode . '-' . $counter;
+                    $counter++;
+                }
                 
                 $event = Event::create([
                     'booking_id'      => $booking->id,
@@ -277,7 +283,7 @@ class BookingController extends Controller
                     'event_start'     => $booking->event_start,
                     'event_end'       => $booking->event_end,
                     'venue'           => $booking->venue,
-                    'personnel_count' => 12,
+                    'personnel_count' => $booking->serviceCatalog?->max_personnel ?? 0,
                 ]);
 
                 // 3. KUNCI FIXED PROFIT — INPUT MANUAL DARI ADMIN (bukan otomatis 30%)
@@ -390,7 +396,13 @@ class BookingController extends Controller
                 ]);
 
                 // Buat Event
-                $eventCode = 'EVT-' . date('Y') . '-' . str_pad($booking->id, 3, '0', STR_PAD_LEFT);
+                $baseCode = 'EVT-' . date('Y') . '-' . str_pad($booking->id, 3, '0', STR_PAD_LEFT);
+                $eventCode = $baseCode;
+                $counter = 1;
+                while (Event::where('event_code', $eventCode)->where('booking_id', '!=', $booking->id)->exists()) {
+                    $eventCode = $baseCode . '-' . $counter;
+                    $counter++;
+                }
                 $event = Event::firstOrCreate(
                     ['booking_id' => $booking->id],
                     [
@@ -400,7 +412,7 @@ class BookingController extends Controller
                         'event_start'     => $booking->event_start,
                         'event_end'       => $booking->event_end,
                         'venue'           => $booking->venue,
-                        'personnel_count' => 12,
+                        'personnel_count' => $booking->serviceCatalog?->max_personnel ?? 0,
                     ]
                 );
 

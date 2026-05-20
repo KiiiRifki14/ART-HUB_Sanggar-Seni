@@ -31,8 +31,8 @@ class PersonnelController extends Controller
             'phone'        => 'nullable|string|max:20',
             'has_day_job'  => 'nullable|boolean',
             'day_job_name' => 'nullable|string|max:255',
-            'day_job_start'=> 'nullable|date_format:H:i',
-            'day_job_end'  => 'nullable|date_format:H:i',
+            'day_job_start'=> ['nullable', 'regex:/^([01]\d|2[0-3]):[0-5]\d$/'],
+            'day_job_end'  => ['nullable', 'regex:/^([01]\d|2[0-3]):[0-5]\d$/'],
         ]);
 
         try {
@@ -82,8 +82,8 @@ class PersonnelController extends Controller
             'phone'        => 'nullable|string|max:20',
             'has_day_job'  => 'nullable|boolean',
             'day_job_name' => 'nullable|string|max:255',
-            'day_job_start'=> 'nullable|date_format:H:i',
-            'day_job_end'  => 'nullable|date_format:H:i',
+            'day_job_start'=> ['nullable', 'regex:/^([01]\d|2[0-3]):[0-5]\d$/'],
+            'day_job_end'  => ['nullable', 'regex:/^([01]\d|2[0-3]):[0-5]\d$/'],
             'is_active'    => 'nullable|boolean',
             'is_backup'    => 'nullable|boolean',
         ]);
@@ -130,5 +130,26 @@ class PersonnelController extends Controller
         } catch (\Exception $e) {
             return back()->with('error', 'Gagal menghapus: ' . $e->getMessage());
         }
+    }
+
+    /**
+     * Setujui pendaftaran personel baru (ubah is_active = true)
+     */
+    public function approve(Personnel $personnel)
+    {
+        $personnel->update(['is_active' => true]);
+        return redirect()->route('admin.personnel.index')
+            ->with('success', "✅ {$personnel->user->name} telah disetujui dan sekarang bisa mengakses Portal Kru!");
+    }
+
+    /**
+     * Tolak pendaftaran personel baru (hapus akun)
+     */
+    public function reject(Personnel $personnel)
+    {
+        $name = $personnel->user->name ?? 'Personel';
+        $personnel->user->delete(); // cascades ke personnel via FK
+        return redirect()->route('admin.personnel.index')
+            ->with('warning', "❌ Pendaftaran {$name} telah DITOLAK dan akun dihapus.");
     }
 }

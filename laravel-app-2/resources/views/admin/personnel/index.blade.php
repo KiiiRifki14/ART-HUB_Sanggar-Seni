@@ -7,16 +7,33 @@
 @section('content')
 
 @php
-    $total  = $personnel->count();
-    $active = $personnel->where('is_active', true)->count();
-    $backup = $personnel->where('is_backup', true)->count();
-    $dayJob = $personnel->where('has_day_job', true)->count();
+    $total   = $personnel->count();
+    $active  = $personnel->where('is_active', true)->count();
+    $pending = $personnel->where('is_active', false)->count();
+    $backup  = $personnel->where('is_backup', true)->count();
+    $dayJob  = $personnel->where('has_day_job', true)->count();
     $specialtyMap = [
         'penari'      => ['Penari', 'bi-person-arms-up', 'bg-pink-500/10 text-pink-700 border-pink-500/20'],
         'pemusik'     => ['Pemusik', 'bi-music-note-beamed', 'bg-blue-500/10 text-blue-700 border-blue-500/20'],
         'multi_talent'=> ['Multi Talent', 'bi-stars', 'bg-secondary/10 text-secondary border-secondary/20'],
     ];
 @endphp
+
+{{-- ======== BANNER: Pending Approval ======== --}}
+@if($pending > 0)
+<div class="mb-6 p-4 rounded-xl border border-orange-500/40 bg-orange-500/5 flex items-center gap-4">
+    <div class="w-10 h-10 rounded-full bg-orange-500/10 flex-shrink-0 flex items-center justify-center">
+        <i class="bi bi-person-exclamation text-orange-500 text-xl"></i>
+    </div>
+    <div class="flex-1">
+        <div class="font-body font-bold text-orange-700 text-sm">Ada {{ $pending }} Pendaftaran Personel Menunggu Persetujuan!</div>
+        <div class="font-body text-xs text-orange-600/80 mt-0.5">Personel baru mendaftar mandiri dan belum bisa mengakses portal mereka. Tinjau dan setujui di bawah.</div>
+    </div>
+    <a href="#pending-section" class="flex-shrink-0 px-4 py-2 bg-orange-500 text-white rounded-lg font-label text-xs font-bold uppercase tracking-wider hover:bg-orange-600 transition-colors">
+        Tinjau Sekarang
+    </a>
+</div>
+@endif
 
 {{-- Stat bar --}}
 <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
@@ -30,10 +47,10 @@
         <div class="font-headline text-3xl font-bold text-green-600 mb-1">{{ $active }}</div>
         <div class="font-label text-[0.65rem] uppercase tracking-widest text-outline font-bold">Aktif</div>
     </div>
-    <div class="bg-surface-container-lowest rounded-xl p-5 border border-outline-variant/30 shadow-[0_8px_20px_rgba(54,31,26,0.03)] text-center">
-        <i class="bi bi-person-badge-fill text-2xl text-blue-500 mb-2 block"></i>
-        <div class="font-headline text-3xl font-bold text-blue-600 mb-1">{{ $backup }}</div>
-        <div class="font-label text-[0.65rem] uppercase tracking-widest text-outline font-bold">Cadangan</div>
+    <div class="bg-surface-container-lowest rounded-xl p-5 border {{ $pending > 0 ? 'border-orange-500/30' : 'border-outline-variant/30' }} shadow-[0_8px_20px_rgba(54,31,26,0.03)] text-center">
+        <i class="bi bi-hourglass-split text-2xl {{ $pending > 0 ? 'text-orange-500' : 'text-outline' }} mb-2 block"></i>
+        <div class="font-headline text-3xl font-bold {{ $pending > 0 ? 'text-orange-600' : 'text-outline' }} mb-1">{{ $pending }}</div>
+        <div class="font-label text-[0.65rem] uppercase tracking-widest text-outline font-bold">Menunggu Persetujuan</div>
     </div>
     <div class="bg-surface-container-lowest rounded-xl p-5 border border-orange-500/20 shadow-[0_8px_20px_rgba(54,31,26,0.03)] text-center">
         <i class="bi bi-briefcase-fill text-2xl text-orange-500 mb-2 block"></i>
@@ -54,8 +71,8 @@
 </div>
 
 {{-- Table --}}
-<div class="bg-surface-container-lowest rounded-xl border border-outline-variant/30 shadow-[0_12px_24px_rgba(54,31,26,0.03)] overflow-hidden">
-    <table class="w-full">
+<div class="bg-surface-container-lowest rounded-xl border border-outline-variant/30 shadow-[0_12px_24px_rgba(54,31,26,0.03)] overflow-hidden overflow-x-auto">
+    <table class="w-full min-w-[900px]">
         <thead class="bg-surface-container-low">
             <tr>
                 <th class="font-label text-[0.65rem] uppercase tracking-widest text-outline font-bold px-6 py-4 text-left w-8">#</th>
@@ -125,14 +142,34 @@
                         <i class="bi bi-check-circle-fill"></i> Aktif
                     </span>
                     @else
-                    <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded bg-orange-500/10 text-orange-600 border border-orange-500/20 font-label text-[0.65rem] font-bold uppercase tracking-wider"
-                          title="Edit untuk mengaktifkan">
+                    <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded bg-orange-500/10 text-orange-600 border border-orange-500/20 font-label text-[0.65rem] font-bold uppercase tracking-wider">
                         <i class="bi bi-hourglass-split"></i> Menunggu
                     </span>
                     @endif
                 </td>
                 <td class="px-6 py-4 text-center">
                     <div class="flex items-center justify-center gap-2">
+                        @if(!$p->is_active)
+                        {{-- Tombol Setujui untuk personel yang pending --}}
+                        <form method="POST" action="{{ route('admin.personnel.approve', $p->id) }}" class="m-0">
+                            @csrf
+                            <button type="submit"
+                                    class="h-8 px-3 rounded-lg bg-green-500/10 text-green-600 border border-green-500/20 hover:bg-green-500 hover:text-white transition-all font-label text-[0.65rem] font-bold uppercase tracking-wider flex items-center gap-1"
+                                    title="Setujui Bergabung"
+                                    onclick="return confirm('Setujui {{ addslashes($p->user->name ?? '') }} sebagai Personel Aktif?')">
+                                <i class="bi bi-check-circle-fill"></i> Setujui
+                            </button>
+                        </form>
+                        <form method="POST" action="{{ route('admin.personnel.reject', $p->id) }}" class="m-0">
+                            @csrf @method('DELETE')
+                            <button type="submit"
+                                    class="h-8 px-3 rounded-lg bg-red-500/10 text-red-600 border border-red-500/20 hover:bg-red-500 hover:text-white transition-all font-label text-[0.65rem] font-bold uppercase tracking-wider flex items-center gap-1"
+                                    title="Tolak & Hapus Akun"
+                                    onclick="return confirm('Tolak dan hapus akun {{ addslashes($p->user->name ?? '') }}? Data tidak bisa dikembalikan.')">
+                                <i class="bi bi-x-circle-fill"></i> Tolak
+                            </button>
+                        </form>
+                        @else
                         <a href="{{ route('admin.personnel.edit', $p->id) }}"
                            class="w-8 h-8 rounded-lg bg-surface-container flex items-center justify-center text-on-surface-variant hover:bg-secondary hover:text-white transition-all"
                            title="Edit">
@@ -148,6 +185,7 @@
                                 <i class="bi bi-trash3-fill text-sm"></i>
                             </button>
                         </form>
+                        @endif
                     </div>
                 </td>
             </tr>

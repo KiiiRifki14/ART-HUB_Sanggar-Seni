@@ -94,19 +94,73 @@ class EventController extends Controller
 
     /**
      * TAMPILKAN HALAMAN PLOTTING (Smart Plotting)
-     * Akan memanggil Stored Procedure MySQL yang menggunakan CURSOR
-     * untuk mengecek tabrakan jadwal dengan event lain, latihan, atau pekerjaan utama.
+     * Memfilter personel berdasarkan specialty katalog, memeriksa unavailability,
+     * dan mengisi auto-select hingga kuota max_personnel katalog.
      */
     public function plotting(Event $event)
     {
-        $event->load(['booking', 'personnel.user', 'financialRecord']);
+        $event->load(['booking.serviceCatalog', 'personnel.user', 'financialRecord']);
 
         $date  = \Carbon\Carbon::parse($event->event_date)->format('Y-m-d');
         $start = is_string($event->event_start) ? $event->event_start : \Carbon\Carbon::parse($event->event_start)->format('H:i:s');
         $end   = is_string($event->event_end)   ? $event->event_end   : \Carbon\Carbon::parse($event->event_end)->format('H:i:s');
 
-        // Jalankan Stored Procedure untuk deteksi konflik jadwal.
-        // Dibungkus try-catch agar halaman tetap tampil walau SP belum ada di DB.
+        // ── Ambil data katalog (max_personnel & specialty_type) ──────────────
+        $catalog      = $event->booking->serviceCatalog ?? null;
+        $maxPersonnel = $catalog?->max_personnel ?? 0;   // 0 = tidak ada batas
+        $specialtyReq = $catalog?->specialty_type ?? 'gabungan';
+
+        // ── Ambil ID personel yang BERHALANGAN di tanggal event ─────────────
+        $unavailableIds = \App\Models\PersonnelUnavailability::where('start_date', '<=', $date)
+            ->where('end_date', '>=', $date)
+            ->pluck('personnel_id')
+            ->toArray();
+
+        // ── Ambil personel aktif, filter berdasarkan specialty ───────────────
+        $personnelQuery = Personnel::with('user')->where('is_active', true);
+        if ($specialtyReq === 'penari') {
+            $personnelQuery->where('specialty', 'penari');
+        } elseif ($specialtyReq === 'pemusik') {
+            $personnelQuery->where('specialty', 'pemusik');
+        }
+        // 'gabungan' = semua specialty diizinkan
+
+        $personnel = $personnelQuery->orderByRaw("FIELD(specialty, 'penari', 'pemusik', 'multi_talent')")
+                                    ->orderBy('id')
+                                    ->get();
+
+        // ── Tandai status unavailability ─────────────────────────────────────
+        $personnel->each(function ($p) use ($unavailableIds, $date) {
+            $p->is_unavailable = in_array($p->id, $unavailableIds);
+            // Ambil alasan berhalangan untuk tooltip
+            $p->unavailability_reason = $p->is_unavailable
+                ? \App\Models\PersonnelUnavailability::where('personnel_id', $p->id)
+                    ->where('start_date', '<=', $date)->where('end_date', '>=', $date)
+                    ->value('reason')
+                : null;
+        });
+
+        // ── ID personel yang SUDAH diplot sebelumnya ─────────────────────────
+        $alreadyPlottedIds = $event->personnel->pluck('id')->toArray();
+
+        // ── Auto-select: pilih personel available hingga kuota ───────────────
+        $autoSelectedIds = [];
+        if (empty($alreadyPlottedIds)) {
+            // Hanya auto-select jika belum ada plotting sebelumnya
+            $quota    = $maxPersonnel > 0 ? $maxPersonnel : PHP_INT_MAX;
+            $selected = 0;
+            foreach ($personnel as $p) {
+                if ($selected >= $quota) break;
+                if (!$p->is_unavailable) {
+                    $autoSelectedIds[] = $p->id;
+                    $selected++;
+                }
+            }
+        } else {
+            $autoSelectedIds = $alreadyPlottedIds;
+        }
+
+        // ── SP check (best-effort, tidak wajib ada) ──────────────────────────
         $spData = null;
         try {
             DB::statement(
@@ -121,13 +175,15 @@ class EventController extends Controller
             ');
             $spData = $spResult[0] ?? null;
         } catch (\Exception $e) {
-            // SP belum terdaftar / DB error: $spData tetap null, form tetap tampil
+            // SP belum ada / DB error — lanjut
         }
 
-        $personnel = Personnel::with('user')->where('is_active', true)->get();
-        $fees      = FeeReference::where('is_active', true)->get();
+        $fees = FeeReference::where('is_active', true)->get();
 
-        return view('admin.events.plotting', compact('event', 'personnel', 'fees', 'spData'));
+        return view('admin.events.plotting', compact(
+            'event', 'personnel', 'fees', 'spData',
+            'unavailableIds', 'autoSelectedIds', 'maxPersonnel', 'specialtyReq', 'catalog'
+        ));
     }
 
     /**

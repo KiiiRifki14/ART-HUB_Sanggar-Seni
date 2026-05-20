@@ -7,7 +7,7 @@
 @section('content')
 
 {{-- ── ROW 1: STAT CARDS ── --}}
-<div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
     <div class="bg-surface-container-lowest rounded-xl p-5 border border-outline-variant/30 shadow-[0_12px_24px_rgba(54,31,26,0.03)] hover:-translate-y-1 transition-all">
         <div class="flex justify-between items-start mb-4">
             <div class="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center">

@@ -2,7 +2,7 @@
 <html lang="id">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5, user-scalable=yes">
     <title>@yield('title', 'Portal Kru – ART-HUB')</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Cormorant+Garamond:ital,wght@0,600;0,700;1,600&display=swap" rel="stylesheet">
@@ -30,8 +30,10 @@
                 radial-gradient(ellipse at 10% 20%, rgba(139,26,42,0.18) 0%, transparent 55%),
                 radial-gradient(ellipse at 90% 80%, rgba(197,160,40,0.06) 0%, transparent 50%);
             min-height: 100vh;
+            min-height: 100dvh; /* dynamic viewport height untuk mobile */
             font-family: 'Plus Jakarta Sans', sans-serif;
             color: #fff;
+            overflow-x: hidden;
         }
         /* Offline banner */
         #offlineBanner { display:none; position:fixed; top:0; inset-inline:0; z-index:999; background:#dc2626; color:#fff; text-align:center; font-size:0.75rem; font-weight:700; padding:6px; }
@@ -114,7 +116,7 @@
 </header>
 
 <!-- MAIN -->
-<main style="max-width:600px; margin:0 auto; padding:20px 16px 110px;">
+<main style="max-width:600px; margin:0 auto; padding:20px 16px 110px; overflow-x: hidden;">
     @yield('content')
 </main>
 

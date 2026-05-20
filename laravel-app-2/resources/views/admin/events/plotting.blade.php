@@ -15,12 +15,22 @@
     <span class="text-outline">Plotting Personel</span>
 </div>
 
-{{-- ── STATUS BAR: INFO EVENT + RESULT SP ── --}}
+{{-- ── STATUS BAR: INFO EVENT + CATALOG QUOTA ── --}}
 <div class="bg-surface-container-lowest rounded-xl border border-outline-variant/30 shadow-[0_12px_24px_rgba(54,31,26,0.03)] p-6 mb-8">
     <div class="grid grid-cols-1 md:grid-cols-2 gap-6 items-center">
         <div>
             <h5 class="font-headline font-bold text-lg text-primary flex items-center gap-2 mb-2">
-                <i class="bi bi-people-fill text-secondary"></i> Formasi {{ $event->personnel_count ?? 12 }} Personel
+                <i class="bi bi-people-fill text-secondary"></i>
+                Formasi
+                @if($maxPersonnel > 0)
+                    <span class="text-secondary">{{ $maxPersonnel }}</span>
+                @endif
+                Personel
+                @if($catalog)
+                    <span class="ml-1 px-2 py-0.5 text-[0.6rem] font-label uppercase tracking-wider font-bold rounded bg-secondary-container text-on-secondary-container border border-secondary/20">
+                        {{ $catalog->name }}
+                    </span>
+                @endif
             </h5>
             <div class="font-label text-xs uppercase tracking-widest text-on-surface-variant font-bold flex items-center gap-2 flex-wrap">
                 <span><i class="bi bi-calendar-event"></i> {{ $event->event_date->format('l, d M Y') }}</span>
@@ -29,10 +39,32 @@
                 <span class="text-outline-variant">•</span>
                 <span><i class="bi bi-geo-alt"></i> {{ $event->venue }}</span>
             </div>
+
+            @if($maxPersonnel > 0)
+            <div class="mt-3 flex items-center gap-2">
+                <div class="flex-grow bg-surface-container-high rounded-full h-1.5 overflow-hidden">
+                    <div class="h-full rounded-full bg-secondary transition-all" id="quota-bar"
+                         style="width: {{ min(100, round(($event->personnel->count() / $maxPersonnel) * 100)) }}%"></div>
+                </div>
+                <span class="font-label text-[0.65rem] font-bold uppercase tracking-widest text-outline" id="quota-label">
+                    {{ $event->personnel->count() }} / {{ $maxPersonnel }}
+                </span>
+            </div>
+            @endif
         </div>
 
-        {{-- Hasil Stored Procedure (jika tersedia) --}}
+        {{-- Hasil Stored Procedure (jika tersedia) + Unavailability Info --}}
         <div>
+            @if(count($unavailableIds) > 0)
+            <div class="flex items-center gap-4 p-4 rounded-xl bg-red-500/10 border border-red-500/20 text-red-700 mb-3">
+                <i class="bi bi-calendar-x-fill text-3xl"></i>
+                <div>
+                    <h6 class="font-headline font-bold text-sm mb-1">{{ count($unavailableIds) }} Personel Berhalangan Hadir</h6>
+                    <p class="font-body text-[0.7rem] opacity-90 leading-tight">Personel ini <strong>tidak dapat dipilih</strong> karena ada halangan di tanggal {{ $event->event_date->format('d M Y') }}.</p>
+                </div>
+            </div>
+            @endif
+
             @if(isset($spData) && $spData)
                 @if($spData->collision_count > 0)
                 <div class="flex items-center gap-4 p-4 rounded-xl bg-red-500/10 border border-red-500/20 text-red-700">
@@ -56,7 +88,7 @@
                 <i class="bi bi-database-fill-check text-4xl text-secondary"></i>
                 <div>
                     <h6 class="font-headline font-bold text-base text-secondary mb-1">Deteksi Konflik SQL Siap</h6>
-                    <p class="font-body text-[0.7rem] opacity-80 leading-tight">Klik "Validasi & Kunci Plotting" untuk menjalankan Stored Procedure check_personnel_availability.</p>
+                    <p class="font-body text-[0.7rem] opacity-80 leading-tight">Klik "Validasi & Kunci Plotting" untuk menjalankan SP.</p>
                 </div>
             </div>
             @endif
@@ -94,49 +126,75 @@
                         <tbody class="divide-y divide-outline-variant/20">
                             @foreach($personnel as $idx => $p)
                             @php
-                                $pivotData = $event->personnel->firstWhere('id', $p->id)?->pivot;
-                                $alreadyPlotted = !is_null($pivotData);
+                                $isUnavailable = $p->is_unavailable;
+                                $isAutoSelected = in_array($p->id, $autoSelectedIds);
                                 $collidingIds = [];
                                 if (isset($spData) && $spData && !empty($spData->collision_details)) {
                                     preg_match_all('/ID:(\d+)/', $spData->collision_details, $m);
                                     $collidingIds = $m[1] ?? [];
                                 }
                                 $isColliding = in_array((string)$p->id, $collidingIds);
-                                $rowClass = $isColliding ? 'bg-red-500/5 hover:bg-red-500/10' : 'hover:bg-surface-container-low/50';
+                                $isDisabled  = $isUnavailable || $isColliding;
+
+                                if ($isUnavailable) {
+                                    $rowClass = 'bg-red-500/8 border-l-4 border-l-red-500';
+                                } elseif ($isColliding) {
+                                    $rowClass = 'bg-orange-500/5 border-l-4 border-l-orange-500';
+                                } else {
+                                    $rowClass = 'hover:bg-surface-container-low/50';
+                                }
                             @endphp
-                            <tr class="transition-colors {{ $rowClass }}">
+                            <tr class="transition-colors {{ $rowClass }}" data-personnel-id="{{ $p->id }}">
                                 <td class="px-6 py-4 text-center">
-                                    <input class="w-4 h-4 rounded border-outline-variant/50 text-secondary focus:ring-secondary cursor-pointer" type="checkbox" name="personnel[{{ $idx }}][selected]"
+                                    <input class="plot-checkbox w-4 h-4 rounded border-outline-variant/50 text-secondary focus:ring-secondary
+                                                  {{ $isDisabled ? 'opacity-30 cursor-not-allowed' : 'cursor-pointer' }}"
+                                           type="checkbox" name="personnel[{{ $idx }}][selected]"
                                            value="1" id="chk-{{ $p->id }}"
-                                           {{ $alreadyPlotted ? 'checked' : '' }}
-                                           {{ $isColliding ? 'disabled' : '' }}
+                                           {{ $isAutoSelected ? 'checked' : '' }}
+                                           {{ $isDisabled ? 'disabled' : '' }}
                                            onchange="updatePreview()">
                                     <input type="hidden" name="personnel[{{ $idx }}][id]" value="{{ $p->id }}">
                                     <input type="hidden" name="personnel[{{ $idx }}][fee_reference_id]" value="{{ $fees->first()?->id ?? 1 }}">
                                 </td>
                                 <td class="px-6 py-4">
                                     <div class="flex items-center gap-3">
-                                        <div class="w-9 h-9 rounded-full bg-surface-container-highest border border-outline-variant/30 text-on-surface-variant font-headline font-bold text-xs flex items-center justify-center flex-shrink-0">
+                                        <div class="w-9 h-9 rounded-full flex-shrink-0 font-headline font-bold text-xs flex items-center justify-center
+                                                    {{ $isUnavailable ? 'bg-red-500/20 text-red-600 border border-red-500/30' : 'bg-surface-container-highest border border-outline-variant/30 text-on-surface-variant' }}">
                                             {{ strtoupper(substr($p->user->name ?? 'P', 0, 2)) }}
                                         </div>
                                         <div>
-                                            <div class="font-body font-bold text-sm text-on-surface">{{ $p->user->name ?? 'Personel' }}</div>
-                                            @if($p->day_job_name)
-                                            <div class="font-body text-[0.65rem] text-orange-500 font-semibold"><i class="bi bi-briefcase-fill me-0.5"></i>{{ $p->day_job_name }}</div>
+                                            <div class="font-body font-bold text-sm {{ $isUnavailable ? 'text-red-700 line-through' : 'text-on-surface' }}">
+                                                {{ $p->user->name ?? 'Personel' }}
+                                            </div>
+                                            @if($isUnavailable)
+                                                <div class="font-body text-[0.65rem] text-red-500 font-bold flex items-center gap-1">
+                                                    <i class="bi bi-calendar-x-fill"></i>
+                                                    Berhalangan: {{ $p->unavailability_reason ?? 'Ada halangan' }}
+                                                </div>
+                                            @elseif($p->day_job_name)
+                                                <div class="font-body text-[0.65rem] text-orange-500 font-semibold">
+                                                    <i class="bi bi-briefcase-fill me-0.5"></i>{{ $p->day_job_name }}
+                                                </div>
                                             @endif
                                         </div>
                                     </div>
                                 </td>
                                 <td class="px-6 py-4">
-                                    <span class="inline-block px-2 py-0.5 rounded border border-outline-variant/50 bg-surface-container-highest text-on-surface-variant font-label text-[0.6rem] font-bold uppercase tracking-wider">
+                                    <span class="inline-block px-2 py-0.5 rounded border font-label text-[0.6rem] font-bold uppercase tracking-wider
+                                                 {{ match($p->specialty) {
+                                                     'penari'  => 'border-pink-500/30 bg-pink-500/10 text-pink-600',
+                                                     'pemusik' => 'border-blue-500/30 bg-blue-500/10 text-blue-600',
+                                                     default   => 'border-outline-variant/50 bg-surface-container-highest text-on-surface-variant'
+                                                 } }}">
                                         {{ $p->specialty }}
                                     </span>
                                 </td>
                                 <td class="px-6 py-4">
-                                    <select class="w-full bg-surface-container-low border border-outline-variant/50 rounded-lg px-3 py-1.5 font-body text-xs text-on-surface focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all {{ $isColliding ? 'opacity-50 cursor-not-allowed' : '' }}" name="personnel[{{ $idx }}][role_in_event]" {{ $isColliding ? 'disabled' : '' }}>
-                                        <option value="penari_utama" {{ str_contains($p->specialty ?? '', 'Tari') ? 'selected' : '' }}>Penari Utama</option>
+                                    <select class="w-full bg-surface-container-low border border-outline-variant/50 rounded-lg px-3 py-1.5 font-body text-xs text-on-surface focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all {{ $isDisabled ? 'opacity-40 cursor-not-allowed' : '' }}"
+                                            name="personnel[{{ $idx }}][role_in_event]" {{ $isDisabled ? 'disabled' : '' }}>
+                                        <option value="penari_utama" {{ $p->specialty === 'penari' ? 'selected' : '' }}>Penari Utama</option>
                                         <option value="penari_latar">Penari Latar</option>
-                                        <option value="pemusik" {{ str_contains($p->specialty ?? '', 'Musik') ? 'selected' : '' }}>Pemusik</option>
+                                        <option value="pemusik" {{ $p->specialty === 'pemusik' ? 'selected' : '' }}>Pemusik</option>
                                         <option value="cadangan">Cadangan</option>
                                         <option value="MC">MC / Pembawa Acara</option>
                                     </select>
@@ -145,12 +203,16 @@
                                     <span class="font-headline font-bold text-sm text-secondary">Rp {{ number_format($fees->first()?->base_fee ?? 500000, 0, ',', '.') }}</span>
                                 </td>
                                 <td class="px-6 py-4 text-center">
-                                    @if($isColliding)
-                                        <span class="inline-block px-2 py-0.5 rounded bg-red-500/10 border border-red-500/20 text-red-600 font-label text-[0.6rem] font-bold uppercase tracking-wider shadow-sm">KONFLIK</span>
-                                    @elseif($alreadyPlotted)
-                                        <span class="inline-block px-2 py-0.5 rounded bg-secondary/10 border border-secondary/20 text-secondary-container font-label text-[0.6rem] font-bold uppercase tracking-wider shadow-sm">DITUGASKAN</span>
+                                    @if($isUnavailable)
+                                        <span class="inline-block px-2 py-0.5 rounded bg-red-500/10 border border-red-500/20 text-red-600 font-label text-[0.6rem] font-bold uppercase tracking-wider">
+                                            <i class="bi bi-calendar-x-fill"></i> BERHALANGAN
+                                        </span>
+                                    @elseif($isColliding)
+                                        <span class="inline-block px-2 py-0.5 rounded bg-orange-500/10 border border-orange-500/20 text-orange-600 font-label text-[0.6rem] font-bold uppercase tracking-wider">KONFLIK JADWAL</span>
+                                    @elseif($isAutoSelected)
+                                        <span class="inline-block px-2 py-0.5 rounded bg-secondary/10 border border-secondary/20 text-secondary font-label text-[0.6rem] font-bold uppercase tracking-wider">✓ DITUGASKAN</span>
                                     @else
-                                        <span class="inline-block px-2 py-0.5 rounded bg-green-500/10 border border-green-500/20 text-green-600 font-label text-[0.6rem] font-bold uppercase tracking-wider shadow-sm">TERSEDIA</span>
+                                        <span class="inline-block px-2 py-0.5 rounded bg-green-500/10 border border-green-500/20 text-green-600 font-label text-[0.6rem] font-bold uppercase tracking-wider">TERSEDIA</span>
                                     @endif
                                 </td>
                             </tr>
@@ -213,6 +275,18 @@
                 </div>
             </div>
 
+            {{-- Tombol Override Kuota --}}
+            @if($maxPersonnel > 0)
+            <div id="quota-override-wrap" class="hidden">
+                <div class="bg-orange-500/10 border border-orange-500/20 rounded-xl p-4 text-center">
+                    <p class="font-body text-xs text-orange-700 mb-2">Kuota maksimal ({{ $maxPersonnel }} orang) sudah tercapai. Ini adalah permintaan klien tambahan.</p>
+                    <button type="button" onclick="unlockQuota()" class="font-label text-xs font-bold uppercase tracking-widest text-orange-700 underline underline-offset-2">
+                        <i class="bi bi-unlock-fill"></i> Tambah Override Personel
+                    </button>
+                </div>
+            </div>
+            @endif
+
             {{-- Tombol Submit --}}
             <button type="submit" class="w-full flex justify-center items-center gap-2 bg-secondary text-primary px-4 py-3.5 rounded-xl font-label text-[0.7rem] font-bold uppercase tracking-widest hover:bg-secondary-container transition-all shadow-md">
                 <i class="bi bi-lock-fill"></i> Validasi SQL & Kunci Plotting
@@ -226,16 +300,55 @@
 
 @push('scripts')
 <script>
-    const baseFee = Number("{{ $fees->first()?->base_fee ?? 500000 }}");
+    const baseFee    = Number("{{ $fees->first()?->base_fee ?? 500000 }}");
+    const maxPersonnel = {{ $maxPersonnel }};  // 0 = tanpa batas
+    let quotaUnlocked  = false;
+
     function updatePreview() {
-        const checked = document.querySelectorAll('#plotting-table input[type="checkbox"]:checked:not(:disabled)');
-        const count = checked.length;
-        const total = count * baseFee;
+        const boxes   = document.querySelectorAll('.plot-checkbox:not(:disabled)');
+        const checked = [...boxes].filter(b => b.checked);
+        const count   = checked.length;
+        const total   = count * baseFee;
+
         document.getElementById('preview-count').textContent = count;
         document.getElementById('preview-total').textContent = 'Rp ' + total.toLocaleString('id-ID');
+
+        // Update quota bar
+        const barEl   = document.getElementById('quota-bar');
+        const labelEl = document.getElementById('quota-label');
+        if (barEl && maxPersonnel > 0) {
+            const pct = Math.min(100, Math.round((count / maxPersonnel) * 100));
+            barEl.style.width = pct + '%';
+            barEl.style.background = count >= maxPersonnel ? '#f97316' : '';
+        }
+        if (labelEl && maxPersonnel > 0) {
+            labelEl.textContent = count + ' / ' + maxPersonnel;
+        }
+
+        // Kuota enforcement
+        if (maxPersonnel > 0 && !quotaUnlocked) {
+            const overrideWrap = document.getElementById('quota-override-wrap');
+            if (count >= maxPersonnel) {
+                // Disable semua checkbox yang belum dicentang
+                boxes.forEach(b => { if (!b.checked) b.disabled = true; });
+                if (overrideWrap) overrideWrap.classList.remove('hidden');
+            } else {
+                // Re-enable jika kembali di bawah kuota
+                boxes.forEach(b => { b.disabled = false; });
+                if (overrideWrap) overrideWrap.classList.add('hidden');
+            }
+        }
     }
-    
-    // Call on load to ensure accurate initial state
+
+    function unlockQuota() {
+        quotaUnlocked = true;
+        document.querySelectorAll('.plot-checkbox').forEach(b => {
+            if (!b.classList.contains('is-unavailable')) b.disabled = false;
+        });
+        const overrideWrap = document.getElementById('quota-override-wrap');
+        if (overrideWrap) overrideWrap.classList.add('hidden');
+    }
+
     document.addEventListener('DOMContentLoaded', updatePreview);
 </script>
 @endpush

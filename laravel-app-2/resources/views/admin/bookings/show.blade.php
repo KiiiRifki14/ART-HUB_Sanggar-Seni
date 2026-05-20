@@ -99,7 +99,7 @@
                     <div class="text-right">
                         <span class="font-headline font-bold text-lg text-primary block">Rp {{ number_format($booking->total_price, 0, ',', '.') }}</span>
                         @if($booking->status === 'pending')
-                            <button type="button" class="mt-1 text-[0.65rem] font-label font-bold uppercase tracking-wider text-secondary hover:text-primary transition-colors flex items-center justify-end gap-1" data-bs-toggle="modal" data-bs-target="#modalUpdateHarga"><i class="bi bi-pencil"></i> Nego</button>
+                            <button type="button" onclick="document.getElementById('modalUpdateHarga').classList.remove('hidden');document.getElementById('modalUpdateHarga').classList.add('flex');" class="mt-1 text-[0.65rem] font-label font-bold uppercase tracking-wider text-secondary hover:text-primary transition-colors flex items-center justify-end gap-1"><i class="bi bi-pencil"></i> Nego</button>
                         @endif
                     </div>
                 </div>
@@ -185,35 +185,36 @@
     </div>
 </div>
 
-{{-- Modal Update Harga Nego (Bootstrap modal diubah style-nya) --}}
+{{-- Modal Update Harga Nego --}}
 @if($booking->status === 'pending')
-<div class="modal fade" id="modalUpdateHarga" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content border-0 rounded-2xl overflow-hidden shadow-2xl bg-surface-container-lowest">
-            <div class="px-6 py-5 border-b border-outline-variant/20 flex justify-between items-center bg-surface-container-low">
-                <h5 class="font-headline font-bold text-lg text-primary flex items-center gap-2">
-                    <i class="bi bi-pencil-square text-secondary"></i> Update Harga Nego
-                </h5>
-                <button type="button" class="text-on-surface-variant hover:text-primary transition-colors" data-bs-dismiss="modal">
-                    <i class="bi bi-x-lg"></i>
-                </button>
-            </div>
-            <form action="{{ route('admin.bookings.update_price', $booking->id) }}" method="POST">
-                @csrf
-                @method('PATCH')
-                <div class="p-6">
-                    <p class="font-body text-sm text-on-surface-variant leading-relaxed mb-5">Tentukan harga akhir (Deal Price) dengan Klien sebelum DP dikonfirmasi. Ini akan menjadi acuan total tagihan klien di Portal mereka.</p>
-                    <div>
-                        <label class="block font-label text-xs uppercase tracking-widest text-on-surface-variant font-bold mb-1.5">Total Harga Akhir (Rp)</label>
-                        <input type="number" name="total_price" class="w-full bg-surface-container-low border border-outline-variant/50 rounded-lg px-4 py-2.5 font-headline text-lg font-bold text-on-surface focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all" value="{{ $booking->total_price }}" required>
-                    </div>
-                </div>
-                <div class="px-6 py-4 border-t border-outline-variant/20 bg-surface-container-low flex justify-end gap-3">
-                    <button type="button" class="px-5 py-2.5 rounded-lg border border-outline-variant/50 font-label text-xs font-bold uppercase tracking-widest text-on-surface-variant hover:bg-surface-container transition-colors" data-bs-dismiss="modal">Batal</button>
-                    <button type="submit" class="px-5 py-2.5 rounded-lg bg-primary text-white font-label text-xs font-bold uppercase tracking-widest hover:bg-primary-container transition-colors">Simpan Harga Nego</button>
-                </div>
-            </form>
+<div id="modalUpdateHarga" class="fixed inset-0 z-[100] hidden items-center justify-center p-4">
+    <div class="absolute inset-0 bg-black/50 backdrop-blur-sm" onclick="this.parentElement.classList.add('hidden');this.parentElement.classList.remove('flex');"></div>
+    <div class="relative w-full max-w-md bg-surface-container-lowest rounded-2xl shadow-2xl border border-outline-variant/30 overflow-hidden">
+        <div class="px-6 py-5 border-b border-outline-variant/20 flex justify-between items-center bg-surface-container-low">
+            <h5 class="font-headline font-bold text-lg text-primary flex items-center gap-2">
+                <i class="bi bi-pencil-square text-secondary"></i> Update Harga Nego
+            </h5>
+            <button type="button" class="text-on-surface-variant hover:text-primary transition-colors"
+                onclick="document.getElementById('modalUpdateHarga').classList.add('hidden');document.getElementById('modalUpdateHarga').classList.remove('flex');">
+                <i class="bi bi-x-lg"></i>
+            </button>
         </div>
+        <form action="{{ route('admin.bookings.update_price', $booking->id) }}" method="POST">
+            @csrf
+            @method('PATCH')
+            <div class="p-6">
+                <p class="font-body text-sm text-on-surface-variant leading-relaxed mb-5">Tentukan harga akhir (Deal Price) dengan Klien sebelum DP dikonfirmasi.</p>
+                <div>
+                    <label class="block font-label text-xs uppercase tracking-widest text-on-surface-variant font-bold mb-1.5">Total Harga Akhir (Rp)</label>
+                    <input type="number" name="total_price" class="w-full bg-surface-container-low border border-outline-variant/50 rounded-lg px-4 py-2.5 font-headline text-lg font-bold text-on-surface focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all" value="{{ $booking->total_price }}" required>
+                </div>
+            </div>
+            <div class="px-6 py-4 border-t border-outline-variant/20 bg-surface-container-low flex justify-end gap-3">
+                <button type="button" class="px-5 py-2.5 rounded-lg border border-outline-variant/50 font-label text-xs font-bold uppercase tracking-widest text-on-surface-variant hover:bg-surface-container transition-colors"
+                    onclick="document.getElementById('modalUpdateHarga').classList.add('hidden');document.getElementById('modalUpdateHarga').classList.remove('flex');">Batal</button>
+                <button type="submit" class="px-5 py-2.5 rounded-lg bg-primary text-white font-label text-xs font-bold uppercase tracking-widest hover:bg-primary-container transition-colors">Simpan Harga Nego</button>
+            </div>
+        </form>
     </div>
 </div>
 @endif

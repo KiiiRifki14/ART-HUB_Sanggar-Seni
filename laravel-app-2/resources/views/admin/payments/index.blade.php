@@ -60,8 +60,8 @@
                 <th class="font-label text-[0.65rem] uppercase tracking-widest text-outline font-bold px-6 py-4 text-right">Total Kontrak</th>
                 <th class="font-label text-[0.65rem] uppercase tracking-widest text-outline font-bold px-6 py-4 text-right">DP Masuk</th>
                 <th class="font-label text-[0.65rem] uppercase tracking-widest text-outline font-bold px-6 py-4 text-right">Sisa Tagihan</th>
-                <th class="font-label text-[0.65rem] uppercase tracking-widest text-outline font-bold px-6 py-4 text-center">Status Event</th>
                 <th class="font-label text-[0.65rem] uppercase tracking-widest text-outline font-bold px-6 py-4 text-center">Status Pembayaran</th>
+                <th class="font-label text-[0.65rem] uppercase tracking-widest text-outline font-bold px-6 py-4 text-center">Status Event / Aksi</th>
             </tr>
         </thead>
         <tbody class="divide-y divide-outline-variant/20">
@@ -98,59 +98,69 @@
                         Rp {{ number_format($sisa, 0, ',', '.') }}
                     </div>
                 </td>
-                <td class="px-6 py-4 text-center">
-                    @if($booking->status === 'pending') 
-                        <span class="inline-block px-2 py-0.5 rounded border border-outline-variant/30 bg-surface-container font-label text-[0.6rem] font-bold uppercase tracking-wider text-outline">PENDING</span>
-                    @elseif($booking->status === 'completed') 
-                        <span class="inline-block px-2 py-0.5 rounded border border-blue-500/20 bg-blue-500/10 font-label text-[0.6rem] font-bold uppercase tracking-wider text-blue-600">SELESAI</span>
-                    @else 
-                        <span class="inline-block px-2 py-0.5 rounded border border-outline-variant/30 bg-surface-container font-label text-[0.6rem] font-bold uppercase tracking-wider text-outline">{{ $stName }}</span>
-                    @endif
-                </td>
+                {{-- KOLOM 1: STATUS PEMBAYARAN & AKSI PELUNASAN --}}
                 <td class="px-6 py-4 text-center">
                     @if($isLunas)
                         <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded bg-green-500/10 text-green-600 border border-green-500/20 font-label text-[0.65rem] font-bold uppercase tracking-wider">
                             <i class="bi bi-check-circle-fill"></i> LUNAS
                         </span>
                         <div class="font-label text-xs text-outline mt-1">{{ \Carbon\Carbon::parse($booking->full_paid_at ?? now())->format('d M Y') }}</div>
-                    @else
-                        @if($booking->status === 'completed' || $booking->status === 'paid_full')
-                            @php $sisaFormatted = number_format($sisa, 0, ',', '.'); @endphp
-                            @if($booking->status === 'completed')
-                                @if($booking->full_payment_proof)
-                                    <div class="flex flex-col gap-1.5">
-                                        <a href="{{ asset('storage/' . $booking->full_payment_proof) }}" target="_blank" class="w-full text-center py-1 rounded bg-blue-50 text-blue-600 border border-blue-200 font-label text-[0.6rem] font-bold uppercase tracking-wider hover:bg-blue-100 transition-colors">Lihat Bukti</a>
-                                        <div class="flex gap-1.5">
-                                            <form action="{{ route('admin.bookings.full_payment', $booking->id) }}" method="POST" class="flex-1 m-0">
-                                                @csrf
-                                                @method('PATCH')
-                                                <button type="submit" class="w-full py-1.5 rounded bg-green-600 text-white hover:bg-green-700 transition-colors font-label text-[0.6rem] font-bold uppercase tracking-wider" onclick="return confirm('Verifikasi bukti sah & lunas?')">Sah</button>
-                                            </form>
-                                            <form action="{{ route('admin.bookings.reject_full_proof', $booking->id) }}" method="POST" class="flex-1 m-0">
-                                                @csrf
-                                                <button type="submit" class="w-full py-1.5 rounded bg-red-100 text-red-600 hover:bg-red-200 transition-colors font-label text-[0.6rem] font-bold uppercase tracking-wider" onclick="return confirm('Tolak bukti ini?')">Tolak</button>
-                                            </form>
-                                        </div>
-                                    </div>
-                                @else
-                                    <button type="button" 
-                                            onclick="openLunasModal({{ $booking->id }}, '{{ $sisaFormatted }}')"
-                                            class="w-full py-1.5 rounded border border-green-500 text-green-600 hover:bg-green-500 hover:text-white transition-all font-label text-xs font-bold uppercase tracking-wider">
-                                        <i class="bi bi-check-circle me-1"></i>Tandai Lunas
-                                    </button>
-                                @endif
-                            @endif
+                    @elseif($booking->status === 'cancelled')
+                        <span class="inline-block px-2 py-0.5 rounded border border-red-500/20 bg-red-500/10 font-label text-[0.6rem] font-bold uppercase tracking-wider text-red-600">CANCELLED</span>
+                    @elseif($booking->status === 'pending')
+                        <span class="inline-block px-2 py-0.5 rounded border border-outline-variant/30 bg-surface-container font-label text-[0.6rem] font-bold uppercase tracking-wider text-outline">PENDING DP</span>
+                    @elseif(in_array($booking->status, ['dp_paid', 'confirmed']) && !\Carbon\Carbon::parse($booking->event_date)->isPast())
+                        <span class="inline-block px-2 py-0.5 rounded border border-blue-500/20 bg-blue-500/10 font-label text-[0.6rem] font-bold uppercase tracking-wider text-blue-600">DP PAID</span>
+                    @elseif($booking->status === 'completed' || (\Carbon\Carbon::parse($booking->event_date)->isPast() && in_array($booking->status, ['dp_paid', 'confirmed'])))
+                        {{-- Event sudah selesai atau lewat tanggal, tapi belum lunas --}}
+                        @php $sisaFormatted = number_format($sisa, 0, ',', '.'); @endphp
+                        @if($booking->full_payment_proof)
+                            <div class="flex flex-col gap-1.5">
+                                <a href="{{ asset('storage/' . $booking->full_payment_proof) }}" target="_blank" class="w-full text-center py-1 rounded bg-blue-50 text-blue-600 border border-blue-200 font-label text-[0.6rem] font-bold uppercase tracking-wider hover:bg-blue-100 transition-colors">Lihat Bukti</a>
+                                <div class="flex gap-1.5">
+                                    <form action="{{ route('admin.bookings.full_payment', $booking->id) }}" method="POST" class="flex-1 m-0">
+                                        @csrf
+                                        @method('PATCH')
+                                        <button type="submit" class="w-full py-1.5 rounded bg-green-600 text-white hover:bg-green-700 transition-colors font-label text-[0.6rem] font-bold uppercase tracking-wider" onclick="return confirm('Verifikasi bukti sah & lunas?')">Sah</button>
+                                    </form>
+                                    <form action="{{ route('admin.bookings.reject_full_proof', $booking->id) }}" method="POST" class="flex-1 m-0">
+                                        @csrf
+                                        <button type="submit" class="w-full py-1.5 rounded bg-red-100 text-red-600 hover:bg-red-200 transition-colors font-label text-[0.6rem] font-bold uppercase tracking-wider" onclick="return confirm('Tolak bukti ini?')">Tolak</button>
+                                    </form>
+                                </div>
+                            </div>
                         @else
-                            @if(\Carbon\Carbon::parse($booking->event_date)->isPast() && $booking->event)
-                                <a href="{{ route('admin.events.show', $booking->event->id) }}"
-                                   class="w-full flex items-center justify-center gap-1.5 py-1.5 rounded border border-blue-500/30 text-blue-600 hover:bg-blue-500/10 transition-all font-label text-xs font-bold uppercase tracking-wider">
-                                    <i class="bi bi-box-arrow-up-right"></i> Buka Detail Acara
-                                </a>
-                            @else
-                                <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded bg-orange-500/10 text-orange-600 border border-orange-500/20 font-label text-[0.65rem] font-bold uppercase tracking-wider">
-                                    <i class="bi bi-hourglass-split"></i> MENUNGGU EVENT
-                                </span>
-                            @endif
+                            <button type="button" 
+                                    onclick="openLunasModal({{ $booking->id }}, '{{ $sisaFormatted }}')"
+                                    class="w-full py-1.5 rounded border border-green-500 text-green-600 hover:bg-green-500 hover:text-white transition-all font-label text-xs font-bold uppercase tracking-wider">
+                                <i class="bi bi-check-circle me-1"></i>Tandai Lunas
+                            </button>
+                        @endif
+                    @else
+                        <span class="inline-block px-2 py-0.5 rounded border border-outline-variant/30 bg-surface-container font-label text-[0.6rem] font-bold uppercase tracking-wider text-outline">{{ $stName }}</span>
+                    @endif
+                </td>
+
+                {{-- KOLOM 2: STATUS EVENT / AKSI --}}
+                <td class="px-6 py-4 text-center">
+                    @if($booking->status === 'cancelled')
+                        <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded bg-red-500/10 text-red-600 border border-red-500/20 font-label text-[0.65rem] font-bold uppercase tracking-wider">
+                            BATAL
+                        </span>
+                    @elseif($booking->status === 'completed' || $booking->status === 'paid_full')
+                        <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded bg-blue-500/10 text-blue-600 border border-blue-500/20 font-label text-[0.65rem] font-bold uppercase tracking-wider">
+                            <i class="bi bi-flag-fill"></i> SELESAI
+                        </span>
+                    @else
+                        @if(\Carbon\Carbon::parse($booking->event_date)->isPast() && $booking->event)
+                            <a href="{{ route('admin.events.show', $booking->event->id) }}"
+                               class="w-full flex items-center justify-center gap-1.5 py-1.5 rounded border border-blue-500/30 text-blue-600 hover:bg-blue-500/10 transition-all font-label text-xs font-bold uppercase tracking-wider">
+                                <i class="bi bi-box-arrow-up-right"></i> Buka Detail Acara
+                            </a>
+                        @else
+                            <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded bg-orange-500/10 text-orange-600 border border-orange-500/20 font-label text-[0.65rem] font-bold uppercase tracking-wider">
+                                <i class="bi bi-hourglass-split"></i> MENUNGGU EVENT
+                            </span>
                         @endif
                     @endif
                 </td>

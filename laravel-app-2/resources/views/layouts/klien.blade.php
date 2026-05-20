@@ -67,6 +67,31 @@
             }
         }
     </script>
+    <style>
+        /* Mobile bottom nav safe area */
+        @media (max-width: 640px) {
+            .klien-main { padding-bottom: 80px !important; }
+        }
+        .klien-bottom-nav {
+            display: none;
+            position: fixed; bottom: 0; left: 0; right: 0; z-index: 50;
+            background: #361F1A;
+            border-top: 1px solid rgba(252,212,0,0.15);
+            padding: 8px 0 max(10px, env(safe-area-inset-bottom));
+        }
+        @media (max-width: 640px) { .klien-bottom-nav { display: flex; justify-content: space-around; align-items: center; } }
+        .klien-nav-item {
+            display: flex; flex-direction: column; align-items: center; gap: 3px;
+            text-decoration: none; color: rgba(255,255,255,0.45);
+            font-size: 0.55rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em;
+            padding: 4px 16px; border-radius: 10px; transition: all 0.2s;
+        }
+        .klien-nav-item i { font-size: 1.2rem; line-height: 1; }
+        .klien-nav-item.active { color: #FCD400; background: rgba(252,212,0,0.08); }
+        .klien-nav-item:not(.active):hover { color: rgba(255,255,255,0.7); }
+        .klien-nav-item.danger { color: rgba(239,68,68,0.5); }
+        .klien-nav-item.danger:hover { color: rgba(239,68,68,0.85); }
+    </style>
 </head>
 <body class="bg-surface-container-low text-on-surface font-body min-h-screen flex flex-col selection:bg-secondary/30 selection:text-primary">
 
@@ -150,7 +175,7 @@
     </nav>
 
     {{-- Main Content --}}
-    <main class="flex-grow max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 py-8">
+    <main class="flex-grow max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 py-8 klien-main">
         
         {{-- Flash Messages --}}
         @if(session('success'))
@@ -180,5 +205,23 @@
     </footer>
 
     @stack('scripts')
+
+    {{-- Mobile Bottom Navigation (hanya tampil di layar < 640px) --}}
+    <nav class="klien-bottom-nav">
+        <a href="{{ route('klien.dashboard') }}"
+           class="klien-nav-item {{ request()->routeIs('klien.dashboard') ? 'active' : '' }}">
+            <i class="bi bi-house-fill"></i>Beranda
+        </a>
+        <a href="{{ route('klien.bookings.create') }}"
+           class="klien-nav-item {{ request()->routeIs('klien.bookings.create') ? 'active' : '' }}">
+            <i class="bi bi-calendar-plus-fill"></i>Pesan
+        </a>
+        <a href="#" onclick="document.getElementById('klien-logout-form').submit(); return false;"
+           class="klien-nav-item danger">
+            <i class="bi bi-box-arrow-right"></i>Keluar
+        </a>
+    </nav>
+    <form id="klien-logout-form" action="{{ route('logout') }}" method="POST" style="display:none">@csrf</form>
+
 </body>
 </html>

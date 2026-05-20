@@ -83,7 +83,8 @@
                 </td>
                 <td class="px-6 py-4 text-center">
                     @if($booking->payment_proof)
-                        <button type="button" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md border border-outline-variant/50 bg-surface-container-lowest font-label text-[0.65rem] font-bold uppercase tracking-widest text-on-surface-variant hover:border-primary hover:text-primary hover:bg-surface-container transition-all" data-bs-toggle="modal" data-bs-target="#modalVerify{{ $booking->id }}">
+                        <button type="button" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md border border-outline-variant/50 bg-surface-container-lowest font-label text-[0.65rem] font-bold uppercase tracking-widest text-on-surface-variant hover:border-primary hover:text-primary hover:bg-surface-container transition-all"
+                            onclick="openVerifyModal({{ $booking->id }})">
                             <i class="bi bi-eye"></i> Lihat Bukti
                         </button>
                     @else
@@ -92,7 +93,8 @@
                 </td>
                 <td class="px-6 py-4">
                     <div class="flex justify-end gap-2">
-                        <button type="button" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md bg-primary text-white font-label text-[0.65rem] font-bold uppercase tracking-widest hover:bg-primary-container transition-colors shadow-sm" data-bs-toggle="modal" data-bs-target="#modalVerify{{ $booking->id }}">
+                        <button type="button" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md bg-primary text-white font-label text-[0.65rem] font-bold uppercase tracking-widest hover:bg-primary-container transition-colors shadow-sm"
+                            onclick="openVerifyModal({{ $booking->id }})">
                             <i class="bi bi-check-lg"></i> Verifikasi
                         </button>
                         @php $rjMsg = "Tolak & hapus bukti transfer dari " . addslashes($booking->client_name) . "? Klien akan diwajibkan upload ulang."; @endphp
@@ -154,7 +156,7 @@
                 <div class="font-headline font-bold text-primary text-sm">Rp {{ number_format($booking->total_price, 0, ',', '.') }}</div>
             </div>
             <div class="flex-shrink-0 ml-4 flex gap-2">
-                <button type="button" data-bs-toggle="modal" data-bs-target="#modalCash{{ $booking->id }}" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-green-600 text-white font-label text-[0.65rem] font-bold uppercase tracking-widest hover:bg-green-700 transition-colors shadow-sm" title="Terima Pembayaran Tunai (Offline)">
+                <button type="button" onclick="openCashModal({{ $booking->id }})" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-green-600 text-white font-label text-[0.65rem] font-bold uppercase tracking-widest hover:bg-green-700 transition-colors shadow-sm" title="Terima Pembayaran Tunai (Offline)">
                     <i class="bi bi-cash-stack"></i> Terima Cash
                 </button>
                 <a href="{{ route('admin.bookings.show', $booking->id) }}" class="inline-flex items-center justify-center w-8 h-8 rounded-lg border border-outline-variant/50 bg-surface-container-highest text-on-surface-variant hover:border-primary hover:text-primary hover:bg-surface-container-lowest transition-all" title="Detail & Nego Harga">
@@ -183,132 +185,107 @@
     $eventDate    = \Carbon\Carbon::parse($booking->event_date)->isoFormat('D MMMM Y');
 @endphp
 
-<div class="modal fade" id="modalVerify{{ $booking->id }}" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered modal-lg">
-        <div class="modal-content border-0 rounded-2xl overflow-hidden shadow-2xl bg-surface-container-lowest">
-            
-            {{-- Header --}}
-            <div class="px-6 py-5 border-b border-outline-variant/20 bg-surface-container-low flex justify-between items-start">
-                <div>
-                    <h5 class="font-headline font-bold text-lg text-primary flex items-center gap-2 mb-1">
-                        <i class="bi bi-shield-check text-secondary"></i> DP Verification
-                    </h5>
-                    <div class="font-label text-xs uppercase tracking-widest text-on-surface-variant font-bold">
-                        BK-{{ str_pad($booking->id, 3, '0', STR_PAD_LEFT) }} <span class="mx-1 text-outline-variant">•</span> {{ $eventDate }}
-                    </div>
+<div id="modalVerify{{ $booking->id }}" class="fixed inset-0 z-[100] hidden items-center justify-center p-4">
+    <div class="absolute inset-0 bg-black/50 backdrop-blur-sm" onclick="closeVerifyModal({{ $booking->id }})"></div>
+    <div class="relative w-full max-w-3xl bg-surface-container-lowest rounded-2xl shadow-2xl border border-outline-variant/30 overflow-hidden max-h-[90vh] flex flex-col">
+
+        <div class="px-6 py-5 border-b border-outline-variant/20 bg-surface-container-low flex justify-between items-start flex-shrink-0">
+            <div>
+                <h5 class="font-headline font-bold text-lg text-primary flex items-center gap-2 mb-1">
+                    <i class="bi bi-shield-check text-secondary"></i> DP Verification
+                </h5>
+                <div class="font-label text-xs uppercase tracking-widest text-on-surface-variant font-bold">
+                    BK-{{ str_pad($booking->id, 3, '0', STR_PAD_LEFT) }} <span class="mx-1 text-outline-variant">•</span> {{ $eventDate }}
                 </div>
-                <button type="button" class="text-on-surface-variant hover:text-primary transition-colors text-xl leading-none" data-bs-dismiss="modal"><i class="bi bi-x-lg"></i></button>
             </div>
+            <button type="button" class="text-on-surface-variant hover:text-primary transition-colors text-xl" onclick="closeVerifyModal({{ $booking->id }})"><i class="bi bi-x-lg"></i></button>
+        </div>
 
-            {{-- Body --}}
-            <div class="p-6">
-                <div class="grid grid-cols-1 md:grid-cols-12 gap-6">
-
-                    {{-- Kolom Kiri: Deal Summary --}}
-                    <div class="md:col-span-7 space-y-4">
-                        <div class="font-label text-[0.65rem] uppercase tracking-widest text-outline font-bold border-b border-outline-variant/30 pb-2 mb-4">
-                            Deal Summary
-                        </div>
-
+        <div class="p-6 overflow-y-auto flex-1">
+            <div class="grid grid-cols-1 md:grid-cols-12 gap-6">
+                <div class="md:col-span-7 space-y-4">
+                    <div class="font-label text-[0.65rem] uppercase tracking-widest text-outline font-bold border-b border-outline-variant/30 pb-2 mb-4">Deal Summary</div>
+                    <div class="bg-surface-container-low border border-outline-variant/50 rounded-xl p-4">
+                        <div class="font-label text-[0.65rem] uppercase tracking-widest text-outline font-bold mb-1">Client Name</div>
+                        <div class="font-body font-bold text-sm text-on-surface">{{ $booking->client_name }}</div>
+                    </div>
+                    <div class="bg-surface-container-low border border-outline-variant/50 rounded-xl p-4">
+                        <div class="font-label text-[0.65rem] uppercase tracking-widest text-outline font-bold mb-1">Total Contract Price</div>
+                        <div class="font-headline font-bold text-lg text-primary">Rp {{ number_format($booking->total_price, 0, ',', '.') }}</div>
+                    </div>
+                    <div class="grid grid-cols-2 gap-4">
                         <div class="bg-surface-container-low border border-outline-variant/50 rounded-xl p-4">
-                            <div class="font-label text-[0.65rem] uppercase tracking-widest text-outline font-bold mb-1">Client Name</div>
-                            <div class="font-body font-bold text-sm text-on-surface">{{ $booking->client_name }}</div>
+                            <div class="font-label text-[0.65rem] uppercase tracking-widest text-outline font-bold mb-1">DP Received</div>
+                            <div class="font-headline font-bold text-base text-green-600">Rp {{ number_format($dpAmount, 0, ',', '.') }}</div>
                         </div>
-
                         <div class="bg-surface-container-low border border-outline-variant/50 rounded-xl p-4">
-                            <div class="font-label text-[0.65rem] uppercase tracking-widest text-outline font-bold mb-1">Total Contract Price</div>
-                            <div class="font-headline font-bold text-lg text-primary">Rp {{ number_format($booking->total_price, 0, ',', '.') }}</div>
+                            <div class="font-label text-[0.65rem] uppercase tracking-widest text-outline font-bold mb-2">Payment Status</div>
+                            <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded bg-orange-500/10 text-orange-600 border border-orange-500/20 font-label text-[0.6rem] font-bold uppercase tracking-wider">
+                                <i class="bi bi-clock-fill"></i> Pending Verification
+                            </span>
                         </div>
-
-                        <div class="grid grid-cols-2 gap-4">
-                            <div class="bg-surface-container-low border border-outline-variant/50 rounded-xl p-4">
-                                <div class="font-label text-[0.65rem] uppercase tracking-widest text-outline font-bold mb-1">DP Received (50%)</div>
-                                <div class="font-headline font-bold text-base text-green-600">Rp {{ number_format($dpAmount, 0, ',', '.') }}</div>
-                            </div>
-                            <div class="bg-surface-container-low border border-outline-variant/50 rounded-xl p-4 flex flex-col justify-center">
-                                <div class="font-label text-[0.65rem] uppercase tracking-widest text-outline font-bold mb-2">Payment Status</div>
-                                <div>
-                                    <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded bg-orange-500/10 text-orange-600 border border-orange-500/20 font-label text-[0.6rem] font-bold uppercase tracking-wider">
-                                        <i class="bi bi-clock-fill"></i> Pending Verification
-                                    </span>
-                                </div>
-                            </div>
-                        </div>
-
-                        {{-- Profit Card --}}
-                        <div class="bg-gradient-to-br from-primary-container to-primary rounded-xl p-5 border border-primary/20 shadow-md">
-                            <label class="block font-label text-[0.65rem] uppercase tracking-widest text-secondary font-bold mb-1.5"><i class="bi bi-lock-fill"></i> Fixed Profit Pimpinan (Rp)</label>
-                            <p class="font-body text-[0.65rem] text-white/80 mb-2">Tentukan nominal laba yang ingin dikunci (Saran: Rp {{ number_format($fixedProfit, 0, ',', '.') }}).</p>
-                            <input type="number" name="fixed_profit_nominal" min="0" value="{{ $fixedProfit }}" placeholder="Nominal Rp" class="w-full bg-white/10 border border-white/20 rounded-lg px-4 py-2 font-headline font-bold text-white placeholder-white/50 focus:border-secondary focus:ring-1 focus:ring-secondary outline-none transition-all" required form="formConfirm{{ $booking->id }}">
-                        </div>
-
-                        @if($opsBudget > 0)
-                        <div class="bg-blue-500/5 border border-blue-500/20 rounded-xl p-4">
-                            <div class="font-label text-[0.65rem] uppercase tracking-widest text-blue-700/70 font-bold mb-1">Sisa Budget Operasional</div>
-                            <div class="font-headline font-bold text-base text-blue-600">Rp {{ number_format($opsBudget, 0, ',', '.') }}</div>
-                        </div>
-                        @else
-                        <div class="bg-orange-500/10 border border-orange-500/20 rounded-xl p-4 text-orange-700 font-body text-xs flex items-start gap-2">
-                            <i class="bi bi-exclamation-triangle-fill mt-0.5"></i>
-                            <div>DP lebih kecil dari target laba 30% — seluruh DP dikunci sebagai cicilan laba. Budget operasional menunggu pelunasan.</div>
-                        </div>
-                        @endif
                     </div>
-
-                    {{-- Kolom Kanan: Preview Bukti --}}
-                    <div class="md:col-span-5">
-                        <div class="font-label text-[0.65rem] uppercase tracking-widest text-outline font-bold border-b border-outline-variant/30 pb-2 mb-4">
-                            Bukti Transfer
-                        </div>
-                        
-                        @if($booking->payment_proof)
-                            <div class="rounded-xl border border-outline-variant/30 overflow-hidden shadow-sm mb-3 group cursor-pointer relative" 
-                                 data-url="{{ asset('storage/' . $booking->payment_proof) }}" 
-                                 onclick="window.open(this.dataset.url, '_blank')">
-                                <img src="{{ asset('storage/' . $booking->payment_proof) }}" class="w-full h-48 object-cover transition-transform duration-500 group-hover:scale-105" alt="Bukti Transfer">
-                                <div class="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors flex items-center justify-center">
-                                    <i class="bi bi-arrows-fullscreen text-white opacity-0 group-hover:opacity-100 text-3xl drop-shadow-md transition-opacity"></i>
-                                </div>
-                            </div>
-                            <a href="{{ asset('storage/' . $booking->payment_proof) }}" download class="w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg border border-outline-variant/50 font-label text-xs font-bold uppercase tracking-widest text-on-surface-variant hover:bg-surface-container hover:text-primary transition-colors">
-                                <i class="bi bi-download"></i> Unduh Bukti
-                            </a>
-                        @else
-                            <div class="border-2 border-dashed border-outline-variant/50 rounded-xl p-10 text-center text-outline bg-surface-container-low/50">
-                                <i class="bi bi-image text-4xl mb-2 block"></i>
-                                <div class="font-body text-sm">Belum ada bukti</div>
-                            </div>
-                        @endif
+                    <div class="bg-gradient-to-br from-primary-container to-primary rounded-xl p-5 border border-primary/20 shadow-md">
+                        <label class="block font-label text-[0.65rem] uppercase tracking-widest text-secondary font-bold mb-1.5"><i class="bi bi-lock-fill"></i> Fixed Profit Pimpinan (Rp)</label>
+                        <p class="font-body text-[0.65rem] text-white/80 mb-2">Saran: Rp {{ number_format($fixedProfit, 0, ',', '.') }}</p>
+                        <input type="number" name="fixed_profit_nominal" min="0" value="{{ $fixedProfit }}" placeholder="Nominal Rp"
+                               class="w-full bg-white/10 border border-white/20 rounded-lg px-4 py-2 font-headline font-bold text-white placeholder-white/50 focus:border-secondary outline-none transition-all"
+                               required form="formConfirm{{ $booking->id }}">
                     </div>
-
+                    @if($opsBudget > 0)
+                    <div class="bg-blue-500/5 border border-blue-500/20 rounded-xl p-4">
+                        <div class="font-label text-[0.65rem] uppercase tracking-widest text-blue-700/70 font-bold mb-1">Sisa Budget Operasional</div>
+                        <div class="font-headline font-bold text-base text-blue-600">Rp {{ number_format($opsBudget, 0, ',', '.') }}</div>
+                    </div>
+                    @else
+                    <div class="bg-orange-500/10 border border-orange-500/20 rounded-xl p-4 text-orange-700 font-body text-xs flex items-start gap-2">
+                        <i class="bi bi-exclamation-triangle-fill mt-0.5"></i>
+                        <div>DP lebih kecil dari target laba 30% — seluruh DP dikunci sebagai cicilan laba.</div>
+                    </div>
+                    @endif
+                </div>
+                <div class="md:col-span-5">
+                    <div class="font-label text-[0.65rem] uppercase tracking-widest text-outline font-bold border-b border-outline-variant/30 pb-2 mb-4">Bukti Transfer</div>
+                    @if($booking->payment_proof)
+                        <div class="rounded-xl border border-outline-variant/30 overflow-hidden shadow-sm mb-3 group cursor-pointer relative"
+                             onclick="window.open('{{ asset('storage/' . $booking->payment_proof) }}', '_blank')">
+                            <img src="{{ asset('storage/' . $booking->payment_proof) }}" class="w-full h-48 object-cover transition-transform duration-500 group-hover:scale-105" alt="Bukti Transfer">
+                            <div class="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors flex items-center justify-center">
+                                <i class="bi bi-arrows-fullscreen text-white opacity-0 group-hover:opacity-100 text-3xl drop-shadow-md transition-opacity"></i>
+                            </div>
+                        </div>
+                        <a href="{{ asset('storage/' . $booking->payment_proof) }}" download class="w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg border border-outline-variant/50 font-label text-xs font-bold uppercase tracking-widest text-on-surface-variant hover:bg-surface-container hover:text-primary transition-colors">
+                            <i class="bi bi-download"></i> Unduh Bukti
+                        </a>
+                    @else
+                        <div class="border-2 border-dashed border-outline-variant/50 rounded-xl p-10 text-center text-outline bg-surface-container-low/50">
+                            <i class="bi bi-image text-4xl mb-2 block"></i>
+                            <div class="font-body text-sm">Belum ada bukti</div>
+                        </div>
+                    @endif
                 </div>
             </div>
+        </div>
 
-            {{-- Footer Aksi --}}
-            <div class="px-6 py-4 border-t border-outline-variant/20 bg-surface-container-low flex justify-between items-center">
-                <button type="button" class="px-4 py-2 rounded-lg border border-outline-variant/50 font-label text-xs font-bold uppercase tracking-widest text-on-surface-variant hover:bg-surface-container transition-colors" data-bs-dismiss="modal">
-                    Batal
-                </button>
-                <div class="flex gap-2">
-                    {{-- Reject --}}
-                    @php $rjMsg2 = "Tolak & hapus bukti transfer dari " . addslashes($booking->client_name) . "?"; @endphp
-                    <form action="{{ route('admin.bookings.reject_proof', $booking->id) }}" method="POST" class="m-0" onsubmit="return confirm('{{ $rjMsg2 }}')">
-                        @csrf
-                        <button type="submit" class="px-4 py-2.5 rounded-lg border border-red-500/30 bg-red-500/10 text-red-600 font-label text-xs font-bold uppercase tracking-widest hover:bg-red-500/20 transition-colors flex items-center gap-1.5">
-                            <i class="bi bi-x-circle"></i> Tolak
-                        </button>
-                    </form>
-                    {{-- Confirm --}}
-                    @php $cfMsg = 'Konfirmasi DP & Kunci Laba (Fixed Profit akan disimpan sesuai input) untuk booking ' . addslashes($booking->client_name) . '?'; @endphp
-                    <form action="{{ route('admin.bookings.confirm', $booking->id) }}" method="POST" class="m-0" id="formConfirm{{ $booking->id }}" onsubmit="return confirm('{{ $cfMsg }}')">
-                        @csrf
-                        <button type="submit" class="px-5 py-2.5 rounded-lg bg-green-500 text-white font-label text-xs font-bold uppercase tracking-widest hover:bg-green-600 transition-colors flex items-center gap-1.5 shadow-md">
-                            <i class="bi bi-check-circle"></i> Konfirmasi
-                        </button>
-                    </form>
-                </div>
+        <div class="px-6 py-4 border-t border-outline-variant/20 bg-surface-container-low flex justify-between items-center flex-shrink-0">
+            <button type="button" class="px-4 py-2 rounded-lg border border-outline-variant/50 font-label text-xs font-bold uppercase tracking-widest text-on-surface-variant hover:bg-surface-container transition-colors"
+                    onclick="closeVerifyModal({{ $booking->id }})">Batal</button>
+            <div class="flex gap-2">
+                @php $rjMsg2 = "Tolak & hapus bukti transfer dari " . addslashes($booking->client_name) . "?"; @endphp
+                <form action="{{ route('admin.bookings.reject_proof', $booking->id) }}" method="POST" class="m-0" onsubmit="return confirm('{{ $rjMsg2 }}')">
+                    @csrf
+                    <button type="submit" class="px-4 py-2.5 rounded-lg border border-red-500/30 bg-red-500/10 text-red-600 font-label text-xs font-bold uppercase tracking-widest hover:bg-red-500/20 transition-colors flex items-center gap-1.5">
+                        <i class="bi bi-x-circle"></i> Tolak
+                    </button>
+                </form>
+                <form action="{{ route('admin.bookings.confirm', $booking->id) }}" method="POST" class="m-0" id="formConfirm{{ $booking->id }}"
+                      onsubmit="return confirm('Konfirmasi DP & Kunci Laba untuk {{ addslashes($booking->client_name) }}?')">
+                    @csrf
+                    <button type="submit" class="px-5 py-2.5 rounded-lg bg-green-500 text-white font-label text-xs font-bold uppercase tracking-widest hover:bg-green-600 transition-colors flex items-center gap-1.5 shadow-md">
+                        <i class="bi bi-check-circle"></i> Konfirmasi
+                    </button>
+                </form>
             </div>
-
         </div>
     </div>
 </div>
@@ -318,48 +295,48 @@
      MODAL KONFIRMASI PEMBAYARAN CASH (Offline)
 ═══════════════════════════════════════════════════════ --}}
 @foreach($pendingNoProof as $booking)
-<div class="modal fade" id="modalCash{{ $booking->id }}" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content border-0 rounded-2xl overflow-hidden shadow-2xl bg-surface-container-lowest">
-            <div class="px-6 py-5 border-b border-green-500/20 flex justify-between items-center bg-green-500/10">
-                <h5 class="font-headline font-bold text-lg text-green-700 flex items-center gap-2">
-                    <i class="bi bi-cash-stack"></i> Terima Pembayaran Tunai
-                </h5>
-                <button type="button" class="text-green-700/50 hover:text-green-700 transition-colors" data-bs-dismiss="modal">
-                    <i class="bi bi-x-lg"></i>
-                </button>
-            </div>
-            <form action="{{ route('admin.bookings.confirm_cash', $booking->id) }}" method="POST">
-                @csrf
-                <div class="p-6 space-y-5">
-                    <div class="flex items-center justify-between p-3 rounded-lg border border-outline-variant/30 bg-surface-container-low/50">
-                        <span class="font-label text-xs uppercase tracking-widest text-outline font-bold">Total Deal</span>
-                        <span class="font-headline text-lg font-bold text-on-surface">Rp {{ number_format($booking->total_price, 0, ',', '.') }}</span>
-                    </div>
-                    <div class="flex items-center justify-between p-3 rounded-lg border border-green-500/30 bg-green-500/5">
-                        <span class="font-label text-xs uppercase tracking-widest text-green-600 font-bold">DP Tunai Diterima (50%)</span>
-                        <span class="font-headline text-2xl font-bold text-green-600">Rp {{ number_format($booking->dp_amount, 0, ',', '.') }}</span>
-                    </div>
-
-                    <hr class="border-outline-variant/20 border-dashed">
-
-                    <div>
-                        <label class="block font-label text-[0.65rem] uppercase tracking-widest text-primary font-bold mb-1.5"><i class="bi bi-lock-fill"></i> Fixed Profit Pimpinan (Rp)</label>
-                        <p class="font-body text-[0.7rem] text-on-surface-variant mb-2">Tentukan nominal laba yang ingin dikunci langsung dari uang tunai ini.</p>
-                        <input type="number" name="fixed_profit_nominal" min="0" placeholder="Contoh: 2000000" class="w-full bg-surface-container border border-primary/30 rounded-lg px-4 py-2.5 font-headline font-bold text-primary focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all" required>
-                    </div>
-
-                    <div>
-                        <label class="block font-label text-[0.65rem] uppercase tracking-widest text-on-surface-variant font-bold mb-1.5">Catatan Pembayaran</label>
-                        <input type="text" name="cash_note" placeholder="Diterima oleh..., Catatan kwitansi..." class="w-full bg-surface-container-lowest border border-outline-variant/50 rounded-lg px-4 py-2 font-body text-sm text-on-surface focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all">
-                    </div>
-                </div>
-                <div class="px-6 py-4 border-t border-outline-variant/20 bg-surface-container-low flex justify-end gap-3">
-                    <button type="button" class="px-5 py-2.5 rounded-lg border border-outline-variant/50 font-label text-xs font-bold uppercase tracking-widest text-on-surface-variant hover:bg-surface-container transition-colors" data-bs-dismiss="modal">Batal</button>
-                    <button type="submit" class="px-5 py-2.5 rounded-lg bg-green-600 text-white font-label text-xs font-bold uppercase tracking-widest hover:bg-green-700 transition-colors shadow-sm" onclick="return confirm('Proses pembayaran tunai ini? Status akan otomatis menjadi DP PAID.')">Verifikasi Cash</button>
-                </div>
-            </form>
+<div id="modalCash{{ $booking->id }}" class="fixed inset-0 z-[100] hidden items-center justify-center p-4">
+    <div class="absolute inset-0 bg-black/50 backdrop-blur-sm" onclick="closeCashModal({{ $booking->id }})"></div>
+    <div class="relative w-full max-w-md bg-surface-container-lowest rounded-2xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh]">
+        <div class="px-6 py-5 border-b border-green-500/20 flex justify-between items-center bg-green-500/10 flex-shrink-0">
+            <h5 class="font-headline font-bold text-lg text-green-700 flex items-center gap-2">
+                <i class="bi bi-cash-stack"></i> Terima Pembayaran Tunai
+            </h5>
+            <button type="button" class="text-green-700/50 hover:text-green-700 transition-colors" onclick="closeCashModal({{ $booking->id }})">
+                <i class="bi bi-x-lg"></i>
+            </button>
         </div>
+        <form action="{{ route('admin.bookings.confirm_cash', $booking->id) }}" method="POST" class="flex-1 overflow-y-auto">
+            @csrf
+            <div class="p-6 space-y-5">
+                <div class="flex items-center justify-between p-3 rounded-lg border border-primary/30 bg-primary/5">
+                    <span class="font-label text-xs uppercase tracking-widest text-primary font-bold">Total Deal</span>
+                    <span class="font-headline text-2xl font-bold text-primary">Rp {{ number_format($booking->total_price, 0, ',', '.') }}</span>
+                </div>
+                <div class="flex items-center justify-between p-3 rounded-lg border border-green-500/30 bg-green-500/5">
+                    <span class="font-label text-xs uppercase tracking-widest text-green-600 font-bold">DP Tunai (50%)</span>
+                    <span class="font-headline text-lg font-bold text-green-600">Rp {{ number_format($booking->dp_amount, 0, ',', '.') }}</span>
+                </div>
+                <hr class="border-outline-variant/20 border-dashed">
+                <div>
+                    <label class="block font-label text-[0.65rem] uppercase tracking-widest text-primary font-bold mb-1.5"><i class="bi bi-lock-fill"></i> Fixed Profit Pimpinan (Rp)</label>
+                    <p class="font-body text-[0.7rem] text-on-surface-variant mb-2">Tentukan nominal laba yang ingin dikunci langsung dari uang tunai ini.</p>
+                    <input type="number" name="fixed_profit_nominal" min="0" placeholder="Contoh: 2000000"
+                           class="w-full bg-surface-container border border-primary/30 rounded-lg px-4 py-2.5 font-headline font-bold text-primary focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary transition-all" required>
+                </div>
+                <div>
+                    <label class="block font-label text-[0.65rem] uppercase tracking-widest text-on-surface-variant font-bold mb-1.5">Catatan Pembayaran</label>
+                    <input type="text" name="cash_note" placeholder="Diterima oleh..."
+                           class="w-full bg-surface-container-lowest border border-outline-variant/50 rounded-lg px-4 py-2.5 font-body text-sm text-on-surface focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary transition-all">
+                </div>
+            </div>
+            <div class="px-6 py-4 border-t border-outline-variant/20 bg-surface-container-low flex justify-end gap-3 flex-shrink-0">
+                <button type="button" class="px-5 py-2.5 rounded-lg border border-outline-variant/50 font-label text-xs font-bold uppercase tracking-widest text-on-surface-variant hover:bg-surface-container transition-colors"
+                        onclick="closeCashModal({{ $booking->id }})">Batal</button>
+                <button type="submit" class="px-5 py-2.5 rounded-lg bg-green-600 text-white font-label text-xs font-bold uppercase tracking-widest hover:bg-green-700 transition-colors shadow-sm"
+                        onclick="return confirm('Proses pembayaran tunai ini?')">Verifikasi Cash</button>
+            </div>
+        </form>
     </div>
 </div>
 @endforeach
@@ -374,6 +351,31 @@ function filterTable() {
         rows[i].style.display = name.includes(query) ? '' : 'none';
     }
 }
+
+function openVerifyModal(id) {
+    var el = document.getElementById('modalVerify' + id);
+    if (el) { el.classList.remove('hidden'); el.classList.add('flex'); }
+}
+function closeVerifyModal(id) {
+    var el = document.getElementById('modalVerify' + id);
+    if (el) { el.classList.add('hidden'); el.classList.remove('flex'); }
+}
+function openCashModal(id) {
+    var el = document.getElementById('modalCash' + id);
+    if (el) { el.classList.remove('hidden'); el.classList.add('flex'); }
+}
+function closeCashModal(id) {
+    var el = document.getElementById('modalCash' + id);
+    if (el) { el.classList.add('hidden'); el.classList.remove('flex'); }
+}
+
+document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') {
+        document.querySelectorAll('[id^="modalVerify"], [id^="modalCash"]').forEach(function(m) {
+            m.classList.add('hidden'); m.classList.remove('flex');
+        });
+    }
+});
 </script>
 
 @endsection

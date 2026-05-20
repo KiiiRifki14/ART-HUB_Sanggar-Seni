@@ -16,8 +16,8 @@
 </div>
 
 {{-- Table Card --}}
-<div class="bg-surface-container-lowest rounded-xl border border-outline-variant/30 shadow-[0_12px_24px_rgba(54,31,26,0.03)] overflow-hidden">
-    <table class="w-full">
+<div class="bg-surface-container-lowest rounded-xl border border-outline-variant/30 shadow-[0_12px_24px_rgba(54,31,26,0.03)] overflow-hidden overflow-x-auto">
+    <table class="w-full min-w-[1000px]">
         <thead class="bg-surface-container-low">
             <tr>
                 <th class="font-label text-[0.65rem] uppercase tracking-widest text-outline font-bold px-6 py-4 text-left">Kode</th>
