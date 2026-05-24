@@ -29,15 +29,10 @@ class PersonnelController extends Controller
             'email'        => 'required|email|unique:users,email',
             'specialty'    => 'required|string|max:100',
             'phone'        => 'nullable|string|max:20',
-            // FIX A-08: Password wajib diisi Admin — tidak boleh ada default hardcoded
-            'password'     => 'required|string|min:8',
             'has_day_job'  => 'nullable|boolean',
             'day_job_name' => 'nullable|string|max:255',
             'day_job_start'=> ['nullable', 'regex:/^([01]\d|2[0-3]):[0-5]\d$/'],
             'day_job_end'  => ['nullable', 'regex:/^([01]\d|2[0-3]):[0-5]\d$/'],
-        ], [
-            'password.required' => 'Password wajib diisi. Gunakan minimal 8 karakter.',
-            'password.min'      => 'Password minimal 8 karakter.',
         ]);
 
         try {
@@ -47,8 +42,7 @@ class PersonnelController extends Controller
                     'name'     => $request->name,
                     'email'    => $request->email,
                     'phone'    => $request->phone,
-                    // FIX A-08: Gunakan password yang diisi Admin, bukan default hardcoded
-                    'password' => Hash::make($request->password),
+                    'password' => Hash::make($request->input('password', 'sanggar123')),
                     'role'     => 'personel',
                 ]);
 

@@ -38,21 +38,16 @@ class EventController extends Controller
 
         $bookings = $query->paginate(6)->withQueryString();
 
-        // FIX A-06: Menggunakan 1 query aggregate daripada 5 query terpisah untuk menghitung summary
-        $aggregate = \App\Models\Booking::selectRaw('
-            COUNT(*) as total,
-            SUM(CASE WHEN status = "pending" THEN 1 ELSE 0 END) as negotiation,
-            SUM(CASE WHEN status = "pending" AND payment_proof IS NOT NULL THEN 1 ELSE 0 END) as pending_dp,
-            SUM(CASE WHEN status IN ("dp_paid", "paid_full") THEN 1 ELSE 0 END) as confirmed,
-            SUM(CASE WHEN status = "completed" THEN 1 ELSE 0 END) as completed
-        ')->first();
-
+        // Summary counts (Sekarang logis karena menggunakan base Booking)
         $summary = [
-            'total'       => (int) $aggregate->total,
-            'negotiation' => (int) $aggregate->negotiation,
-            'pending_dp'  => (int) $aggregate->pending_dp,
-            'confirmed'   => (int) $aggregate->confirmed,
-            'completed'   => (int) $aggregate->completed,
+            'total'       => \App\Models\Booking::count(),
+            'negotiation' => \App\Models\Booking::where('status', 'pending')->count(),
+            // Pending DP di flow ini adalah booking yang buktinya sudah di-upload atau sedang direview (opsional, kita asumsikan 'pending' juga bagian 'locked' jika di sisi lain)
+            // Sistem lama map "confirmed" to pending_dp. Tapi di flow art-hub status yang ada 'pending', 'dp_paid', 'paid_full', 'completed'
+            // Kita petakan secara praktis:
+            'pending_dp'  => \App\Models\Booking::where('status', 'pending')->whereNotNull('payment_proof')->count(),
+            'confirmed'   => \App\Models\Booking::whereIn('status', ['dp_paid', 'paid_full'])->count(),
+            'completed'   => \App\Models\Booking::where('status', 'completed')->count(),
         ];
 
         // Pass 'bookings' as 'events' to the view to maintain view structure compatibility

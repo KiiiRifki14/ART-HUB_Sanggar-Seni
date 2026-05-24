@@ -17,7 +17,7 @@ class FinancialController extends Controller
      */
     public function index()
     {
-        $records = FinancialRecord::with('event.booking')->latest()->paginate(15)->withQueryString();
+        $records = FinancialRecord::with('event.booking')->get();
         return view('admin.financials.index', compact('records'));
     }
 

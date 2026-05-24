@@ -36,8 +36,6 @@ class CmsController extends Controller
             'history_founder_name', 'history_quote', 'history_paragraph',
             'footer_address', 'footer_email', 'footer_tagline', 'footer_copyright',
             'founder_photo_active',
-            // Informasi Kontak & Pembayaran
-            'admin_whatsapp', 'bank_type', 'bank_account_number', 'bank_account_name',
         ];
 
         foreach ($textFields as $key) {
@@ -78,9 +76,6 @@ class CmsController extends Controller
             $path = $request->file('founder_photo')->store('cms', 'public');
             SiteContent::updateOrCreate(['key' => 'founder_photo'], ['value' => $path]);
         }
-
-        // Invalidate cache agar perubahan langsung terlihat di sidebar admin
-        \Illuminate\Support\Facades\Cache::forget('site_contents');
 
         return redirect()->back()->with('success', 'Konten Landing Page berhasil diperbarui!');
     }

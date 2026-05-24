@@ -15,9 +15,8 @@ class CostumeController extends Controller
      */
     public function index()
     {
-        // FIX C-04: Menggunakan pagination daripada menarik semua data sekaligus (all() & get())
-        $sanggarCostumes = \App\Models\SanggarCostume::paginate(10, ['*'], 'sanggar_page')->withQueryString();
-        $vendorRentals = \App\Models\CostumeRental::with(['event', 'vendor'])->latest()->paginate(10, ['*'], 'vendor_page')->withQueryString();
+        $sanggarCostumes = \App\Models\SanggarCostume::all();
+        $vendorRentals = \App\Models\CostumeRental::with(['event', 'vendor'])->latest()->get();
         return view('admin.costumes.index', compact('sanggarCostumes', 'vendorRentals'));
     }
     // ==========================================

@@ -1,5 +1,3 @@
-# 🔍 LAPORAN AUDIT SISTEM MENYELURUH — ART-HUB Sanggar Seni
-**Tanggal Audit:** 24 Mei 2026  
 **Auditor:** AI Code Analyst (Antigravity)  
 **Lokasi Proyek:** `d:/ART-HUB_Sanggar Seni/laravel-app-2/`  
 **Stack:** Laravel 11, Blade, Tailwind CSS (CDN), MySQL, Vite  

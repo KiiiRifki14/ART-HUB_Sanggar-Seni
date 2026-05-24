@@ -43,13 +43,10 @@ class RehearsalController extends Controller
         $collisionCount = $spResult[0]->collision_count ?? 0;
         $collisionDetails = $spResult[0]->collision_details;
 
-        // FIX F-04: Berikan opsi untuk membatalkan atau memaksa simpan
-        if ($collisionCount > 0 && !$request->has('force_save')) {
-            $msg = 'MySQL mendeteksi ' . $collisionCount . ' personel memiliki bentrok jadwal: ' . $collisionDetails . '. Centang "Tetap Simpan" jika ingin memaksa jadwal dibuat.';
-            return redirect()->back()->withInput()->with('conflict_warning', $msg);
-        }
+        // Kami tetap menyimpan jadwal, namun memberikan hard warning
+        // sehingga Admin bisa menegosiasikan jam latihan via grup WhatsApp 
+        // jika SP mendeteksi bapak-bapak pemusik belum pulang kerja (Day Job Conflict)
 
-        // Kami tetap menyimpan jadwal jika tidak ada konflik ATAU jika admin memilih force_save
         $rehearsal = Rehearsal::create([
             'event_id' => $event->id,
             'type' => $request->type,
@@ -62,7 +59,8 @@ class RehearsalController extends Controller
 
         $msg = 'Jadwal latihan (' . strtoupper($request->type) . ') berhasil dibuat!';
         if ($collisionCount > 0) {
-            $msg .= ' (Penyimpanan dipaksa, harap konfirmasi ulang kepada personel terkait).';
+            $msg .= ' [PERHATIAN DARI MYSQL]: Terdapat risiko ' . $collisionCount . ' personel tabrakan jadwal: ' . $collisionDetails;
+            return redirect()->back()->with('warning', $msg);
         }
 
         return redirect()->back()->with('success', $msg);

@@ -412,11 +412,10 @@ class BookingController extends Controller
                     ]
                 );
 
-                // FIX A-05: Gunakan $targetProfit (variable bound dari luar closure)
-                // bukan $request->fixed_profit_nominal langsung, untuk konsistensi
-                $profitPct        = $booking->total_price > 0 ? ($targetProfit / $booking->total_price) * 100 : 0;
+                // Kunci laba dengan nominal manual
+                $profitPct        = $booking->total_price > 0 ? ($request->fixed_profit_nominal / $booking->total_price) * 100 : 0;
                 $dpMasuk          = $booking->dp_amount;
-                $operationalBudget = max(0, $dpMasuk - $targetProfit);
+                $operationalBudget = max(0, $dpMasuk - $request->fixed_profit_nominal);
                 $safetyBufferAmt  = $operationalBudget * 0.10;
 
                 FinancialRecord::firstOrCreate(
@@ -425,7 +424,7 @@ class BookingController extends Controller
                         'total_revenue'        => $booking->total_price,
                         'fixed_profit_pct'     => round($profitPct, 2),
                         'is_profit_overridden' => true,
-                        'fixed_profit'         => $targetProfit,
+                        'fixed_profit'         => $request->fixed_profit_nominal,
                         'dp_received'          => $dpMasuk,
                         'operational_budget'   => $operationalBudget,
                         'safety_buffer_pct'    => 10.00,
@@ -487,17 +486,10 @@ class BookingController extends Controller
             'dp_amount' => 'required|numeric',
         ]);
 
-        // FIX B-01: Explicitly pass only validated keys to avoid Mass Assignment risks
-        // since Booking model uses guarded = []
-        $dataToInsert = collect($validated)->only([
-            'client_name', 'client_phone', 'event_type', 'event_date',
-            'event_start', 'event_end', 'venue', 'total_price', 'dp_amount'
-        ])->toArray();
+        $validated['booking_source'] = 'admin_manual';
+        $validated['status'] = 'pending';
 
-        $dataToInsert['booking_source'] = 'admin_manual';
-        $dataToInsert['status'] = 'pending';
-
-        Booking::create($dataToInsert);
+        Booking::create($validated);
 
         return redirect()->route('admin.bookings.index')->with('success', 'Booking manual berhasil ditambahkan.');
     }

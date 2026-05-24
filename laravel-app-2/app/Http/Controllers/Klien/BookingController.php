@@ -31,8 +31,6 @@ class BookingController extends Controller
 
     /**
      * Simpan Booking Baru
-     * FIX A-02: Menggunakan DB::transaction + lockForUpdate untuk mencegah
-     * race condition double-booking (dua klien booking tanggal yang sama bersamaan)
      */
     public function store(Request $request)
     {
@@ -48,6 +46,14 @@ class BookingController extends Controller
                 'required',
                 'date',
                 'after:today',
+                function ($attribute, $value, $fail) {
+                    $exists = Booking::where('event_date', $value)
+                        ->whereIn('status', ['dp_paid', 'confirmed', 'paid_full', 'completed'])
+                        ->exists();
+                    if ($exists) {
+                        $fail('Tanggal ' . \Carbon\Carbon::parse($value)->format('d M Y') . ' sudah penuh/di-booking. Silakan pilih tanggal lain.');
+                    }
+                },
             ],
             'event_start'  => 'required',
             'event_end'    => 'required',
@@ -99,7 +105,6 @@ class BookingController extends Controller
             return back()->withErrors(['event_date' => $e->getMessage()])->withInput();
         }
     }
-
 
     /**
      * Negotiation Hub (Status Booking & Harga)

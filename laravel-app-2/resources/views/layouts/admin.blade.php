@@ -88,8 +88,7 @@
         /* ── SIDEBAR ── */
         #sidebar {
             width: var(--sidebar-w);
-            height: 100vh;            /* fallback untuk browser lama */
-            height: 100dvh;          /* dynamic viewport height - fix untuk mobile iOS Safari */
+            height: 100vh;            /* fixed height */
             background: linear-gradient(185deg, #23120f 0%, #150907 100%);
             border-right: 1px solid rgba(255,255,255,0.05);
             display: flex; flex-direction: column;
@@ -420,7 +419,7 @@
 
     {{-- Brand --}}
     @php
-        $siteContents = Cache::remember('site_contents', 3600, fn() => \App\Models\SiteContent::pluck('value', 'key')->toArray());
+        $siteContents = \App\Models\SiteContent::pluck('value', 'key')->toArray();
         $sanggarName = $siteContents['sanggar_name'] ?? 'Cahaya Gumilang';
         $sanggarLogo = $siteContents['sanggar_logo'] ?? null;
     @endphp

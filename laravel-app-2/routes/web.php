@@ -167,9 +167,7 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
     Route::put('/costumes/{costume}/update-asset', [CostumeController::class, 'updateAsset'])->name('costumes.update-asset');
     Route::delete('/costumes/{costume}/destroy-asset', [CostumeController::class, 'destroyAsset'])->name('costumes.destroy-asset');
     // Rute API untuk Tambah Vendor (AJAX)
-    Route::post('/costumes/vendor/api', [CostumeController::class, 'storeVendorApi'])
-        ->name('costumes.store-vendor-api')
-        ->middleware('throttle:60,1'); // FIX B-02: Rate limiting API vendor
+    Route::post('/costumes/vendor/api', [CostumeController::class, 'storeVendorApi'])->name('costumes.store-vendor-api');
 
     Route::get('/costumes/create-rental', [CostumeController::class, 'createRental'])->name('costumes.create-rental');
     Route::post('/costumes/store-rental', [CostumeController::class, 'storeRental'])->name('costumes.store-rental');
