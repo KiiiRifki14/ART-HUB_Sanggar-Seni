@@ -33,13 +33,36 @@
             </div>
         </div>
         <div class="p-6">
-            <div>
-                <label class="block font-label text-xs uppercase tracking-widest text-on-surface-variant font-bold mb-2">Nama Sanggar</label>
-                <input type="text" name="sanggar_name"
-                       value="{{ $contents['sanggar_name'] ?? 'Cahaya Gumilang' }}"
-                       class="w-full bg-surface-container-low border border-outline-variant/50 rounded-xl px-4 py-3 font-headline text-lg font-bold text-primary focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-colors"
-                       placeholder="Cahaya Gumilang" required>
-                <p class="font-body text-xs text-outline mt-1.5">Nama ini akan tampil di Navbar, Hero Section, dan Footer website.</p>
+            <div class="grid md:grid-cols-2 gap-6 items-start">
+                <div>
+                    <label class="block font-label text-xs uppercase tracking-widest text-on-surface-variant font-bold mb-2">Nama Sanggar</label>
+                    <input type="text" name="sanggar_name"
+                           value="{{ $contents['sanggar_name'] ?? 'Cahaya Gumilang' }}"
+                           class="w-full bg-surface-container-low border border-outline-variant/50 rounded-xl px-4 py-3 font-headline text-lg font-bold text-primary focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-colors"
+                           placeholder="Cahaya Gumilang" required>
+                    <p class="font-body text-xs text-outline mt-1.5">Nama ini akan tampil di Navbar, Hero Section, dan Footer website.</p>
+                </div>
+                <div>
+                    <label class="block font-label text-xs uppercase tracking-widest text-on-surface-variant font-bold mb-2">Logo Sanggar</label>
+                    <div class="flex items-center gap-4">
+                        <div class="w-16 h-16 rounded-xl bg-surface-container border border-outline-variant/30 flex flex-shrink-0 items-center justify-center overflow-hidden">
+                            @if(!empty($contents['sanggar_logo']))
+                                <img src="{{ asset('storage/' . $contents['sanggar_logo']) }}" id="logoPreview" class="w-full h-full object-contain" alt="Logo">
+                            @else
+                                <div class="font-headline font-bold text-xl text-primary" id="logoTextFallback">AH</div>
+                                <img src="" id="logoPreview" class="w-full h-full object-contain hidden" alt="Logo">
+                            @endif
+                        </div>
+                        <div class="flex-1">
+                            <label class="inline-block px-4 py-2 rounded-lg border border-outline-variant/50 hover:bg-surface-container hover:border-primary transition-colors cursor-pointer text-xs font-semibold text-on-surface mb-1">
+                                <input type="file" name="sanggar_logo" class="hidden" accept="image/png,image/svg+xml,image/jpeg" onchange="previewLogo(this)">
+                                <i class="bi bi-upload me-1"></i> Pilih Logo Baru
+                            </label>
+                            <p class="font-body text-[0.65rem] text-outline">Format: PNG, SVG. Latar belakang transparan lebih disarankan. Maks: 1MB.</p>
+                            <p id="logo_image_name" class="font-body text-[0.65rem] text-secondary mt-1 hidden"><i class="bi bi-check-circle-fill"></i> <span></span></p>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -255,6 +278,23 @@
 
 @push('scripts')
 <script>
+function previewLogo(input) {
+    if (input.files && input.files[0]) {
+        const reader = new FileReader();
+        reader.onload = e => {
+            const preview = document.getElementById('logoPreview');
+            const fallback = document.getElementById('logoTextFallback');
+            preview.src = e.target.result;
+            preview.classList.remove('hidden');
+            if (fallback) fallback.classList.add('hidden');
+        };
+        reader.readAsDataURL(input.files[0]);
+        const nameEl = document.getElementById('logo_image_name');
+        nameEl.classList.remove('hidden');
+        nameEl.querySelector('span').textContent = input.files[0].name;
+    }
+}
+
 function previewImage(input, previewId) {
     if (input.files && input.files[0]) {
         const reader = new FileReader();

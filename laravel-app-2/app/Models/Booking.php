@@ -55,12 +55,12 @@ class Booking extends Model
     }
 
     /**
-     * Relasi ke Feedback Klien (Belum diimplementasikan)
+     * Relasi ke Feedback Klien
      */
-    // public function feedback(): HasOne
-    // {
-    //     return $this->hasOne(ClientFeedback::class);
-    // }
+    public function feedback(): HasOne
+    {
+        return $this->hasOne(ClientFeedback::class);
+    }
 
     /**
      * Cek apakah DP sudah diverifikasi (ada pembayaran DP)

@@ -304,10 +304,60 @@
                 @endif
 
             @elseif($booking->status === 'completed')
-                <div class="p-8 text-center bg-secondary/10">
+                <div class="p-8 text-center bg-secondary/10 rounded-t-xl">
                     <i class="bi bi-star-fill text-5xl text-secondary mb-4 block"></i>
                     <div class="font-headline font-bold text-lg text-primary mb-2">Pementasan Sukses!</div>
                     <div class="font-body text-sm text-on-surface-variant leading-relaxed">Semua pembayaran lunas. Terima kasih sudah mengundang kami.</div>
+                </div>
+
+                {{-- FEEDBACK / RATING --}}
+                <div class="p-6 border-t border-outline-variant/30 bg-surface-container-lowest rounded-b-xl">
+                    @if($booking->feedback)
+                        {{-- Sudah Kasih Ulasan --}}
+                        <div class="text-center">
+                            <div class="font-label text-xs uppercase tracking-widest font-bold text-outline mb-3">Ulasan Anda</div>
+                            <div class="flex justify-center gap-1 mb-3">
+                                @for($i = 1; $i <= 5; $i++)
+                                    <i class="bi {{ $i <= $booking->feedback->rating ? 'bi-star-fill text-secondary' : 'bi-star text-outline-variant' }} text-xl"></i>
+                                @endfor
+                            </div>
+                            @if($booking->feedback->testimony)
+                                <p class="font-body text-sm text-on-surface italic">"{{ $booking->feedback->testimony }}"</p>
+                            @endif
+                        </div>
+                    @else
+                        {{-- Form Ulasan Baru --}}
+                        <div x-data="{ rating: 0, hover: 0 }">
+                            <div class="font-label text-xs uppercase tracking-widest font-bold text-primary text-center mb-4">Berikan Penilaian Anda</div>
+                            <form action="{{ route('klien.bookings.feedback', $booking->id) }}" method="POST">
+                                @csrf
+                                <div class="flex justify-center gap-2 mb-4">
+                                    <template x-for="i in 5">
+                                        <button type="button" 
+                                                @click="rating = i" 
+                                                @mouseenter="hover = i" 
+                                                @mouseleave="hover = 0"
+                                                class="text-3xl transition-transform hover:scale-110 focus:outline-none"
+                                                :class="(hover >= i || rating >= i) ? 'text-secondary' : 'text-outline-variant'">
+                                            <i class="bi bi-star-fill"></i>
+                                        </button>
+                                    </template>
+                                </div>
+                                <input type="hidden" name="rating" x-model="rating" required>
+                                
+                                <div class="mb-4">
+                                    <textarea name="testimony" rows="3" placeholder="Tuliskan ulasan Anda tentang pementasan kami... (Opsional)" 
+                                              class="w-full bg-surface-container-low border border-outline-variant/50 rounded-xl px-4 py-3 font-body text-sm text-on-surface focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-colors resize-none"></textarea>
+                                </div>
+                                
+                                <button type="submit" :disabled="rating === 0" 
+                                        :class="rating === 0 ? 'opacity-50 cursor-not-allowed' : 'hover:bg-primary-container'"
+                                        class="w-full flex justify-center items-center gap-2 bg-primary text-white px-4 py-3 rounded-xl font-label text-xs font-bold uppercase tracking-widest transition-all">
+                                    <i class="bi bi-send-fill"></i> Kirim Ulasan
+                                </button>
+                            </form>
+                        </div>
+                    @endif
                 </div>
             @endif
         </div>

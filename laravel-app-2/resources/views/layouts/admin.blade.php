@@ -418,11 +418,20 @@
 <nav id="sidebar">
 
     {{-- Brand --}}
+    @php
+        $siteContents = \App\Models\SiteContent::pluck('value', 'key')->toArray();
+        $sanggarName = $siteContents['sanggar_name'] ?? 'Cahaya Gumilang';
+        $sanggarLogo = $siteContents['sanggar_logo'] ?? null;
+    @endphp
     <div class="arh-brand">
-        <div class="arh-brand-logo">AH</div>
+        @if($sanggarLogo)
+            <img src="{{ asset('storage/' . $sanggarLogo) }}" alt="Logo" class="arh-brand-logo" style="background: transparent; object-fit: contain; box-shadow: none;">
+        @else
+            <div class="arh-brand-logo">AH</div>
+        @endif
         <div class="arh-brand-text">
             <div class="arh-brand-title">ART-HUB</div>
-            <div class="arh-brand-sub">Sanggar Cahaya Gumilang</div>
+            <div class="arh-brand-sub">{{ $sanggarName }}</div>
         </div>
     </div>
 
@@ -521,6 +530,54 @@
     </div>
 
     <div style="display:flex;align-items:center;gap:12px;">
+        
+        {{-- Notification Dropdown --}}
+        @php
+            $unreadNotifications = Auth::user()->unreadNotifications;
+            $unreadCount = $unreadNotifications->count();
+        @endphp
+        <div x-data="{ open: false }" class="relative">
+            <button @click="open = !open" @click.away="open = false" class="relative p-2 text-on-surface-variant hover:text-primary transition-colors flex items-center justify-center rounded-full hover:bg-surface-container">
+                <i class="bi bi-bell-fill" style="font-size: 1.1rem;"></i>
+                @if($unreadCount > 0)
+                    <span class="absolute top-1 right-1 flex items-center justify-center w-4 h-4 text-[0.6rem] font-bold text-white bg-red-500 border-2 border-white rounded-full">
+                        {{ $unreadCount > 9 ? '9+' : $unreadCount }}
+                    </span>
+                @endif
+            </button>
+
+            <div x-show="open" x-cloak
+                 x-transition:enter="transition ease-out duration-200"
+                 x-transition:enter-start="opacity-0 scale-95 translate-y-2"
+                 x-transition:enter-end="opacity-100 scale-100 translate-y-0"
+                 x-transition:leave="transition ease-in duration-150"
+                 x-transition:leave-start="opacity-100 scale-100 translate-y-0"
+                 x-transition:leave-end="opacity-0 scale-95 translate-y-2"
+                 class="absolute right-0 mt-2 w-80 bg-white rounded-2xl shadow-lg border border-outline-variant/30 overflow-hidden z-50">
+                <div class="px-4 py-3 bg-surface-container-lowest border-b border-outline-variant/20 flex items-center justify-between">
+                    <h3 class="font-headline font-bold text-sm text-primary">Notifikasi</h3>
+                    @if($unreadCount > 0)
+                        <span class="bg-primary/10 text-primary text-[0.65rem] font-bold px-2 py-0.5 rounded-full">{{ $unreadCount }} Baru</span>
+                    @endif
+                </div>
+                <div class="max-h-80 overflow-y-auto">
+                    @forelse($unreadNotifications as $notification)
+                        <a href="{{ route('admin.notifications.read', $notification->id) }}" class="block px-4 py-3 hover:bg-surface-container-low border-b border-outline-variant/10 transition-colors">
+                            <p class="text-xs text-on-surface font-semibold mb-1">{{ $notification->data['message'] ?? 'Ada notifikasi baru' }}</p>
+                            <span class="text-[0.65rem] text-outline flex items-center gap-1">
+                                <i class="bi bi-clock"></i> {{ $notification->created_at->diffForHumans() }}
+                            </span>
+                        </a>
+                    @empty
+                        <div class="px-4 py-6 text-center text-outline text-sm flex flex-col items-center">
+                            <i class="bi bi-bell-slash text-2xl mb-2 opacity-50"></i>
+                            Tidak ada notifikasi baru
+                        </div>
+                    @endforelse
+                </div>
+            </div>
+        </div>
+
         <span class="hidden md:inline-flex" style="background:rgba(252,212,0,0.12);color:#705d00;font-size:0.68rem;font-weight:700;padding:4px 10px;border-radius:99px;font-family:'Manrope',sans-serif;text-transform:uppercase;letter-spacing:0.08em;align-items:center;">
             Admin
         </span>
@@ -630,6 +687,21 @@
             }
         });
     });
+
+    // Persist sidebar scroll position
+    const sidebarNav = document.querySelector('.arh-nav');
+    if (sidebarNav) {
+        // Restore scroll position
+        const savedScroll = sessionStorage.getItem('arh_sidebar_scroll');
+        if (savedScroll) {
+            sidebarNav.scrollTop = parseInt(savedScroll, 10);
+        }
+
+        // Save scroll position before navigating away
+        window.addEventListener('beforeunload', () => {
+            sessionStorage.setItem('arh_sidebar_scroll', sidebarNav.scrollTop);
+        });
+    }
 
     // Initialize Lucide Icons
     lucide.createIcons();

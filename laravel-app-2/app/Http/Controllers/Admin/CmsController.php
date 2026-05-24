@@ -18,9 +18,12 @@ class CmsController extends Controller
     public function update(Request $request)
     {
         $request->validate([
+            'sanggar_logo'  => 'nullable|image|mimes:png,svg,jpg,jpeg|max:1024',
             'hero_image'    => 'nullable|image|mimes:jpg,jpeg,png,webp|max:3072',
             'founder_photo' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
         ], [
+            'sanggar_logo.image'  => 'Logo harus berupa gambar.',
+            'sanggar_logo.max'    => 'Ukuran logo maksimal 1MB.',
             'hero_image.image'    => 'File harus berupa gambar.',
             'hero_image.max'      => 'Ukuran gambar hero maksimal 3MB.',
             'founder_photo.image' => 'File harus berupa gambar.',
@@ -42,6 +45,16 @@ class CmsController extends Controller
                     ['value' => $request->input($key)]
                 );
             }
+        }
+
+        // Upload Logo Sanggar
+        if ($request->hasFile('sanggar_logo')) {
+            $oldPath = SiteContent::where('key', 'sanggar_logo')->value('value');
+            if ($oldPath && Storage::disk('public')->exists($oldPath)) {
+                Storage::disk('public')->delete($oldPath);
+            }
+            $path = $request->file('sanggar_logo')->store('cms', 'public');
+            SiteContent::updateOrCreate(['key' => 'sanggar_logo'], ['value' => $path]);
         }
 
         // Upload Hero Image

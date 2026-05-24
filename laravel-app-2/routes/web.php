@@ -225,6 +225,9 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
     Route::put('/profile', [\App\Http\Controllers\Admin\AdminProfileController::class, 'update'])->name('profile.update');
     Route::put('/profile/password', [\App\Http\Controllers\Admin\AdminProfileController::class, 'updatePassword'])->name('profile.password');
 
+    // NOTIFICATIONS
+    Route::get('/notifications/{id}/read', [\App\Http\Controllers\Admin\NotificationController::class, 'markAsRead'])->name('notifications.read');
+
 });
 
 // ══════════════════════════════════════════════════════════════════════════
@@ -314,6 +317,8 @@ Route::middleware(['auth', 'role:klien'])->prefix('klien')->name('klien.')->grou
     Route::get('/bookings/{id}', [\App\Http\Controllers\Klien\BookingController::class, 'show'])->name('bookings.show');
     Route::post('/bookings/{id}/proof', [\App\Http\Controllers\Klien\BookingController::class, 'uploadProof'])->name('bookings.upload_proof');
     Route::post('/bookings/{id}/full-proof', [\App\Http\Controllers\Klien\BookingController::class, 'uploadFullProof'])->name('bookings.upload_full_proof');
+    Route::post('/bookings/{booking}/feedback', [\App\Http\Controllers\Klien\ClientFeedbackController::class, 'store'])->name('bookings.feedback');
+    
     Route::post('/notifications/read-all', function () {
         Auth::user()->unreadNotifications->markAsRead();
         return redirect()->back();

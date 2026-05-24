@@ -29,6 +29,7 @@ laravel-app-2/
 - 📂 **Http**
   - 📂 **Controllers**
     - 📂 **Admin**
+      - 📄 [AdminProfileController.php](file:///d:/ART-HUB_Sanggar%20Seni/laravel-app-2/app/Http/Controllers/Admin/AdminProfileController.php)
       - 📄 [BookingController.php](file:///d:/ART-HUB_Sanggar%20Seni/laravel-app-2/app/Http/Controllers/Admin/BookingController.php)
       - 📄 [CancellationController.php](file:///d:/ART-HUB_Sanggar%20Seni/laravel-app-2/app/Http/Controllers/Admin/CancellationController.php)
       - 📄 [CmsController.php](file:///d:/ART-HUB_Sanggar%20Seni/laravel-app-2/app/Http/Controllers/Admin/CmsController.php)
@@ -171,7 +172,9 @@ laravel-app-2/
   - 📄 [hero_tari_sunda.png](file:///d:/ART-HUB_Sanggar%20Seni/laravel-app-2/public/images/hero_tari_sunda.png)
 - 📂 **storage**
   - 📂 **cms**
+    - 📄 [8ugzTRJaUPta3rmqJiw4IBFG6SbZtEaW4TbKSWoR.jpg](file:///d:/ART-HUB_Sanggar%20Seni/laravel-app-2/public/storage/cms/8ugzTRJaUPta3rmqJiw4IBFG6SbZtEaW4TbKSWoR.jpg)
     - 📄 [a2tUrD7nJwG4K7lI1xU6QqpcJO03OMWaTOWOMeAi.jpg](file:///d:/ART-HUB_Sanggar%20Seni/laravel-app-2/public/storage/cms/a2tUrD7nJwG4K7lI1xU6QqpcJO03OMWaTOWOMeAi.jpg)
+    - 📄 [thWyK3LGZLxniZMcKn25MeOYAeyjz7oSVcDQmErB.png](file:///d:/ART-HUB_Sanggar%20Seni/laravel-app-2/public/storage/cms/thWyK3LGZLxniZMcKn25MeOYAeyjz7oSVcDQmErB.png)
   - 📂 **personnel-photos**
     - 📄 [iWjCR7CB2asS4kkBSaCXAWxb47V0QOe8YtyzCL7t.png](file:///d:/ART-HUB_Sanggar%20Seni/laravel-app-2/public/storage/personnel-photos/iWjCR7CB2asS4kkBSaCXAWxb47V0QOe8YtyzCL7t.png)
   - 📂 **proofs**
@@ -182,6 +185,7 @@ laravel-app-2/
   - 📄 [.gitignore](file:///d:/ART-HUB_Sanggar%20Seni/laravel-app-2/public/storage/.gitignore)
 - 📄 [.htaccess](file:///d:/ART-HUB_Sanggar%20Seni/laravel-app-2/public/.htaccess)
 - 📄 [favicon.ico](file:///d:/ART-HUB_Sanggar%20Seni/laravel-app-2/public/favicon.ico)
+- 📄 [hot](file:///d:/ART-HUB_Sanggar%20Seni/laravel-app-2/public/hot)
 - 📄 [index.php](file:///d:/ART-HUB_Sanggar%20Seni/laravel-app-2/public/index.php)
 - 📄 [robots.txt](file:///d:/ART-HUB_Sanggar%20Seni/laravel-app-2/public/robots.txt)
 
@@ -209,6 +213,7 @@ laravel-app-2/
     - 📂 **costumes**
       - 📄 [create-asset.blade.php](file:///d:/ART-HUB_Sanggar%20Seni/laravel-app-2/resources/views/admin/costumes/create-asset.blade.php)
       - 📄 [create-rental.blade.php](file:///d:/ART-HUB_Sanggar%20Seni/laravel-app-2/resources/views/admin/costumes/create-rental.blade.php)
+      - 📄 [edit-asset.blade.php](file:///d:/ART-HUB_Sanggar%20Seni/laravel-app-2/resources/views/admin/costumes/edit-asset.blade.php)
       - 📄 [index.blade.php](file:///d:/ART-HUB_Sanggar%20Seni/laravel-app-2/resources/views/admin/costumes/index.blade.php)
     - 📂 **events**
       - 📄 [index.blade.php](file:///d:/ART-HUB_Sanggar%20Seni/laravel-app-2/resources/views/admin/events/index.blade.php)
@@ -227,6 +232,8 @@ laravel-app-2/
       - 📄 [create.blade.php](file:///d:/ART-HUB_Sanggar%20Seni/laravel-app-2/resources/views/admin/personnel/create.blade.php)
       - 📄 [edit.blade.php](file:///d:/ART-HUB_Sanggar%20Seni/laravel-app-2/resources/views/admin/personnel/edit.blade.php)
       - 📄 [index.blade.php](file:///d:/ART-HUB_Sanggar%20Seni/laravel-app-2/resources/views/admin/personnel/index.blade.php)
+    - 📂 **profile**
+      - 📄 [edit.blade.php](file:///d:/ART-HUB_Sanggar%20Seni/laravel-app-2/resources/views/admin/profile/edit.blade.php)
     - 📂 **rehearsals**
       - 📄 [index.blade.php](file:///d:/ART-HUB_Sanggar%20Seni/laravel-app-2/resources/views/admin/rehearsals/index.blade.php)
     - 📄 [dashboard.blade.php](file:///d:/ART-HUB_Sanggar%20Seni/laravel-app-2/resources/views/admin/dashboard.blade.php)
@@ -275,6 +282,17 @@ laravel-app-2/
       - 📄 [update-password-form.blade.php](file:///d:/ART-HUB_Sanggar%20Seni/laravel-app-2/resources/views/profile/partials/update-password-form.blade.php)
       - 📄 [update-profile-information-form.blade.php](file:///d:/ART-HUB_Sanggar%20Seni/laravel-app-2/resources/views/profile/partials/update-profile-information-form.blade.php)
     - 📄 [edit.blade.php](file:///d:/ART-HUB_Sanggar%20Seni/laravel-app-2/resources/views/profile/edit.blade.php)
+  - 📂 **vendor**
+    - 📂 **pagination**
+      - 📄 [bootstrap-4.blade.php](file:///d:/ART-HUB_Sanggar%20Seni/laravel-app-2/resources/views/vendor/pagination/bootstrap-4.blade.php)
+      - 📄 [bootstrap-5.blade.php](file:///d:/ART-HUB_Sanggar%20Seni/laravel-app-2/resources/views/vendor/pagination/bootstrap-5.blade.php)
+      - 📄 [default.blade.php](file:///d:/ART-HUB_Sanggar%20Seni/laravel-app-2/resources/views/vendor/pagination/default.blade.php)
+      - 📄 [semantic-ui.blade.php](file:///d:/ART-HUB_Sanggar%20Seni/laravel-app-2/resources/views/vendor/pagination/semantic-ui.blade.php)
+      - 📄 [simple-bootstrap-4.blade.php](file:///d:/ART-HUB_Sanggar%20Seni/laravel-app-2/resources/views/vendor/pagination/simple-bootstrap-4.blade.php)
+      - 📄 [simple-bootstrap-5.blade.php](file:///d:/ART-HUB_Sanggar%20Seni/laravel-app-2/resources/views/vendor/pagination/simple-bootstrap-5.blade.php)
+      - 📄 [simple-default.blade.php](file:///d:/ART-HUB_Sanggar%20Seni/laravel-app-2/resources/views/vendor/pagination/simple-default.blade.php)
+      - 📄 [simple-tailwind.blade.php](file:///d:/ART-HUB_Sanggar%20Seni/laravel-app-2/resources/views/vendor/pagination/simple-tailwind.blade.php)
+      - 📄 [tailwind.blade.php](file:///d:/ART-HUB_Sanggar%20Seni/laravel-app-2/resources/views/vendor/pagination/tailwind.blade.php)
   - 📄 [dashboard.blade.php](file:///d:/ART-HUB_Sanggar%20Seni/laravel-app-2/resources/views/dashboard.blade.php)
   - 📄 [welcome.blade.php](file:///d:/ART-HUB_Sanggar%20Seni/laravel-app-2/resources/views/welcome.blade.php)
 
@@ -289,7 +307,9 @@ laravel-app-2/
     - 📄 [.gitignore](file:///d:/ART-HUB_Sanggar%20Seni/laravel-app-2/storage/app/private/.gitignore)
   - 📂 **public**
     - 📂 **cms**
+      - 📄 [8ugzTRJaUPta3rmqJiw4IBFG6SbZtEaW4TbKSWoR.jpg](file:///d:/ART-HUB_Sanggar%20Seni/laravel-app-2/storage/app/public/cms/8ugzTRJaUPta3rmqJiw4IBFG6SbZtEaW4TbKSWoR.jpg)
       - 📄 [a2tUrD7nJwG4K7lI1xU6QqpcJO03OMWaTOWOMeAi.jpg](file:///d:/ART-HUB_Sanggar%20Seni/laravel-app-2/storage/app/public/cms/a2tUrD7nJwG4K7lI1xU6QqpcJO03OMWaTOWOMeAi.jpg)
+      - 📄 [thWyK3LGZLxniZMcKn25MeOYAeyjz7oSVcDQmErB.png](file:///d:/ART-HUB_Sanggar%20Seni/laravel-app-2/storage/app/public/cms/thWyK3LGZLxniZMcKn25MeOYAeyjz7oSVcDQmErB.png)
     - 📂 **personnel-photos**
       - 📄 [iWjCR7CB2asS4kkBSaCXAWxb47V0QOe8YtyzCL7t.png](file:///d:/ART-HUB_Sanggar%20Seni/laravel-app-2/storage/app/public/personnel-photos/iWjCR7CB2asS4kkBSaCXAWxb47V0QOe8YtyzCL7t.png)
     - 📂 **proofs**
@@ -365,4 +385,4 @@ Mendefinisikan rute URL sistem:
 - `web.php`: Rute utama aplikasi yang mengelompokkan otorisasi multi-role (Admin, Personnel, Klien) secara ketat menggunakan middleware `RoleMiddleware`.
 
 ---
-*Dokumen ini diperbarui secara otomatis berdasarkan analisis repositori terbaru pada tanggal 22 Mei 2026.*
+*Dokumen ini diperbarui secara otomatis berdasarkan analisis repositori terbaru pada tanggal 24 Mei 2026.*
