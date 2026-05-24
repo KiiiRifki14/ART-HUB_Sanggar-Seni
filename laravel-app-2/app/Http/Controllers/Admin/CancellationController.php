@@ -35,6 +35,12 @@ class CancellationController extends Controller
             return redirect()->back()->with('error', 'Booking sudah dibatalkan sebelumnya.');
         }
 
+        // FIX A-07: Tidak boleh batalkan booking jika event sudah lewat
+        $eventDate = is_string($booking->event_date) ? $booking->event_date : $booking->event_date->format('Y-m-d');
+        if (\Carbon\Carbon::parse($eventDate)->isPast()) {
+            return redirect()->back()->with('error', 'Pembatalan tidak dapat diproses karena tanggal event (' . \Carbon\Carbon::parse($eventDate)->format('d M Y') . ') sudah lewat.');
+        }
+
         try {
             DB::transaction(function () use ($booking, $request) {
                 // Konversi tanggal ke string (untuk memastikan kompabilitas input SQL function)
@@ -63,7 +69,8 @@ class CancellationController extends Controller
                 // Jika Denda lebih besar dari DP, Refund = 0 (klien rugi / sanggar untung)
                 $refundAmount = max(0, $booking->dp_amount - $penaltyAmount);
 
-                // 2. Simpan Data Cancellation
+                // 2. Simpan Data Cancellation + Audit Digital Acknowledgement
+                // FIX B-05: Simpan IP address, user agent, dan timestamp sebagai bukti digital
                 Cancellation::create([
                     'booking_id'              => $booking->id,
                     'cancellation_date'       => Carbon::now()->format('Y-m-d'),
@@ -74,6 +81,10 @@ class CancellationController extends Controller
                     'status'                  => 'pending',
                     'reason'                  => $request->reason,
                     'digital_acknowledgement' => $request->digital_acknowledgement,
+                    // FIX B-05: Data audit untuk keperluan hukum
+                    'acknowledged_ip'         => $request->ip(),
+                    'acknowledged_at'         => Carbon::now(),
+                    'acknowledged_ua'         => substr($request->userAgent() ?? '', 0, 255),
                 ]);
 
                 // 3. Batalkan Booking dan lepaskan ikatan Event

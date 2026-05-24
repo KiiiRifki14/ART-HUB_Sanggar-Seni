@@ -166,6 +166,13 @@
             </div>
             @endforelse
         </div>
+        
+        {{-- Pagination Aset Sanggar --}}
+        @if($sanggarCostumes->hasPages())
+        <div class="px-6 py-4 border-t border-outline-variant/20 bg-surface-container-low">
+            {{ $sanggarCostumes->links() }}
+        </div>
+        @endif
     </div>
 </div>
 
@@ -314,6 +321,13 @@
             </div>
             @endforelse
         </div>
+
+        {{-- Pagination Sewa Vendor --}}
+        @if($vendorRentals->hasPages())
+        <div class="px-6 py-4 border-t border-outline-variant/20 bg-surface-container-low">
+            {{ $vendorRentals->links() }}
+        </div>
+        @endif
     </div>
 </div>
 

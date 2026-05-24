@@ -262,6 +262,51 @@
         </div>
     </div>
 
+    {{-- ══════════ SECTION KONTAK & PEMBAYARAN ══════════ --}}
+    <div class="bg-surface-container-lowest border border-outline-variant/30 rounded-2xl shadow-sm overflow-hidden">
+        <div class="px-6 py-4 border-b border-outline-variant/20 bg-surface-container-low/50 flex items-center gap-3">
+            <div class="w-9 h-9 rounded-lg bg-green-500/10 flex items-center justify-center flex-shrink-0">
+                <i class="bi bi-telephone-fill text-green-600"></i>
+            </div>
+            <div>
+                <div class="font-headline text-base text-primary font-bold">Informasi Kontak & Pembayaran</div>
+                <p class="font-label text-[0.65rem] uppercase tracking-widest text-outline">Nomor WA Admin & Rekening Bank (ditampilkan di portal Klien)</p>
+            </div>
+        </div>
+        <div class="p-6 grid md:grid-cols-2 gap-6">
+            <div>
+                <label class="block font-label text-xs uppercase tracking-widest text-on-surface-variant font-bold mb-2">Nomor WhatsApp Admin</label>
+                <input type="text" name="admin_whatsapp"
+                       value="{{ $contents['admin_whatsapp'] ?? '' }}"
+                       placeholder="628123456789 (tanpa tanda +)"
+                       class="w-full bg-surface-container-low border border-outline-variant/50 rounded-xl px-4 py-2.5 font-body text-sm text-on-surface focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-colors">
+                <p class="font-body text-xs text-outline mt-1.5">Format: 628xxx (kode negara tanpa +). Digunakan untuk tombol "Negosiasi Harga" di portal Klien.</p>
+            </div>
+            <div>
+                <label class="block font-label text-xs uppercase tracking-widest text-on-surface-variant font-bold mb-2">Jenis Bank</label>
+                <input type="text" name="bank_type"
+                       value="{{ $contents['bank_type'] ?? 'BCA' }}"
+                       placeholder="BCA / BRI / Mandiri / dll"
+                       class="w-full bg-surface-container-low border border-outline-variant/50 rounded-xl px-4 py-2.5 font-body text-sm text-on-surface focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-colors">
+            </div>
+            <div>
+                <label class="block font-label text-xs uppercase tracking-widest text-on-surface-variant font-bold mb-2">Nomor Rekening</label>
+                <input type="text" name="bank_account_number"
+                       value="{{ $contents['bank_account_number'] ?? '' }}"
+                       placeholder="1234 5678 90"
+                       class="w-full bg-surface-container-low border border-outline-variant/50 rounded-xl px-4 py-2.5 font-body text-sm text-on-surface focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-colors">
+            </div>
+            <div>
+                <label class="block font-label text-xs uppercase tracking-widest text-on-surface-variant font-bold mb-2">Nama Pemilik Rekening (a/n)</label>
+                <input type="text" name="bank_account_name"
+                       value="{{ $contents['bank_account_name'] ?? '' }}"
+                       placeholder="Nama sesuai buku tabungan"
+                       class="w-full bg-surface-container-low border border-outline-variant/50 rounded-xl px-4 py-2.5 font-body text-sm text-on-surface focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-colors">
+                <p class="font-body text-xs text-outline mt-1.5">Ditampilkan di halaman pembayaran portal Klien.</p>
+            </div>
+        </div>
+    </div>
+
     {{-- TOMBOL AKSI --}}
     <div class="flex items-center justify-between gap-4 py-2">
         <a href="{{ url('/') }}" target="_blank"
@@ -275,6 +320,7 @@
     </div>
 
 </form>
+
 
 @push('scripts')
 <script>

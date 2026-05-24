@@ -14,7 +14,7 @@
 </div>
 
 {{-- ══ TABLE (Desktop) ══ --}}
-<div class="hidden md:block bg-surface-container-lowest rounded-xl border border-outline-variant/30 shadow-[0_12px_24px_rgba(54,31,26,0.03)] overflow-hidden mb-8">
+<div class="hidden md:block bg-surface-container-lowest rounded-xl border border-outline-variant/30 shadow-[0_12px_24px_rgba(54,31,26,0.03)] overflow-hidden mb-8 overflow-x-auto">
     <table class="w-full">
         <thead class="bg-surface-container-low">
             <tr>

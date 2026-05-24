@@ -79,10 +79,13 @@
                         </div>
                     </div>
                     
-                    <div class="bg-surface-container-low border border-outline-variant/50 rounded-xl p-4">
-                        <label class="font-label text-[0.65rem] font-bold uppercase tracking-widest text-outline block mb-1">Password Default</label>
-                        <div class="font-body text-sm font-mono text-secondary font-bold">sanggar123</div>
-                        <p class="font-body text-xs text-outline mt-1">Personel diwajibkan mengganti password setelah login pertama.</p>
+                    <div>
+                        <label class="font-label text-[0.65rem] font-bold uppercase tracking-widest text-outline block mb-1.5 ml-1">Password Akun <span class="text-red-500">*</span></label>
+                        <input type="password" name="password"
+                               class="w-full bg-surface-container-low border {{ $errors->has('password') ? 'border-red-500' : 'border-outline-variant/50' }} rounded-xl px-4 py-3 font-body text-sm text-on-surface focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-colors"
+                               placeholder="Min. 8 karakter" required autocomplete="new-password">
+                        @error('password')<p class="text-red-500 font-body text-xs mt-1 ml-1">{{ $message }}</p>@enderror
+                        <p class="font-body text-xs text-outline mt-1 ml-1">Personel dapat mengubah password setelah login pertama melalui halaman profil.</p>
                     </div>
                 </div>
             </section>

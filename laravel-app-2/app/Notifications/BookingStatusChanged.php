@@ -41,7 +41,8 @@ class BookingStatusChanged extends Notification
     {
         return [
             'title' => 'Update Status Pesanan',
-            'message' => 'Pesanan Anda (' . $this->booking->booking_code . ') ' . $this->statusMessage,
+            // FIX B-06: Sanitasi data yang masuk ke notifikasi untuk mencegah XSS
+            'message' => 'Pesanan Anda (' . strip_tags($this->booking->booking_code) . ') ' . strip_tags($this->statusMessage),
             'booking_id' => $this->booking->id
         ];
     }

@@ -95,7 +95,7 @@ class BookingController extends Controller
             'payment_receipt' => null,
         ]);
 
-        $user = \App\Models\User::find($booking->user_id);
+        $user = \App\Models\User::find($booking->client_id);
         if ($user) {
             $user->notify(new BookingStatusChanged($booking, 'Bukti pembayaran ditolak. Silakan upload ulang bukti yang valid.'));
         }
@@ -131,7 +131,7 @@ class BookingController extends Controller
             $booking->event->update(['status' => 'ready']);
         }
 
-        $user = \App\Models\User::find($booking->user_id);
+        $user = \App\Models\User::find($booking->client_id);
         if ($user) {
             $user->notify(new BookingStatusChanged($booking, 'telah LUNAS 100%. Terima kasih!'));
         }
@@ -156,7 +156,7 @@ class BookingController extends Controller
             'full_payment_proof' => null,
         ]);
 
-        $user = \App\Models\User::find($booking->user_id);
+        $user = \App\Models\User::find($booking->client_id);
         if ($user) {
             $user->notify(new BookingStatusChanged($booking, 'Bukti pelunasan ditolak. Silakan upload ulang bukti yang valid.'));
         }
@@ -194,7 +194,7 @@ class BookingController extends Controller
             }
         }
 
-        $user = \App\Models\User::find($booking->user_id);
+        $user = \App\Models\User::find($booking->client_id);
         if ($user) {
             $user->notify(new BookingStatusChanged($booking, 'telah LUNAS 100% secara TUNAI (Cash). Terima kasih!'));
         }
@@ -214,17 +214,13 @@ class BookingController extends Controller
             'total_price' => 'required|numeric|min:0',
         ]);
 
-        if ($booking->status !== 'pending') {
-            return redirect()->back()->with('error', 'Hanya booking dengan status pending yang bisa diubah harganya.');
-        }
-
         $booking->update([
             'total_price' => $request->total_price,
             // Re-adjust DP minimum based on new total
             'dp_amount' => $request->total_price * 0.50,
         ]);
 
-        $user = \App\Models\User::find($booking->user_id);
+        $user = \App\Models\User::find($booking->client_id);
         if ($user) {
             $user->notify(new BookingStatusChanged($booking, 'harganya telah diperbarui menjadi Rp ' . number_format($request->total_price, 0, ',', '.')));
         }
@@ -351,7 +347,7 @@ class BookingController extends Controller
             $successMsg = $profitStatus === 'partial_lock'
                 ? '⚠️ DP Dikonfirmasi (Mode Cicil Laba). DP lebih kecil dari target laba — seluruh DP dikunci. Dana operasional menunggu pelunasan!'
                 : '✅ DP Berhasil Dikonfirmasi. Laba Pimpinan '  . number_format($targetProfit, 0, ',', '.') . ' Telah Dikunci & Event Telah Dibuat!';
-            $user = \App\Models\User::find($booking->user_id);
+            $user = \App\Models\User::find($booking->client_id);
             if ($user) {
                 $user->notify(new BookingStatusChanged($booking, 'telah dikonfirmasi (DP Masuk).'));
             }
@@ -416,10 +412,11 @@ class BookingController extends Controller
                     ]
                 );
 
-                // Kunci laba dengan nominal manual
-                $profitPct        = $booking->total_price > 0 ? ($request->fixed_profit_nominal / $booking->total_price) * 100 : 0;
+                // FIX A-05: Gunakan $targetProfit (variable bound dari luar closure)
+                // bukan $request->fixed_profit_nominal langsung, untuk konsistensi
+                $profitPct        = $booking->total_price > 0 ? ($targetProfit / $booking->total_price) * 100 : 0;
                 $dpMasuk          = $booking->dp_amount;
-                $operationalBudget = max(0, $dpMasuk - $request->fixed_profit_nominal);
+                $operationalBudget = max(0, $dpMasuk - $targetProfit);
                 $safetyBufferAmt  = $operationalBudget * 0.10;
 
                 FinancialRecord::firstOrCreate(
@@ -428,7 +425,7 @@ class BookingController extends Controller
                         'total_revenue'        => $booking->total_price,
                         'fixed_profit_pct'     => round($profitPct, 2),
                         'is_profit_overridden' => true,
-                        'fixed_profit'         => $request->fixed_profit_nominal,
+                        'fixed_profit'         => $targetProfit,
                         'dp_received'          => $dpMasuk,
                         'operational_budget'   => $operationalBudget,
                         'safety_buffer_pct'    => 10.00,
@@ -441,7 +438,7 @@ class BookingController extends Controller
                 );
             });
 
-            $user = \App\Models\User::find($booking->user_id);
+            $user = \App\Models\User::find($booking->client_id);
             if ($user) {
                 $user->notify(new BookingStatusChanged($booking, 'pembayaran tunai (Cash) telah dikonfirmasi (DP Masuk).'));
             }
@@ -490,10 +487,17 @@ class BookingController extends Controller
             'dp_amount' => 'required|numeric',
         ]);
 
-        $validated['booking_source'] = 'admin_manual';
-        $validated['status'] = 'pending';
+        // FIX B-01: Explicitly pass only validated keys to avoid Mass Assignment risks
+        // since Booking model uses guarded = []
+        $dataToInsert = collect($validated)->only([
+            'client_name', 'client_phone', 'event_type', 'event_date',
+            'event_start', 'event_end', 'venue', 'total_price', 'dp_amount'
+        ])->toArray();
 
-        Booking::create($validated);
+        $dataToInsert['booking_source'] = 'admin_manual';
+        $dataToInsert['status'] = 'pending';
+
+        Booking::create($dataToInsert);
 
         return redirect()->route('admin.bookings.index')->with('success', 'Booking manual berhasil ditambahkan.');
     }

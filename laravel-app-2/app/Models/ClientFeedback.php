@@ -24,6 +24,20 @@ class ClientFeedback extends Model
     ];
 
     /**
+     * FIX F-02: Pastikan submitted_at otomatis terisi saat model dibuat
+     */
+    protected static function boot()
+    {
+        parent::boot();
+
+        static::creating(function ($model) {
+            if (empty($model->submitted_at)) {
+                $model->submitted_at = now();
+            }
+        });
+    }
+
+    /**
      * Relasi kembali ke Booking
      */
     public function booking(): BelongsTo

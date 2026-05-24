@@ -29,9 +29,9 @@ class RoleMiddleware
         if (!in_array(Auth::user()->role, $roles)) {
             $userRole = Auth::user()->role;
             $redirectPath = match ($userRole) {
-                'personnel' => '/personnel/dashboard',
-                'klien' => '/klien/dashboard',
-                default => '/dashboard',
+                'personel' => '/personnel/dashboard', // 'personel' (satu l) sesuai nilai di database
+                'klien'    => '/klien/dashboard',
+                default    => '/dashboard',
             };
 
             return redirect($redirectPath)->with('error', 'Akses Ditolak: Anda tidak memiliki wewenang untuk memasuki area tersebut.');

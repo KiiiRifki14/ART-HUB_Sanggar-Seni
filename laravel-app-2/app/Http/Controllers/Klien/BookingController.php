@@ -31,6 +31,8 @@ class BookingController extends Controller
 
     /**
      * Simpan Booking Baru
+     * FIX A-02: Menggunakan DB::transaction + lockForUpdate untuk mencegah
+     * race condition double-booking (dua klien booking tanggal yang sama bersamaan)
      */
     public function store(Request $request)
     {
@@ -46,14 +48,6 @@ class BookingController extends Controller
                 'required',
                 'date',
                 'after:today',
-                function ($attribute, $value, $fail) {
-                    $exists = Booking::where('event_date', $value)
-                        ->whereIn('status', ['dp_paid', 'confirmed', 'paid_full', 'completed'])
-                        ->exists();
-                    if ($exists) {
-                        $fail('Tanggal ' . \Carbon\Carbon::parse($value)->format('d M Y') . ' sudah penuh/di-booking. Silakan pilih tanggal lain.');
-                    }
-                },
             ],
             'event_start'  => 'required',
             'event_end'    => 'required',
@@ -61,30 +55,51 @@ class BookingController extends Controller
             'client_phone' => 'required|string',
         ]);
 
-        // Harga dari catalog di server — immune dari manipulasi
-        $basePrice = $catalog->price;
-        $dpAmount  = $basePrice * 0.50;
+        try {
+            $booking = \Illuminate\Support\Facades\DB::transaction(function () use ($request, $catalog) {
 
-        $booking = Booking::create([
-            'client_id'          => Auth::id(),
-            'client_name'        => Auth::user()->name,
-            'client_phone'       => $request->client_phone,
-            'event_type'         => $catalog->name,
-            'service_catalog_id' => $catalog->id,
-            'event_date'         => $request->event_date,
-            'event_start'        => $request->event_start,
-            'event_end'          => $request->event_end,
-            'venue'              => $request->venue,
-            'venue_address'      => $request->venue_address,
-            'booking_source'     => 'web',
-            'status'             => 'pending',
-            'total_price'        => $basePrice,
-            'dp_amount'          => $dpAmount,
-        ]);
+                // FIX A-02: Cek ketersediaan tanggal DALAM transaksi dengan lockForUpdate
+                // Ini memastikan tidak ada booking lain yang bisa masuk untuk tanggal ini
+                // sebelum insert kita selesai (Pessimistic Locking).
+                $conflict = \App\Models\Booking::where('event_date', $request->event_date)
+                    ->whereIn('status', ['dp_paid', 'confirmed', 'paid_full', 'completed'])
+                    ->lockForUpdate()
+                    ->exists();
 
-        return redirect()->route('klien.bookings.show', $booking->id)
-            ->with('success', 'Booking berhasil diajukan! Tim kami akan meninjau pesanan Anda.');
+                if ($conflict) {
+                    throw new \Exception('Tanggal ' . \Carbon\Carbon::parse($request->event_date)->format('d M Y') . ' sudah penuh/di-booking. Silakan pilih tanggal lain.');
+                }
+
+                // Harga dari catalog di server — immune dari manipulasi
+                $basePrice = $catalog->price;
+                $dpAmount  = $basePrice * 0.50;
+
+                return \App\Models\Booking::create([
+                    'client_id'          => Auth::id(),
+                    'client_name'        => Auth::user()->name,
+                    'client_phone'       => $request->client_phone,
+                    'event_type'         => $catalog->name,
+                    'service_catalog_id' => $catalog->id,
+                    'event_date'         => $request->event_date,
+                    'event_start'        => $request->event_start,
+                    'event_end'          => $request->event_end,
+                    'venue'              => $request->venue,
+                    'venue_address'      => $request->venue_address,
+                    'booking_source'     => 'web',
+                    'status'             => 'pending',
+                    'total_price'        => $basePrice,
+                    'dp_amount'          => $dpAmount,
+                ]);
+            });
+
+            return redirect()->route('klien.bookings.show', $booking->id)
+                ->with('success', 'Booking berhasil diajukan! Tim kami akan meninjau pesanan Anda.');
+
+        } catch (\Exception $e) {
+            return back()->withErrors(['event_date' => $e->getMessage()])->withInput();
+        }
     }
+
 
     /**
      * Negotiation Hub (Status Booking & Harga)
@@ -103,7 +118,8 @@ class BookingController extends Controller
         $booking = Booking::where('id', $id)->where('client_id', Auth::id())->firstOrFail();
 
         $request->validate([
-            'payment_proof' => 'required|image|mimes:jpg,jpeg,png|max:5120', // Maks 5MB (MIME check)
+            // FIX B-04: Tambahkan validasi mimetypes berbasis finfo untuk mencegah bypass ekstensi
+            'payment_proof' => 'required|image|mimetypes:image/jpeg,image/png,image/jpg|max:5120',
         ]);
 
         // Simpan file ke storage public (Contoh sederhana)
@@ -128,7 +144,8 @@ class BookingController extends Controller
         }
 
         $request->validate([
-            'full_payment_proof' => 'required|image|mimes:jpg,jpeg,png|max:5120',
+            // FIX B-04: Tambahkan validasi mimetypes berbasis finfo
+            'full_payment_proof' => 'required|image|mimetypes:image/jpeg,image/png,image/jpg|max:5120',
         ]);
 
         $path = $request->file('full_payment_proof')->store('proofs', 'public');
