@@ -252,18 +252,24 @@ class BookingController extends Controller
             $targetProfit = 0;
 
             DB::transaction(function () use ($booking, $request, &$profitStatus, &$targetProfit) {
+                // FIX A-01: Kunci data booking secara eksklusif (Pessimistic Locking)
+                $lockedBooking = Booking::where('id', $booking->id)->lockForUpdate()->firstOrFail();
                 
-                // 1. UPDATE STATUS BOOKING & BUKTI TRANSFER
-                $receiptPath = $request->input('receipt_path', $booking->payment_receipt); 
+                if (in_array($lockedBooking->status, ['dp_paid', 'confirmed', 'paid_full', 'completed'])) {
+                    throw new \Exception('Booking ini sudah dikonfirmasi sebelumnya oleh admin lain.');
+                }
 
-                $booking->update([
+                // 1. UPDATE STATUS BOOKING & BUKTI TRANSFER
+                $receiptPath = $request->input('receipt_path', $lockedBooking->payment_receipt); 
+
+                $lockedBooking->update([
                     'status' => 'dp_paid',
                     'payment_receipt' => $receiptPath,
                     'dp_paid_at' => now(),
                 ]);
 
                 // 2. BUAT ENTRI EVENT OTOMATIS
-                $baseCode = 'EVT-' . date('Y') . '-' . str_pad($booking->id, 3, '0', STR_PAD_LEFT);
+                $baseCode = 'EVT-' . date('Y') . '-' . str_pad($lockedBooking->id, 3, '0', STR_PAD_LEFT);
                 $eventCode = $baseCode;
                 $counter = 1;
                 while (Event::where('event_code', $eventCode)->exists()) {
@@ -272,14 +278,14 @@ class BookingController extends Controller
                 }
                 
                 $event = Event::create([
-                    'booking_id'      => $booking->id,
+                    'booking_id'      => $lockedBooking->id,
                     'event_code'      => $eventCode,
                     'status'          => 'planning',
-                    'event_date'      => $booking->event_date,
-                    'event_start'     => $booking->event_start,
-                    'event_end'       => $booking->event_end,
-                    'venue'           => $booking->venue,
-                    'personnel_count' => $booking->serviceCatalog?->max_personnel ?? 0,
+                    'event_date'      => $lockedBooking->event_date,
+                    'event_start'     => $lockedBooking->event_start,
+                    'event_end'       => $lockedBooking->event_end,
+                    'venue'           => $lockedBooking->venue,
+                    'personnel_count' => $lockedBooking->serviceCatalog?->max_personnel ?? 0,
                 ]);
 
                 // 3. KUNCI FIXED PROFIT — INPUT MANUAL DARI ADMIN (bukan otomatis 30%)
@@ -289,9 +295,9 @@ class BookingController extends Controller
                 // ══════════════════════════════════════════════════════════════
                 $targetProfit = (float) $request->input('fixed_profit_nominal');
                 // Hitung persen informasional (untuk dicatat di DB, bukan untuk kalkulasi)
-                $profitPct    = $booking->total_price > 0 ? ($targetProfit / $booking->total_price) * 100 : 0;
+                $profitPct    = $lockedBooking->total_price > 0 ? ($targetProfit / $lockedBooking->total_price) * 100 : 0;
                 $isOverridden = true; // Selalu true karena manual
-                $dpMasuk      = $booking->dp_amount;                         // e.g. Rp 1.5 Jt (DP VIP kecil)
+                $dpMasuk      = $lockedBooking->dp_amount;                         // e.g. Rp 1.5 Jt (DP VIP kecil)
 
                 if ($dpMasuk >= $targetProfit) {
                     // SKENARIO NORMAL: DP cukup besar — potong laba di depan
@@ -324,7 +330,7 @@ class BookingController extends Controller
 
                 FinancialRecord::create([
                     'event_id'             => $event->id,
-                    'total_revenue'        => $booking->total_price,
+                    'total_revenue'        => $lockedBooking->total_price,
                     'fixed_profit_pct'     => $profitPct,
                     'is_profit_overridden' => $isOverridden,
                     'fixed_profit'         => $fixedProfit,
@@ -382,9 +388,15 @@ class BookingController extends Controller
             $targetProfit = (float) $request->input('fixed_profit_nominal');
 
             DB::transaction(function () use ($booking, $request, &$targetProfit) {
+                // FIX A-01: Lock data booking
+                $lockedBooking = Booking::where('id', $booking->id)->lockForUpdate()->firstOrFail();
+
+                if (in_array($lockedBooking->status, ['dp_paid', 'confirmed', 'paid_full', 'completed'])) {
+                    throw new \Exception('Booking ini sudah dikonfirmasi sebelumnya oleh admin lain.');
+                }
 
                 // Tandai booking sebagai DP PAID dengan catatan cash
-                $booking->update([
+                $lockedBooking->update([
                     'status'           => 'dp_paid',
                     'payment_proof'    => null,      // Tidak ada gambar struk
                     'payment_receipt'  => 'CASH_OFFLINE: ' . ($request->cash_note ?? 'Dibayar tunai di sanggar'),
@@ -392,39 +404,40 @@ class BookingController extends Controller
                 ]);
 
                 // Buat Event
-                $baseCode = 'EVT-' . date('Y') . '-' . str_pad($booking->id, 3, '0', STR_PAD_LEFT);
+                $baseCode = 'EVT-' . date('Y') . '-' . str_pad($lockedBooking->id, 3, '0', STR_PAD_LEFT);
                 $eventCode = $baseCode;
                 $counter = 1;
-                while (Event::where('event_code', $eventCode)->where('booking_id', '!=', $booking->id)->exists()) {
+                while (Event::where('event_code', $eventCode)->where('booking_id', '!=', $lockedBooking->id)->exists()) {
                     $eventCode = $baseCode . '-' . $counter;
                     $counter++;
                 }
                 $event = Event::firstOrCreate(
-                    ['booking_id' => $booking->id],
+                    ['booking_id' => $lockedBooking->id],
                     [
                         'event_code'      => $eventCode,
                         'status'          => 'planning',
-                        'event_date'      => $booking->event_date,
-                        'event_start'     => $booking->event_start,
-                        'event_end'       => $booking->event_end,
-                        'venue'           => $booking->venue,
-                        'personnel_count' => $booking->serviceCatalog?->max_personnel ?? 0,
+                        'event_date'      => $lockedBooking->event_date,
+                        'event_start'     => $lockedBooking->event_start,
+                        'event_end'       => $lockedBooking->event_end,
+                        'venue'           => $lockedBooking->venue,
+                        'personnel_count' => $lockedBooking->serviceCatalog?->max_personnel ?? 0,
                     ]
                 );
 
                 // Kunci laba dengan nominal manual
-                $profitPct        = $booking->total_price > 0 ? ($request->fixed_profit_nominal / $booking->total_price) * 100 : 0;
-                $dpMasuk          = $booking->dp_amount;
-                $operationalBudget = max(0, $dpMasuk - $request->fixed_profit_nominal);
+                // FIX A-05: Menggunakan variabel terikat $targetProfit
+                $profitPct        = $lockedBooking->total_price > 0 ? ($targetProfit / $lockedBooking->total_price) * 100 : 0;
+                $dpMasuk          = $lockedBooking->dp_amount;
+                $operationalBudget = max(0, $dpMasuk - $targetProfit);
                 $safetyBufferAmt  = $operationalBudget * 0.10;
 
                 FinancialRecord::firstOrCreate(
                     ['event_id' => $event->id],
                     [
-                        'total_revenue'        => $booking->total_price,
+                        'total_revenue'        => $lockedBooking->total_price,
                         'fixed_profit_pct'     => round($profitPct, 2),
                         'is_profit_overridden' => true,
-                        'fixed_profit'         => $request->fixed_profit_nominal,
+                        'fixed_profit'         => $targetProfit,
                         'dp_received'          => $dpMasuk,
                         'operational_budget'   => $operationalBudget,
                         'safety_buffer_pct'    => 10.00,

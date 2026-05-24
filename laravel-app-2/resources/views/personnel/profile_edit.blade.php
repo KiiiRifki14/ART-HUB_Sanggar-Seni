@@ -56,7 +56,7 @@
             @endif
         </div>
         <div class="flex-1">
-            <label for="photo" class="flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl cursor-pointer font-bold text-sm transition-colors" style="background:rgba(197,160,40,0.1);border:1px solid rgba(197,160,40,0.25);color:#C5A028">
+            <label for="photo" class="flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl cursor-pointer font-bold text-sm transition-colors" style="background:transparent; border:1px solid #C5A028; color:#C5A028">
                 <i class="bi bi-camera-fill"></i> Ganti Foto
             </label>
             <input id="photo" type="file" name="photo" accept="image/*" class="hidden" onchange="previewPhoto(this)">
@@ -142,6 +142,47 @@
     </button>
 </div>
 
+</form>
+
+{{-- Ganti Password --}}
+<form action="{{ route('personnel.profile.password') }}" method="POST">
+@csrf
+<div class="fu5 rounded-3xl p-5 mt-6 mb-4" style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.09)">
+    <div class="text-xs font-bold uppercase tracking-widest mb-4 flex items-center gap-2" style="color:rgba(255,255,255,0.35)">
+        <i class="bi bi-shield-lock-fill"></i> Keamanan (Ganti Password)
+    </div>
+
+    <div class="flex flex-col gap-4">
+        <div>
+            <label class="block text-xs font-bold uppercase tracking-widest mb-2" style="color:rgba(255,255,255,0.4)">Password Saat Ini <span class="text-red-400">*</span></label>
+            <input type="password" name="current_password" required
+                   class="w-full px-4 py-3 rounded-xl text-sm font-medium text-white outline-none transition-all"
+                   style="background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1)">
+            @error('current_password')<div class="mt-1 text-xs text-red-400">{{ $message }}</div>@enderror
+        </div>
+        
+        <div>
+            <label class="block text-xs font-bold uppercase tracking-widest mb-2" style="color:rgba(255,255,255,0.4)">Password Baru <span class="text-red-400">*</span></label>
+            <input type="password" name="password" required
+                   class="w-full px-4 py-3 rounded-xl text-sm font-medium text-white outline-none transition-all"
+                   style="background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1)">
+            <div class="mt-1 text-xs" style="color:rgba(255,255,255,0.25)">Min. 8 karakter (huruf besar, kecil, angka)</div>
+            @error('password')<div class="mt-1 text-xs text-red-400">{{ $message }}</div>@enderror
+        </div>
+
+        <div>
+            <label class="block text-xs font-bold uppercase tracking-widest mb-2" style="color:rgba(255,255,255,0.4)">Konfirmasi Password Baru <span class="text-red-400">*</span></label>
+            <input type="password" name="password_confirmation" required
+                   class="w-full px-4 py-3 rounded-xl text-sm font-medium text-white outline-none transition-all"
+                   style="background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1)">
+        </div>
+        
+        <button type="submit" class="w-full flex items-center justify-center gap-2 p-3 rounded-xl font-bold text-xs uppercase tracking-widest transition-all mt-2 hover:bg-white/20"
+                style="background:rgba(255,255,255,0.15);border:1px solid rgba(255,255,255,0.25);color:#fff">
+            <i class="bi bi-key-fill"></i> Perbarui Password
+        </button>
+    </div>
+</div>
 </form>
 
 @endsection

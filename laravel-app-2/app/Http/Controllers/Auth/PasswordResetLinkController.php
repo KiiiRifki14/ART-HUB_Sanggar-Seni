@@ -30,16 +30,20 @@ class PasswordResetLinkController extends Controller
             'email' => ['required', 'email'],
         ]);
 
-        // We will send the password reset link to this user. Once we have attempted
-        // to send the link, we will examine the response then see the message we
-        // need to show to the user. Finally, we'll send out a proper response.
-        $status = Password::sendResetLink(
-            $request->only('email')
-        );
+        $user = \App\Models\User::where('email', $request->email)->first();
 
-        return $status == Password::RESET_LINK_SENT
-                    ? back()->with('status', __($status))
-                    : back()->withInput($request->only('email'))
-                        ->withErrors(['email' => __($status)]);
+        if ($user) {
+            $otp = sprintf("%06d", mt_rand(1, 999999));
+            $user->otp_code = $otp;
+            $user->otp_expires_at = now()->addMinutes(15);
+            $user->save();
+
+            \Illuminate\Support\Facades\Mail::to($user->email)->send(new \App\Mail\OtpMail($otp));
+        }
+
+        // Store email in session to be used in OTP form
+        session(['reset_email' => $request->email]);
+
+        return redirect()->route('password.reset.otp.form')->with('status', 'Jika email terdaftar, kode OTP telah dikirimkan.');
     }
 }

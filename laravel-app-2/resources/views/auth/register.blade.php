@@ -192,6 +192,22 @@
                         </label>
                     </div>
 
+                    {{-- OTP --}}
+                    <div class="flex gap-3" data-aos="fade-up" data-aos-delay="575">
+                        <div class="field-group relative flex-1">
+                            <input type="text" name="otp_code" id="p_otp" placeholder=" " required maxlength="6"
+                                class="peer block w-full bg-surface-container-high border-0 border-b-2 border-outline-variant/40 py-3 px-4 text-on-surface focus:ring-0 focus:border-secondary focus:bg-surface-container-lowest rounded-t-lg transition-all duration-200 tracking-widest text-center font-bold">
+                            <label for="p_otp" class="absolute left-4 top-3 text-on-surface-variant font-label text-sm transition-all duration-200 pointer-events-none
+                                peer-placeholder-shown:top-3 peer-placeholder-shown:text-sm
+                                peer-focus:-top-5 peer-focus:text-xs peer-focus:text-secondary peer-focus:uppercase peer-focus:tracking-widest">
+                                Kode OTP
+                            </label>
+                        </div>
+                        <button type="button" id="btn_send_p_otp" onclick="sendOtp('p_email', 'btn_send_p_otp')" class="bg-secondary-container text-on-secondary-container px-4 rounded-lg font-semibold hover:bg-secondary-fixed-dim transition-colors text-sm whitespace-nowrap shadow-sm">
+                            Kirim OTP
+                        </button>
+                    </div>
+
                     {{-- Password --}}
                     <div class="field-group relative" data-aos="fade-up" data-aos-delay="600">
                         <input type="password" name="password" id="p_password" placeholder=" " required
@@ -201,6 +217,7 @@
                             peer-focus:-top-5 peer-focus:text-xs peer-focus:text-secondary peer-focus:uppercase peer-focus:tracking-widest">
                             Kata Sandi
                         </label>
+                        <p class="text-xs text-on-surface-variant/70 mt-1 ml-1">Minimal 8 karakter (huruf besar, kecil, angka).</p>
                     </div>
 
                     {{-- Confirm Password --}}
@@ -261,8 +278,20 @@
                         </div>
                         <div>
                             <label class="block font-label text-xs uppercase tracking-[0.05em] text-on-surface-variant mb-2">Alamat Email</label>
-                            <input type="email" name="email" required value="{{ old('email') }}" placeholder="name@domain.com"
+                            <input type="email" name="email" id="c_email" required value="{{ old('email') }}" placeholder="name@domain.com"
                                 class="w-full bg-surface-container-high/60 border-0 border-b-2 border-outline-variant/40 text-on-surface font-body px-4 py-3 rounded-t-lg focus:ring-0 focus:border-secondary transition-all duration-200 placeholder:text-on-surface-variant/40">
+                        </div>
+                    </div>
+
+                    {{-- OTP --}}
+                    <div data-aos="fade-up" data-aos-delay="525">
+                        <label class="block font-label text-xs uppercase tracking-[0.05em] text-on-surface-variant mb-2">Kode OTP</label>
+                        <div class="flex gap-3">
+                            <input type="text" name="otp_code" required placeholder="123456" maxlength="6"
+                                class="w-full bg-surface-container-high/60 border-0 border-b-2 border-outline-variant/40 text-on-surface font-body px-4 py-3 rounded-t-lg focus:ring-0 focus:border-secondary transition-all duration-200 tracking-widest text-center font-bold">
+                            <button type="button" id="btn_send_c_otp" onclick="sendOtp('c_email', 'btn_send_c_otp')" class="bg-secondary-container text-on-secondary-container px-6 rounded-lg font-semibold hover:bg-secondary-fixed-dim transition-colors text-sm whitespace-nowrap shadow-sm">
+                                Kirim OTP
+                            </button>
                         </div>
                     </div>
 
@@ -276,6 +305,7 @@
                                 <span class="material-symbols-outlined text-[20px]">visibility_off</span>
                             </button>
                         </div>
+                        <p class="text-xs text-on-surface-variant/70 mt-1 ml-1">Minimal 8 karakter (huruf besar, kecil, angka).</p>
                     </div>
 
                     {{-- Confirm Password --}}
@@ -306,7 +336,105 @@
     </section>
 </main>
 
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
+async function sendOtp(emailInputId, btnId) {
+    const email = document.getElementById(emailInputId).value;
+    const btn = document.getElementById(btnId);
+
+    if (!email) {
+        Swal.fire({
+            icon: 'warning',
+            title: 'Oops...',
+            text: 'Silakan isi alamat email terlebih dahulu!',
+            confirmButtonColor: '#361f1a'
+        });
+        return;
+    }
+
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+        Swal.fire({
+            icon: 'warning',
+            title: 'Format Email Salah',
+            text: 'Harap masukkan alamat email yang valid.',
+            confirmButtonColor: '#361f1a'
+        });
+        return;
+    }
+
+    // Start Cooldown immediately to prevent double click
+    const originalText = btn.innerText;
+    btn.disabled = true;
+    btn.classList.add('opacity-50', 'cursor-not-allowed');
+    btn.innerText = 'Mengirim...';
+
+    try {
+        const response = await fetch("{{ route('otp.register.send') }}", {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                'Accept': 'application/json'
+            },
+            body: JSON.stringify({ email: email })
+        });
+
+        const data = await response.json();
+
+        if (response.ok) {
+            Swal.fire({
+                icon: 'success',
+                title: 'Terkirim!',
+                text: data.message || 'Kode OTP telah dikirim ke email Anda. Cek folder Inbox/Spam.',
+                confirmButtonColor: '#361f1a'
+            });
+
+            // Start 60s cooldown
+            let timeLeft = 60;
+            const timer = setInterval(() => {
+                btn.innerText = `${timeLeft}s`;
+                timeLeft--;
+                if (timeLeft < 0) {
+                    clearInterval(timer);
+                    btn.disabled = false;
+                    btn.classList.remove('opacity-50', 'cursor-not-allowed');
+                    btn.innerText = originalText;
+                }
+            }, 1000);
+        } else {
+            // Handle Laravel Validation Errors
+            let errorMsg = data.message || 'Gagal mengirim OTP.';
+            if (data.errors && data.errors.email) {
+                errorMsg = data.errors.email[0];
+            }
+
+            Swal.fire({
+                icon: 'error',
+                title: 'Gagal',
+                text: errorMsg,
+                confirmButtonColor: '#361f1a'
+            });
+
+            // Re-enable button on error
+            btn.disabled = false;
+            btn.classList.remove('opacity-50', 'cursor-not-allowed');
+            btn.innerText = originalText;
+        }
+    } catch (error) {
+        Swal.fire({
+            icon: 'error',
+            title: 'Kesalahan Sistem',
+            text: 'Terjadi kesalahan saat menghubungi server.',
+            confirmButtonColor: '#361f1a'
+        });
+        // Re-enable button on error
+        btn.disabled = false;
+        btn.classList.remove('opacity-50', 'cursor-not-allowed');
+        btn.innerText = originalText;
+    }
+}
+
 function switchTab(tab) {
     const isPersonnel = (tab === 'personnel');
 

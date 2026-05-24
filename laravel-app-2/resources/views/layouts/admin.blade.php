@@ -554,15 +554,18 @@
                  x-transition:leave-start="opacity-100 scale-100 translate-y-0"
                  x-transition:leave-end="opacity-0 scale-95 translate-y-2"
                  class="absolute right-0 mt-2 w-80 bg-white rounded-2xl shadow-lg border border-outline-variant/30 overflow-hidden z-50">
-                <div class="px-4 py-3 bg-surface-container-lowest border-b border-outline-variant/20 flex items-center justify-between">
-                    <h3 class="font-headline font-bold text-sm text-primary">Notifikasi</h3>
-                    @if($unreadCount > 0)
-                        <span class="bg-primary/10 text-primary text-[0.65rem] font-bold px-2 py-0.5 rounded-full">{{ $unreadCount }} Baru</span>
-                    @endif
-                </div>
+                    <div class="px-4 py-3 border-b border-outline-variant/10 flex justify-between items-center bg-surface-container-low rounded-t-2xl">
+                        <span class="font-bold text-primary text-sm">Notifikasi Baru</span>
+                        @if($unreadCount > 0)
+                        <form action="{{ route('notifications.read_all') }}" method="POST" class="m-0 inline">
+                            @csrf
+                            <button type="submit" class="text-xs font-bold text-secondary hover:text-primary transition-colors">Tandai Semua Dibaca</button>
+                        </form>
+                        @endif
+                    </div>
                 <div class="max-h-80 overflow-y-auto">
                     @forelse($unreadNotifications as $notification)
-                        <a href="{{ route('admin.notifications.read', $notification->id) }}" class="block px-4 py-3 hover:bg-surface-container-low border-b border-outline-variant/10 transition-colors">
+                        <a href="{{ route('notifications.read', $notification->id) }}" class="block px-4 py-3 hover:bg-surface-container-low border-b border-outline-variant/10 transition-colors">
                             <p class="text-xs text-on-surface font-semibold mb-1">{{ $notification->data['message'] ?? 'Ada notifikasi baru' }}</p>
                             <span class="text-[0.65rem] text-outline flex items-center gap-1">
                                 <i class="bi bi-clock"></i> {{ $notification->created_at->diffForHumans() }}

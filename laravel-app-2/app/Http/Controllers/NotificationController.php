@@ -1,8 +1,7 @@
 <?php
 
-namespace App\Http\Controllers\Admin;
+namespace App\Http\Controllers;
 
-use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -13,6 +12,7 @@ class NotificationController extends Controller
      */
     public function markAsRead($id)
     {
+        // Pastikan hanya mencari notifikasi milik user yang sedang login (Mencegah IDOR)
         $notification = Auth::user()->notifications()->find($id);
 
         if ($notification) {
@@ -25,6 +25,15 @@ class NotificationController extends Controller
         }
 
         // Fallback redirect
+        return redirect()->back();
+    }
+
+    /**
+     * Mark all notifications as read for the authenticated user.
+     */
+    public function markAllAsRead(Request $request)
+    {
+        Auth::user()->unreadNotifications->markAsRead();
         return redirect()->back();
     }
 }

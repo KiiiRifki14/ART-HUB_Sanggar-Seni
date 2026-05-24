@@ -74,6 +74,9 @@ class CancellationController extends Controller
                     'status'                  => 'pending',
                     'reason'                  => $request->reason,
                     'digital_acknowledgement' => $request->digital_acknowledgement,
+                    'acknowledged_ip'         => $request->ip(),
+                    'acknowledged_at'         => now(),
+                    'acknowledged_ua'         => $request->userAgent(),
                 ]);
 
                 // 3. Batalkan Booking dan lepaskan ikatan Event

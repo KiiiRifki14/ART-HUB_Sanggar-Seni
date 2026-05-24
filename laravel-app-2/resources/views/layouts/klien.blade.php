@@ -136,7 +136,7 @@
                             <div class="px-4 py-2 border-b border-outline-variant/20 flex justify-between items-center">
                                 <h3 class="font-headline font-bold text-primary text-sm">Notifikasi</h3>
                                 @if(Auth::user()->unreadNotifications->count() > 0)
-                                    <form action="{{ route('klien.notifications.read_all') }}" method="POST" class="m-0">
+                                    <form action="{{ route('notifications.read_all') }}" method="POST" class="m-0">
                                         @csrf
                                         <button type="submit" class="text-[10px] font-label font-bold uppercase tracking-widest text-secondary hover:text-secondary-container">Tandai Dibaca</button>
                                     </form>
@@ -163,6 +163,9 @@
                         <span class="font-label text-xs uppercase tracking-widest text-secondary font-bold">{{ Auth::user()->name }}</span>
                         <span class="font-label text-[0.65rem] text-white/60 uppercase tracking-widest">Portal Klien</span>
                     </div>
+                    <a href="{{ route('klien.profile.edit') }}" class="p-2 rounded-lg text-white/80 hover:text-white hover:bg-white/10 transition-colors" title="Profil">
+                        <i class="bi bi-person-circle text-lg"></i>
+                    </a>
                     <form action="{{ route('logout') }}" method="POST" class="m-0">
                         @csrf
                         <button type="submit" class="p-2 rounded-lg text-white/80 hover:text-white hover:bg-white/10 transition-colors" title="Keluar">
@@ -215,6 +218,10 @@
         <a href="{{ route('klien.bookings.create') }}"
            class="klien-nav-item {{ request()->routeIs('klien.bookings.create') ? 'active' : '' }}">
             <i class="bi bi-calendar-plus-fill"></i>Pesan
+        </a>
+        <a href="{{ route('klien.profile.edit') }}"
+           class="klien-nav-item {{ request()->routeIs('klien.profile.edit') ? 'active' : '' }}">
+            <i class="bi bi-person-circle"></i>Profil
         </a>
         <a href="#" onclick="document.getElementById('klien-logout-form').submit(); return false;"
            class="klien-nav-item danger">

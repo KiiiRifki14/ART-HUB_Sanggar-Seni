@@ -34,11 +34,10 @@ Route::get('/dashboard', function () {
     return redirect()->route('klien.dashboard');
 })->middleware(['auth'])->name('dashboard');
 
-// Profil dari Breeze
+// NOTIFICATIONS GLOBAL
 Route::middleware('auth')->group(function () {
-    Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
-    Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
-    Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destro');
+    Route::get('/notifications/{id}/read', [\App\Http\Controllers\NotificationController::class, 'markAsRead'])->name('notifications.read');
+    Route::post('/notifications/read-all', [\App\Http\Controllers\NotificationController::class, 'markAllAsRead'])->name('notifications.read_all');
 });
 
 // ══════════════════════════════════════════════════════════════════════════
@@ -225,9 +224,6 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
     Route::put('/profile', [\App\Http\Controllers\Admin\AdminProfileController::class, 'update'])->name('profile.update');
     Route::put('/profile/password', [\App\Http\Controllers\Admin\AdminProfileController::class, 'updatePassword'])->name('profile.password');
 
-    // NOTIFICATIONS
-    Route::get('/notifications/{id}/read', [\App\Http\Controllers\Admin\NotificationController::class, 'markAsRead'])->name('notifications.read');
-
 });
 
 // ══════════════════════════════════════════════════════════════════════════
@@ -298,6 +294,7 @@ Route::middleware(['auth', 'role:personel'])->prefix('personnel')->name('personn
         // Profil Mandiri
         Route::get('/profile', [PersonnelProfileController::class, 'edit'])->name('profile.edit');
         Route::post('/profile', [PersonnelProfileController::class, 'update'])->name('profile.update');
+        Route::post('/profile/password', [PersonnelProfileController::class, 'updatePassword'])->name('profile.password');
 
         // Keuangan
         Route::get('/keuangan', [PersonnelFinancialController::class, 'index'])->name('keuangan');
@@ -319,10 +316,10 @@ Route::middleware(['auth', 'role:klien'])->prefix('klien')->name('klien.')->grou
     Route::post('/bookings/{id}/full-proof', [\App\Http\Controllers\Klien\BookingController::class, 'uploadFullProof'])->name('bookings.upload_full_proof');
     Route::post('/bookings/{booking}/feedback', [\App\Http\Controllers\Klien\ClientFeedbackController::class, 'store'])->name('bookings.feedback');
     
-    Route::post('/notifications/read-all', function () {
-        Auth::user()->unreadNotifications->markAsRead();
-        return redirect()->back();
-    })->name('notifications.read_all');
+    // PENGATURAN PROFIL KLIEN
+    Route::get('/profile', [\App\Http\Controllers\Klien\KlienProfileController::class, 'edit'])->name('profile.edit');
+    Route::put('/profile', [\App\Http\Controllers\Klien\KlienProfileController::class, 'update'])->name('profile.update');
+    Route::put('/profile/password', [\App\Http\Controllers\Klien\KlienProfileController::class, 'updatePassword'])->name('profile.password');
 });
 
 // Memuat Rute Login/Register yang dibuat oleh Breeze

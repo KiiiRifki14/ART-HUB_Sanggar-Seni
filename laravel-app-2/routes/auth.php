@@ -15,7 +15,12 @@ Route::middleware('guest')->group(function () {
     Route::get('register', [RegisteredUserController::class, 'create'])
         ->name('register');
 
-    Route::post('register', [RegisteredUserController::class, 'store']);
+    Route::post('register', [RegisteredUserController::class, 'store'])
+        ->middleware('throttle:5,1'); // Batasi registrasi maksimal 5x per menit u/ mencegah spam
+
+    Route::post('send-register-otp', [\App\Http\Controllers\Auth\RegisterOtpController::class, 'send'])
+        ->middleware('throttle:3,1')
+        ->name('otp.register.send');
 
     Route::get('login', [AuthenticatedSessionController::class, 'create'])
         ->name('login');
@@ -26,12 +31,14 @@ Route::middleware('guest')->group(function () {
         ->name('password.request');
 
     Route::post('forgot-password', [PasswordResetLinkController::class, 'store'])
+        ->middleware('throttle:3,1') // Batasi kirim link reset maksimal 3x per menit
         ->name('password.email');
 
-    Route::get('reset-password/{token}', [NewPasswordController::class, 'create'])
-        ->name('password.reset');
+    Route::get('reset-password-otp', [NewPasswordController::class, 'create'])
+        ->name('password.reset.otp.form');
 
-    Route::post('reset-password', [NewPasswordController::class, 'store'])
+    Route::post('reset-password-otp', [NewPasswordController::class, 'store'])
+        ->middleware('throttle:3,1') // Batasi eksekusi reset maksimal 3x per menit
         ->name('password.store');
 });
 

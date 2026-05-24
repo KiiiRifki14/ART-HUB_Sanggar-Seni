@@ -19,9 +19,12 @@ class NewPasswordController extends Controller
     /**
      * Display the password reset view.
      */
-    public function create(Request $request): View
+    public function create(Request $request): View|RedirectResponse
     {
-        return view('auth.reset-password', ['request' => $request]);
+        if (!session()->has('reset_email')) {
+            return redirect()->route('password.request');
+        }
+        return view('auth.reset-password-otp');
     }
 
     /**
@@ -32,32 +35,33 @@ class NewPasswordController extends Controller
     public function store(Request $request): RedirectResponse
     {
         $request->validate([
-            'token' => ['required'],
+            'otp_code' => ['required', 'string', 'size:6'],
             'email' => ['required', 'email'],
             'password' => ['required', 'confirmed', Rules\Password::defaults()],
         ]);
 
-        // Here we will attempt to reset the user's password. If it is successful we
-        // will update the password on an actual user model and persist it to the
-        // database. Otherwise we will parse the error and return the response.
-        $status = Password::reset(
-            $request->only('email', 'password', 'password_confirmation', 'token'),
-            function (User $user) use ($request) {
-                $user->forceFill([
-                    'password' => Hash::make($request->password),
-                    'remember_token' => Str::random(60),
-                ])->save();
+        $user = User::where('email', $request->email)->first();
 
-                event(new PasswordReset($user));
-            }
-        );
+        if (!$user || $user->otp_code !== $request->otp_code) {
+            return back()->withInput($request->only('email'))->withErrors(['otp_code' => 'Kode OTP tidak valid atau email salah.']);
+        }
 
-        // If the password was successfully reset, we will redirect the user back to
-        // the application's home authenticated view. If there is an error we can
-        // redirect them back to where they came from with their error message.
-        return $status == Password::PASSWORD_RESET
-                    ? redirect()->route('login')->with('status', __($status))
-                    : back()->withInput($request->only('email'))
-                        ->withErrors(['email' => __($status)]);
+        if (now()->greaterThan($user->otp_expires_at)) {
+            return back()->withInput($request->only('email'))->withErrors(['otp_code' => 'Kode OTP sudah kedaluwarsa.']);
+        }
+
+        // OTP valid, change password
+        $user->forceFill([
+            'password' => Hash::make($request->password),
+            'remember_token' => Str::random(60),
+            'otp_code' => null,
+            'otp_expires_at' => null,
+        ])->save();
+
+        event(new PasswordReset($user));
+        
+        session()->forget('reset_email');
+
+        return redirect()->route('login')->with('status', 'Password telah berhasil direset. Silakan login.');
     }
 }

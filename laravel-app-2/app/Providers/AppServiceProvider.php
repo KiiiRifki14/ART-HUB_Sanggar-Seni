@@ -22,5 +22,13 @@ class AppServiceProvider extends ServiceProvider
         \Illuminate\Support\Facades\Gate::define('view-financials', function (\App\Models\User $user) {
             return $user->role === 'admin';
         });
+
+        // Set global default password rules
+        \Illuminate\Validation\Rules\Password::defaults(function () {
+            return \Illuminate\Validation\Rules\Password::min(8)
+                ->letters()
+                ->mixedCase()
+                ->numbers();
+        });
     }
 }

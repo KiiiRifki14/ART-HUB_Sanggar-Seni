@@ -29,7 +29,7 @@ class RoleMiddleware
         if (!in_array(Auth::user()->role, $roles)) {
             $userRole = Auth::user()->role;
             $redirectPath = match ($userRole) {
-                'personnel' => '/personnel/dashboard',
+                'personel' => '/personnel/dashboard',
                 'klien' => '/klien/dashboard',
                 default => '/dashboard',
             };

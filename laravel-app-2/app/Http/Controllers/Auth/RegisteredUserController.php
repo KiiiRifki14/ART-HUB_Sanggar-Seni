@@ -36,7 +36,35 @@ class RegisteredUserController extends Controller
             'email' => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:'.User::class],
             'phone' => ['required', 'string', 'max:20', 'regex:/^[0-9\-\+\(\)]+$/'],
             'password' => ['required', 'confirmed', Rules\Password::defaults()],
+            'otp_code' => ['required', 'string', 'size:6'],
         ]);
+
+        $email = $request->email;
+        $cacheKey = 'register_otp:' . $email;
+        $attemptsKey = 'register_otp_attempts:' . $email;
+
+        $cachedOtp = \Illuminate\Support\Facades\Cache::get($cacheKey);
+
+        if (!$cachedOtp) {
+            return back()->withInput()->withErrors(['otp_code' => 'Kode OTP tidak valid atau sudah kedaluwarsa. Silakan minta ulang.']);
+        }
+
+        if ($cachedOtp !== $request->otp_code) {
+            $attempts = \Illuminate\Support\Facades\Cache::get($attemptsKey, 0) + 1;
+            \Illuminate\Support\Facades\Cache::put($attemptsKey, $attempts, now()->addMinutes(15));
+
+            if ($attempts >= 5) {
+                \Illuminate\Support\Facades\Cache::forget($cacheKey);
+                \Illuminate\Support\Facades\Cache::forget($attemptsKey);
+                return back()->withInput()->withErrors(['otp_code' => 'Terlalu banyak percobaan salah. Kode OTP telah hangus, silakan minta kode baru.']);
+            }
+
+            return back()->withInput()->withErrors(['otp_code' => 'Kode OTP salah. Sisa percobaan: ' . (5 - $attempts)]);
+        }
+
+        // OTP Valid, clear cache
+        \Illuminate\Support\Facades\Cache::forget($cacheKey);
+        \Illuminate\Support\Facades\Cache::forget($attemptsKey);
         
         $role = $request->role === 'personnel' ? 'personel' : 'klien';
 
@@ -47,6 +75,7 @@ class RegisteredUserController extends Controller
             'phone' => strip_tags($request->phone),
             'password' => Hash::make($request->password),
             'role' => $role,
+            'email_verified_at' => now(), // Verifikasi email langsung sukses
         ]);
 
         if ($role === 'personel') {
@@ -66,11 +95,12 @@ class RegisteredUserController extends Controller
 
         event(new Registered($user));
 
+        Auth::login($user);
+
         if ($role === 'personel') {
-            Auth::login($user);
             return redirect()->route('personnel.pending');
         }
 
-        return redirect()->route('login')->with('status', 'Account created successfully! Please login.');
+        return redirect()->route('dashboard');
     }
 }

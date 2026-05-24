@@ -194,7 +194,7 @@
                     <div class="relative">
                         <input type="password" id="new_password" name="password" required
                                class="w-full bg-surface-container-low border border-outline-variant/50 rounded-xl px-4 py-3 font-body text-sm text-on-surface focus:outline-none focus:border-secondary focus:ring-1 focus:ring-secondary transition-colors"
-                               placeholder="Minimal 8 karakter">
+                               placeholder="Min. 8 karakter (A-a-1)">
                         <button type="button" onclick="togglePassword('new_password', this)" class="absolute inset-y-0 right-0 px-4 flex items-center text-outline hover:text-secondary transition-colors" title="Lihat Password">
                             <i class="bi bi-eye-slash-fill"></i>
                         </button>
