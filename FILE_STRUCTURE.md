@@ -36,6 +36,7 @@ laravel-app-2/
       - 📄 [CostumeController.php](file:///d:/ART-HUB_Sanggar%20Seni/laravel-app-2/app/Http/Controllers/Admin/CostumeController.php)
       - 📄 [EventController.php](file:///d:/ART-HUB_Sanggar%20Seni/laravel-app-2/app/Http/Controllers/Admin/EventController.php)
       - 📄 [FinancialController.php](file:///d:/ART-HUB_Sanggar%20Seni/laravel-app-2/app/Http/Controllers/Admin/FinancialController.php)
+      - 📄 [NotificationController.php](file:///d:/ART-HUB_Sanggar%20Seni/laravel-app-2/app/Http/Controllers/Admin/NotificationController.php)
       - 📄 [PaymentController.php](file:///d:/ART-HUB_Sanggar%20Seni/laravel-app-2/app/Http/Controllers/Admin/PaymentController.php)
       - 📄 [PersonnelController.php](file:///d:/ART-HUB_Sanggar%20Seni/laravel-app-2/app/Http/Controllers/Admin/PersonnelController.php)
       - 📄 [RehearsalController.php](file:///d:/ART-HUB_Sanggar%20Seni/laravel-app-2/app/Http/Controllers/Admin/RehearsalController.php)
@@ -52,6 +53,7 @@ laravel-app-2/
       - 📄 [VerifyEmailController.php](file:///d:/ART-HUB_Sanggar%20Seni/laravel-app-2/app/Http/Controllers/Auth/VerifyEmailController.php)
     - 📂 **Klien**
       - 📄 [BookingController.php](file:///d:/ART-HUB_Sanggar%20Seni/laravel-app-2/app/Http/Controllers/Klien/BookingController.php)
+      - 📄 [ClientFeedbackController.php](file:///d:/ART-HUB_Sanggar%20Seni/laravel-app-2/app/Http/Controllers/Klien/ClientFeedbackController.php)
     - 📂 **Personnel**
       - 📄 [AttendanceController.php](file:///d:/ART-HUB_Sanggar%20Seni/laravel-app-2/app/Http/Controllers/Personnel/AttendanceController.php)
       - 📄 [FinancialController.php](file:///d:/ART-HUB_Sanggar%20Seni/laravel-app-2/app/Http/Controllers/Personnel/FinancialController.php)
@@ -70,6 +72,7 @@ laravel-app-2/
 - 📂 **Models**
   - 📄 [Booking.php](file:///d:/ART-HUB_Sanggar%20Seni/laravel-app-2/app/Models/Booking.php)
   - 📄 [Cancellation.php](file:///d:/ART-HUB_Sanggar%20Seni/laravel-app-2/app/Models/Cancellation.php)
+  - 📄 [ClientFeedback.php](file:///d:/ART-HUB_Sanggar%20Seni/laravel-app-2/app/Models/ClientFeedback.php)
   - 📄 [CostumeRental.php](file:///d:/ART-HUB_Sanggar%20Seni/laravel-app-2/app/Models/CostumeRental.php)
   - 📄 [CostumeUsage.php](file:///d:/ART-HUB_Sanggar%20Seni/laravel-app-2/app/Models/CostumeUsage.php)
   - 📄 [CostumeVendor.php](file:///d:/ART-HUB_Sanggar%20Seni/laravel-app-2/app/Models/CostumeVendor.php)
