@@ -21,7 +21,7 @@ use App\Http\Controllers\ProfileController;
 Route::get('/', function () {
     $contents = \App\Models\SiteContent::pluck('value', 'key')->toArray();
     $personnels = \App\Models\Personnel::with('user')->where('is_active', true)->get();
-    $catalogs = \App\Models\ServiceCatalog::where('is_active', true)->orderBy('sort_order')->orderBy('id')->get();
+    $catalogs = \App\Models\ServiceCatalog::where('is_active', true)->orderBy('sort_order')->orderBy('id')->paginate(6);
     return view('welcome', compact('contents', 'personnels', 'catalogs'));
 });
 

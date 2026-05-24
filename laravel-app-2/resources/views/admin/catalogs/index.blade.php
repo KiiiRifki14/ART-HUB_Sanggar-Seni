@@ -45,6 +45,7 @@
                         <th class="text-left px-5 py-3.5 font-label text-[0.65rem] uppercase tracking-widest text-outline font-bold">Gambar</th>
                         <th class="text-left px-5 py-3.5 font-label text-[0.65rem] uppercase tracking-widest text-outline font-bold">Nama Paket</th>
                         <th class="text-left px-5 py-3.5 font-label text-[0.65rem] uppercase tracking-widest text-outline font-bold">Harga</th>
+                        <th class="text-left px-5 py-3.5 font-label text-[0.65rem] uppercase tracking-widest text-outline font-bold">Rating</th>
                         <th class="text-left px-5 py-3.5 font-label text-[0.65rem] uppercase tracking-widest text-outline font-bold">Badge</th>
                         <th class="text-center px-5 py-3.5 font-label text-[0.65rem] uppercase tracking-widest text-outline font-bold">Tampil</th>
                         <th class="text-center px-5 py-3.5 font-label text-[0.65rem] uppercase tracking-widest text-outline font-bold">Aksi</th>
@@ -72,6 +73,12 @@
                         </td>
                         <td class="px-5 py-4">
                             <span class="font-headline font-bold text-sm text-primary">{{ $catalog->price_formatted }}</span>
+                        </td>
+                        <td class="px-5 py-4">
+                            <div class="flex items-center gap-1 font-headline font-bold text-sm {{ $catalog->average_rating > 0 ? 'text-secondary' : 'text-outline-variant' }}">
+                                <i class="bi bi-star-fill text-xs"></i>
+                                <span>{{ $catalog->average_rating > 0 ? $catalog->average_rating : '-' }}</span>
+                            </div>
                         </td>
                         <td class="px-5 py-4">
                             @if($catalog->badge)
@@ -138,6 +145,10 @@
                 <p class="font-headline font-bold text-primary text-sm truncate">{{ $catalog->name }}</p>
                 <p class="font-headline font-bold text-secondary text-sm">{{ $catalog->price_formatted }}</p>
             </div>
+            <div class="flex items-center gap-1 mr-2 font-headline font-bold text-sm {{ $catalog->average_rating > 0 ? 'text-secondary' : 'text-outline-variant' }}">
+                <i class="bi bi-star-fill text-xs"></i>
+                <span>{{ $catalog->average_rating > 0 ? $catalog->average_rating : '-' }}</span>
+            </div>
             <button type="button" onclick="toggleCatalog(this)"
                     data-url="{{ route('admin.catalogs.toggle', $catalog->id) }}"
                     data-active="{{ $catalog->is_active ? '1' : '0' }}"
@@ -169,6 +180,12 @@
     <i class="bi bi-info-circle-fill text-secondary flex-shrink-0 mt-0.5"></i>
     <p>Katalog yang ditampilkan di landing page hanya yang <strong>status tampilnya aktif (hijau)</strong>. Urutan tampil diatur via kolom <strong>#</strong> (sort order) di form edit.</p>
 </div>
+
+@if($catalogs->hasPages())
+<div class="mt-6 mb-8">
+    {{ $catalogs->links() }}
+</div>
+@endif
 
 @push('scripts')
 <script>

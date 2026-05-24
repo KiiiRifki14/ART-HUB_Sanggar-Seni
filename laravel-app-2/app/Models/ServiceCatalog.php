@@ -51,4 +51,16 @@ class ServiceCatalog extends Model
     {
         return $this->hasMany(Booking::class);
     }
+
+    /**
+     * Hitung rata-rata rating dari feedback klien
+     */
+    public function getAverageRatingAttribute(): float
+    {
+        $avg = \App\Models\ClientFeedback::whereHas('booking', function ($q) {
+            $q->where('service_catalog_id', $this->id);
+        })->avg('rating');
+
+        return $avg ? round((float) $avg, 1) : 0.0;
+    }
 }

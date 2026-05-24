@@ -173,6 +173,13 @@ html { scroll-behavior: smooth; }
         </div>
         <div class="p-6 flex flex-col flex-grow">
           <h3 class="font-headline text-xl text-primary font-semibold mb-2">{{ $svc->name }}</h3>
+          @if($svc->average_rating > 0)
+          <div class="flex items-center gap-1.5 mb-3">
+            <i class="bi bi-star-fill text-sm text-secondary-container"></i>
+            <span class="font-headline font-bold text-sm text-secondary">{{ $svc->average_rating }}</span>
+            <span class="text-[0.65rem] font-label uppercase tracking-widest text-outline-variant ml-1">Dari Klien</span>
+          </div>
+          @endif
           <p class="text-sm text-on-surface-variant leading-relaxed mb-5 flex-grow">{{ $svc->description }}</p>
           <div class="border-t border-outline-variant/20 pt-4 flex items-center justify-between">
             <div>
@@ -193,6 +200,11 @@ html { scroll-behavior: smooth; }
       </div>
       @endforelse
     </div>
+    @if($catalogs->hasPages())
+    <div class="mt-12 flex justify-center w-full overflow-x-auto pb-4">
+      {{ $catalogs->fragment('katalog')->links() }}
+    </div>
+    @endif
   </div>
 </section>
 

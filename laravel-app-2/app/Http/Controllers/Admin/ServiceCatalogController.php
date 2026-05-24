@@ -11,7 +11,7 @@ class ServiceCatalogController extends Controller
 {
     public function index()
     {
-        $catalogs = ServiceCatalog::orderBy('sort_order')->orderBy('id')->get();
+        $catalogs = ServiceCatalog::orderBy('sort_order')->orderBy('id')->paginate(10);
         return view('admin.catalogs.index', compact('catalogs'));
     }
 
