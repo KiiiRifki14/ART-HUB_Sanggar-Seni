@@ -1,4 +1,4 @@
-﻿
+
 <!DOCTYPE html>
 <html lang="id">
 <head>
@@ -46,8 +46,11 @@ html { scroll-behavior: smooth; }
 {{-- ═══════ NAVBAR ═══════ --}}
 <header class="fixed top-0 left-0 right-0 z-50 bg-surface/90 backdrop-blur-md border-b border-outline-variant/20 shadow-sm">
   <div class="max-w-7xl mx-auto px-5 h-16 flex items-center justify-between">
-    <a href="#" class="font-headline font-bold text-xl text-primary tracking-tight">
-      <span class="text-secondary">{{ $contents["sanggar_name"] ?? "Cahaya" }}</span>
+    <a href="#" class="font-headline font-bold text-xl text-primary tracking-tight flex items-center gap-3">
+      @if(!empty($contents['sanggar_logo']))
+        <img src="{{ asset('storage/'.$contents['sanggar_logo']) }}" alt="Logo" class="h-9 w-auto object-contain">
+      @endif
+      <span class="text-secondary">{{ $contents["sanggar_name"] ?? "Cahaya Gumilang" }}</span>
     </a>
     <nav class="hidden md:flex items-center gap-7">
       <a href="#profil" class="nav-link text-on-surface-variant hover:text-secondary">Profil</a>
@@ -271,10 +274,15 @@ html { scroll-behavior: smooth; }
 <footer class="bg-surface py-16 px-6 lg:px-10 border-t border-outline-variant/20">
   <div class="max-w-7xl mx-auto">
     <div class="grid sm:grid-cols-2 md:grid-cols-4 gap-10 pb-12 border-b border-outline-variant/20">
-      <div class="md:col-span-2">
-        <h3 class="font-headline text-2xl text-primary font-bold mb-3">{{ $contents["sanggar_name"] ?? "Cahaya Gumilang" }}</h3>
-        <p class="text-on-surface-variant text-sm leading-relaxed max-w-xs">{{ $contents["footer_tagline"] ?? "Pusat pelestarian dan pengembangan seni budaya tradisional Indonesia." }}</p>
-      </div>
+        <div class="md:col-span-2">
+          <div class="flex items-center gap-3 mb-3">
+            @if(!empty($contents['sanggar_logo']))
+              <img src="{{ asset('storage/'.$contents['sanggar_logo']) }}" alt="Logo" class="h-10 w-auto object-contain">
+            @endif
+            <h3 class="font-headline text-2xl text-primary font-bold">{{ $contents["sanggar_name"] ?? "Cahaya Gumilang" }}</h3>
+          </div>
+          <p class="text-on-surface-variant text-sm leading-relaxed max-w-xs">{{ $contents["footer_tagline"] ?? "Pusat pelestarian dan pengembangan seni budaya tradisional Indonesia." }}</p>
+        </div>
       <div>
         <h4 class="font-label text-xs font-bold uppercase tracking-widest text-primary mb-5">Navigasi</h4>
         <ul class="space-y-3 text-sm text-on-surface-variant">

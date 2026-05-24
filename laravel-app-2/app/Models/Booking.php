@@ -61,4 +61,12 @@ class Booking extends Model
     // {
     //     return $this->hasOne(ClientFeedback::class);
     // }
+
+    /**
+     * Cek apakah DP sudah diverifikasi (ada pembayaran DP)
+     */
+    public function isDpVerified(): bool
+    {
+        return !is_null($this->dp_paid_at) && $this->dp_amount > 0;
+    }
 }

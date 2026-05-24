@@ -36,7 +36,7 @@ class EventController extends Controller
             $query->where('status', $filter);
         }
 
-        $bookings = $query->get();
+        $bookings = $query->paginate(6)->withQueryString();
 
         // Summary counts (Sekarang logis karena menggunakan base Booking)
         $summary = [

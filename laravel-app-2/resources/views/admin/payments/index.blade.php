@@ -112,8 +112,8 @@
                         <span class="inline-block px-2 py-0.5 rounded border border-outline-variant/30 bg-surface-container font-label text-[0.6rem] font-bold uppercase tracking-wider text-outline">PENDING DP</span>
                     @elseif(in_array($booking->status, ['dp_paid', 'confirmed']) && !\Carbon\Carbon::parse($booking->event_date)->isPast())
                         <span class="inline-block px-2 py-0.5 rounded border border-blue-500/20 bg-blue-500/10 font-label text-[0.6rem] font-bold uppercase tracking-wider text-blue-600">DP PAID</span>
-                    @elseif(in_array($booking->status, ['completed', 'dp_paid', 'confirmed']) && !$isLunas)
-                        {{-- Event sudah selesai atau status belum lunas, tampilkan aksi pelunasan --}}
+                    @elseif(in_array($booking->status, ['completed', 'dp_paid', 'confirmed']) && !$isLunas && $booking->isDpVerified())
+                        {{-- Event sudah selesai, belum lunas, dan DP sudah diverifikasi --}}
                         @if($booking->full_payment_proof && strpos($booking->full_payment_proof, 'CASH_OFFLINE') === false)
                             <div class="flex flex-col gap-1.5">
                                 <a href="{{ asset('storage/' . $booking->full_payment_proof) }}" target="_blank" class="w-full text-center py-1 rounded bg-blue-50 text-blue-600 border border-blue-200 font-label text-[0.6rem] font-bold uppercase tracking-wider hover:bg-blue-100 transition-colors">Lihat Bukti</a>
@@ -223,7 +223,7 @@
                     <div class="font-headline font-bold text-xs {{ $isOverdue ? 'text-red-600' : 'text-primary' }}">Rp {{ $sisaFormatted }}</div>
                 </div>
             </div>
-            @if(!$isLunas && $booking->status !== 'cancelled' && (in_array($booking->status, ['completed', 'dp_paid', 'confirmed'])))
+            @if(!$isLunas && $booking->status !== 'cancelled' && (in_array($booking->status, ['completed', 'dp_paid', 'confirmed'])) && $booking->isDpVerified())
             <button type="button" 
                     class="btn-tandai-lunas w-full flex items-center justify-center gap-1.5 py-2 rounded-lg border border-green-500 text-green-600 hover:bg-green-500 hover:text-white transition-all font-label text-[0.65rem] font-bold uppercase tracking-wider"
                     data-booking-id="{{ $booking->id }}"

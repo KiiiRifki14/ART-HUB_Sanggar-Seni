@@ -24,26 +24,26 @@
 @endphp
 
 {{-- Stat Cards --}}
-<div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-    <div class="bg-surface-container-lowest rounded-xl p-5 border border-outline-variant/30 shadow-[0_8px_20px_rgba(54,31,26,0.03)] text-center">
-        <i class="bi bi-receipt-cutoff text-2xl text-secondary mb-2 block"></i>
-        <div class="font-headline text-3xl font-bold text-primary mb-1">{{ $total }}</div>
-        <div class="font-label text-[0.65rem] uppercase tracking-widest text-outline font-bold">Total Booking</div>
+<div class="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4 mb-6 md:mb-8">
+    <div class="bg-surface-container-lowest rounded-xl p-3 md:p-5 border border-outline-variant/30 shadow-[0_8px_20px_rgba(54,31,26,0.03)] text-center">
+        <i class="bi bi-receipt-cutoff text-xl md:text-2xl text-secondary mb-1 md:mb-2 block"></i>
+        <div class="font-headline text-xl md:text-3xl font-bold text-primary mb-0.5 md:mb-1">{{ $total }}</div>
+        <div class="font-label text-[0.55rem] md:text-[0.65rem] uppercase tracking-widest text-outline font-bold">Total Booking</div>
     </div>
-    <div class="bg-surface-container-lowest rounded-xl p-5 border border-orange-500/20 shadow-[0_8px_20px_rgba(54,31,26,0.03)] text-center">
-        <i class="bi bi-hourglass-split text-2xl text-orange-500 mb-2 block"></i>
-        <div class="font-headline text-3xl font-bold text-orange-600 mb-1">{{ $pending }}</div>
-        <div class="font-label text-[0.65rem] uppercase tracking-widest text-outline font-bold">Menunggu DP</div>
+    <div class="bg-surface-container-lowest rounded-xl p-3 md:p-5 border border-orange-500/20 shadow-[0_8px_20px_rgba(54,31,26,0.03)] text-center">
+        <i class="bi bi-hourglass-split text-xl md:text-2xl text-orange-500 mb-1 md:mb-2 block"></i>
+        <div class="font-headline text-xl md:text-3xl font-bold text-orange-600 mb-0.5 md:mb-1">{{ $pending }}</div>
+        <div class="font-label text-[0.55rem] md:text-[0.65rem] uppercase tracking-widest text-outline font-bold">Menunggu DP</div>
     </div>
-    <div class="bg-surface-container-lowest rounded-xl p-5 border border-secondary/20 shadow-[0_8px_20px_rgba(54,31,26,0.03)] text-center">
-        <i class="bi bi-lock-fill text-2xl text-secondary mb-2 block"></i>
-        <div class="font-headline text-3xl font-bold text-secondary mb-1">{{ $dpPaid }}</div>
-        <div class="font-label text-[0.65rem] uppercase tracking-widest text-outline font-bold">Laba Terkunci</div>
+    <div class="bg-surface-container-lowest rounded-xl p-3 md:p-5 border border-secondary/20 shadow-[0_8px_20px_rgba(54,31,26,0.03)] text-center">
+        <i class="bi bi-lock-fill text-xl md:text-2xl text-secondary mb-1 md:mb-2 block"></i>
+        <div class="font-headline text-xl md:text-3xl font-bold text-secondary mb-0.5 md:mb-1">{{ $dpPaid }}</div>
+        <div class="font-label text-[0.55rem] md:text-[0.65rem] uppercase tracking-widest text-outline font-bold">Laba Terkunci</div>
     </div>
-    <div class="bg-surface-container-lowest rounded-xl p-5 border border-green-500/20 shadow-[0_8px_20px_rgba(54,31,26,0.03)] text-center">
-        <i class="bi bi-check-circle-fill text-2xl text-green-500 mb-2 block"></i>
-        <div class="font-headline text-3xl font-bold text-green-600 mb-1">{{ $done }}</div>
-        <div class="font-label text-[0.65rem] uppercase tracking-widest text-outline font-bold">Selesai</div>
+    <div class="bg-surface-container-lowest rounded-xl p-3 md:p-5 border border-green-500/20 shadow-[0_8px_20px_rgba(54,31,26,0.03)] text-center">
+        <i class="bi bi-check-circle-fill text-xl md:text-2xl text-green-500 mb-1 md:mb-2 block"></i>
+        <div class="font-headline text-xl md:text-3xl font-bold text-green-600 mb-0.5 md:mb-1">{{ $done }}</div>
+        <div class="font-label text-[0.55rem] md:text-[0.65rem] uppercase tracking-widest text-outline font-bold">Selesai</div>
     </div>
 </div>
 
@@ -57,12 +57,12 @@
 </div>
 
 {{-- Filter Tabs --}}
-<div class="flex gap-2 flex-wrap mb-4" id="filter-tabs">
+<div class="flex gap-1.5 sm:gap-2 overflow-x-auto whitespace-nowrap scrollbar-none pb-1.5 -mx-4 px-4 md:flex-wrap md:mx-0 md:px-0 mb-4" id="filter-tabs">
     @php
         $tabs = ['all'=>"Semua ({$total})",'pending'=>"Pending ({$pending})",'dp_paid'=>"DP Dibayar ({$dpPaid})",'completed'=>"Selesai ({$done})",'cancelled'=>"Batal ({$canceled})"];
     @endphp
     @foreach($tabs as $key => $label)
-    <button class="px-4 py-2 rounded-lg font-label text-xs font-bold uppercase tracking-widest transition-all border filter-tab {{ $key === 'all' ? 'bg-primary text-white border-primary shadow-sm' : 'bg-surface-container-lowest text-on-surface-variant border-outline-variant/30 hover:border-primary/40 hover:text-primary' }}"
+    <button class="flex-shrink-0 px-2 py-1 sm:px-3 sm:py-1.5 md:px-4 md:py-2 rounded-lg font-label text-[0.52rem] sm:text-[0.6rem] md:text-xs font-bold uppercase tracking-widest transition-all border filter-tab {{ $key === 'all' ? 'bg-primary text-white border-primary shadow-sm' : 'bg-surface-container-lowest text-on-surface-variant border-outline-variant/30 hover:border-primary/40 hover:text-primary' }}"
             onclick="filterBooking('{{ $key }}', this)">
         {{ $label }}
     </button>
@@ -145,7 +145,7 @@
 </div>
 
 {{-- ════ MOBILE CARDS (Mobile only) ════ --}}
-<div class="md:hidden space-y-3" id="booking-tbody-mobile">
+<div class="md:hidden space-y-2" id="booking-tbody-mobile">
     @forelse($bookings as $booking)
     @php
         [$stLabel, $stClass] = $statusMap[$booking->status] ?? [strtoupper($booking->status), 'bg-surface-container text-outline border-outline-variant/30'];
@@ -153,59 +153,59 @@
     @endphp
     <div data-status="{{ $booking->status }}" class="bg-surface-container-lowest rounded-xl border border-outline-variant/30 shadow-sm overflow-hidden">
         {{-- Card Header --}}
-        <div class="flex items-center justify-between px-4 py-3 bg-surface-container-low border-b border-outline-variant/20">
-            <span class="inline-block px-2.5 py-1 rounded bg-secondary-container/40 text-on-secondary-container border border-secondary/20 font-label text-[0.65rem] font-bold tracking-wider">#{{ str_pad($booking->id, 4, '0', STR_PAD_LEFT) }}</span>
-            <span class="inline-block px-2.5 py-1 rounded border font-label text-[0.6rem] font-bold uppercase tracking-wider {{ $stClass }}">{{ $stLabel }}</span>
+        <div class="flex items-center justify-between px-2.5 py-1.5 bg-surface-container-low border-b border-outline-variant/20">
+            <span class="inline-block px-1.5 py-0.5 rounded bg-secondary-container/40 text-on-secondary-container border border-secondary/20 font-label text-[0.52rem] font-bold tracking-wider">#{{ str_pad($booking->id, 4, '0', STR_PAD_LEFT) }}</span>
+            <span class="inline-block px-1.5 py-0.5 rounded border font-label text-[0.5rem] font-bold uppercase tracking-wider {{ $stClass }}">{{ $stLabel }}</span>
         </div>
         {{-- Card Body --}}
-        <div class="px-4 py-3 space-y-2.5">
-            <div class="flex justify-between items-start">
+        <div class="px-2.5 py-2 space-y-1.5">
+            <div class="flex justify-between items-start gap-2">
                 <div>
-                    <div class="font-body font-bold text-sm text-on-surface">{{ $booking->client_name ?? ($booking->client->name ?? 'Klien Manual') }}</div>
-                    <div class="font-label text-[0.65rem] text-outline">{{ $booking->client_phone ?? '—' }}</div>
+                    <div class="font-body font-bold text-[0.7rem] sm:text-xs text-on-surface leading-tight">{{ $booking->client_name ?? ($booking->client->name ?? 'Klien Manual') }}</div>
+                    <div class="font-label text-[0.55rem] sm:text-[0.6rem] text-outline mt-0.5">{{ $booking->client_phone ?? '—' }}</div>
                 </div>
-                <div class="text-right">
-                    <div class="font-label text-[0.6rem] uppercase tracking-widest text-outline">Tanggal</div>
-                    <div class="font-body text-xs font-bold text-on-surface">{{ \Carbon\Carbon::parse($booking->event_date)->format('d M Y') }}</div>
+                <div class="text-right flex-shrink-0">
+                    <div class="font-label text-[0.45rem] uppercase tracking-widest text-outline">Tanggal</div>
+                    <div class="font-body text-[0.65rem] font-bold text-on-surface">{{ \Carbon\Carbon::parse($booking->event_date)->format('d M Y') }}</div>
                 </div>
             </div>
-            <div class="flex items-center gap-1.5 font-label text-[0.65rem] text-on-surface-variant">
+            <div class="flex items-center gap-1 font-label text-[0.55rem] text-on-surface-variant">
                 <i class="bi bi-calendar-event text-secondary"></i>
-                <span class="capitalize font-bold">{{ $booking->event_type }}</span>
+                <span class="capitalize font-bold">{{ str_replace('_', ' ', $booking->event_type) }}</span>
                 <span class="text-outline">•</span>
                 <span>{{ $booking->created_at->format('d M Y') }}</span>
             </div>
-            <div class="grid grid-cols-2 gap-2">
-                <div class="bg-surface-container rounded-lg p-2.5">
-                    <div class="font-label text-[0.55rem] uppercase tracking-widest text-outline mb-0.5">Kontrak</div>
-                    <div class="font-headline font-bold text-sm text-primary">Rp {{ number_format($booking->total_price, 0, ',', '.') }}</div>
+            <div class="grid grid-cols-2 gap-1.5">
+                <div class="bg-surface-container rounded-lg p-1.5">
+                    <div class="font-label text-[0.42rem] uppercase tracking-widest text-outline mb-0.5">Kontrak</div>
+                    <div class="font-headline font-bold text-[0.68rem] text-primary">Rp {{ number_format($booking->total_price, 0, ',', '.') }}</div>
                 </div>
-                <div class="bg-surface-container rounded-lg p-2.5">
-                    <div class="font-label text-[0.55rem] uppercase tracking-widest text-outline mb-0.5">DP</div>
-                    <div class="font-headline font-bold text-sm text-secondary">Rp {{ number_format($booking->dp_amount, 0, ',', '.') }}</div>
-                    @if(!$booking->dp_paid_at)<div class="font-label text-[0.55rem] text-orange-500 font-bold">Belum bayar</div>@endif
+                <div class="bg-surface-container rounded-lg p-1.5">
+                    <div class="font-label text-[0.42rem] uppercase tracking-widest text-outline mb-0.5">DP</div>
+                    <div class="font-headline font-bold text-[0.68rem] text-secondary">Rp {{ number_format($booking->dp_amount, 0, ',', '.') }}</div>
+                    @if(!$booking->dp_paid_at)<div class="font-label text-[0.42rem] text-orange-500 font-bold">Belum bayar</div>@endif
                 </div>
             </div>
             @if($booking->status === 'pending' && $daysLeft <= 7 && $daysLeft >= 0)
-            <div class="font-label text-[0.6rem] text-red-500 font-bold flex items-center gap-1"><i class="bi bi-exclamation-triangle-fill"></i> Acara H-{{ $daysLeft }} — segera tindak lanjuti!</div>
+            <div class="font-label text-[0.5rem] text-red-500 font-bold flex items-center gap-1"><i class="bi bi-exclamation-triangle-fill"></i> Acara H-{{ $daysLeft }}</div>
             @endif
         </div>
         {{-- Card Footer --}}
-        <div class="px-4 py-3 border-t border-outline-variant/20 bg-surface-container-low/30 flex gap-2">
-            <a href="{{ route('admin.bookings.show', $booking->id) }}" class="flex-1 flex items-center justify-center gap-1.5 py-2 rounded-lg bg-primary text-white font-label text-[0.65rem] font-bold uppercase tracking-widest hover:bg-primary-container transition-colors">
-                <i class="bi bi-eye-fill"></i> Detail
+        <div class="px-2.5 py-1.5 border-t border-outline-variant/20 bg-surface-container-low/30 flex gap-2">
+            <a href="{{ route('admin.bookings.show', $booking->id) }}" class="flex-1 flex items-center justify-center gap-1 py-1 rounded-lg bg-primary text-white font-label text-[0.55rem] font-bold uppercase tracking-widest hover:bg-primary-container transition-colors">
+                <i class="bi bi-eye-fill text-[0.65rem]"></i> Detail
             </a>
             @if($booking->status === 'pending')
-            <button type="button" onclick="openKunciModal({{ $booking->id }}, '{{ addslashes($booking->client_name) }}', {{ $booking->total_price }}, {{ $booking->dp_amount }})" class="flex-1 flex items-center justify-center gap-1.5 py-2 rounded-lg bg-secondary/10 border border-secondary/30 text-secondary font-label text-[0.65rem] font-bold uppercase tracking-widest hover:bg-secondary hover:text-white transition-colors">
-                <i class="bi bi-lock-fill"></i> Kunci DP
+            <button type="button" onclick="openKunciModal({{ $booking->id }}, '{{ addslashes($booking->client_name) }}', {{ $booking->total_price }}, {{ $booking->dp_amount }})" class="flex-1 flex items-center justify-center gap-1 py-1 rounded-lg bg-secondary/10 border border-secondary/30 text-secondary font-label text-[0.55rem] font-bold uppercase tracking-widest hover:bg-secondary hover:text-white transition-colors">
+                <i class="bi bi-lock-fill text-[0.65rem]"></i> Kunci DP
             </button>
             @endif
         </div>
     </div>
     @empty
-    <div class="py-16 flex flex-col items-center justify-center bg-surface-container-lowest border border-outline-variant/30 border-dashed rounded-xl">
-        <i class="bi bi-inbox text-4xl text-outline mb-3"></i>
-        <p class="font-headline text-base text-on-surface font-semibold">Belum ada data booking</p>
+    <div class="py-12 flex flex-col items-center justify-center bg-surface-container-lowest border border-outline-variant/30 border-dashed rounded-xl">
+        <i class="bi bi-inbox text-3xl text-outline mb-2"></i>
+        <p class="font-headline text-sm text-on-surface font-semibold">Belum ada data booking</p>
     </div>
     @endforelse
 </div>
@@ -413,7 +413,7 @@ function filterBooking(status, btn) {
     btn.classList.add('bg-primary','text-white','border-primary','shadow-sm');
     btn.classList.remove('bg-surface-container-lowest','text-on-surface-variant','border-outline-variant/30');
 
-    document.querySelectorAll('#booking-tbody tr[data-status]').forEach(row => {
+    document.querySelectorAll('#booking-tbody tr[data-status], #booking-tbody-mobile [data-status]').forEach(row => {
         const s = row.dataset.status;
         const show = status === 'all'
             || s === status

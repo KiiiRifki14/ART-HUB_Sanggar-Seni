@@ -51,6 +51,39 @@ class CostumeController extends Controller
             ->with('success', 'Aset Sanggar baru berhasil ditambahkan!');
     }
 
+    public function editAsset(\App\Models\SanggarCostume $costume)
+    {
+        return view('admin.costumes.edit-asset', compact('costume'));
+    }
+
+    public function updateAsset(Request $request, \App\Models\SanggarCostume $costume)
+    {
+        $request->validate([
+            'name'      => 'required|string|max:255',
+            'category'  => 'required|string|max:100',
+            'quantity'  => 'required|integer|min:1',
+            'condition' => 'required|in:good,damaged,maintenance',
+        ]);
+
+        $costume->update([
+            'name'      => $request->name,
+            'category'  => $request->category,
+            'quantity'  => $request->quantity,
+            'condition' => $request->condition,
+        ]);
+
+        return redirect()->route('admin.costumes.index')
+            ->with('success', 'Aset Sanggar berhasil diperbarui!');
+    }
+
+    public function destroyAsset(\App\Models\SanggarCostume $costume)
+    {
+        $costume->delete();
+
+        return redirect()->route('admin.costumes.index')
+            ->with('success', 'Aset Sanggar berhasil dihapus!');
+    }
+
     // ==========================================
     // BAGIAN 2: SEWA VENDOR EKSTERNAL
     // ==========================================

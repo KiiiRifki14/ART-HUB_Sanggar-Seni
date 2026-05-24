@@ -163,6 +163,9 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
     Route::post('/costume-rentals/{rental}/return', [CostumeController::class, 'returnVendorRental'])->name('costumes.rental.return');
     Route::get('/costumes/create-asset', [CostumeController::class, 'createAsset'])->name('costumes.create-asset');
     Route::post('/costumes/store-asset', [CostumeController::class, 'storeAsset'])->name('costumes.store-asset');
+    Route::get('/costumes/{costume}/edit-asset', [CostumeController::class, 'editAsset'])->name('costumes.edit-asset');
+    Route::put('/costumes/{costume}/update-asset', [CostumeController::class, 'updateAsset'])->name('costumes.update-asset');
+    Route::delete('/costumes/{costume}/destroy-asset', [CostumeController::class, 'destroyAsset'])->name('costumes.destroy-asset');
     // Rute API untuk Tambah Vendor (AJAX)
     Route::post('/costumes/vendor/api', [CostumeController::class, 'storeVendorApi'])->name('costumes.store-vendor-api');
 
@@ -216,6 +219,11 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
     // KATALOG JASA
     Route::resource('catalogs', ServiceCatalogController::class)->except(['show']);
     Route::patch('/catalogs/{catalog}/toggle', [ServiceCatalogController::class, 'toggleActive'])->name('catalogs.toggle');
+
+    // PENGATURAN PROFIL ADMIN
+    Route::get('/profile', [\App\Http\Controllers\Admin\AdminProfileController::class, 'edit'])->name('profile.edit');
+    Route::put('/profile', [\App\Http\Controllers\Admin\AdminProfileController::class, 'update'])->name('profile.update');
+    Route::put('/profile/password', [\App\Http\Controllers\Admin\AdminProfileController::class, 'updatePassword'])->name('profile.password');
 
 });
 

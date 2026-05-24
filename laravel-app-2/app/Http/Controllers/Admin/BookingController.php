@@ -109,7 +109,7 @@ class BookingController extends Controller
      */
     public function confirmFullPayment(Request $request, Booking $booking)
     {
-        if (!in_array($booking->status, ['dp_paid', 'confirmed'])) {
+        if (!in_array($booking->status, ['dp_paid', 'confirmed', 'completed'])) {
             return redirect()->back()->with('error', 'Status booking tidak valid untuk pelunasan.');
         }
 
@@ -144,7 +144,7 @@ class BookingController extends Controller
      */
     public function rejectFullProof(Request $request, Booking $booking)
     {
-        if (!in_array($booking->status, ['dp_paid', 'confirmed'])) {
+        if (!in_array($booking->status, ['dp_paid', 'confirmed', 'completed'])) {
             return redirect()->back()->with('error', 'Status booking tidak valid untuk menolak pelunasan.');
         }
 
@@ -169,7 +169,7 @@ class BookingController extends Controller
      */
     public function confirmFullCashPayment(Request $request, Booking $booking)
     {
-        if (!in_array($booking->status, ['dp_paid', 'confirmed'])) {
+        if (!in_array($booking->status, ['dp_paid', 'confirmed', 'completed'])) {
             return redirect()->back()->with('error', 'Status booking tidak valid untuk pelunasan.');
         }
 

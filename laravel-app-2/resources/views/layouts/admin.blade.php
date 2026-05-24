@@ -11,6 +11,7 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
 
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
     <script>
         tailwind.config = {
@@ -42,6 +43,12 @@
                         "body":     ["Manrope", "sans-serif"],
                         "label":    ["Manrope", "sans-serif"],
                     },
+                    fontSize: {
+                        'golden-h1': ['42px', { lineHeight: '55px' }],
+                        'golden-h2': ['26px', { lineHeight: '42px' }],
+                        'golden-body': ['16px', { lineHeight: '26px' }],
+                        'golden-caption': ['10px', { lineHeight: '16px' }],
+                    },
                     keyframes: {
                         fadeUp: {
                             '0%': { opacity: '0', transform: 'translateY(15px)' },
@@ -63,194 +70,236 @@
 
     <style>
         :root {
-            --sidebar-w: 260px;
-            --sidebar-mini: 64px;
-            --topbar-h: 60px;
+            --sidebar-w: 280px;
+            --sidebar-mini: 72px;
+            --topbar-h: 70px;
         }
         * { box-sizing: border-box; }
         body { font-family: 'Manrope', sans-serif; background: #faf9f6; color: #1a1c1a; margin: 0; }
         .material-symbols-outlined { font-variation-settings: 'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24; font-size: 1.1rem; }
         [x-cloak] { display: none !important; }
 
+        /* Golden Ratio CSS Classes */
+        .text-golden-h1 { font-size: 42px !important; line-height: 55px !important; }
+        .text-golden-h2 { font-size: 26px !important; line-height: 42px !important; }
+        .text-golden-body { font-size: 16px !important; line-height: 26px !important; }
+        .text-golden-caption { font-size: 10px !important; line-height: 16px !important; }
+
         /* ── SIDEBAR ── */
         #sidebar {
             width: var(--sidebar-w);
-            height: 100vh;            /* fixed height, bukan min-height */
-            background: linear-gradient(180deg, #2b1915 0%, #1f0f0c 100%);
-            border-right: 1px solid rgba(255,255,255,0.04);
+            height: 100vh;            /* fixed height */
+            background: linear-gradient(185deg, #23120f 0%, #150907 100%);
+            border-right: 1px solid rgba(255,255,255,0.05);
             display: flex; flex-direction: column;
-            position: fixed; top: 0; left: 0; z-index: 1040;
-            transition: width 0.3s cubic-bezier(0.2, 0, 0, 1);
-            overflow: hidden;         /* clip horizontal saja */
-            box-shadow: 4px 0 24px rgba(0,0,0,0.1);
+            position: fixed; top: 0; left: 0; z-index: 1050; /* high z-index to hover above all */
+            transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            overflow: hidden;
+            box-shadow: 6px 0 30px rgba(0,0,0,0.25);
         }
         #sidebar.mini { width: var(--sidebar-mini); }
 
         /* Brand */
         .arh-brand {
-            display: flex; align-items: center; gap: 10px;
-            padding: 0 14px; height: 60px; flex-shrink: 0;
-            background: rgba(0,0,0,0.15);
+            display: flex; align-items: center; gap: 12px;
+            padding: 0 20px; height: var(--topbar-h); flex-shrink: 0;
+            background: rgba(0,0,0,0.2);
+            border-bottom: 1px solid rgba(255,255,255,0.03);
+            transition: padding 0.3s;
         }
         .arh-brand-logo {
-            width: 34px; height: 34px; border-radius: 8px; flex-shrink: 0;
-            background: linear-gradient(135deg, #fcd400, #e9c400);
+            width: 38px; height: 38px; border-radius: 10px; flex-shrink: 0;
+            background: linear-gradient(135deg, #fcd400, #bfa000);
             display: flex; align-items: center; justify-content: center;
-            font-family: 'Noto Serif', serif; font-weight: 700; font-size: 0.78rem; color: #361f1a;
+            font-family: 'Noto Serif', serif; font-weight: 800; font-size: 0.9rem; color: #23120f;
+            box-shadow: 0 4px 10px rgba(252,212,0,0.25);
         }
         .arh-brand-text { flex: 1; min-width: 0; overflow: hidden; white-space: nowrap; transition: opacity 0.2s; }
-        .arh-brand-title { font-family: 'Noto Serif', serif; font-size: 1rem; font-weight: 700; color: #fcd400; letter-spacing: 0.5px; }
-        .arh-brand-sub { font-size: 0.55rem; color: rgba(255,255,255,0.5); text-transform: uppercase; letter-spacing: 1px; }
+        .arh-brand-title { font-family: 'Noto Serif', serif; font-size: 1.15rem; font-weight: 700; color: #fcd400; letter-spacing: 0.5px; }
+        .arh-brand-sub { font-size: 0.58rem; color: rgba(255,255,255,0.45); text-transform: uppercase; letter-spacing: 1.5px; font-weight: 600; margin-top: 1px; }
         #sidebar.mini .arh-brand { justify-content: center; padding: 0; }
         #sidebar.mini .arh-brand-text { display: none; }
 
-        /* Toggle */
-        #sidebarToggle {
-            width: 30px; height: 30px; border-radius: 6px; flex-shrink: 0; margin-left: auto;
-            border: 1px solid rgba(255,255,255,0.1); background: rgba(255,255,255,0.05);
-            color: rgba(255,255,255,0.6); display: flex; align-items: center; justify-content: center;
-            cursor: pointer; transition: all 0.2s;
-        }
-        #sidebarToggle:hover { background: rgba(252,212,0,0.15); color: #fcd400; border-color: rgba(252,212,0,0.3); }
-        #sidebar.mini #sidebarToggle { margin-left: 0; }
-
-        /* User row */
+        /* User row (now an anchor link) */
         .arh-user {
-            display: flex; align-items: center; gap: 10px;
-            padding: 10px 14px; flex-shrink: 0;
-            border-bottom: 1px solid rgba(255,255,255,0.06);
+            display: flex; align-items: center; gap: 12px;
+            padding: 12px;
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 12px;
+            margin: 16px;
+            flex-shrink: 0;
+            backdrop-filter: blur(12px);
+            transition: all 0.3s ease;
+            text-decoration: none;
+            position: relative;
+            overflow: hidden;
+        }
+        .arh-user::after {
+            content: '↗ Lihat Website';
+            position: absolute; bottom: 0; left: 0; right: 0;
+            background: linear-gradient(135deg, rgba(252,212,0,0.9), rgba(180,152,0,0.9));
+            color: #23120f; font-size: 0.55rem; font-weight: 800;
+            text-align: center; padding: 4px 0; letter-spacing: 0.12em; text-transform: uppercase;
+            transform: translateY(100%); transition: transform 0.25s ease;
+            font-family: 'Manrope', sans-serif;
+        }
+        .arh-user:hover::after { transform: translateY(0); }
+        .arh-user:hover {
+            border-color: rgba(252,212,0,0.4);
+            box-shadow: 0 4px 20px rgba(252,212,0,0.15);
+            background: rgba(255,255,255,0.08);
         }
         .arh-avatar {
-            width: 32px; height: 32px; border-radius: 50%; flex-shrink: 0;
+            width: 36px; height: 36px; border-radius: 50%; flex-shrink: 0;
             background: linear-gradient(135deg, #fcd400, #e9c400);
             display: flex; align-items: center; justify-content: center;
-            font-weight: 800; font-size: 0.72rem; color: #361f1a;
+            font-weight: 800; font-size: 0.8rem; color: #23120f;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.15);
         }
         .arh-user-info { overflow: hidden; white-space: nowrap; }
-        .arh-user-name { font-size: 0.78rem; font-weight: 600; color: #faf9f6; }
-        .arh-user-role { font-size: 0.58rem; color: rgba(252,212,0,0.7); text-transform: uppercase; letter-spacing: 0.5px; }
-        #sidebar.mini .arh-user { justify-content: center; padding: 10px 0; }
+        .arh-user-name { font-size: 0.85rem; font-weight: 700; color: #faf9f6; }
+        .arh-user-role { font-size: 0.6rem; color: rgba(252,212,0,0.85); text-transform: uppercase; letter-spacing: 1px; font-weight: 700; margin-top: 1px; }
+        #sidebar.mini .arh-user { justify-content: center; padding: 8px; margin: 16px 8px; border-radius: 10px; }
         #sidebar.mini .arh-user-info { display: none; }
+        #sidebar.mini .arh-user::after { display: none; }
+        #sidebar.mini .arh-user[data-tooltip]::before {
+            content: attr(data-tooltip); position: fixed;
+            left: calc(var(--sidebar-mini) + 12px);
+            background: #180907; color: #fcd400; font-size: 0.8rem; font-weight: 600;
+            padding: 8px 16px; border-radius: 8px; white-space: nowrap;
+            pointer-events: none; opacity: 0; transition: opacity 0.2s; z-index: 9999;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5); border: 1px solid rgba(252,212,0,0.2);
+        }
+        #sidebar.mini .arh-user:hover[data-tooltip]::before { opacity: 1; }
 
-        /* Nav — scrollable, selalu menyisakan ruang untuk footer sidebar */
-        .arh-nav { list-style: none; padding: 16px 16px 0; margin: 0; overflow-y: auto; flex: 1; min-height: 0; }
-        
-        /* Custom Scrollbar for Nav */
+        /* Nav - scrollable */
+        .arh-nav { list-style: none; padding: 0 16px 16px; margin: 0; overflow-y: auto; flex: 1; min-height: 0; }
         .arh-nav::-webkit-scrollbar { width: 4px; }
         .arh-nav::-webkit-scrollbar-track { background: transparent; }
-        .arh-nav::-webkit-scrollbar-thumb { background: rgba(252,212,0,0.15); border-radius: 10px; }
-        .arh-nav::-webkit-scrollbar-thumb:hover { background: rgba(252,212,0,0.3); }
+        .arh-nav::-webkit-scrollbar-thumb { background: rgba(252,212,0,0.1); border-radius: 10px; }
+        .arh-nav::-webkit-scrollbar-thumb:hover { background: rgba(252,212,0,0.25); }
 
         .arh-nav-section {
-            font-size: 0.62rem; color: rgba(255,255,255,0.35); text-transform: uppercase;
-            letter-spacing: 1.5px; padding: 18px 8px 8px; font-weight: 700; white-space: nowrap;
+            font-size: 0.68rem; color: rgba(255,255,255,0.3); text-transform: uppercase;
+            letter-spacing: 2px; padding: 22px 8px 10px; font-weight: 800; white-space: nowrap;
+            border-bottom: 1px solid rgba(255,255,255,0.03);
+            margin-bottom: 8px;
         }
-        #sidebar.mini .arh-nav-section { height: 1px; background: rgba(255,255,255,0.06); margin: 12px 8px 8px; padding: 0; font-size: 0; }
+        #sidebar.mini .arh-nav-section { height: 1px; background: rgba(255,255,255,0.05); margin: 16px 8px 12px; padding: 0; font-size: 0; border: none; }
 
         .arh-nav-link {
+            position: relative;
             display: flex; align-items: center; gap: 12px;
-            padding: 10px 12px; border-radius: 10px; margin-bottom: 6px;
-            color: rgba(255,255,255,0.6); text-decoration: none;
-            font-size: 0.85rem; font-weight: 500;
-            transition: all 0.2s ease; white-space: nowrap; overflow: hidden;
+            padding: 12px 14px; border-radius: 10px; margin-bottom: 6px;
+            color: rgba(255,255,255,0.65); text-decoration: none;
+            font-size: 0.9rem; font-weight: 500;
+            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1); white-space: nowrap; overflow: hidden;
             border: 1px solid transparent;
         }
-        .arh-nav-link:hover { background: rgba(255,255,255,0.04); color: #fff; border-color: rgba(255,255,255,0.08); }
+        .arh-nav-link::before {
+            content: ''; position: absolute; left: 0; top: 25%; height: 50%; width: 3px;
+            background: #fcd400; border-radius: 0 4px 4px 0; opacity: 0;
+            transition: opacity 0.2s, transform 0.2s; transform: scaleY(0.3);
+        }
+        .arh-nav-link:hover::before { opacity: 0.5; transform: scaleY(1); }
+        .arh-nav-link.active::before { opacity: 1; transform: scaleY(1.3); }
+
+        .arh-nav-link:hover {
+            background: rgba(255,255,255,0.03);
+            color: #fff;
+            padding-left: 18px;
+        }
+        #sidebar.mini .arh-nav-link:hover { padding-left: 14px; }
+
         .arh-nav-link.active {
-            background: rgba(252,212,0,0.1);
+            background: linear-gradient(90deg, rgba(252,212,0,0.12) 0%, rgba(252,212,0,0.02) 100%);
             border-color: rgba(252,212,0,0.2);
-            color: #fcd400; font-weight: 600;
+            color: #fcd400; font-weight: 700;
         }
         .arh-nav-icon { 
-            width: 26px; height: 26px; text-align: center; flex-shrink: 0; font-size: 1.1rem;
+            width: 28px; height: 28px; text-align: center; flex-shrink: 0;
             display: flex; align-items: center; justify-content: center;
-            border-radius: 6px; background: rgba(0,0,0,0.2); transition: all 0.2s ease;
+            border-radius: 8px; background: rgba(0,0,0,0.3); transition: all 0.25s ease;
         }
-        .arh-nav-link:hover .arh-nav-icon { background: rgba(255,255,255,0.1); color: #fff; }
-        .arh-nav-link.active .arh-nav-icon { background: #fcd400; color: #2b1915; box-shadow: 0 4px 12px rgba(252,212,0,0.3); }
+        .arh-nav-icon svg {
+            width: 16px !important; height: 16px !important;
+            transition: all 0.25s ease;
+        }
+        .arh-nav-link:hover .arh-nav-icon { background: rgba(252,212,0,0.15); color: #fcd400; transform: scale(1.05); }
+        .arh-nav-link.active .arh-nav-icon { background: #fcd400; color: #23120f; box-shadow: 0 0 10px rgba(252,212,0,0.3); }
 
-        #sidebar.mini .arh-nav { padding: 16px 8px 0; }
+        #sidebar.mini .arh-nav { padding: 0 8px 16px; }
         #sidebar.mini .arh-nav-link { justify-content: center; padding: 12px 0; border-color: transparent; }
-        #sidebar.mini .arh-nav-icon { background: transparent; width: 32px; height: 32px; font-size: 1.25rem; }
-        #sidebar.mini .arh-nav-link.active .arh-nav-icon { background: #fcd400; color: #2b1915; }
+        #sidebar.mini .arh-nav-icon { background: transparent; width: 36px; height: 36px; }
+        #sidebar.mini .arh-nav-icon svg { width: 20px !important; height: 20px !important; }
+        #sidebar.mini .arh-nav-link.active .arh-nav-icon { background: #fcd400; color: #23120f; border-radius: 10px; }
         #sidebar.mini .arh-nav-label { display: none; }
 
         /* Tooltip mini */
         #sidebar.mini .arh-nav-link::after {
             content: attr(data-tooltip); position: fixed;
             left: calc(var(--sidebar-mini) + 12px);
-            background: #21120f; color: #faf9f6; font-size: 0.8rem; font-weight: 500;
-            padding: 6px 14px; border-radius: 8px; white-space: nowrap;
+            background: #180907; color: #faf9f6; font-size: 0.8rem; font-weight: 600;
+            padding: 8px 16px; border-radius: 8px; white-space: nowrap;
             pointer-events: none; opacity: 0; transition: opacity 0.2s; z-index: 9999;
-            box-shadow: 0 8px 24px rgba(0,0,0,0.4); border: 1px solid rgba(252,212,0,0.15);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5); border: 1px solid rgba(252,212,0,0.2);
         }
         #sidebar.mini .arh-nav-link:hover::after { opacity: 1; }
 
-        /* Logout – selalu nempel di bawah sidebar, tidak ikut scroll */
-        .arh-logout-wrap { padding: 16px; flex-shrink: 0; border-top: 1px solid rgba(255,255,255,0.04); margin-top: auto; }
-        .arh-logout {
+        /* Bottom Action wrap */
+        .arh-logout-wrap { padding: 16px; flex-shrink: 0; border-top: 1px solid rgba(255,255,255,0.04); margin-top: auto; background: rgba(0,0,0,0.15); }
+        #sidebar.mini .arh-logout-wrap { padding: 12px 8px; }
+
+        .arh-logout, .arh-landing {
             display: flex; align-items: center; gap: 12px;
-            padding: 10px 12px; border-radius: 10px; width: 100%;
-            color: rgba(255,255,255,0.5); font-size: 0.85rem; font-weight: 500;
+            padding: 10px 14px; border-radius: 10px; width: 100%;
+            color: rgba(255,255,255,0.65); font-size: 0.88rem; font-weight: 600;
             background: none; border: 1px solid transparent; cursor: pointer;
-            transition: all 0.2s ease; white-space: nowrap; overflow: hidden;
+            transition: all 0.25s ease; white-space: nowrap; overflow: hidden;
+            text-decoration: none;
         }
+        .arh-landing:hover { background: rgba(255,255,255,0.03); color: #fff; }
         .arh-logout:hover { background: rgba(239,68,68,0.1); color: #fca5a5; border-color: rgba(239,68,68,0.2); }
-        .arh-logout .arh-nav-icon {
-            width: 26px; height: 26px; text-align: center; flex-shrink: 0; font-size: 1.1rem;
+        
+        .arh-landing .arh-nav-icon, .arh-logout .arh-nav-icon {
+            width: 28px; height: 28px; text-align: center; flex-shrink: 0; font-size: 1.2rem;
             display: flex; align-items: center; justify-content: center;
-            border-radius: 6px; background: rgba(0,0,0,0.2); transition: all 0.2s ease;
+            border-radius: 8px; background: rgba(0,0,0,0.3); transition: all 0.25s ease;
         }
+        .arh-landing:hover .arh-nav-icon { background: rgba(252,212,0,0.15); color: #fcd400; }
         .arh-logout:hover .arh-nav-icon { background: rgba(239,68,68,0.2); color: #fca5a5; }
 
-        #sidebar.mini .arh-logout { justify-content: center; padding: 12px 0; border-color: transparent; }
-        #sidebar.mini .arh-logout .arh-nav-icon { background: transparent; width: 32px; height: 32px; font-size: 1.25rem; }
-        #sidebar.mini .arh-logout-label { display: none; }
-        #sidebar.mini .arh-logout::after {
-            content: 'Keluar'; position: fixed; left: calc(var(--sidebar-mini) + 12px);
-            background: #21120f; color: #fca5a5; font-size: 0.8rem; font-weight: 500;
-            padding: 6px 14px; border-radius: 8px; white-space: nowrap;
-            pointer-events: none; opacity: 0; transition: opacity 0.2s; z-index: 9999;
-            box-shadow: 0 8px 24px rgba(0,0,0,0.4); border: 1px solid rgba(239,68,68,0.2);
-        }
-        #sidebar.mini .arh-logout:hover::after { opacity: 1; }
-
-        /* Landing Page Link */
-        .arh-landing {
-            display: flex; align-items: center; gap: 12px;
-            padding: 10px 12px; border-radius: 10px; width: 100%;
-            color: rgba(255,255,255,0.7); font-size: 0.85rem; font-weight: 500;
-            text-decoration: none; transition: all 0.2s ease; white-space: nowrap; overflow: hidden;
-            border: 1px solid transparent;
-        }
-        .arh-landing:hover { background: rgba(255,255,255,0.04); color: #ffffff; border-color: rgba(255,255,255,0.08); }
-        .arh-landing .arh-nav-icon {
-            width: 26px; height: 26px; text-align: center; flex-shrink: 0; font-size: 1.1rem;
-            display: flex; align-items: center; justify-content: center;
-            border-radius: 6px; background: rgba(0,0,0,0.2); transition: all 0.2s ease;
-        }
-        .arh-landing:hover .arh-nav-icon { background: rgba(255,255,255,0.1); color: #fff; }
-
-        #sidebar.mini .arh-landing { justify-content: center; padding: 12px 0; border-color: transparent; }
-        #sidebar.mini .arh-landing .arh-nav-icon { background: transparent; width: 32px; height: 32px; font-size: 1.25rem; }
-        #sidebar.mini .arh-landing-label { display: none; }
+        #sidebar.mini .arh-landing, #sidebar.mini .arh-logout { justify-content: center; padding: 12px 0; border-color: transparent; }
+        #sidebar.mini .arh-landing .arh-nav-icon, #sidebar.mini .arh-logout .arh-nav-icon { background: transparent; width: 36px; height: 36px; font-size: 1.35rem; }
+        #sidebar.mini .arh-landing-label, #sidebar.mini .arh-logout-label { display: none; }
+        
         #sidebar.mini .arh-landing::after {
             content: 'Landing Page'; position: fixed; left: calc(var(--sidebar-mini) + 12px);
-            background: #21120f; color: #ffffff; font-size: 0.8rem; font-weight: 500;
-            padding: 6px 14px; border-radius: 8px; white-space: nowrap;
+            background: #180907; color: #ffffff; font-size: 0.8rem; font-weight: 600;
+            padding: 8px 16px; border-radius: 8px; white-space: nowrap;
             pointer-events: none; opacity: 0; transition: opacity 0.2s; z-index: 9999;
-            box-shadow: 0 8px 24px rgba(0,0,0,0.4); border: 1px solid rgba(255,255,255,0.15);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5); border: 1px solid rgba(252,212,0,0.2);
         }
         #sidebar.mini .arh-landing:hover::after { opacity: 1; }
+
+        #sidebar.mini .arh-logout::after {
+            content: 'Keluar'; position: fixed; left: calc(var(--sidebar-mini) + 12px);
+            background: #180907; color: #fca5a5; font-size: 0.8rem; font-weight: 600;
+            padding: 8px 16px; border-radius: 8px; white-space: nowrap;
+            pointer-events: none; opacity: 0; transition: opacity 0.2s; z-index: 9999;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5); border: 1px solid rgba(239,68,68,0.2);
+        }
+        #sidebar.mini .arh-logout:hover::after { opacity: 1; }
 
         /* ── TOPBAR ── */
         #topbar {
             height: var(--topbar-h);
             background: #ffffff;
-            box-shadow: 0 1px 0 #efeeeb, 0 4px 16px rgba(54,31,26,0.04);
-            display: flex; align-items: center; padding: 0 24px;
+            border-bottom: 1px solid #efeeeb;
+            display: flex; align-items: center; padding: 0 28px;
             position: fixed; top: 0; left: var(--sidebar-w); right: 0;
-            z-index: 1030; transition: left 0.28s cubic-bezier(0.4,0,0.2,1); gap: 14px;
+            z-index: 1030; transition: left 0.3s cubic-bezier(0.4, 0, 0.2, 1); gap: 16px;
         }
         #topbar.mini { left: var(--sidebar-mini); }
 
@@ -259,7 +308,7 @@
             margin-left: var(--sidebar-w);
             padding-top: var(--topbar-h);
             min-height: 100vh;
-            transition: margin-left 0.28s cubic-bezier(0.4,0,0.2,1);
+            transition: margin-left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             background: #faf9f6;
         }
         #page-content.mini { margin-left: var(--sidebar-mini); }
@@ -267,15 +316,33 @@
         /* ── MOBILE ── */
         #sidebarOverlay {
             display: none; position: fixed; inset: 0;
-            background: rgba(54,31,26,0.55); z-index: 1039; backdrop-filter: blur(2px);
+            background: rgba(35,18,15,0.6); z-index: 1049; backdrop-filter: blur(4px);
+            transition: opacity 0.3s ease;
+        }
+
+        /* Hide scrollbar for Chrome, Safari and Opera */
+        .scrollbar-none::-webkit-scrollbar {
+            display: none !important;
+        }
+        /* Hide scrollbar for IE, Edge and Firefox */
+        .scrollbar-none {
+            -ms-overflow-style: none !important;  /* IE and Edge */
+            scrollbar-width: none !important;  /* Firefox */
         }
         @media (max-width: 768px) {
-            #sidebar { transform: translateX(-100%); width: var(--sidebar-w) !important; transition: transform 0.28s ease; }
+            #sidebar { transform: translateX(-100%); width: var(--sidebar-w) !important; transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
             #sidebar.mobile-open { transform: translateX(0) !important; }
-            #topbar, #topbar.mini { left: 0 !important; }
-            #page-content, #page-content.mini { margin-left: 0 !important; padding-bottom: 0; }
+            #topbar, #topbar.mini { left: 0 !important; padding: 0 16px !important; }
+            #page-content, #page-content.mini { margin-left: 0 !important; }
             #page-content main { padding: 16px !important; }
             .mobile-menu-btn { display: flex !important; }
+            
+            /* Global Responsive overrides on mobile */
+            .grid { gap: 12px !important; }
+            .p-6 { padding: 16px !important; }
+            .p-5 { padding: 12px !important; }
+            .mb-8 { margin-bottom: 20px !important; }
+            .mb-6 { margin-bottom: 16px !important; }
         }
 
         /* ── ALERT HERITAGE ── */
@@ -306,7 +373,6 @@
             100% { opacity: 1; transform: scale(1); }
         }
 
-        /* Menyihir seluruh elemen dalam main content untuk muncul berurutan (Cascade Fade Up) */
         #page-content main > * {
             opacity: 0;
             animation: fadeUp 0.5s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
@@ -321,7 +387,6 @@
         #page-content main > *:nth-child(8) { animation-delay: 0.40s; }
         #page-content main > *:nth-child(n+9) { animation-delay: 0.45s; }
 
-        /* Pengecualian animasi membesar untuk Notifikasi */
         #page-content main .alert-heritage-success, 
         #page-content main .alert-heritage-warning, 
         #page-content main .alert-heritage-danger {
@@ -361,15 +426,15 @@
         </div>
     </div>
 
-    {{-- User --}}
+    {{-- User: klik → landing page (tanpa logout) --}}
     @auth
-    <div class="arh-user">
+    <a href="{{ url('/') }}" class="arh-user" title="Lihat Landing Page" data-tooltip="Lihat Landing Page" style="text-decoration:none;cursor:pointer;">
         <div class="arh-avatar">{{ strtoupper(substr(Auth::user()->name, 0, 2)) }}</div>
         <div class="arh-user-info">
             <div class="arh-user-name">{{ Auth::user()->name }}</div>
-            <div class="arh-user-role">Pimpinan Sanggar</div>
+            <div class="arh-user-role" style="color:rgba(252,212,0,0.7);font-size:0.55rem;margin-top:2px;">✦ Klik → Lihat Website</div>
         </div>
-    </div>
+    </a>
     @endauth
 
     {{-- Nav --}}
@@ -378,25 +443,26 @@
         $pendingBadge = \App\Models\Personnel::where('is_active', false)->count();
         $menuGroups = [
             'UTAMA' => [
-                ['Dashboard',         'bi-grid-1x2-fill',         'admin.dashboard',                  $r->routeIs('admin.dashboard'),                  0],
-                ['Event Management',  'bi-calendar-check-fill',   'admin.events.index',               $r->routeIs('admin.events.*') && !$r->routeIs('admin.events.monitoring*'), 0],
-                ['Event Monitoring',  'bi-binoculars-fill',       'admin.events.monitoring',          $r->routeIs('admin.events.monitoring*'),          0],
+                ['Dashboard',         'layout-dashboard',         'admin.dashboard',                  $r->routeIs('admin.dashboard'),                  0],
+                ['Event Management',  'calendar-days',            'admin.events.index',               $r->routeIs('admin.events.*') && !$r->routeIs('admin.events.monitoring*'), 0],
+                ['Event Monitoring',  'eye',                      'admin.events.monitoring',          $r->routeIs('admin.events.monitoring*'),          0],
             ],
             'SDM & PRODUKSI' => [
-                ['Personnel',         'bi-people-fill',           'admin.personnel.index',            $r->routeIs('admin.personnel.*'),                 $pendingBadge],
-                ['Costume & Logistik','bi-bag-fill',              'admin.costumes.index',             $r->routeIs('admin.costumes.*'),                  0],
+                ['Personnel',         'users',                    'admin.personnel.index',            $r->routeIs('admin.personnel.*'),                 $pendingBadge],
+                ['Costume & Logistik','package',                  'admin.costumes.index',             $r->routeIs('admin.costumes.*'),                  0],
             ],
             'KEUANGAN' => [
-                ['Daftar Booking',    'bi-journal-text',          'admin.bookings.index',             $r->routeIs('admin.bookings.index'),              0],
-                ['DP Verification',   'bi-patch-check-fill',      'admin.bookings.dp_verification',   $r->routeIs('admin.bookings.dp_verification'),    0],
-                ['Payment Tracking',  'bi-receipt-cutoff',        'admin.payments.index',             $r->routeIs('admin.payments.*'),                  0],
-                ['Financial Report',  'bi-graph-up-arrow',        'admin.financials.index',           $r->routeIs('admin.financials.index'),            0],
-                ['Post-Event Update', 'bi-clipboard2-check-fill', 'admin.financials.post_event_list', $r->routeIs('admin.financials.post_event_list'),  0],
+                ['Daftar Booking',    'book-open',                'admin.bookings.index',             $r->routeIs('admin.bookings.index'),              0],
+                ['DP Verification',   'check-circle',             'admin.bookings.dp_verification',   $r->routeIs('admin.bookings.dp_verification'),    0],
+                ['Payment Tracking',  'receipt',                  'admin.payments.index',             $r->routeIs('admin.payments.*'),                  0],
+                ['Financial Report',  'trending-up',              'admin.financials.index',           $r->routeIs('admin.financials.index'),            0],
+                ['Post-Event Update', 'clipboard-check',          'admin.financials.post_event_list', $r->routeIs('admin.financials.post_event_list'),  0],
             ],
             'MANAJEMEN' => [
-                ['Cancellation',      'bi-shield-exclamation',    'admin.cancellations.index',        $r->routeIs('admin.cancellations.*'),             0],
-                ['Katalog Jasa',      'bi-collection-fill',       'admin.catalogs.index',             $r->routeIs('admin.catalogs.*'),                  0],
-                ['CMS Landing Page',  'bi-window-sidebar',        'admin.cms.index',                  $r->routeIs('admin.cms.*'),                       0],
+                ['Cancellation',      'shield-alert',             'admin.cancellations.index',        $r->routeIs('admin.cancellations.*'),             0],
+                ['Katalog Jasa',      'folder-open',              'admin.catalogs.index',             $r->routeIs('admin.catalogs.*'),                  0],
+                ['CMS Landing Page',  'layout',                   'admin.cms.index',                  $r->routeIs('admin.cms.*'),                       0],
+                ['Pengaturan Profil', 'user-cog',                 'admin.profile.edit',               $r->routeIs('admin.profile.*'),                   0],
             ],
         ];
     @endphp
@@ -409,7 +475,7 @@
                 <a href="{{ route($routeName) }}"
                    class="arh-nav-link {{ $isActive ? 'active' : '' }}"
                    data-tooltip="{{ $label }}">
-                    <i class="bi {{ $icon }} arh-nav-icon"></i>
+                    <span class="arh-nav-icon"><i data-lucide="{{ $icon }}"></i></span>
                     <span class="arh-nav-label">{{ $label }}</span>
                     @if($badge > 0)
                     <span style="
@@ -427,16 +493,12 @@
         @endforeach
     </ul>
 
-    {{-- Footer Actions (Landing Page & Logout) --}}
+    {{-- Footer Actions (Logout) --}}
     <div class="arh-logout-wrap" style="display:flex; flex-direction:column; gap:4px;">
-        <a href="{{ url('/') }}" class="arh-landing" data-tooltip="Lihat Landing Page">
-            <i class="bi bi-window-desktop arh-nav-icon"></i>
-            <span class="arh-landing-label">Landing Page</span>
-        </a>
         <form method="POST" action="{{ route('logout') }}">
             @csrf
             <button type="submit" class="arh-logout" data-tooltip="Keluar">
-                <i class="bi bi-box-arrow-left arh-nav-icon"></i>
+                <span class="arh-nav-icon"><i data-lucide="log-out"></i></span>
                 <span class="arh-logout-label">Keluar</span>
             </button>
         </form>
@@ -445,11 +507,15 @@
 
 {{-- ════ TOPBAR ════ --}}
 <nav id="topbar">
+    <button id="sidebarToggle" type="button" class="hidden md:flex items-center justify-center mr-2 w-9 h-9 rounded-lg border border-outline-variant/30 bg-white text-primary hover:border-secondary hover:text-secondary hover:bg-secondary/5 transition-all shadow-sm flex-shrink-0" title="Toggle Sidebar">
+        <i class="bi bi-layout-sidebar-reverse" style="font-size: 1.1rem;"></i>
+    </button>
+    
     <div style="flex:1; min-width:0;">
-        <div style="font-family:'Noto Serif',serif;font-size:1rem;font-weight:600;color:#361f1a;line-height:1.2; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">
+        <div style="font-family:'Noto Serif',serif;font-size:1.1rem;font-weight:700;color:#361f1a;line-height:1.2; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">
             @yield('page_title', 'Admin Panel')
         </div>
-        <div style="font-size:0.68rem;color:#827471;font-family:'Manrope',sans-serif;text-transform:uppercase;letter-spacing:0.05em; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">
+        <div style="font-size:0.72rem;color:#827471;font-family:'Manrope',sans-serif;text-transform:uppercase;letter-spacing:0.05em; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; margin-top: 2px;">
             @yield('page_subtitle')
         </div>
     </div>
@@ -458,15 +524,15 @@
         <span class="hidden md:inline-flex" style="background:rgba(252,212,0,0.12);color:#705d00;font-size:0.68rem;font-weight:700;padding:4px 10px;border-radius:99px;font-family:'Manrope',sans-serif;text-transform:uppercase;letter-spacing:0.08em;align-items:center;">
             Admin
         </span>
-        <span class="hidden md:inline-block" style="font-size:0.72rem;color:#827471;font-family:'Manrope',sans-serif;">
+        <span class="hidden md:inline-block" style="font-size:0.72rem;color:#827471;font-family:'Manrope',sans-serif;font-weight:500;">
             {{ now()->translatedFormat('d M Y') }}
         </span>
 
-        {{-- Mobile hamburger moved to right --}}
+        {{-- Mobile hamburger kustom --}}
         <button onclick="openSidebarMobile()"
-            style="width:36px;height:36px;border-radius:8px;border:1px solid #e9e8e5;background:#f4f3f1;color:#361f1a;cursor:pointer;flex-shrink:0;display:none;align-items:center;justify-content:center;"
-            class="mobile-menu-btn" id="mobileMenuBtn">
-            <i class="bi bi-list" style="font-size:1.3rem;"></i>
+            style="width:40px;height:40px;border-radius:8px;border:1px solid #e9e8e5;background:#ffffff;color:#361f1a;cursor:pointer;flex-shrink:0;display:none;align-items:center;justify-content:center;box-shadow: 0 2px 8px rgba(0,0,0,0.05);"
+            class="mobile-menu-btn hover:border-secondary hover:text-secondary transition-all" id="mobileMenuBtn">
+            <i class="bi bi-list" style="font-size:1.4rem;"></i>
         </button>
     </div>
 </nav>
@@ -564,6 +630,9 @@
             }
         });
     });
+
+    // Initialize Lucide Icons
+    lucide.createIcons();
 
 
 </script>

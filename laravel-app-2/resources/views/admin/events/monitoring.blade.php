@@ -35,10 +35,10 @@
             <p class="font-body text-[0.7rem] text-on-surface-variant">Pantau pergerakan acara dan personel secara live.</p>
         </div>
     </div>
-    <div class="flex flex-wrap gap-2">
+    <div class="flex overflow-x-auto whitespace-nowrap scrollbar-none pb-2 -mx-4 px-4 md:flex-wrap md:mx-0 md:px-0 gap-1.5 sm:gap-2">
         @foreach($filters as $key => $f)
             <a href="{{ route('admin.events.monitoring', $key !== 'all' ? ['filter' => $key] : []) }}"
-               class="px-4 py-2 rounded-lg border font-label text-[0.65rem] font-bold uppercase tracking-widest transition-all flex items-center gap-1.5 shadow-sm {{ $currentFilter === $key ? 'bg-primary text-white border-primary' : 'bg-surface-container-lowest text-on-surface-variant border-outline-variant/30 hover:border-primary/30 hover:text-primary hover:bg-surface-container-low' }}">
+               class="flex-shrink-0 px-2 py-1 sm:px-3 sm:py-1.5 md:px-4 md:py-2 rounded-lg border font-label text-[0.52rem] sm:text-[0.58rem] md:text-[0.65rem] font-bold uppercase tracking-widest transition-all flex items-center gap-1 sm:gap-1.5 shadow-sm {{ $currentFilter === $key ? 'bg-primary text-white border-primary' : 'bg-surface-container-lowest text-on-surface-variant border-outline-variant/30 hover:border-primary/30 hover:text-primary hover:bg-surface-container-low' }}">
                 <i class="bi {{ $f['icon'] }}"></i> {{ $f['label'] }}
             </a>
         @endforeach
@@ -46,7 +46,7 @@
 </div>
 
 {{-- Event Grid --}}
-<div class="grid grid-cols-1 md:grid-cols-2 2xl:grid-cols-3 gap-6">
+<div class="grid grid-cols-1 md:grid-cols-2 2xl:grid-cols-3 gap-4 sm:gap-6">
     @forelse($events as $booking)
     @php
         $eventModel = $booking->event;
@@ -72,20 +72,20 @@
         
         {{-- Urgent Badge Overlay --}}
         @if($isUrgent)
-        <div class="absolute top-0 right-0 px-3 py-1 bg-gradient-to-r from-orange-500 to-orange-600 text-white font-label text-[0.6rem] font-bold uppercase tracking-widest rounded-bl-lg shadow-sm z-10 flex items-center gap-1">
+        <div class="absolute top-0 right-0 px-2.5 py-0.5 sm:px-3 sm:py-1 bg-gradient-to-r from-orange-500 to-orange-600 text-white font-label text-[0.52rem] sm:text-[0.6rem] font-bold uppercase tracking-widest rounded-bl-lg shadow-sm z-10 flex items-center gap-1">
             <i class="bi bi-fire"></i> H-{{ $daysUntil }}
         </div>
         @endif
 
         {{-- Card Header --}}
-        <div class="px-5 py-4 border-b border-outline-variant/20 flex items-start gap-4 relative">
-            <div class="w-14 h-14 rounded-xl flex flex-col items-center justify-center border flex-shrink-0 {{ $isUrgent ? 'bg-orange-500/10 border-orange-500/20 text-orange-600' : 'bg-surface-container border-outline-variant/30 text-on-surface' }}">
-                <span class="font-headline font-bold text-xl leading-none">{{ $eventDate->format('d') }}</span>
-                <span class="font-label text-[0.65rem] uppercase tracking-widest font-bold mt-0.5">{{ $eventDate->format('M') }}</span>
+        <div class="px-3.5 py-2.5 sm:px-5 sm:py-4 border-b border-outline-variant/20 flex items-start gap-3 sm:gap-4 relative">
+            <div class="w-10 h-11 sm:w-14 sm:h-14 rounded-xl flex flex-col items-center justify-center border flex-shrink-0 {{ $isUrgent ? 'bg-orange-500/10 border-orange-500/20 text-orange-600' : 'bg-surface-container border-outline-variant/30 text-on-surface' }}">
+                <span class="font-headline font-bold text-sm sm:text-xl leading-none">{{ $eventDate->format('d') }}</span>
+                <span class="font-label text-[0.45rem] sm:text-[0.65rem] uppercase tracking-widest font-bold mt-0.5">{{ $eventDate->format('M') }}</span>
             </div>
             <div class="min-w-0 flex-grow pt-0.5">
-                <h3 class="font-body font-bold text-base text-on-surface truncate mb-1" title="{{ $booking->client_name }}">{{ $booking->client_name ?? '—' }}</h3>
-                <div class="font-label text-[0.65rem] text-on-surface-variant flex items-center gap-1.5 uppercase tracking-widest font-bold">
+                <h3 class="font-body font-bold text-sm sm:text-base text-on-surface truncate mb-0.5 sm:mb-1" title="{{ $booking->client_name }}">{{ $booking->client_name ?? '—' }}</h3>
+                <div class="font-label text-[0.55rem] sm:text-[0.65rem] text-on-surface-variant flex items-center gap-1 uppercase tracking-widest font-bold">
                     <i class="bi bi-clock"></i> {{ \Carbon\Carbon::parse($booking->event_start)->format('H:i') }}
                     <span class="text-outline-variant mx-1">•</span>
                     <span class="truncate">{{ str_replace('_', ' ', $booking->event_type ?? '—') }}</span>
@@ -94,24 +94,24 @@
         </div>
 
         {{-- Card Body --}}
-        <div class="p-5 flex-grow space-y-4">
+        <div class="p-3.5 sm:p-5 flex-grow space-y-3 sm:space-y-4">
             {{-- Venue --}}
             <div>
-                <span class="font-label text-[0.6rem] uppercase tracking-widest text-outline font-bold mb-1 flex items-center gap-1"><i class="bi bi-geo-alt-fill"></i> Lokasi Venue</span>
-                <p class="font-body text-sm font-medium text-on-surface line-clamp-2" title="{{ $booking->venue }}">{{ $booking->venue }}</p>
+                <span class="font-label text-[0.52rem] sm:text-[0.6rem] uppercase tracking-widest text-outline font-bold mb-0.5 sm:mb-1 flex items-center gap-1"><i class="bi bi-geo-alt-fill"></i> Lokasi Venue</span>
+                <p class="font-body text-xs sm:text-sm font-medium text-on-surface line-clamp-2" title="{{ $booking->venue }}">{{ $booking->venue }}</p>
             </div>
 
-            <div class="grid grid-cols-2 gap-4">
+            <div class="grid grid-cols-2 gap-3 sm:gap-4">
                 {{-- Deal Price --}}
-                <div class="bg-surface-container-low border border-outline-variant/50 rounded-lg p-3">
-                    <span class="font-label text-[0.6rem] uppercase tracking-widest text-outline font-bold mb-1 block">Deal Price</span>
-                    <span class="font-headline font-bold text-sm {{ $bStatus === 'pending' ? 'text-orange-600' : 'text-primary' }}">{{ $priceDisplay }}</span>
+                <div class="bg-surface-container-low border border-outline-variant/50 rounded-lg p-2 sm:p-3">
+                    <span class="font-label text-[0.52rem] sm:text-[0.6rem] uppercase tracking-widest text-outline font-bold mb-0.5 block">Deal Price</span>
+                    <span class="font-headline font-bold text-xs sm:text-sm {{ $bStatus === 'pending' ? 'text-orange-600' : 'text-primary' }}">{{ $priceDisplay }}</span>
                 </div>
                 {{-- Status --}}
-                <div class="bg-surface-container-low border border-outline-variant/50 rounded-lg p-3 flex flex-col justify-center">
-                    <span class="font-label text-[0.6rem] uppercase tracking-widest text-outline font-bold mb-1.5 block">Status Acara</span>
+                <div class="bg-surface-container-low border border-outline-variant/50 rounded-lg p-2 sm:p-3 flex flex-col justify-center">
+                    <span class="font-label text-[0.52rem] sm:text-[0.6rem] uppercase tracking-widest text-outline font-bold mb-1 block">Status Acara</span>
                     <div>
-                        <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded border font-label text-[0.55rem] font-bold uppercase tracking-wider {{ $statusInfo['class'] }}">
+                        <span class="inline-flex items-center gap-1 px-2 py-0.5 sm:px-2.5 sm:py-1 rounded border font-label text-[0.5rem] sm:text-[0.55rem] font-bold uppercase tracking-wider {{ $statusInfo['class'] }}">
                             <i class="bi {{ $statusInfo['icon'] }}"></i> {{ $statusInfo['label'] }}
                         </span>
                     </div>
@@ -126,11 +126,11 @@
                     $pPct = $pReq > 0 ? min(100, round(($pCount / $pReq) * 100)) : 0;
                 @endphp
                 <div>
-                    <div class="flex justify-between items-end mb-1.5">
-                        <span class="font-label text-[0.6rem] uppercase tracking-widest text-outline font-bold"><i class="bi bi-people-fill me-1"></i> Plotting Personel</span>
-                        <span class="font-body text-xs font-bold {{ $pCount >= $pReq ? 'text-green-600' : 'text-primary' }}">{{ $pCount }}/{{ $pReq }} Orang</span>
+                    <div class="flex justify-between items-end mb-1 sm:mb-1.5">
+                        <span class="font-label text-[0.52rem] sm:text-[0.6rem] uppercase tracking-widest text-outline font-bold"><i class="bi bi-people-fill me-1"></i> Plotting Personel</span>
+                        <span class="font-body text-[0.65rem] sm:text-xs font-bold {{ $pCount >= $pReq ? 'text-green-600' : 'text-primary' }}">{{ $pCount }}/{{ $pReq }} Orang</span>
                     </div>
-                    <div class="h-2 w-full bg-surface-container-high rounded-full overflow-hidden border border-outline-variant/30">
+                    <div class="h-1.5 sm:h-2 w-full bg-surface-container-high rounded-full overflow-hidden border border-outline-variant/30">
                         <div class="h-full transition-all duration-1000 {{ $pPct == 100 ? 'bg-green-500' : 'bg-secondary' }}" {!! 'style="width: '.$pPct.'%;"' !!}></div>
                     </div>
                 </div>
@@ -138,15 +138,15 @@
         </div>
 
         {{-- Card Footer Actions --}}
-        <div class="px-5 py-4 border-t border-outline-variant/20 bg-surface-container-low/50 flex justify-end gap-2">
+        <div class="px-3.5 py-2.5 sm:px-5 sm:py-4 border-t border-outline-variant/20 bg-surface-container-low/50 flex justify-end gap-2">
             @if($eventModel)
                 <a href="{{ route('admin.events.monitoring.show', $eventModel->id) }}"
-                   class="w-full inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg bg-primary text-white font-label text-xs font-bold uppercase tracking-widest hover:bg-primary-container transition-colors shadow-sm group-hover:shadow-md">
+                   class="w-full inline-flex items-center justify-center gap-1.5 px-3 py-1.5 sm:py-2.5 rounded-lg bg-primary text-white font-label text-[0.65rem] sm:text-xs font-bold uppercase tracking-widest hover:bg-primary-container transition-colors shadow-sm group-hover:shadow-md">
                     <i class="bi bi-eye-fill"></i> Detail Monitor
                 </a>
             @else
                 <a href="{{ route('admin.bookings.show', $booking->id) }}"
-                   class="w-full inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg border border-secondary/30 bg-secondary/10 font-label text-xs font-bold uppercase tracking-widest text-secondary-container hover:bg-secondary hover:text-white transition-colors">
+                   class="w-full inline-flex items-center justify-center gap-1.5 px-3 py-1.5 sm:py-2.5 rounded-lg border border-secondary/30 bg-secondary/10 font-label text-[0.65rem] sm:text-xs font-bold uppercase tracking-widest text-secondary-container hover:bg-secondary hover:text-white transition-colors">
                     <i class="bi bi-ui-checks"></i> Tindak Lanjut (Nego)
                 </a>
             @endif
@@ -159,6 +159,11 @@
         <p class="font-label text-xs uppercase tracking-widest text-outline">Tidak ada acara yang sesuai filter saat ini.</p>
     </div>
     @endforelse
+</div>
+
+{{-- Pagination Links --}}
+<div class="mt-8 flex justify-center">
+    {!! $events->links() !!}
 </div>
 
 @endsection
