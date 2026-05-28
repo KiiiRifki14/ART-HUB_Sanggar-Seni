@@ -245,6 +245,7 @@ Route::middleware(['auth', 'role:personel'])->prefix('personnel')->name('personn
             $personnel = $user->personnelProfile;
             $now       = now();
 
+            // All upcoming events for stats, compact widget, etc.
             $upcomingEvents = $personnel
                 ? $personnel->events()
                     ->where('event_date', '>=', $now->toDateString())
@@ -252,25 +253,61 @@ Route::middleware(['auth', 'role:personel'])->prefix('personnel')->name('personn
                     ->get()
                 : collect();
 
-            // Kalender logic
-            $thisMonth   = $now->month; $thisYear = $now->year;
+            // Paginated detailed tasks list (3 events per page)
+            $paginatedDetailEvents = $personnel
+                ? $personnel->events()
+                    ->where('event_date', '>=', $now->toDateString())
+                    ->orderBy('event_date', 'asc')
+                    ->paginate(2, ['*'], 'detail_page')
+                : new \Illuminate\Pagination\LengthAwarePaginator([], 0, 3);
+
+            // Kalender navigation logic
+            $thisMonth = request()->query('month', $now->month);
+            $thisYear  = request()->query('year', $now->year);
+
+            if (!is_numeric($thisMonth) || $thisMonth < 1 || $thisMonth > 12) $thisMonth = $now->month;
+            if (!is_numeric($thisYear) || $thisYear < 2000 || $thisYear > 2100) $thisYear = $now->year;
+
             $firstDay    = \Carbon\Carbon::create($thisYear, $thisMonth, 1);
             $daysInMonth = $firstDay->daysInMonth;
             $startDow    = $firstDay->dayOfWeek;
-            $eventDates  = $upcomingEvents->pluck('event_date')
+
+            // Fetch events in selected month range for calendar markings
+            $calendarEvents = $personnel
+                ? $personnel->events()
+                    ->whereBetween('event_date', [
+                        $firstDay->copy()->startOfMonth()->toDateString(),
+                        $firstDay->copy()->endOfMonth()->toDateString()
+                    ])->get()
+                : collect();
+
+            $eventDates  = $calendarEvents->pluck('event_date')
                 ->map(fn($d) => \Carbon\Carbon::parse($d)->format('Y-m-d'))->toArray();
-            $urgentDates = $upcomingEvents->filter(function ($e) use ($now) {
+            $urgentDates = $calendarEvents->filter(function ($e) use ($now) {
                 $d = \Carbon\Carbon::parse($e->event_date)->startOfDay()->diffInDays($now->startOfDay(), false);
                 return $d >= -3 && $d <= 0;
             })->pluck('event_date')->map(fn($d) => \Carbon\Carbon::parse($d)->format('Y-m-d'))->toArray();
 
-            // Unavailabilities
+            // Prev & Next Month variables
+            $prevMonthObj = $firstDay->copy()->subMonth();
+            $nextMonthObj = $firstDay->copy()->addMonth();
+            $prevMonth = $prevMonthObj->month;
+            $prevYear  = $prevMonthObj->year;
+            $nextMonth = $nextMonthObj->month;
+            $nextYear  = $nextMonthObj->year;
+
+            // Unavailabilities within selected month
             $unavailabilityDates = [];
             if ($personnel) {
                 $unavailabilities = $personnel->unavailabilities()
-                    ->where(function($query) use ($now) {
-                        $query->where('start_date', '>=', $now->copy()->startOfMonth())
-                              ->orWhere('end_date', '>=', $now->copy()->startOfMonth());
+                    ->where(function($query) use ($firstDay) {
+                        $query->whereBetween('start_date', [
+                            $firstDay->copy()->startOfMonth()->toDateString(),
+                            $firstDay->copy()->endOfMonth()->toDateString()
+                        ])->orWhereBetween('end_date', [
+                            $firstDay->copy()->startOfMonth()->toDateString(),
+                            $firstDay->copy()->endOfMonth()->toDateString()
+                        ]);
                     })->get();
                 foreach($unavailabilities as $unavail) {
                     $start = \Carbon\Carbon::parse($unavail->start_date);
@@ -282,8 +319,9 @@ Route::middleware(['auth', 'role:personel'])->prefix('personnel')->name('personn
             }
 
             return view('personnel.dashboard', compact(
-                'personnel', 'now', 'upcomingEvents',
+                'personnel', 'now', 'upcomingEvents', 'paginatedDetailEvents',
                 'firstDay', 'daysInMonth', 'startDow', 'thisMonth', 'thisYear',
+                'prevMonth', 'prevYear', 'nextMonth', 'nextYear',
                 'eventDates', 'urgentDates', 'unavailabilityDates'
             ));
         })->name('dashboard');

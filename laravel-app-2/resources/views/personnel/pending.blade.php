@@ -7,13 +7,13 @@
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;700&family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
     <style>
         :root {
-            --bg-dark:      #800000;
-            --bg-card:      #FDFBF7;
-            --text-main:    #1A1A1A;
-            --text-muted:   #7A7A7A;
-            --gold-primary: #D4AF37;
-            --gold-dark:    #b5952f;
-            --border-color: #E8E3D9;
+            --bg-dark:      #8B1A2A;
+            --bg-card:      #FFFFFF;
+            --text-main:    #1A1817;
+            --text-muted:   #847B78;
+            --gold-primary: #C5A028;
+            --gold-dark:    #8B1A2A;
+            --border-color: rgba(197,160,40,0.2);
         }
 
         * {
@@ -24,7 +24,10 @@
         }
 
         body {
-            background: linear-gradient(135deg, var(--bg-dark), #4a0000);
+            background: #FAF9F6;
+            background-image:
+                radial-gradient(ellipse at 10% 20%, rgba(139,26,42,0.05) 0%, transparent 55%),
+                radial-gradient(ellipse at 90% 80%, rgba(197,160,40,0.03) 0%, transparent 50%);
             color: var(--text-main);
             min-height: 100vh;
             display: flex;
@@ -35,12 +38,19 @@
         .pending-container {
             background: var(--bg-card);
             padding: 50px 40px;
-            border-radius: 16px;
+            border-radius: 24px;
             max-width: 500px;
             text-align: center;
             border: 1px solid var(--border-color);
-            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.4);
+            box-shadow: 0 8px 30px rgba(139, 26, 42, 0.05);
             animation: fadeIn 0.8s ease;
+        }
+
+        @media (max-width: 600px) {
+            .pending-container {
+                margin: 20px;
+                padding: 40px 24px;
+            }
         }
 
         @keyframes fadeIn {
@@ -99,9 +109,9 @@
 
         .btn:hover {
             background: var(--bg-dark);
-            color: #FFFFFF;
+            color: var(--gold-primary);
             transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(128, 0, 0, 0.25);
+            box-shadow: 0 5px 15px rgba(139, 26, 42, 0.25);
         }
     </style>
 </head>
