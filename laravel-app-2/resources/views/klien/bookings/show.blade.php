@@ -185,7 +185,15 @@
 
                 {{-- DUA PILIHAN: Langsung Bayar atau Nego via WA --}}
                 @php
-                    $adminPhone = '6281234567890'; // Ganti dengan nomor WA admin sanggar
+                    $siteContents = \Illuminate\Support\Facades\Cache::remember(
+                        'site_contents',
+                        3600,
+                        fn() => \App\Models\SiteContent::pluck('value', 'key')->toArray()
+                    );
+                    $adminPhone = $siteContents['admin_whatsapp'] ?? '6281234567890';
+                    $bankName = $siteContents['bank_name'] ?? 'BCA';
+                    $bankAccount = $siteContents['bank_account'] ?? '1234 5678 90 a/n Cahaya Gumilang';
+
                     $waMsg = urlencode(
                         "Halo kak, saya " . Auth::user()->name .
                         " ingin negosiasi harga untuk booking " .
@@ -215,8 +223,8 @@
                     <div id="payNowSection" class="hidden animate-fade-up">
                         <div class="bg-surface-container rounded-lg p-4 mb-4 text-center border border-outline-variant/30">
                             <div class="font-label text-[0.65rem] text-outline uppercase tracking-widest font-bold mb-1">Transfer DP ke Rekening:</div>
-                            <div class="font-headline font-bold text-xl text-primary mb-0.5">🏦 BCA <span class="text-secondary">1234 5678 90</span></div>
-                            <div class="font-body text-xs text-on-surface-variant font-medium">a/n Cahaya Gumilang</div>
+                            <div class="font-headline font-bold text-xl text-primary mb-0.5">🏦 {{ $bankName }}</div>
+                            <div class="font-body text-xs text-on-surface-variant font-medium">{{ $bankAccount }}</div>
                         </div>
                         <form action="{{ route('klien.bookings.upload_proof', $booking->id) }}" method="POST" enctype="multipart/form-data">
                             @csrf

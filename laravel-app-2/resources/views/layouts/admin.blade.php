@@ -88,7 +88,8 @@
         /* ── SIDEBAR ── */
         #sidebar {
             width: var(--sidebar-w);
-            height: 100vh;            /* fixed height */
+            height: 100vh;
+            height: 100dvh; /* fix iOS safari */
             background: linear-gradient(185deg, #23120f 0%, #150907 100%);
             border-right: 1px solid rgba(255,255,255,0.05);
             display: flex; flex-direction: column;
@@ -419,7 +420,11 @@
 
     {{-- Brand --}}
     @php
-        $siteContents = \App\Models\SiteContent::pluck('value', 'key')->toArray();
+        $siteContents = \Illuminate\Support\Facades\Cache::remember(
+            'site_contents',
+            3600,
+            fn() => \App\Models\SiteContent::pluck('value', 'key')->toArray()
+        );
         $sanggarName = $siteContents['sanggar_name'] ?? 'Cahaya Gumilang';
         $sanggarLogo = $siteContents['sanggar_logo'] ?? null;
     @endphp

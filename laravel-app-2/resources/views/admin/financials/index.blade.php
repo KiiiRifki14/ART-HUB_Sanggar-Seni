@@ -53,8 +53,8 @@
 </div>
 
 {{-- ══ TABLE (Desktop) ══ --}}
-<div class="hidden md:block bg-surface-container-lowest rounded-xl border border-outline-variant/30 shadow-[0_12px_24px_rgba(54,31,26,0.03)] overflow-hidden">
-    <table class="w-full">
+<div class="hidden md:block bg-surface-container-lowest rounded-xl border border-outline-variant/30 shadow-[0_12px_24px_rgba(54,31,26,0.03)] overflow-hidden overflow-x-auto w-full">
+    <table class="w-full min-w-[900px]">
         <thead class="bg-surface-container-low">
             <tr>
                 <th class="font-label text-[0.65rem] uppercase tracking-widest text-outline font-bold px-6 py-4 text-left">Event</th>
@@ -124,6 +124,12 @@
         </tbody>
     </table>
 </div>
+
+@if ($records->hasPages())
+<div class="mt-4 px-1">
+    {{ $records->links() }}
+</div>
+@endif
 
 {{-- ══ MOBILE CARDS (Mobile only) ══ --}}
 <div class="md:hidden space-y-3">

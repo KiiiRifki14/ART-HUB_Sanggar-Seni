@@ -19,6 +19,24 @@
     ];
 @endphp
 
+{{-- Temp Password Alert --}}
+@if (session('temp_password'))
+<div class="bg-yellow-50 border border-yellow-300 text-yellow-900 rounded-lg p-4 mb-4 flex items-start gap-3">
+    <svg class="w-5 h-5 mt-0.5 shrink-0 text-yellow-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/>
+    </svg>
+    <div>
+        <p class="font-semibold">Password Sementara untuk <span class="underline">{{ session('temp_password_name') }}</span></p>
+        <p class="mt-1">Berikan password ini kepada personel yang bersangkutan:</p>
+        <code class="mt-1 inline-block bg-yellow-100 border border-yellow-400 px-3 py-1 rounded text-base font-mono tracking-widest select-all">
+            {{ session('temp_password') }}
+        </code>
+        <p class="text-xs mt-2 text-yellow-700">⚠ Password ini hanya ditampilkan sekali. Salin sebelum menutup halaman ini.</p>
+    </div>
+</div>
+@endif
+
+
 {{-- ======== BANNER: Pending Approval ======== --}}
 @if($pending > 0)
 <div class="mb-6 p-4 rounded-xl border border-orange-500/40 bg-orange-500/5 flex items-center gap-4">

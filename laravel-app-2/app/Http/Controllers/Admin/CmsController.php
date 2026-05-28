@@ -77,6 +77,7 @@ class CmsController extends Controller
             SiteContent::updateOrCreate(['key' => 'founder_photo'], ['value' => $path]);
         }
 
+        \Illuminate\Support\Facades\Cache::forget('site_contents');
         return redirect()->back()->with('success', 'Konten Landing Page berhasil diperbarui!');
     }
 }

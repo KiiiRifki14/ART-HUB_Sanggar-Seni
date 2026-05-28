@@ -35,14 +35,18 @@ class PersonnelController extends Controller
             'day_job_end'  => ['nullable', 'regex:/^([01]\d|2[0-3]):[0-5]\d$/'],
         ]);
 
+        $tempPassword = $request->filled('password')
+            ? $request->input('password')
+            : \Illuminate\Support\Str::random(8);
+
         try {
-            DB::transaction(function () use ($request) {
+            DB::transaction(function () use ($request, $tempPassword) {
                 // Buat akun user untuk personel
                 $user = User::create([
                     'name'     => $request->name,
                     'email'    => $request->email,
                     'phone'    => $request->phone,
-                    'password' => Hash::make($request->input('password', 'sanggar123')),
+                    'password' => Hash::make($tempPassword),
                     'role'     => 'personel',
                 ]);
 
@@ -58,6 +62,13 @@ class PersonnelController extends Controller
                     'is_backup'     => $request->boolean('is_backup'),
                 ]);
             });
+
+            if (!$request->filled('password')) {
+                return redirect()->route('admin.personnel.index')
+                    ->with('success', "Personel {$request->name} berhasil ditambahkan ke sanggar!")
+                    ->with('temp_password', $tempPassword)
+                    ->with('temp_password_name', $request->name);
+            }
 
             return redirect()->route('admin.personnel.index')
                 ->with('success', "Personel {$request->name} berhasil ditambahkan ke sanggar!");
