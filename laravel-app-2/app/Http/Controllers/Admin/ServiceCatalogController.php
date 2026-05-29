@@ -91,6 +91,14 @@ class ServiceCatalogController extends Controller
 
         $catalog->update($validated);
 
+        // Sync personnel count to active events (planning & rehearsal)
+        $targetCount = $catalog->max_personnel > 0 ? $catalog->max_personnel : 12;
+        \App\Models\Event::whereHas('booking', function ($q) use ($catalog) {
+            $q->where('service_catalog_id', $catalog->id);
+        })
+        ->whereIn('status', ['planning', 'rehearsal'])
+        ->update(['personnel_count' => $targetCount]);
+
         return redirect()->route('admin.catalogs.index')
             ->with('success', "Katalog \"{$catalog->name}\" berhasil diperbarui!");
     }

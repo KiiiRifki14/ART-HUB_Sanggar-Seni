@@ -91,6 +91,10 @@ class RegisteredUserController extends Controller
                 'is_active' => false,
                 'is_backup' => false,
             ]);
+
+            // Notify admins about new personnel registration
+            $admins = User::where('role', 'admin')->get();
+            \Illuminate\Support\Facades\Notification::send($admins, new \App\Notifications\NewPersonnelRegistration($user->name));
         }
 
         event(new Registered($user));

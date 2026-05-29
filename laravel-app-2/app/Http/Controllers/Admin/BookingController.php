@@ -19,6 +19,13 @@ class BookingController extends Controller
      */
     public function index()
     {
+        // Otomatis tandai event yang sudah lewat tanggalnya sebagai Selesai
+        try {
+            \Illuminate\Support\Facades\Artisan::call('events:auto-complete');
+        } catch (\Exception $e) {
+            // Abaikan jika gagal
+        }
+
         $bookings = Booking::with('client')
             ->latest()
             ->get();
@@ -285,7 +292,7 @@ class BookingController extends Controller
                     'event_start'     => $lockedBooking->event_start,
                     'event_end'       => $lockedBooking->event_end,
                     'venue'           => $lockedBooking->venue,
-                    'personnel_count' => $lockedBooking->serviceCatalog?->max_personnel ?? 0,
+                    'personnel_count' => ($lockedBooking->serviceCatalog?->max_personnel > 0) ? $lockedBooking->serviceCatalog->max_personnel : 12,
                 ]);
 
                 // 3. KUNCI FIXED PROFIT — INPUT MANUAL DARI ADMIN (bukan otomatis 30%)
@@ -420,7 +427,7 @@ class BookingController extends Controller
                         'event_start'     => $lockedBooking->event_start,
                         'event_end'       => $lockedBooking->event_end,
                         'venue'           => $lockedBooking->venue,
-                        'personnel_count' => $lockedBooking->serviceCatalog?->max_personnel ?? 0,
+                        'personnel_count' => ($lockedBooking->serviceCatalog?->max_personnel > 0) ? $lockedBooking->serviceCatalog->max_personnel : 12,
                     ]
                 );
 

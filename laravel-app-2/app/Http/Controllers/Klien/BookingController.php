@@ -98,6 +98,10 @@ class BookingController extends Controller
                 ]);
             });
 
+            // Kirim notifikasi ke Admin
+            $admins = \App\Models\User::where('role', 'admin')->get();
+            \Illuminate\Support\Facades\Notification::send($admins, new \App\Notifications\NewBookingCreated($booking));
+
             return redirect()->route('klien.bookings.show', $booking->id)
                 ->with('success', 'Booking berhasil diajukan! Tim kami akan meninjau pesanan Anda.');
 
@@ -134,6 +138,10 @@ class BookingController extends Controller
             'payment_proof' => $path
         ]);
 
+        // Kirim notifikasi ke Admin
+        $admins = \App\Models\User::where('role', 'admin')->get();
+        \Illuminate\Support\Facades\Notification::send($admins, new \App\Notifications\DpPaymentProofUploaded($booking));
+
         return redirect()->back()->with('success', 'Bukti bayar berhasil diunggah! Menunggu konfirmasi Admin.');
     }
 
@@ -158,6 +166,10 @@ class BookingController extends Controller
         $booking->update([
             'full_payment_proof' => $path
         ]);
+
+        // Kirim notifikasi ke Admin
+        $admins = \App\Models\User::where('role', 'admin')->get();
+        \Illuminate\Support\Facades\Notification::send($admins, new \App\Notifications\FullPaymentProofUploaded($booking));
 
         return redirect()->back()->with('success', 'Bukti pelunasan berhasil diunggah! Menunggu verifikasi dari Admin.');
     }

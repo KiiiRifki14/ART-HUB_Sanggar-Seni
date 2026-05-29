@@ -4,7 +4,7 @@
 @section('page_subtitle', 'Input data penyewaan kostum dari pihak ketiga (eksternal).')
 
 @section('content')
-<div class="max-w-3xl mx-auto" x-data="{ showVendorModal: false, vendorName: '', isSubmitting: false }">
+<div class="max-w-3xl mx-auto" x-data="vendorManager">
     <div class="bg-surface-container-lowest rounded-2xl border border-outline-variant/30 shadow-sm p-6 md:p-8">
 
         <div class="flex items-center gap-3 mb-8 pb-4 border-b border-outline-variant/20">
@@ -112,6 +112,10 @@
     <script>
         document.addEventListener('alpine:init', () => {
             Alpine.data('vendorManager', () => ({
+                showVendorModal: false,
+                vendorName: '',
+                isSubmitting: false,
+
                 saveVendor() {
                     if (this.vendorName.trim() === '') return;
 

@@ -25,6 +25,13 @@ class EventController extends Controller
      */
     public function monitoring(Request $request)
     {
+        // Otomatis tandai event yang sudah lewat tanggalnya sebagai Selesai
+        try {
+            \Illuminate\Support\Facades\Artisan::call('events:auto-complete');
+        } catch (\Exception $e) {
+            // Abaikan jika gagal
+        }
+
         // Gunakan Booking sebagai base query agar status 'pending'/'negotiation' ikut terbaca
         // Karena Event record baru di-generate setelah DP divalidasi.
         $query = \App\Models\Booking::with(['event.personnel', 'client'])
@@ -147,7 +154,7 @@ class EventController extends Controller
         $autoSelectedIds = [];
         if (empty($alreadyPlottedIds)) {
             // Hanya auto-select jika belum ada plotting sebelumnya
-            $quota    = $maxPersonnel > 0 ? $maxPersonnel : PHP_INT_MAX;
+            $quota    = $maxPersonnel > 0 ? $maxPersonnel : 0;
             $selected = 0;
             foreach ($personnel as $p) {
                 if ($selected >= $quota) break;

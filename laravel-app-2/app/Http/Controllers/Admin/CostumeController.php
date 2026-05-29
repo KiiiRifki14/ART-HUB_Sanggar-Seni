@@ -90,8 +90,12 @@ class CostumeController extends Controller
 
     public function createRental()
     {
-        // Ambil data event dan vendor untuk ditampilkan di dropdown form
-        $events = \App\Models\Event::all();
+        // Ambil data event yang belum selesai dan belum lewat tanggal pelaksanaan (upcoming / active)
+        $events = \App\Models\Event::with('booking')
+            ->whereNotIn('status', ['completed', 'cancelled'])
+            ->where('event_date', '>=', Carbon::today()->toDateString())
+            ->orderBy('event_date', 'asc')
+            ->get();
         $vendors = \App\Models\CostumeVendor::all();
 
         // Menampilkan form tambah sewaan
@@ -102,7 +106,20 @@ class CostumeController extends Controller
     {
         // Validasi input
         $request->validate([
-            'event_id'          => 'required|exists:events,id',
+            'event_id'          => [
+                'required',
+                'exists:events,id',
+                function ($attribute, $value, $fail) {
+                    $event = \App\Models\Event::find($value);
+                    if ($event) {
+                        if (in_array($event->status, ['completed', 'cancelled'])) {
+                            $fail('Event ini sudah selesai atau dibatalkan.');
+                        } elseif (Carbon::parse($event->event_date)->lt(Carbon::today())) {
+                            $fail('Event ini sudah lewat tanggal pelaksanaannya.');
+                        }
+                    }
+                }
+            ],
             'costume_vendor_id' => 'required|exists:costume_vendors,id',
             'costume_type'      => 'required|string|max:255',
             'quantity'          => 'required|integer|min:1',
@@ -111,9 +128,9 @@ class CostumeController extends Controller
         ]);
 
         // Simpan transaksi sewa ke database
-        \App\Models\CostumeRental::create([
+        $rental = \App\Models\CostumeRental::create([
             'event_id'          => $request->event_id,
-            'costume_vendor_id' => $request->costume_vendor_id,
+            'vendor_id'         => $request->costume_vendor_id,
             'costume_type'      => $request->costume_type,
             'quantity'          => $request->quantity,
             'rental_cost'       => $request->rental_cost,
@@ -121,8 +138,25 @@ class CostumeController extends Controller
             'status'            => 'rented', // Default status saat baru menyewa
         ]);
 
+        // Auto-create Operational Cost untuk sewa vendor ini
+        $financialRecord = \App\Models\FinancialRecord::where('event_id', $request->event_id)->first();
+        if ($financialRecord && $request->rental_cost > 0) {
+            \App\Models\OperationalCost::create([
+                'financial_record_id' => $financialRecord->id,
+                'category'            => 'sewa_kostum',
+                'description'         => 'Sewa Vendor: ' . $request->costume_type . ' (' . $request->quantity . ' pcs)',
+                'estimated_amount'    => $request->rental_cost,
+                'actual_amount'       => $request->rental_cost,
+                'updated_by'          => \Illuminate\Support\Facades\Auth::id(),
+            ]);
+
+            // Update total pengeluaran aktual di FinancialRecord
+            $totalActual = \App\Models\OperationalCost::where('financial_record_id', $financialRecord->id)->sum('actual_amount');
+            $financialRecord->update(['actual_operational_cost' => $totalActual]);
+        }
+
         return redirect()->route('admin.costumes.index')
-            ->with('success', 'Data penyewaan kostum vendor berhasil dicatat!');
+            ->with('success', 'Data penyewaan kostum vendor berhasil dicatat dan biaya operasional ditambahkan!');
     }
     /**
      * MENGEMBALIKAN KOSTUM ASET SANGGAR
@@ -200,9 +234,10 @@ class CostumeController extends Controller
             'name' => 'required|string|max:255',
         ]);
 
-        // Simpan vendor baru ke database
+        // Simpan vendor baru ke database dengan default city 'Subang' agar tidak melanggar constraint non-null DB
         $vendor = \App\Models\CostumeVendor::create([
             'name' => $request->name,
+            'city' => 'Subang',
         ]);
 
         // Kembalikan respons dalam bentuk JSON (agar bisa dibaca oleh JavaScript)

@@ -40,6 +40,13 @@ class FinancialController extends Controller
      */
     public function postEventList()
     {
+        // Otomatis tandai event yang sudah lewat tanggalnya sebagai Selesai
+        try {
+            \Illuminate\Support\Facades\Artisan::call('events:auto-complete');
+        } catch (\Exception $e) {
+            // Abaikan jika gagal
+        }
+
         // Event yang sudah lewat tanggalnya (selesai) atau status completed
         $events = \App\Models\Event::with(['booking', 'financialRecord.operationalCosts'])
             ->where(function ($q) {

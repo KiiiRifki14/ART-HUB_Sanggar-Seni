@@ -114,6 +114,8 @@
                     <div class="font-body font-semibold text-on-surface text-sm">Rp {{ number_format($booking->dp_amount, 0, ',', '.') }}</div>
                     @if($booking->dp_paid_at)
                     <div class="font-label text-xs text-outline">{{ \Carbon\Carbon::parse($booking->dp_paid_at)->format('d M Y') }}</div>
+                    @elseif(!in_array($booking->status, ['pending', 'cancelled']))
+                    <div class="font-label text-xs text-secondary font-bold">{{ \Carbon\Carbon::parse($booking->updated_at)->format('d M Y') }}</div>
                     @else
                     <div class="font-label text-xs text-orange-500 font-bold">Belum bayar</div>
                     @endif
@@ -183,7 +185,13 @@
                 <div class="bg-surface-container rounded-lg p-1.5">
                     <div class="font-label text-[0.42rem] uppercase tracking-widest text-outline mb-0.5">DP</div>
                     <div class="font-headline font-bold text-[0.68rem] text-secondary">Rp {{ number_format($booking->dp_amount, 0, ',', '.') }}</div>
-                    @if(!$booking->dp_paid_at)<div class="font-label text-[0.42rem] text-orange-500 font-bold">Belum bayar</div>@endif
+                    @if($booking->dp_paid_at)
+                    <div class="font-label text-[0.42rem] text-outline font-bold">{{ \Carbon\Carbon::parse($booking->dp_paid_at)->format('d M Y') }}</div>
+                    @elseif(!in_array($booking->status, ['pending', 'cancelled']))
+                    <div class="font-label text-[0.42rem] text-secondary font-bold">{{ \Carbon\Carbon::parse($booking->updated_at)->format('d M Y') }}</div>
+                    @else
+                    <div class="font-label text-[0.42rem] text-orange-500 font-bold">Belum bayar</div>
+                    @endif
                 </div>
             </div>
             @if($booking->status === 'pending' && $daysLeft <= 7 && $daysLeft >= 0)

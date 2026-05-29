@@ -141,9 +141,21 @@
                         <span class="inline-flex items-center px-4 rounded-l-lg border border-r-0 border-outline-variant/50 bg-surface-container-highest text-on-surface-variant font-body text-sm font-semibold">
                             +62
                         </span>
+                        @php
+                            $userPhone = auth()->user()->phone ?? '';
+                            // Bersihkan karakter non-digit untuk mempermudah deteksi kode negara
+                            $userPhone = preg_replace('/[^0-9+]/', '', $userPhone);
+                            if (str_starts_with($userPhone, '+62')) {
+                                $userPhone = substr($userPhone, 3);
+                            } elseif (str_starts_with($userPhone, '62')) {
+                                $userPhone = substr($userPhone, 2);
+                            } elseif (str_starts_with($userPhone, '0')) {
+                                $userPhone = substr($userPhone, 1);
+                            }
+                        @endphp
                         <input type="text" name="client_phone"
                                class="w-full bg-surface-container-low border border-outline-variant/50 rounded-r-lg px-4 py-2.5 font-body text-sm text-on-surface focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all @error('client_phone') border-red-500 @enderror"
-                               placeholder="81xxxxxxxxx" required>
+                               placeholder="81xxxxxxxxx" value="{{ old('client_phone', $userPhone) }}" required>
                     </div>
                     @error('client_phone')<div class="text-red-500 text-xs mt-1 font-body">{{ $message }}</div>@enderror
                 </div>

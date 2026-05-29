@@ -5,6 +5,21 @@
 
 @section('content')
 
+@php
+    $pendingCount = $events->filter(function($e) {
+        return !$e->financialRecord || !$e->financialRecord->operationalCosts || $e->financialRecord->operationalCosts->count() === 0;
+    })->count();
+@endphp
+
+@if($pendingCount > 0)
+<div class="mb-6 p-4 rounded-xl bg-orange-50 border border-orange-200 text-orange-800 flex items-center gap-3 font-body text-xs sm:text-sm shadow-sm animate-fade-up">
+    <i class="bi bi-exclamation-triangle-fill text-lg text-orange-600"></i>
+    <div>
+        <strong>Peringatan:</strong> Ada <strong>{{ $pendingCount }}</strong> pementasan selesai yang belum dimasukkan biaya operasional lapangannya sama sekali. Harap segera isi untuk kalkulasi laba bersih.
+    </div>
+</div>
+@endif
+
 <div class="flex justify-between items-center mb-6">
     <p class="font-label text-xs uppercase tracking-widest text-outline">Daftar pementasan yang sudah lewat dan butuh pencatatan biaya operasional lapangan (Bensin, Makan, dll).</p>
 </div>

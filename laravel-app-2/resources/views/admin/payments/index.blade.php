@@ -7,12 +7,10 @@
 @section('content')
 
 @php
-    $total    = $bookings->count();
-    $unpaid   = $bookings->whereIn('status',['completed', 'paid_full'])->whereNull('full_paid_at')->count();
-    $piutang  = $bookings->whereIn('status',['completed', 'confirmed', 'dp_paid', 'pending'])->whereNull('full_paid_at')->sum(function($b) {
-                    return $b->total_price - $b->dp_amount;
-                });
-    $lunas    = $bookings->whereNotNull('full_paid_at')->count();
+    $total    = $stats['total'];
+    $unpaid   = $stats['unpaid'];
+    $piutang  = $stats['piutang'];
+    $lunas    = $stats['lunas'];
 @endphp
 
 {{-- Stat Cards --}}
@@ -239,6 +237,11 @@
         <p class="font-headline text-base text-on-surface font-semibold">Belum ada tagihan</p>
     </div>
     @endforelse
+</div>
+
+{{-- Pagination Links --}}
+<div class="mt-6 flex justify-end">
+    {{ $bookings->links() }}
 </div>
 
 @endsection

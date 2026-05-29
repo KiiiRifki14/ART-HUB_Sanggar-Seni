@@ -455,6 +455,16 @@
     @php
         $r = request();
         $pendingBadge = \App\Models\Personnel::where('is_active', false)->count();
+        $pendingBookingBadge = \App\Models\Booking::where('status', 'pending')->count();
+        $pendingDpVerificationBadge = \App\Models\Booking::where('status', 'pending')->whereNotNull('payment_proof')->count();
+        $pendingPostEventBadge = \App\Models\Event::where(function ($q) {
+                $q->where('event_date', '<', now()->toDateString())
+                  ->orWhere('status', 'completed');
+            })
+            ->whereHas('financialRecord', function ($q) {
+                $q->whereDoesntHave('operationalCosts');
+            })
+            ->count();
         $menuGroups = [
             'UTAMA' => [
                 ['Dashboard',         'layout-dashboard',         'admin.dashboard',                  $r->routeIs('admin.dashboard'),                  0],
@@ -463,14 +473,15 @@
             ],
             'SDM & PRODUKSI' => [
                 ['Personnel',         'users',                    'admin.personnel.index',            $r->routeIs('admin.personnel.*'),                 $pendingBadge],
+                ['Jadwal Latihan',    'music',                    'admin.rehearsals.index',           $r->routeIs('admin.rehearsals.*'),                0],
                 ['Costume & Logistik','package',                  'admin.costumes.index',             $r->routeIs('admin.costumes.*'),                  0],
             ],
             'KEUANGAN' => [
-                ['Daftar Booking',    'book-open',                'admin.bookings.index',             $r->routeIs('admin.bookings.index'),              0],
-                ['DP Verification',   'check-circle',             'admin.bookings.dp_verification',   $r->routeIs('admin.bookings.dp_verification'),    0],
+                ['Daftar Booking',    'book-open',                'admin.bookings.index',             $r->routeIs('admin.bookings.index'),              $pendingBookingBadge],
+                ['DP Verification',   'check-circle',             'admin.bookings.dp_verification',   $r->routeIs('admin.bookings.dp_verification'),    $pendingDpVerificationBadge],
                 ['Payment Tracking',  'receipt',                  'admin.payments.index',             $r->routeIs('admin.payments.*'),                  0],
                 ['Financial Report',  'trending-up',              'admin.financials.index',           $r->routeIs('admin.financials.index'),            0],
-                ['Post-Event Update', 'clipboard-check',          'admin.financials.post_event_list', $r->routeIs('admin.financials.post_event_list'),  0],
+                ['Post-Event Update', 'clipboard-check',          'admin.financials.post_event_list', $r->routeIs('admin.financials.post_event_list'),  $pendingPostEventBadge],
             ],
             'MANAJEMEN' => [
                 ['Cancellation',      'shield-alert',             'admin.cancellations.index',        $r->routeIs('admin.cancellations.*'),             0],
