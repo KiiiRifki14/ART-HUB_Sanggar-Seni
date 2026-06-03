@@ -190,9 +190,17 @@
                         @else
                         <a href="{{ route('admin.personnel.edit', $p->id) }}"
                            class="w-8 h-8 rounded-lg bg-surface-container flex items-center justify-center text-on-surface-variant hover:bg-secondary hover:text-white transition-all"
-                           title="Edit">
-                            <i class="bi bi-pencil-fill text-sm"></i>
-                        </a>
+                           title="Edit"><i class="bi bi-pencil-fill text-sm"></i></a>
+                        {{-- Tombol Non-aktifkan Sementara --}}
+                        <form method="POST" action="{{ route('admin.personnel.toggle_status', $p->id) }}" class="m-0">
+                            @csrf @method('PATCH')
+                            <button type="submit"
+                                    class="w-8 h-8 rounded-lg bg-orange-500/10 text-orange-600 border border-orange-500/20 hover:bg-orange-500 hover:text-white transition-all"
+                                    title="Non-aktifkan Sementara"
+                                    onclick="return confirm('Non-aktifkan sementara {{ addslashes($p->user->name ?? '') }}? Personel tidak akan muncul di plotting event.')">
+                                <i class="bi bi-pause-circle-fill text-sm"></i>
+                            </button>
+                        </form>
                         @php $delMsg = "Hapus " . addslashes($p->user->name ?? 'personel ini') . "? Data tidak bisa dikembalikan."; @endphp
                         <form method="POST" action="{{ route('admin.personnel.destroy', $p->id) }}" class="m-0"
                               onsubmit="return confirm('{{ $delMsg }}')">
@@ -261,6 +269,10 @@
                 </form>
                 @else
                 <a href="{{ route('admin.personnel.edit', $p->id) }}" class="w-8 h-8 rounded-lg bg-surface-container flex items-center justify-center text-on-surface-variant hover:bg-secondary hover:text-white transition-all"><i class="bi bi-pencil-fill text-sm"></i></a>
+                {{-- Toggle Non-aktif (Mobile) --}}
+                <form method="POST" action="{{ route('admin.personnel.toggle_status', $p->id) }}">@csrf @method('PATCH')
+                    <button type="submit" class="w-8 h-8 rounded-lg bg-orange-500/10 text-orange-600 border border-orange-500/20 hover:bg-orange-500 hover:text-white transition-all" title="Non-aktifkan Sementara" onclick="return confirm('Non-aktifkan sementara {{ addslashes($p->user->name ?? '') }}?')"><i class="bi bi-pause-circle-fill text-sm"></i></button>
+                </form>
                 <form method="POST" action="{{ route('admin.personnel.destroy', $p->id) }}" onsubmit="return confirm('Hapus {{ addslashes($p->user->name ?? 'personel ini') }}?')">@csrf @method('DELETE')
                     <button type="submit" class="w-8 h-8 rounded-lg bg-surface-container flex items-center justify-center text-on-surface-variant hover:bg-red-500 hover:text-white transition-all"><i class="bi bi-trash3-fill text-sm"></i></button>
                 </form>

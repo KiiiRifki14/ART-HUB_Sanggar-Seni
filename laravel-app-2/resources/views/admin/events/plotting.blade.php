@@ -265,13 +265,13 @@
                 </div>
             </div>
 
-            {{-- Info SQL Function --}}
+            {{-- Info Kunci Plotting --}}
             <div class="bg-surface-container-lowest border-l-4 border-l-secondary border-y border-r border-outline-variant/30 rounded-r-xl p-4 shadow-sm">
-                <div class="font-label text-xs uppercase tracking-widest text-primary font-bold mb-2 flex items-center gap-1.5"><i class="bi bi-database-fill text-secondary"></i> Mekanisme SQL</div>
+                <div class="font-label text-xs uppercase tracking-widest text-primary font-bold mb-2 flex items-center gap-1.5"><i class="bi bi-info-circle-fill text-secondary"></i> Cara Kerja Kunci Plotting</div>
                 <div class="font-body text-[0.7rem] text-on-surface-variant leading-relaxed">
-                    Saat "Kunci Plotting" diklik, sistem memanggil:<br>
-                    <code class="text-blue-600 bg-blue-500/10 border border-blue-500/20 px-1.5 py-0.5 rounded my-1 inline-block text-[0.65rem]">CALL sp_check_personnel_availability()</code><br>
-                    Jika lolos, estimasi honor otomatis dihitung SQL.
+                    Sistem akan memeriksa ketersediaan kru pada tanggal acara secara otomatis.
+                    Personel yang sudah di-plot di acara lain pada tanggal yang sama tidak akan bisa dipilih kembali.
+                    Estimasi honor dihitung otomatis berdasarkan jumlah kru yang dipilih.
                 </div>
             </div>
 
@@ -289,7 +289,7 @@
 
             {{-- Tombol Submit --}}
             <button type="submit" class="w-full flex justify-center items-center gap-2 bg-secondary text-primary px-4 py-3.5 rounded-xl font-label text-[0.7rem] font-bold uppercase tracking-widest hover:bg-secondary-container transition-all shadow-md">
-                <i class="bi bi-lock-fill"></i> Validasi SQL & Kunci Plotting
+                <i class="bi bi-lock-fill"></i> Periksa Ketersediaan & Kunci Plotting
             </button>
         </div>
 

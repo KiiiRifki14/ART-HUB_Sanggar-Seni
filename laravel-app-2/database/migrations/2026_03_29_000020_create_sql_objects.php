@@ -113,9 +113,9 @@ return new class extends Migration
                     IF NEW.status = 'damaged' OR NEW.status = 'lost' THEN
                         -- Status tetap sesuai input
                         SET NEW.status = NEW.status;
-                    ELSEIF NEW.actual_return_date > NEW.expected_return_date THEN
-                        SET NEW.status = 'damaged';
                     ELSE
+                        -- Meskipun telat (actual_return_date > expected_return_date), status tetap 'returned'
+                        -- Denda hanya berlaku jika damaged / lost (atau untuk rental eksternal)
                         SET NEW.status = 'returned';
                     END IF;
                 END IF;

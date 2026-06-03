@@ -13,14 +13,32 @@ use Barryvdh\DomPDF\Facade\Pdf;
 class FinancialController extends Controller
 {
     /**
-     * Financial Report Overview
+     * Financial Report Overview with optional date range & keyword filter
      */
-    public function index()
+    public function index(Request $request)
     {
-        $records = FinancialRecord::with('event.booking')
-            ->latest()
-            ->paginate(15)
-            ->withQueryString();
+        $query = FinancialRecord::with('event.booking')->latest();
+
+        // Filter pencarian (event code / jenis acara)
+        if ($search = $request->input('search')) {
+            $query->whereHas('event', function ($q) use ($search) {
+                $q->where('event_code', 'like', "%{$search}%")
+                  ->orWhereHas('booking', function ($q2) use ($search) {
+                      $q2->where('event_type', 'like', "%{$search}%");
+                  });
+            });
+        }
+
+        // Filter rentang tanggal berdasarkan event_date
+        if ($dateFrom = $request->input('date_from')) {
+            $query->whereHas('event', fn($q) => $q->where('event_date', '>=', $dateFrom));
+        }
+        if ($dateTo = $request->input('date_to')) {
+            $query->whereHas('event', fn($q) => $q->where('event_date', '<=', $dateTo));
+        }
+
+        $records = $query->paginate(15)->withQueryString();
+
         return view('admin.financials.index', compact('records'));
     }
 

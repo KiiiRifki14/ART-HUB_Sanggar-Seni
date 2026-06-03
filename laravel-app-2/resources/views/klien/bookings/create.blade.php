@@ -123,9 +123,11 @@
                         @error('venue')<div class="text-red-500 text-xs mt-1 font-body">{{ $message }}</div>@enderror
                     </div>
                     <div>
-                        <label class="block font-label text-xs uppercase tracking-widest text-on-surface-variant font-bold mb-1.5">Alamat Lengkap</label>
-                        <textarea name="venue_address" class="w-full bg-surface-container-low border border-outline-variant/50 rounded-lg px-4 py-2.5 font-body text-sm text-on-surface focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all" rows="2"
-                            placeholder="Contoh: Jl. Diponegoro No. 22, Bandung"></textarea>
+                        <label class="block font-label text-xs uppercase tracking-widest text-on-surface-variant font-bold mb-1.5">Alamat Lengkap <span class="text-red-500">*</span></label>
+                        <textarea name="venue_address" class="w-full bg-surface-container-low border {{ $errors->has('venue_address') ? 'border-red-500' : 'border-outline-variant/50' }} rounded-lg px-4 py-2.5 font-body text-sm text-on-surface focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all" rows="2"
+                            placeholder="Contoh: Jl. Diponegoro No. 22, Kel. Citarum, Kec. Bandung Wetan, Kota Bandung" required>{{ old('venue_address') }}</textarea>
+                        <div class="font-label text-[0.65rem] text-outline mt-1.5 flex items-center gap-1"><i class="bi bi-info-circle"></i> Wajib diisi agar kru dapat menemukan lokasi acara dengan tepat</div>
+                        @error('venue_address')<div class="text-red-500 text-xs mt-1 font-body">{{ $message }}</div>@enderror
                     </div>
                 </div>
             </div>

@@ -27,7 +27,9 @@ class BookingController extends Controller
         }
 
         $bookings = Booking::with('client')
-            ->latest()
+            ->orderByRaw("CASE WHEN status = 'pending' THEN 0 ELSE 1 END")
+            ->orderByRaw("CASE WHEN status = 'pending' THEN created_at END ASC")
+            ->orderByRaw("CASE WHEN status != 'pending' THEN created_at END DESC")
             ->get();
         return view('admin.bookings.index', compact('bookings'));
     }
@@ -51,14 +53,14 @@ class BookingController extends Controller
         $pendingWithProof = Booking::with('client')
             ->where('status', 'pending')
             ->whereNotNull('payment_proof')
-            ->latest()
+            ->orderBy('created_at', 'asc')
             ->get();
 
         // Booking pending yang belum ada bukti bayar (menunggu Klien)
         $pendingNoProof = Booking::with('client')
             ->where('status', 'pending')
             ->whereNull('payment_proof')
-            ->latest()
+            ->orderBy('created_at', 'asc')
             ->get();
 
         // ── SUMMARY CARD 1: Jumlah antrean menunggu verifikasi

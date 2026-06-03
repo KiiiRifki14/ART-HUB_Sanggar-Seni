@@ -85,7 +85,7 @@
                 <tr class="{{ $index % 2 === 0 ? 'bg-surface-container-lowest' : 'bg-surface-container-low/30' }} hover:bg-surface-container-low transition-colors group">
                     <td class="px-6 py-4">
                         <span class="inline-block px-2.5 py-1 rounded border border-outline-variant/50 bg-surface-container-highest text-on-surface-variant font-label text-[0.65rem] font-bold uppercase tracking-wider">
-                            {{ str_replace('_', ' ', $cost->category) }}
+                            {{ ucwords(str_replace('_', ' ', $cost->category)) }}
                         </span>
                     </td>
                     <td class="px-6 py-4 font-body text-sm font-semibold text-on-surface">{{ $cost->description }}</td>
@@ -190,8 +190,10 @@
                     <select name="category" class="w-full bg-surface-container border border-outline-variant/50 rounded-lg px-4 py-2.5 font-body text-sm text-on-surface focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all" required>
                         <option value="konsumsi">Konsumsi</option>
                         <option value="transportasi">Transportasi / Bensin</option>
+                        <option value="sewa_kostum">Sewa Kostum Luar</option>
                         <option value="honor_kru">Honor Tambahan Kru</option>
                         <option value="logistik">Sewa Alat / Logistik</option>
+                        <option value="denda_insiden">Denda Insiden</option>
                         <option value="lainnya">Lainnya</option>
                     </select>
                 </div>

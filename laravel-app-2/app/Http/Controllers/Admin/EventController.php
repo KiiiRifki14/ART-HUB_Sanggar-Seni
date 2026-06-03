@@ -16,7 +16,7 @@ class EventController extends Controller
      */
     public function index()
     {
-        $events = Event::with('booking')->latest('event_date')->paginate(12)->withQueryString();
+        $events = Event::with('booking')->orderBy('event_date', 'asc')->paginate(12)->withQueryString();
         return view('admin.events.index', compact('events'));
     }
 
@@ -68,7 +68,11 @@ class EventController extends Controller
      */
     public function monitoringDetail(Event $event)
     {
-        $event->load(['booking', 'personnel.user', 'financialRecord']);
+        $event->load([
+            'booking.client',
+            'personnel.user',
+            'financialRecord.operationalCosts',
+        ]);
         return view('admin.events.monitoring-detail', compact('event'));
     }
 

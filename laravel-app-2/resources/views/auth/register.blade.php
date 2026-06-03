@@ -138,7 +138,7 @@
                         <label for="p_name" class="absolute left-4 top-3 text-on-surface-variant font-label text-sm transition-all duration-200 pointer-events-none
                             peer-placeholder-shown:top-3 peer-placeholder-shown:text-sm
                             peer-focus:-top-5 peer-focus:text-xs peer-focus:text-secondary peer-focus:uppercase peer-focus:tracking-widest">
-                            Nama Lengkap
+                            Nama Lengkap <span class="text-red-500">*</span>
                         </label>
                     </div>
 
@@ -150,11 +150,11 @@
                             <label for="p_phone" class="absolute left-4 top-3 text-on-surface-variant font-label text-sm transition-all duration-200 pointer-events-none
                                 peer-placeholder-shown:top-3 peer-placeholder-shown:text-sm
                                 peer-focus:-top-5 peer-focus:text-xs peer-focus:text-secondary peer-focus:uppercase peer-focus:tracking-widest">
-                                Nomor WhatsApp
+                                Nomor WhatsApp <span class="text-red-500">*</span>
                             </label>
                         </div>
                         <div class="field-group relative">
-                            <input type="text" name="primary_skill" id="p_skill" placeholder=" " value="{{ old('primary_skill') }}"
+                            <input type="text" name="day_job_name" id="p_skill" placeholder=" " value="{{ old('day_job_name') }}"
                                 class="peer block w-full bg-surface-container-high border-0 border-b-2 border-outline-variant/40 py-3 px-4 text-on-surface focus:ring-0 focus:border-secondary focus:bg-surface-container-lowest rounded-t-lg transition-all duration-200">
                             <label for="p_skill" class="absolute left-4 top-3 text-on-surface-variant font-label text-sm transition-all duration-200 pointer-events-none
                                 peer-placeholder-shown:top-3 peer-placeholder-shown:text-sm
@@ -165,20 +165,15 @@
                     </div>
 
                     {{-- Specialties --}}
-                    <div data-aos="fade-up" data-aos-delay="500">
-                        <p class="font-headline text-base text-primary mb-4">Keahlian Tari &amp; Musik</p>
-                        <div class="grid grid-cols-2 gap-3">
-                            @foreach([['jaipong','Tari Jaipong'],['topeng','Tari Topeng'],['gamelan','Gamelan'],['kendang','Kendang'],['sinden','Sinden'],['other','Lainnya']] as [$val,$label])
-                            <label class="flex items-center gap-3 cursor-pointer group">
-                                <div class="relative flex items-center justify-center flex-shrink-0">
-                                    <input type="checkbox" name="specialties[]" value="{{ $val }}"
-                                        class="peer appearance-none w-5 h-5 border-2 border-outline rounded bg-surface checked:bg-secondary checked:border-secondary focus:ring-2 focus:ring-secondary/20 transition-all cursor-pointer">
-                                    <span class="material-symbols-outlined absolute text-on-primary text-[14px] opacity-0 peer-checked:opacity-100 pointer-events-none" style="font-variation-settings:'FILL' 1;">check</span>
-                                </div>
-                                <span class="font-body text-sm text-on-surface group-hover:text-primary transition-colors">{{ $label }}</span>
-                            </label>
-                            @endforeach
-                        </div>
+                    <div data-aos="fade-up" data-aos-delay="500" class="field-group relative">
+                        <label class="block font-label text-xs uppercase tracking-widest text-on-surface-variant font-bold mb-2">Keahlian / Spesialisasi <span class="text-red-500">*</span></label>
+                        <select name="specialty" required
+                            class="w-full bg-surface-container-high border-0 border-b-2 border-outline-variant/40 py-3 px-4 text-on-surface focus:ring-0 focus:border-secondary focus:bg-surface-container-lowest rounded-t-lg transition-all duration-200">
+                            <option value="" disabled {{ old('specialty') === null ? 'selected' : '' }}>— Pilih Keahlian —</option>
+                            <option value="penari" {{ old('specialty') === 'penari' ? 'selected' : '' }}>🎭 Penari</option>
+                            <option value="pemusik" {{ old('specialty') === 'pemusik' ? 'selected' : '' }}>🎵 Pemusik</option>
+                            <option value="multi_talent" {{ old('specialty') === 'multi_talent' ? 'selected' : '' }}>🎭🎵 Multi-Talent / Kru</option>
+                        </select>
                     </div>
 
                     {{-- Email --}}
@@ -188,7 +183,7 @@
                         <label for="p_email" class="absolute left-4 top-3 text-on-surface-variant font-label text-sm transition-all duration-200 pointer-events-none
                             peer-placeholder-shown:top-3 peer-placeholder-shown:text-sm
                             peer-focus:-top-5 peer-focus:text-xs peer-focus:text-secondary peer-focus:uppercase peer-focus:tracking-widest">
-                            Alamat Email
+                            Alamat Email <span class="text-red-500">*</span>
                         </label>
                     </div>
 
@@ -200,7 +195,7 @@
                             <label for="p_otp" class="absolute left-4 top-3 text-on-surface-variant font-label text-sm transition-all duration-200 pointer-events-none
                                 peer-placeholder-shown:top-3 peer-placeholder-shown:text-sm
                                 peer-focus:-top-5 peer-focus:text-xs peer-focus:text-secondary peer-focus:uppercase peer-focus:tracking-widest">
-                                Kode OTP
+                                Kode OTP <span class="text-red-500">*</span>
                             </label>
                         </div>
                         <button type="button" id="btn_send_p_otp" onclick="sendOtp('p_email', 'btn_send_p_otp')" class="bg-secondary-container text-on-secondary-container px-4 rounded-lg font-semibold hover:bg-secondary-fixed-dim transition-colors text-sm whitespace-nowrap shadow-sm">
@@ -210,25 +205,35 @@
 
                     {{-- Password --}}
                     <div class="field-group relative" data-aos="fade-up" data-aos-delay="600">
-                        <input type="password" name="password" id="p_password" placeholder=" " required
-                            class="peer block w-full bg-surface-container-high border-0 border-b-2 border-outline-variant/40 py-3 px-4 text-on-surface focus:ring-0 focus:border-secondary focus:bg-surface-container-lowest rounded-t-lg transition-all duration-200">
-                        <label for="p_password" class="absolute left-4 top-3 text-on-surface-variant font-label text-sm transition-all duration-200 pointer-events-none
-                            peer-placeholder-shown:top-3 peer-placeholder-shown:text-sm
-                            peer-focus:-top-5 peer-focus:text-xs peer-focus:text-secondary peer-focus:uppercase peer-focus:tracking-widest">
-                            Kata Sandi
-                        </label>
+                        <div class="relative">
+                            <input type="password" name="password" id="p_password" placeholder=" " required
+                                class="peer block w-full bg-surface-container-high border-0 border-b-2 border-outline-variant/40 py-3 pl-4 pr-12 text-on-surface focus:ring-0 focus:border-secondary focus:bg-surface-container-lowest rounded-t-lg transition-all duration-200">
+                            <label for="p_password" class="absolute left-4 top-3 text-on-surface-variant font-label text-sm transition-all duration-200 pointer-events-none
+                                peer-placeholder-shown:top-3 peer-placeholder-shown:text-sm
+                                peer-focus:-top-5 peer-focus:text-xs peer-focus:text-secondary peer-focus:uppercase peer-focus:tracking-widest">
+                                Kata Sandi <span class="text-red-500">*</span>
+                            </label>
+                            <button type="button" onclick="togglePwd('p_password', this)" class="absolute right-3 top-1/2 -translate-y-1/2 text-on-surface-variant hover:text-primary transition-colors z-10">
+                                <span class="material-symbols-outlined text-[20px]">visibility_off</span>
+                            </button>
+                        </div>
                         <p class="text-xs text-on-surface-variant/70 mt-1 ml-1">Minimal 8 karakter (huruf besar, kecil, angka).</p>
                     </div>
 
                     {{-- Confirm Password --}}
                     <div class="field-group relative" data-aos="fade-up" data-aos-delay="650">
-                        <input type="password" name="password_confirmation" id="p_confirm" placeholder=" " required
-                            class="peer block w-full bg-surface-container-high border-0 border-b-2 border-outline-variant/40 py-3 px-4 text-on-surface focus:ring-0 focus:border-secondary focus:bg-surface-container-lowest rounded-t-lg transition-all duration-200">
-                        <label for="p_confirm" class="absolute left-4 top-3 text-on-surface-variant font-label text-sm transition-all duration-200 pointer-events-none
-                            peer-placeholder-shown:top-3 peer-placeholder-shown:text-sm
-                            peer-focus:-top-5 peer-focus:text-xs peer-focus:text-secondary peer-focus:uppercase peer-focus:tracking-widest">
-                            Konfirmasi Kata Sandi
-                        </label>
+                        <div class="relative">
+                            <input type="password" name="password_confirmation" id="p_confirm" placeholder=" " required
+                                class="peer block w-full bg-surface-container-high border-0 border-b-2 border-outline-variant/40 py-3 pl-4 pr-12 text-on-surface focus:ring-0 focus:border-secondary focus:bg-surface-container-lowest rounded-t-lg transition-all duration-200">
+                            <label for="p_confirm" class="absolute left-4 top-3 text-on-surface-variant font-label text-sm transition-all duration-200 pointer-events-none
+                                peer-placeholder-shown:top-3 peer-placeholder-shown:text-sm
+                                peer-focus:-top-5 peer-focus:text-xs peer-focus:text-secondary peer-focus:uppercase peer-focus:tracking-widest">
+                                Konfirmasi Kata Sandi <span class="text-red-500">*</span>
+                            </label>
+                            <button type="button" onclick="togglePwd('p_confirm', this)" class="absolute right-3 top-1/2 -translate-y-1/2 text-on-surface-variant hover:text-primary transition-colors z-10">
+                                <span class="material-symbols-outlined text-[20px]">visibility_off</span>
+                            </button>
+                        </div>
                     </div>
 
                     {{-- CTA --}}
@@ -254,7 +259,7 @@
 
                     {{-- Full Name --}}
                     <div data-aos="fade-up" data-aos-delay="400">
-                        <label class="block font-label text-xs uppercase tracking-[0.05em] text-on-surface-variant mb-2">Nama Lengkap</label>
+                        <label class="block font-label text-xs uppercase tracking-[0.05em] text-on-surface-variant mb-2">Nama Lengkap <span class="text-red-500">*</span></label>
                         <input type="text" name="name" required value="{{ old('name') }}" placeholder="Raden Saleh"
                             class="w-full bg-surface-container-high/60 border-0 border-b-2 border-outline-variant/40 text-on-surface font-body px-4 py-3 rounded-t-lg focus:ring-0 focus:border-secondary transition-all duration-200 placeholder:text-on-surface-variant/40">
                     </div>
@@ -272,12 +277,12 @@
                     {{-- Phone + Email --}}
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6" data-aos="fade-up" data-aos-delay="500">
                         <div>
-                            <label class="block font-label text-xs uppercase tracking-[0.05em] text-on-surface-variant mb-2">Nomor Telepon (WA)</label>
+                            <label class="block font-label text-xs uppercase tracking-[0.05em] text-on-surface-variant mb-2">Nomor Telepon (WA) <span class="text-red-500">*</span></label>
                             <input type="tel" name="phone" value="{{ old('phone') }}" placeholder="+62 812 3456 7890" required
                                 class="w-full bg-surface-container-high/60 border-0 border-b-2 border-outline-variant/40 text-on-surface font-body px-4 py-3 rounded-t-lg focus:ring-0 focus:border-secondary transition-all duration-200 placeholder:text-on-surface-variant/40">
                         </div>
                         <div>
-                            <label class="block font-label text-xs uppercase tracking-[0.05em] text-on-surface-variant mb-2">Alamat Email</label>
+                            <label class="block font-label text-xs uppercase tracking-[0.05em] text-on-surface-variant mb-2">Alamat Email <span class="text-red-500">*</span></label>
                             <input type="email" name="email" id="c_email" required value="{{ old('email') }}" placeholder="name@domain.com"
                                 class="w-full bg-surface-container-high/60 border-0 border-b-2 border-outline-variant/40 text-on-surface font-body px-4 py-3 rounded-t-lg focus:ring-0 focus:border-secondary transition-all duration-200 placeholder:text-on-surface-variant/40">
                         </div>
@@ -285,7 +290,7 @@
 
                     {{-- OTP --}}
                     <div data-aos="fade-up" data-aos-delay="525">
-                        <label class="block font-label text-xs uppercase tracking-[0.05em] text-on-surface-variant mb-2">Kode OTP</label>
+                        <label class="block font-label text-xs uppercase tracking-[0.05em] text-on-surface-variant mb-2">Kode OTP <span class="text-red-500">*</span></label>
                         <div class="flex gap-3">
                             <input type="text" name="otp_code" required placeholder="123456" maxlength="6"
                                 class="w-full bg-surface-container-high/60 border-0 border-b-2 border-outline-variant/40 text-on-surface font-body px-4 py-3 rounded-t-lg focus:ring-0 focus:border-secondary transition-all duration-200 tracking-widest text-center font-bold">
@@ -297,7 +302,7 @@
 
                     {{-- Password --}}
                     <div data-aos="fade-up" data-aos-delay="550">
-                        <label class="block font-label text-xs uppercase tracking-[0.05em] text-on-surface-variant mb-2">Kata Sandi</label>
+                        <label class="block font-label text-xs uppercase tracking-[0.05em] text-on-surface-variant mb-2">Kata Sandi <span class="text-red-500">*</span></label>
                         <div class="relative">
                             <input type="password" name="password" id="c_password" required placeholder="••••••••"
                                 class="w-full bg-surface-container-high/60 border-0 border-b-2 border-outline-variant/40 text-on-surface font-body px-4 py-3 rounded-t-lg focus:ring-0 focus:border-secondary transition-all duration-200 pr-12">
@@ -310,9 +315,14 @@
 
                     {{-- Confirm Password --}}
                     <div data-aos="fade-up" data-aos-delay="600">
-                        <label class="block font-label text-xs uppercase tracking-[0.05em] text-on-surface-variant mb-2">Konfirmasi Kata Sandi</label>
-                        <input type="password" name="password_confirmation" required placeholder="••••••••"
-                            class="w-full bg-surface-container-high/60 border-0 border-b-2 border-outline-variant/40 text-on-surface font-body px-4 py-3 rounded-t-lg focus:ring-0 focus:border-secondary transition-all duration-200">
+                        <label class="block font-label text-xs uppercase tracking-[0.05em] text-on-surface-variant mb-2">Konfirmasi Kata Sandi <span class="text-red-500">*</span></label>
+                        <div class="relative">
+                            <input type="password" name="password_confirmation" id="c_confirm" required placeholder="••••••••"
+                                class="w-full bg-surface-container-high/60 border-0 border-b-2 border-outline-variant/40 text-on-surface font-body px-4 py-3 rounded-t-lg focus:ring-0 focus:border-secondary transition-all duration-200 pr-12">
+                            <button type="button" onclick="togglePwd('c_confirm', this)" class="absolute right-3 top-1/2 -translate-y-1/2 text-on-surface-variant hover:text-primary transition-colors">
+                                <span class="material-symbols-outlined text-[20px]">visibility_off</span>
+                            </button>
+                        </div>
                     </div>
 
                     {{-- CTA --}}

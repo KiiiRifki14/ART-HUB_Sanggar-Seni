@@ -5,7 +5,62 @@
 @section('page_subtitle', 'Detail & Monitoring Event Pementasan.')
 
 @section('content')
-<div x-data="{ showKoordinatModal: {{ $errors->has('latitude') || $errors->has('longitude') ? 'true' : 'false' }} }">
+<div x-data="{ 
+    showKoordinatModal: {{ $errors->has('latitude') || $errors->has('longitude') ? 'true' : 'false' }},
+    lat: '{{ old('latitude', $event->latitude) }}',
+    lng: '{{ old('longitude', $event->longitude) }}',
+    map: null,
+    marker: null,
+    initMap() {
+        if (this.map) return;
+        setTimeout(() => {
+            if (typeof google === 'undefined' || typeof google.maps === 'undefined') {
+                alert('Google Maps API belum termuat. Pastikan GOOGLE_MAPS_API_KEY sudah diset di .env');
+                return;
+            }
+
+            let initialLat = parseFloat(this.lat) || -6.917464;
+            let initialLng = parseFloat(this.lng) || 107.619122;
+            let centerPos = { lat: initialLat, lng: initialLng };
+
+            this.map = new google.maps.Map(document.getElementById('map-container'), {
+                zoom: 15,
+                center: centerPos,
+                mapTypeControl: false,
+                streetViewControl: false
+            });
+
+            this.marker = new google.maps.Marker({
+                position: centerPos,
+                map: this.map,
+                draggable: true,
+                animation: google.maps.Animation.DROP
+            });
+
+            this.marker.addListener('dragend', () => {
+                let position = this.marker.getPosition();
+                this.lat = position.lat().toFixed(6);
+                this.lng = position.lng().toFixed(6);
+            });
+
+            this.map.addListener('click', (e) => {
+                let position = e.latLng;
+                this.marker.setPosition(position);
+                this.lat = position.lat().toFixed(6);
+                this.lng = position.lng().toFixed(6);
+            });
+        }, 150);
+    },
+    updateMarker() {
+        let currentLat = parseFloat(this.lat);
+        let currentLng = parseFloat(this.lng);
+        if (!isNaN(currentLat) && !isNaN(currentLng) && this.marker && this.map) {
+            let latlng = { lat: currentLat, lng: currentLng };
+            this.marker.setPosition(latlng);
+            this.map.panTo(latlng);
+        }
+    }
+}" x-init="$watch('showKoordinatModal', value => { if (value) initMap(); })">
 
 {{-- BACK NAV --}}
 <div class="flex items-center gap-2 mb-6 font-label text-xs uppercase tracking-widest font-bold">
@@ -263,16 +318,23 @@
             @csrf
             @method('PATCH')
             <div class="p-6">
-                <p class="font-body text-sm text-on-surface-variant leading-relaxed mb-5">Masukkan koordinat acara untuk keperluan absensi Geofencing kru (Radius 100m - 200m).</p>
+                <p class="font-body text-sm text-on-surface-variant leading-relaxed mb-4">Pilih lokasi pada peta atau masukkan koordinat acara untuk keperluan absensi Geofencing kru (Radius 100m - 200m).</p>
+                
+                {{-- Map Container --}}
+                <div class="mb-5">
+                    <label class="block font-label text-xs uppercase tracking-widest text-on-surface-variant font-bold mb-1.5">Pilih Lokasi Di Peta</label>
+                    <div id="map-container" class="h-60 w-full rounded-lg border border-outline-variant/40 shadow-inner z-10"></div>
+                </div>
+
                 <div class="space-y-4">
                     <div>
                         <label class="block font-label text-xs uppercase tracking-widest text-on-surface-variant font-bold mb-1.5">Latitude</label>
-                        <input type="text" name="latitude" class="w-full bg-surface-container-low border border-outline-variant/50 rounded-lg px-4 py-2.5 font-body text-sm text-on-surface focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all" value="{{ old('latitude', $event->latitude) }}" placeholder="Contoh: -6.561567" required>
+                        <input type="text" name="latitude" x-model="lat" @input="updateMarker()" class="w-full bg-surface-container-low border border-outline-variant/50 rounded-lg px-4 py-2.5 font-body text-sm text-on-surface focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all" placeholder="Contoh: -6.561567" required>
                         @error('latitude') <p class="text-xs text-red-600 mt-1">{{ $message }}</p> @enderror
                     </div>
                     <div>
                         <label class="block font-label text-xs uppercase tracking-widest text-on-surface-variant font-bold mb-1.5">Longitude</label>
-                        <input type="text" name="longitude" class="w-full bg-surface-container-low border border-outline-variant/50 rounded-lg px-4 py-2.5 font-body text-sm text-on-surface focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all" value="{{ old('longitude', $event->longitude) }}" placeholder="Contoh: 107.766724" required>
+                        <input type="text" name="longitude" x-model="lng" @input="updateMarker()" class="w-full bg-surface-container-low border border-outline-variant/50 rounded-lg px-4 py-2.5 font-body text-sm text-on-surface focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all" placeholder="Contoh: 107.766724" required>
                         @error('longitude') <p class="text-xs text-red-600 mt-1">{{ $message }}</p> @enderror
                     </div>
                 </div>
@@ -287,4 +349,16 @@
 
 </div>
 
+@endsection
+
+@section('styles')
+<style>
+    #map-container {
+        height: 240px;
+    }
+</style>
+@endsection
+
+@section('scripts')
+<script src="https://maps.googleapis.com/maps/api/js?key={{ env('GOOGLE_MAPS_API_KEY') }}&libraries=places"></script>
 @endsection

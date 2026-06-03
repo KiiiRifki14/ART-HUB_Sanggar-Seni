@@ -37,6 +37,9 @@ class RegisteredUserController extends Controller
             'phone' => ['required', 'string', 'max:20', 'regex:/^[0-9\-\+\(\)]+$/'],
             'password' => ['required', 'confirmed', Rules\Password::defaults()],
             'otp_code' => ['required', 'string', 'size:6'],
+            'role' => ['required', 'string', 'in:personnel,klien'],
+            'specialty' => ['required_if:role,personnel', 'nullable', 'string', 'in:penari,pemusik,multi_talent'],
+            'day_job_name' => ['nullable', 'string', 'max:255'],
         ]);
 
         $email = $request->email;
@@ -83,9 +86,9 @@ class RegisteredUserController extends Controller
             
             \App\Models\Personnel::create([
                 'user_id' => $user->id,
-                'specialty' => 'penari', // Defaulting as discussed
+                'specialty' => $request->specialty, // Ganti dari hardcoded 'penari'
                 'has_day_job' => $hasDayJob,
-                'day_job_desc' => $hasDayJob ? $request->day_job_name : null,
+                'day_job_desc' => $hasDayJob ? strip_tags($request->day_job_name) : null,
                 'day_job_start' => $hasDayJob ? $request->day_job_start : null,
                 'day_job_end' => $hasDayJob ? $request->day_job_end : null,
                 'is_active' => false,

@@ -151,6 +151,7 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
     Route::delete('/personnel/{personnel}', [PersonnelController::class, 'destroy'])->name('personnel.destroy');
     Route::post('/personnel/{personnel}/approve', [PersonnelController::class, 'approve'])->name('personnel.approve');
     Route::delete('/personnel/{personnel}/reject', [PersonnelController::class, 'reject'])->name('personnel.reject');
+    Route::patch('/personnel/{personnel}/toggle-status', [PersonnelController::class, 'toggleStatus'])->name('personnel.toggle_status');
 
 
     // PAYMENT TRACKING
@@ -253,6 +254,27 @@ Route::middleware(['auth', 'role:personel'])->prefix('personnel')->name('personn
                     ->get()
                 : collect();
 
+            // Rehearsals for personnel based on plotted events & specialty
+            $upcomingRehearsals = collect();
+            if ($personnel) {
+                $specMap = ['penari' => 'tari', 'pemusik' => 'musik', 'multi_talent' => 'gabungan'];
+                $mappedType = $specMap[$personnel->specialty] ?? 'gabungan';
+                
+                $upcomingRehearsals = \App\Models\Rehearsal::with('event.booking')
+                    ->whereHas('event.personnel', function($q) use ($personnel) {
+                        $q->where('personnel.id', $personnel->id);
+                    })
+                    ->where(function($q) use ($mappedType) {
+                        $q->where('type', 'gabungan');
+                        if ($mappedType !== 'gabungan') {
+                            $q->orWhere('type', $mappedType);
+                        }
+                    })
+                    ->where('rehearsal_date', '>=', $now->toDateString())
+                    ->orderBy('rehearsal_date', 'asc')
+                    ->get();
+            }
+
             // Paginated detailed tasks list (3 events per page)
             $paginatedDetailEvents = $personnel
                 ? $personnel->events()
@@ -287,6 +309,27 @@ Route::middleware(['auth', 'role:personel'])->prefix('personnel')->name('personn
                 $d = \Carbon\Carbon::parse($e->event_date)->startOfDay()->diffInDays($now->startOfDay(), false);
                 return $d >= -3 && $d <= 0;
             })->pluck('event_date')->map(fn($d) => \Carbon\Carbon::parse($d)->format('Y-m-d'))->toArray();
+            
+            // Rehearsal Dates for calendar markings
+            $rehearsalDates = [];
+            if ($personnel) {
+                $calendarRehearsals = \App\Models\Rehearsal::whereHas('event.personnel', function($q) use ($personnel) {
+                        $q->where('personnel.id', $personnel->id);
+                    })
+                    ->where(function($q) use ($mappedType) {
+                        $q->where('type', 'gabungan');
+                        if ($mappedType !== 'gabungan') {
+                            $q->orWhere('type', $mappedType);
+                        }
+                    })
+                    ->whereBetween('rehearsal_date', [
+                        $firstDay->copy()->startOfMonth()->toDateString(),
+                        $firstDay->copy()->endOfMonth()->toDateString()
+                    ])->get();
+                $rehearsalDates = $calendarRehearsals->pluck('rehearsal_date')
+                    ->map(fn($d) => \Carbon\Carbon::parse($d)->format('Y-m-d'))->toArray();
+            }
+
 
             // Prev & Next Month variables
             $prevMonthObj = $firstDay->copy()->subMonth();
@@ -319,10 +362,10 @@ Route::middleware(['auth', 'role:personel'])->prefix('personnel')->name('personn
             }
 
             return view('personnel.dashboard', compact(
-                'personnel', 'now', 'upcomingEvents', 'paginatedDetailEvents',
-                'firstDay', 'daysInMonth', 'startDow', 'thisMonth', 'thisYear',
-                'prevMonth', 'prevYear', 'nextMonth', 'nextYear',
-                'eventDates', 'urgentDates', 'unavailabilityDates'
+                'personnel', 'upcomingEvents', 'upcomingRehearsals', 'paginatedDetailEvents', 
+                'firstDay', 'daysInMonth', 'startDow', 'thisMonth', 'thisYear', 
+                'prevMonth', 'prevYear', 'nextMonth', 'nextYear', 
+                'eventDates', 'urgentDates', 'rehearsalDates', 'now', 'unavailabilityDates'
             ));
         })->name('dashboard');
 

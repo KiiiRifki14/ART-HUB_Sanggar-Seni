@@ -99,6 +99,9 @@ class PersonnelController extends Controller
             'is_backup'    => 'nullable|boolean',
         ]);
 
+        // Simpan nilai lama sebelum update (untuk isi notifikasi)
+        $oldSpecialty = $personnel->specialty;
+
         try {
             DB::transaction(function () use ($request, $personnel) {
                 // 1. Update data User (Nama & HP)
@@ -121,6 +124,19 @@ class PersonnelController extends Controller
                 // Perintah save() memaksa data tersimpan meskipun tidak ada di $fillable model
                 $personnel->save();
             });
+
+            // Kirim notifikasi ke personel yang bersangkutan
+            if ($personnel->user) {
+                $adminName = auth()->user()->name ?? 'Admin';
+                $newSpecialty = $personnel->fresh()->specialty;
+
+                $personnel->user->notify(new \App\Notifications\PersonnelDataUpdated(
+                    updatedBy:    $adminName,
+                    changedFields: [],
+                    oldSpecialty: $oldSpecialty,
+                    newSpecialty: $newSpecialty,
+                ));
+            }
 
             return redirect()->route('admin.personnel.index')
                 ->with('success', "Data personel berhasil diperbarui!");
@@ -162,5 +178,19 @@ class PersonnelController extends Controller
         $personnel->user->delete(); // cascades ke personnel via FK
         return redirect()->route('admin.personnel.index')
             ->with('warning', "❌ Pendaftaran {$name} telah DITOLAK dan akun dihapus.");
+    }
+    /**
+     * Toggle status aktif/non-aktif sementara personel
+     */
+    public function toggleStatus(Personnel $personnel)
+    {
+        $personnel->is_active = !$personnel->is_active;
+        $personnel->save();
+
+        $statusText = $personnel->is_active ? 'diaktifkan kembali' : 'dinonaktifkan sementara';
+        $name = $personnel->user->name ?? 'Personel';
+
+        return redirect()->route('admin.personnel.index')
+            ->with('success', "Status personel {$name} berhasil {$statusText}.");
     }
 }

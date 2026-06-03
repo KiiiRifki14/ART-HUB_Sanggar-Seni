@@ -114,15 +114,18 @@
                 $ds = \Carbon\Carbon::create($thisYear,$thisMonth,$day)->format('Y-m-d');
                 $isTd  = $ds === $now->toDateString();
                 $hasEv = in_array($ds,$eventDates);
+                $hasReh = in_array($ds,$rehearsalDates);
                 $isUrg = in_array($ds,$urgentDates);
                 $isUnavail = in_array($ds, $unavailabilityDates);
             @endphp
-            <div onclick="{{ $hasEv ? "scrollToEvent('$ds')" : "openUnavailModal('$ds')" }}"
-                 class="aspect-square flex flex-col items-center justify-center rounded-full relative text-[0.7rem] font-{{ $isTd||$hasEv?'bold':'medium' }} {{ $hasEv||!$isUnavail?'cursor-pointer':'' }} transition-all"
-                 style="color:{{ $isTd?'#FFF':($hasEv?'#8B1A2A':($isUnavail?'#dc2626':'#4D4946')) }};background:{{ $isTd?'#8B1A2A':($hasEv&&!$isTd?'rgba(197,160,40,0.18)':($isUnavail?'rgba(220,38,38,0.08)':'transparent')) }}">
+            <div onclick="{{ $hasEv||$hasReh ? "scrollToEvent('$ds')" : "openUnavailModal('$ds')" }}"
+                 class="aspect-square flex flex-col items-center justify-center rounded-full relative text-[0.7rem] font-{{ $isTd||$hasEv||$hasReh?'bold':'medium' }} {{ $hasEv||$hasReh||!$isUnavail?'cursor-pointer':'' }} transition-all"
+                 style="color:{{ $isTd?'#FFF':($hasEv?'#8B1A2A':($hasReh?'#0d9488':($isUnavail?'#dc2626':'#4D4946'))) }};background:{{ $isTd?'#8B1A2A':($hasEv&&!$isTd?'rgba(197,160,40,0.18)':($hasReh&&!$isTd?'rgba(13,148,136,0.1)':($isUnavail?'rgba(220,38,38,0.08)':'transparent'))) }}">
                 {{ $day }}
                 @if($hasEv && !$isTd)
                 <span class="absolute w-1 h-1 rounded-full" style="bottom:2px;background:{{ $isUrg?'#ef4444':'#C5A028' }}"></span>
+                @elseif($hasReh && !$isTd)
+                <span class="absolute w-1 h-1 rounded-full" style="bottom:2px;background:#0d9488"></span>
                 @elseif($isUnavail && !$isTd)
                 <span class="absolute w-1 h-1 rounded-full" style="bottom:2px;background:rgba(220,38,38,0.4)"></span>
                 @endif
@@ -181,9 +184,9 @@
 {{-- ═══ DETAIL TUGAS (Full Width Cards) ═══ --}}
 @if($upcomingEvents->count() > 0)
 <div class="fu2 mb-2">
-    <div class="flex items-center gap-2 mb-3">
+    <div class="flex items-center gap-2 mb-3 mt-4">
         <div style="width:3px;height:18px;background:linear-gradient(to bottom,#C5A028,rgba(197,160,40,0.2));border-radius:99px"></div>
-        <div class="font-head font-bold text-[#1A1817] text-lg">Detail Tugas</div>
+        <div class="font-head font-bold text-[#1A1817] text-lg">Detail Tugas (Pementasan)</div>
     </div>
 </div>
 
@@ -306,6 +309,53 @@
     {{ $paginatedDetailEvents->appends(request()->except('detail_page'))->links() }}
 </div>
 @endif
+
+{{-- ═══ JADWAL LATIHAN ═══ --}}
+@if($upcomingRehearsals->count() > 0)
+<div class="fu2 mb-2">
+    <div class="flex items-center gap-2 mb-3 mt-6">
+        <div style="width:3px;height:18px;background:linear-gradient(to bottom,#0d9488,rgba(13,148,136,0.2));border-radius:99px"></div>
+        <div class="font-head font-bold text-[#1A1817] text-lg">Jadwal Latihan</div>
+    </div>
+</div>
+
+<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+@foreach($upcomingRehearsals as $rehearsal)
+@php
+    $rDate = \Carbon\Carbon::parse($rehearsal->rehearsal_date);
+    $rDaysLeft = $now->startOfDay()->diffInDays($rDate->startOfDay(), false);
+    $isTodayR = $rDate->isToday();
+@endphp
+<div id="evt-{{ $rehearsal->rehearsal_date }}" class="event-card rounded-2xl p-4 bg-white flex flex-col justify-between"
+     style="border:1px solid rgba(13,148,136,0.2);box-shadow:0 4px 15px rgba(13,148,136,0.05)">
+    <div class="flex items-start justify-between gap-3 mb-3">
+        <div>
+            <div class="font-bold text-[#1A1817] text-sm mb-1">{{ $rehearsal->event->booking->client_name ?? 'Latihan Gabungan' }}</div>
+            <div class="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[0.6rem] font-bold uppercase tracking-widest bg-teal-50 text-teal-600 border border-teal-100">
+                Latihan {{ ucfirst($rehearsal->type) }}
+            </div>
+        </div>
+        <div class="text-right">
+            <div class="text-[0.65rem] font-bold" style="color:{{ $isTodayR ? '#0d9488' : '#847B78' }}">
+                @if($isTodayR) Hari Ini! @elseif($rDaysLeft==1) Besok @else {{ $rDate->translatedFormat('d M Y') }} @endif
+            </div>
+            <div class="text-xs font-bold text-[#1A1817] mt-0.5">
+                {{ \Carbon\Carbon::parse($rehearsal->start_time)->format('H:i') }} - {{ \Carbon\Carbon::parse($rehearsal->end_time)->format('H:i') }}
+            </div>
+        </div>
+    </div>
+    <div class="flex items-center gap-2 mt-2 pt-2 border-t border-teal-50 text-xs" style="color:#4D4946">
+        <i class="bi bi-geo-alt-fill text-teal-500"></i>
+        <span>{{ $rehearsal->location }}</span>
+    </div>
+    @if($rehearsal->notes)
+    <div class="mt-2 text-[0.65rem] italic bg-gray-50 p-2 rounded-lg" style="color:#847B78">
+        "{{ $rehearsal->notes }}"
+    </div>
+    @endif
+</div>
+@endforeach
+
 
 @endif
 @endsection

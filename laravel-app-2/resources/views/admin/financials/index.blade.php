@@ -43,14 +43,54 @@
 </div>
 
 {{-- Header --}}
-<div class="flex justify-between items-center mb-6">
+<div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-4">
     <h2 class="font-headline text-xl text-primary font-semibold">
         <i class="bi bi-activity text-secondary me-1"></i> Laporan Keuangan per Event
     </h2>
-    <a href="{{ route('admin.financials.export_pdf') }}" class="bg-red-600 text-white px-4 py-2 rounded-lg font-bold text-xs uppercase tracking-widest hover:bg-red-700 transition-colors shadow-md">
+    <a href="{{ route('admin.financials.export_pdf', request()->only(['search','date_from','date_to'])) }}" class="bg-red-600 text-white px-4 py-2 rounded-lg font-bold text-xs uppercase tracking-widest hover:bg-red-700 transition-colors shadow-md whitespace-nowrap">
         <i class="bi bi-file-earmark-pdf-fill me-1"></i> Unduh Laporan PDF
     </a>
 </div>
+
+{{-- Filter Form --}}
+<form method="GET" action="{{ route('admin.financials.index') }}" class="bg-surface-container-lowest border border-outline-variant/30 rounded-xl p-4 mb-6 shadow-sm">
+    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 items-end">
+        <div>
+            <label class="block font-label text-[0.65rem] uppercase tracking-widest text-outline font-bold mb-1.5">Cari Kode / Jenis Acara</label>
+            <div class="relative">
+                <i class="bi bi-search absolute left-3 top-1/2 -translate-y-1/2 text-outline text-xs"></i>
+                <input type="text" name="search" value="{{ request('search') }}"
+                       class="w-full pl-8 pr-4 py-2.5 bg-surface-container-low border border-outline-variant/50 rounded-lg font-body text-sm text-on-surface focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all"
+                       placeholder="Contoh: ARH-001 atau Jaipong">
+            </div>
+        </div>
+        <div>
+            <label class="block font-label text-[0.65rem] uppercase tracking-widest text-outline font-bold mb-1.5">Tanggal Dari</label>
+            <input type="date" name="date_from" value="{{ request('date_from') }}"
+                   class="w-full px-4 py-2.5 bg-surface-container-low border border-outline-variant/50 rounded-lg font-body text-sm text-on-surface focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all">
+        </div>
+        <div>
+            <label class="block font-label text-[0.65rem] uppercase tracking-widest text-outline font-bold mb-1.5">Tanggal Sampai</label>
+            <div class="flex gap-2">
+                <input type="date" name="date_to" value="{{ request('date_to') }}"
+                       class="flex-1 px-4 py-2.5 bg-surface-container-low border border-outline-variant/50 rounded-lg font-body text-sm text-on-surface focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all">
+                <button type="submit" class="flex-shrink-0 px-4 py-2.5 bg-primary text-white rounded-lg font-label text-xs font-bold uppercase tracking-widest hover:opacity-90 transition-all">
+                    <i class="bi bi-funnel-fill"></i>
+                </button>
+                @if(request()->hasAny(['search','date_from','date_to']))
+                <a href="{{ route('admin.financials.index') }}" class="flex-shrink-0 flex items-center px-3 py-2.5 bg-surface-container border border-outline-variant/30 text-on-surface-variant rounded-lg font-label text-xs font-bold hover:bg-red-500 hover:text-white hover:border-red-500 transition-all" title="Reset Filter">
+                    <i class="bi bi-x-lg"></i>
+                </a>
+                @endif
+            </div>
+        </div>
+    </div>
+    @if(request()->hasAny(['search','date_from','date_to']))
+    <div class="mt-3 flex items-center gap-2 font-label text-xs text-secondary font-bold">
+        <i class="bi bi-funnel-fill"></i> Filter aktif — menampilkan {{ $records->total() }} hasil
+    </div>
+    @endif
+</form>
 
 {{-- ══ TABLE (Desktop) ══ --}}
 <div class="hidden md:block bg-surface-container-lowest rounded-xl border border-outline-variant/30 shadow-[0_12px_24px_rgba(54,31,26,0.03)] overflow-hidden overflow-x-auto w-full">

@@ -55,10 +55,11 @@ class BookingController extends Controller
                     }
                 },
             ],
-            'event_start'  => 'required',
-            'event_end'    => 'required',
-            'venue'        => 'required|string',
-            'client_phone' => 'required|string',
+            'event_start'       => 'required',
+            'event_end'         => 'required',
+            'venue'             => 'required|string',
+            'venue_address'     => 'required|string|min:10',
+            'client_phone'      => 'required|string',
         ]);
 
         try {
