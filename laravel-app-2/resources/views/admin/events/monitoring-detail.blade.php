@@ -3,6 +3,26 @@
 @section('page_title', 'Detail Operasional Event')
 @section('page_subtitle', $event->event_code . ' · ' . \Carbon\Carbon::parse($event->event_date)->translatedFormat('d F Y'))
 
+@push('styles')
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css" />
+<style>
+    .event-map-container {
+        width: 100%;
+        height: 300px;
+        border-radius: 0.75rem;
+        border: 1px solid rgba(106, 90, 84, 0.2);
+        z-index: 1;
+    }
+    .leaflet-container {
+        border-radius: 0.75rem;
+    }
+</style>
+@endpush
+
+@push('scripts')
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+@endpush
+
 @section('content')
 @php
     $booking   = $event->booking;
@@ -155,7 +175,7 @@
         </div>
     </div>
 
-    {{-- Kartu Lokasi --}}
+     {{-- Kartu Lokasi --}}
     <div class="bg-surface-container-lowest rounded-2xl border border-outline-variant/30 shadow-[0_8px_20px_rgba(54,31,26,0.03)] p-5">
         <h3 class="font-headline text-sm text-primary font-bold mb-4 flex items-center gap-2 pb-3 border-b border-outline-variant/20">
             <i class="bi bi-geo-alt-fill text-secondary"></i> Lokasi Pementasan
@@ -178,6 +198,7 @@
                     <div class="font-mono text-xs text-on-surface-variant bg-surface-container rounded-lg p-2 mb-2">
                         {{ $event->latitude }}, {{ $event->longitude }}
                     </div>
+                    <div id="eventMapContainer" class="event-map-container mb-3"></div>
                     <a href="https://maps.google.com/?q={{ $event->latitude }},{{ $event->longitude }}" target="_blank"
                        class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-outline-variant/30 font-label text-xs font-bold uppercase tracking-widest text-on-surface-variant hover:bg-surface-container hover:text-primary transition-colors">
                         <i class="bi bi-map"></i> Buka Google Maps
@@ -437,5 +458,38 @@
     </div>
     @endif
 </div>
+
+@endsection
+
+@push('scripts')
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const mapContainer = document.getElementById('eventMapContainer');
+    if (!mapContainer) return;
+    
+    const latitude = {{ $event->latitude ?? 'null' }};
+    const longitude = {{ $event->longitude ?? 'null' }};
+    
+    if (!latitude || !longitude) return;
+    
+    // Initialize map
+    const map = L.map(mapContainer).setView([latitude, longitude], 16);
+    
+    // Add tile layer
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '© OpenStreetMap contributors',
+        maxZoom: 19
+    }).addTo(map);
+    
+    // Add marker
+    L.marker([latitude, longitude], {
+        title: '{{ $event->venue ?? 'Event Location' }}'
+    }).addTo(map).bindPopup(`
+        <strong>{{ $event->venue ?? 'Event Venue' }}</strong><br>
+        {{ $event->latitude }}, {{ $event->longitude }}
+    `).openPopup();
+});
+</script>
+@endpush
 
 @endsection

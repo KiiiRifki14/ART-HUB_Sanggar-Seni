@@ -194,7 +194,7 @@ class BookingController extends Controller
 
         if ($booking->event) {
             $booking->event->update(['status' => 'ready']);
-            
+
             if ($booking->event->financialRecord) {
                 $record = $booking->event->financialRecord;
                 if ($record->status === 'draft') {
@@ -263,13 +263,13 @@ class BookingController extends Controller
             DB::transaction(function () use ($booking, $request, &$profitStatus, &$targetProfit) {
                 // FIX A-01: Kunci data booking secara eksklusif (Pessimistic Locking)
                 $lockedBooking = Booking::where('id', $booking->id)->lockForUpdate()->firstOrFail();
-                
+
                 if (in_array($lockedBooking->status, ['dp_paid', 'confirmed', 'paid_full', 'completed'])) {
                     throw new \Exception('Booking ini sudah dikonfirmasi sebelumnya oleh admin lain.');
                 }
 
                 // 1. UPDATE STATUS BOOKING & BUKTI TRANSFER
-                $receiptPath = $request->input('receipt_path', $lockedBooking->payment_receipt); 
+                $receiptPath = $request->input('receipt_path', $lockedBooking->payment_receipt);
 
                 $lockedBooking->update([
                     'status' => 'dp_paid',
@@ -285,7 +285,7 @@ class BookingController extends Controller
                     $eventCode = $baseCode . '-' . $counter;
                     $counter++;
                 }
-                
+
                 $event = Event::create([
                     'booking_id'      => $lockedBooking->id,
                     'event_code'      => $eventCode,
@@ -353,7 +353,7 @@ class BookingController extends Controller
                     'status'               => $profitStatus === 'partial_lock' ? 'draft' : 'locked',
                 ]);
 
-                // Catatan: Function 'fn_estimate_total_honor' akan ditarik terpisah 
+                // Catatan: Function 'fn_estimate_total_honor' akan ditarik terpisah
                 // saat proses plotting personel di EventController dilakukan.
             });
             // ═══ COMMIT TRANSACTION ═══
@@ -471,7 +471,7 @@ class BookingController extends Controller
             return redirect()->back()->with('error', 'Gagal konfirmasi cash: ' . $e->getMessage());
         }
     }
-    
+
     /**
      * Form Booking Entry Manual
      */
@@ -504,6 +504,8 @@ class BookingController extends Controller
             'event_start' => 'required',
             'event_end' => 'required',
             'venue' => 'required|string',
+            'latitude' => 'nullable|numeric|between:-90,90',
+            'longitude' => 'nullable|numeric|between:-180,180',
             'total_price' => 'required|numeric',
             'dp_amount' => 'required|numeric',
         ]);
@@ -511,7 +513,22 @@ class BookingController extends Controller
         $validated['booking_source'] = 'admin_manual';
         $validated['status'] = 'pending';
 
-        Booking::create($validated);
+        $booking = Booking::create($validated);
+
+        // Also create/update event with coordinates if provided
+        if ($validated['latitude'] && $validated['longitude']) {
+            Event::create([
+                'booking_id' => $booking->id,
+                'event_type' => $validated['event_type'],
+                'event_date' => $validated['event_date'],
+                'event_start' => $validated['event_start'],
+                'event_end' => $validated['event_end'],
+                'venue' => $validated['venue'],
+                'latitude' => $validated['latitude'],
+                'longitude' => $validated['longitude'],
+                'status' => 'planning'
+            ]);
+        }
 
         return redirect()->route('admin.bookings.index')->with('success', 'Booking manual berhasil ditambahkan.');
     }
