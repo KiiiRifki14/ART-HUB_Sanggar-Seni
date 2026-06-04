@@ -448,18 +448,7 @@
                 </tr>
             </tfoot>
         </table>
-    </div>
-
-    {{-- Legend --}}
-    <div class="px-6 py-3 border-t border-outline-variant/10 flex flex-wrap gap-4 font-label text-[0.6rem] uppercase tracking-widest text-outline font-bold">
-        <span class="flex items-center gap-1.5"><span class="w-2 h-2 rounded-full bg-green-500 inline-block"></span> Tepat Waktu</span>
-        <span class="flex items-center gap-1.5"><span class="w-2 h-2 rounded-full bg-orange-500 inline-block"></span> Terlambat</span>
-        <span class="flex items-center gap-1.5"><span class="w-2 h-2 rounded-full bg-red-400 inline-block"></span> Belum Absen</span>
-    </div>
-    @endif
 </div>
-
-@endsection
 
 @push('scripts')
 <script>
@@ -483,7 +472,7 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Add marker
     L.marker([latitude, longitude], {
-        title: '{{ $event->venue ?? 'Event Location' }}'
+        title: '{{ $event->venue ?? "Event Location" }}'
     }).addTo(map).bindPopup(`
         <strong>{{ $event->venue ?? 'Event Venue' }}</strong><br>
         {{ $event->latitude }}, {{ $event->longitude }}
