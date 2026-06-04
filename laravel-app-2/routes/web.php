@@ -171,6 +171,8 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
 
     Route::get('/costumes/create-rental', [CostumeController::class, 'createRental'])->name('costumes.create-rental');
     Route::post('/costumes/store-rental', [CostumeController::class, 'storeRental'])->name('costumes.store-rental');
+    Route::get('/costumes/{rental}/edit-rental', [CostumeController::class, 'editRental'])->name('costumes.edit-rental');
+    Route::put('/costumes/{rental}/update-rental', [CostumeController::class, 'updateRental'])->name('costumes.update-rental');
 
     // FINANCIAL
     Route::get('/financials', [FinancialController::class, 'index'])->name('financials.index');
@@ -259,7 +261,7 @@ Route::middleware(['auth', 'role:personel'])->prefix('personnel')->name('personn
             if ($personnel) {
                 $specMap = ['penari' => 'tari', 'pemusik' => 'musik', 'multi_talent' => 'gabungan'];
                 $mappedType = $specMap[$personnel->specialty] ?? 'gabungan';
-                
+
                 $upcomingRehearsals = \App\Models\Rehearsal::with('event.booking')
                     ->whereHas('event.personnel', function($q) use ($personnel) {
                         $q->where('personnel.id', $personnel->id);
@@ -309,7 +311,7 @@ Route::middleware(['auth', 'role:personel'])->prefix('personnel')->name('personn
                 $d = \Carbon\Carbon::parse($e->event_date)->startOfDay()->diffInDays($now->startOfDay(), false);
                 return $d >= -3 && $d <= 0;
             })->pluck('event_date')->map(fn($d) => \Carbon\Carbon::parse($d)->format('Y-m-d'))->toArray();
-            
+
             // Rehearsal Dates for calendar markings
             $rehearsalDates = [];
             if ($personnel) {
@@ -362,9 +364,9 @@ Route::middleware(['auth', 'role:personel'])->prefix('personnel')->name('personn
             }
 
             return view('personnel.dashboard', compact(
-                'personnel', 'upcomingEvents', 'upcomingRehearsals', 'paginatedDetailEvents', 
-                'firstDay', 'daysInMonth', 'startDow', 'thisMonth', 'thisYear', 
-                'prevMonth', 'prevYear', 'nextMonth', 'nextYear', 
+                'personnel', 'upcomingEvents', 'upcomingRehearsals', 'paginatedDetailEvents',
+                'firstDay', 'daysInMonth', 'startDow', 'thisMonth', 'thisYear',
+                'prevMonth', 'prevYear', 'nextMonth', 'nextYear',
                 'eventDates', 'urgentDates', 'rehearsalDates', 'now', 'unavailabilityDates'
             ));
         })->name('dashboard');
@@ -396,7 +398,7 @@ Route::middleware(['auth', 'role:klien'])->prefix('klien')->name('klien.')->grou
     Route::post('/bookings/{id}/proof', [\App\Http\Controllers\Klien\BookingController::class, 'uploadProof'])->name('bookings.upload_proof');
     Route::post('/bookings/{id}/full-proof', [\App\Http\Controllers\Klien\BookingController::class, 'uploadFullProof'])->name('bookings.upload_full_proof');
     Route::post('/bookings/{booking}/feedback', [\App\Http\Controllers\Klien\ClientFeedbackController::class, 'store'])->name('bookings.feedback');
-    
+
     // PENGATURAN PROFIL KLIEN
     Route::get('/profile', [\App\Http\Controllers\Klien\KlienProfileController::class, 'edit'])->name('profile.edit');
     Route::put('/profile', [\App\Http\Controllers\Klien\KlienProfileController::class, 'update'])->name('profile.update');

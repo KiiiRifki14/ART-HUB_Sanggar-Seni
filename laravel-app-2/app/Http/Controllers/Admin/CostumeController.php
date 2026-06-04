@@ -17,7 +17,8 @@ class CostumeController extends Controller
     {
         $sanggarCostumes = \App\Models\SanggarCostume::all();
         $vendorRentals = \App\Models\CostumeRental::with(['event', 'vendor'])->latest()->get();
-        return view('admin.costumes.index', compact('sanggarCostumes', 'vendorRentals'));
+        $costumeUsages = \App\Models\CostumeUsage::with(['costume', 'event'])->latest()->get();
+        return view('admin.costumes.index', compact('sanggarCostumes', 'vendorRentals', 'costumeUsages'));
     }
     // ==========================================
     // BAGIAN 1: ASET KOSTUM SANGGAR
@@ -158,6 +159,86 @@ class CostumeController extends Controller
         return redirect()->route('admin.costumes.index')
             ->with('success', 'Data penyewaan kostum vendor berhasil dicatat dan biaya operasional ditambahkan!');
     }
+
+    public function editRental(\App\Models\CostumeRental $rental)
+    {
+        // Ambil data event yang belum selesai
+        $events = \App\Models\Event::with('booking')
+            ->whereNotIn('status', ['completed', 'cancelled'])
+            ->orderBy('event_date', 'asc')
+            ->get();
+        $vendors = \App\Models\CostumeVendor::all();
+
+        return view('admin.costumes.edit-rental', compact('rental', 'events', 'vendors'));
+    }
+
+    public function updateRental(Request $request, \App\Models\CostumeRental $rental)
+    {
+        // Validasi input
+        $request->validate([
+            'event_id'          => [
+                'required',
+                'exists:events,id',
+                function ($attribute, $value, $fail) {
+                    $event = \App\Models\Event::find($value);
+                    if ($event) {
+                        if (in_array($event->status, ['completed', 'cancelled'])) {
+                            $fail('Event ini sudah selesai atau dibatalkan.');
+                        } elseif (Carbon::parse($event->event_date)->lt(Carbon::today())) {
+                            $fail('Event ini sudah lewat tanggal pelaksanaannya.');
+                        }
+                    }
+                }
+            ],
+            'costume_vendor_id' => 'required|exists:costume_vendors,id',
+            'costume_type'      => 'required|string|max:255',
+            'quantity'          => 'required|integer|min:1',
+            'rental_cost'       => 'required|numeric|min:0',
+            'due_date'          => 'required|date',
+        ]);
+
+        // Jika rental_cost berubah, update operational cost
+        $oldCost = $rental->rental_cost;
+        $newCost = $request->rental_cost;
+        $costDifference = $newCost - $oldCost;
+
+        // Update rental data
+        $rental->update([
+            'event_id'          => $request->event_id,
+            'vendor_id'         => $request->costume_vendor_id,
+            'costume_type'      => $request->costume_type,
+            'quantity'          => $request->quantity,
+            'rental_cost'       => $request->rental_cost,
+            'due_date'          => $request->due_date,
+        ]);
+
+        // Update operational cost jika ada
+        if ($costDifference != 0) {
+            $financialRecord = \App\Models\FinancialRecord::where('event_id', $request->event_id)->first();
+            if ($financialRecord) {
+                // Find and update the operational cost for this rental
+                $operationalCost = \App\Models\OperationalCost::where('financial_record_id', $financialRecord->id)
+                    ->where('category', 'sewa_kostum')
+                    ->where('description', 'like', '%' . $request->costume_type . '%')
+                    ->first();
+
+                if ($operationalCost) {
+                    $operationalCost->update([
+                        'estimated_amount' => $newCost,
+                        'actual_amount'    => $newCost,
+                        'updated_by'       => \Illuminate\Support\Facades\Auth::id(),
+                    ]);
+
+                    // Update total pengeluaran aktual di FinancialRecord
+                    $totalActual = \App\Models\OperationalCost::where('financial_record_id', $financialRecord->id)->sum('actual_amount');
+                    $financialRecord->update(['actual_operational_cost' => $totalActual]);
+                }
+            }
+        }
+
+        return redirect()->route('admin.costumes.index')
+            ->with('success', 'Data penyewaan kostum vendor berhasil diperbarui!');
+    }
     /**
      * MENGEMBALIKAN KOSTUM ASET SANGGAR
      * Controller ini akan memicu DUA TRIGGERS SECARA BERANTAI di MySQL:
@@ -197,8 +278,14 @@ class CostumeController extends Controller
      * MENGEMBALIKAN KOSTUM SEWA VENDOR LUAR
      * Memanggil TRIGGER: trg_costume_rental_overdue
      */
-    public function returnVendorRental(CostumeRental $rental)
+    public function returnVendorRental(Request $request, CostumeRental $rental)
     {
+        // Validasi input
+        $request->validate([
+            'status' => 'sometimes|in:rented,damaged',
+            'notes'  => 'nullable|string'
+        ]);
+
         // Peringatan: Kita hanya mengisi 'returned_date'
         // Seluruh kalkulasi status OVERDUE, hari OVERDUE_DAYS, dan OVERDUE_FINE (Rp 50.000 / hari)
         // Dihandle 100% oleh TRIGGER MySQL (trg_costume_rental_overdue).
