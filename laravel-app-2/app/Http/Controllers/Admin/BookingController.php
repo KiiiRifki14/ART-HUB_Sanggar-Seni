@@ -294,6 +294,8 @@ class BookingController extends Controller
                     'event_start'     => $lockedBooking->event_start,
                     'event_end'       => $lockedBooking->event_end,
                     'venue'           => $lockedBooking->venue,
+                    'latitude'        => $lockedBooking->latitude,
+                    'longitude'       => $lockedBooking->longitude,
                     'personnel_count' => ($lockedBooking->serviceCatalog?->max_personnel > 0) ? $lockedBooking->serviceCatalog->max_personnel : 12,
                 ]);
 

@@ -1,5 +1,83 @@
 @extends('layouts.klien')
 
+@push('styles')
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css" />
+<style>
+    /* ============================================================
+       FIX LEAFLET + TAILWIND CONFLICT
+       Tailwind resets: img { max-width: 100% } dan box-sizing: border-box
+       keduanya MERUSAK rendering tile Leaflet → tile berhamburan
+    ============================================================ */
+    .leaflet-container img {
+        max-width: none !important;
+        max-height: none !important;
+        width: auto !important;
+    }
+    .leaflet-container img.leaflet-tile {
+        width: 256px !important;
+        height: 256px !important;
+    }
+    .leaflet-container * {
+        box-sizing: content-box !important;
+    }
+    .leaflet-container {
+        box-sizing: border-box !important;
+        border-radius: 0.75rem;
+        font-size: 12px;
+    }
+
+    /* Map container: ukuran tetap, tidak bisa meluber */
+    #mapContainer {
+        width: 100%;
+        height: 300px;
+        position: relative;
+        display: block;
+        border-radius: 0.75rem;
+        border: 1px solid rgba(106, 90, 84, 0.2);
+        overflow: hidden;
+        z-index: 1;
+    }
+
+    /* Autocomplete */
+    .map-search-wrapper {
+        position: relative;
+        z-index: 10;
+    }
+    .autocomplete-dropdown {
+        position: absolute;
+        top: 100%;
+        left: 0;
+        right: 0;
+        background: white;
+        border: 1px solid rgba(106, 90, 84, 0.2);
+        border-top: none;
+        border-radius: 0 0 0.75rem 0.75rem;
+        max-height: 200px;
+        overflow-y: auto;
+        box-shadow: 0 8px 16px rgba(0, 0, 0, 0.08);
+        display: none;
+        z-index: 9999;
+    }
+    .autocomplete-dropdown.active {
+        display: block;
+    }
+    .autocomplete-item {
+        padding: 0.75rem 1rem;
+        cursor: pointer;
+        border-bottom: 1px solid rgba(106, 90, 84, 0.1);
+        font-size: 0.875rem;
+        color: #1a1a1a;
+        transition: background-color 0.2s ease;
+    }
+    .autocomplete-item:hover {
+        background-color: rgba(106, 90, 84, 0.05);
+    }
+    .autocomplete-item:last-child {
+        border-bottom: none;
+    }
+</style>
+@endpush
+
 @section('title', 'Ajukan Pesanan Pementasan – ART-HUB Sanggar Cahaya Gumilang')
 
 @section('content')
@@ -117,14 +195,51 @@
                 <div class="space-y-5">
                     <div>
                         <label class="block font-label text-xs uppercase tracking-widest text-on-surface-variant font-bold mb-1.5">Nama Gedung / Venue <span class="text-red-500">*</span></label>
-                        <input type="text" name="venue"
+                        <input type="text" name="venue" id="venueInput" value="{{ old('venue') }}"
                                class="w-full bg-surface-container-low border border-outline-variant/50 rounded-lg px-4 py-2.5 font-body text-sm text-on-surface focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all @error('venue') border-red-500 @enderror"
                                placeholder="Contoh: Gedung Sate, Bandung" required>
                         @error('venue')<div class="text-red-500 text-xs mt-1 font-body">{{ $message }}</div>@enderror
                     </div>
+
+                    <div>
+                        <label class="block font-label text-xs uppercase tracking-widest text-on-surface-variant font-bold mb-1.5">Cari Alamat di Peta</label>
+                        <div class="map-search-wrapper">
+                            <input type="text" id="addressSearch" 
+                                   placeholder="Ketik alamat atau nama tempat untuk mencari (min. 3 karakter)..."
+                                   autocomplete="off"
+                                   class="w-full bg-surface-container-low border border-outline-variant/50 rounded-lg px-4 py-2.5 font-body text-sm text-on-surface focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all">
+                            <div class="autocomplete-dropdown" id="autocompleteDropdown"></div>
+                        </div>
+                    </div>
+
+                    <!-- Map Container -->
+                    <div id="mapContainer"></div>
+
+                    <!-- Hidden fields for lat, lon -->
+                    <input type="hidden" name="latitude" id="latitudeInput" value="{{ old('latitude') }}">
+                    <input type="hidden" name="longitude" id="longitudeInput" value="{{ old('longitude') }}">
+
+                    <!-- Coordinate Display -->
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label class="block font-label text-xs uppercase tracking-widest text-on-surface-variant font-bold mb-1">Latitude</label>
+                            <input type="text" id="latitudeDisplay" readonly
+                                   class="w-full bg-surface-container-highest border border-outline-variant/50 rounded-lg px-4 py-2.5 font-body text-sm text-on-surface-variant outline-none"
+                                   placeholder="Otomatis terisi">
+                        </div>
+                        <div>
+                            <label class="block font-label text-xs uppercase tracking-widest text-on-surface-variant font-bold mb-1">Longitude</label>
+                            <input type="text" id="longitudeDisplay" readonly
+                                   class="w-full bg-surface-container-highest border border-outline-variant/50 rounded-lg px-4 py-2.5 font-body text-sm text-on-surface-variant outline-none"
+                                   placeholder="Otomatis terisi">
+                        </div>
+                    </div>
+
+                    <p class="text-on-surface-variant text-xs mt-1.5 font-body">💡 Tip: Anda bisa mencari alamat di atas, memilih hasil pencarian, atau langsung mengklik dan menggeser marker di peta untuk menaruh lokasi presisi.</p>
+
                     <div>
                         <label class="block font-label text-xs uppercase tracking-widest text-on-surface-variant font-bold mb-1.5">Alamat Lengkap <span class="text-red-500">*</span></label>
-                        <textarea name="venue_address" class="w-full bg-surface-container-low border {{ $errors->has('venue_address') ? 'border-red-500' : 'border-outline-variant/50' }} rounded-lg px-4 py-2.5 font-body text-sm text-on-surface focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all" rows="2"
+                        <textarea id="venueAddressInput" name="venue_address" class="w-full bg-surface-container-low border {{ $errors->has('venue_address') ? 'border-red-500' : 'border-outline-variant/50' }} rounded-lg px-4 py-2.5 font-body text-sm text-on-surface focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all" rows="3"
                             placeholder="Contoh: Jl. Diponegoro No. 22, Kel. Citarum, Kec. Bandung Wetan, Kota Bandung" required>{{ old('venue_address') }}</textarea>
                         <div class="font-label text-[0.65rem] text-outline mt-1.5 flex items-center gap-1"><i class="bi bi-info-circle"></i> Wajib diisi agar kru dapat menemukan lokasi acara dengan tepat</div>
                         @error('venue_address')<div class="text-red-500 text-xs mt-1 font-body">{{ $message }}</div>@enderror
@@ -210,6 +325,7 @@
 </div>
 
 @push('scripts')
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
 <script>
 document.querySelectorAll('.k-pkg-radio').forEach(function(radio) {
     radio.addEventListener('change', function() {
@@ -228,6 +344,165 @@ document.querySelectorAll('.k-pkg-radio').forEach(function(radio) {
             var pers = maxPers > 0 ? maxPers + ' Personel' : 'Bebas';
             infoEl.innerText = specialty + ' · ' + pers;
         }
+    });
+});
+
+document.addEventListener('DOMContentLoaded', function() {
+    let map = null;
+    let marker = null;
+    const API_URL = '{{ url("/api/geocoding") }}';
+    
+    const addressSearch = document.getElementById('addressSearch');
+    const dropdown = document.getElementById('autocompleteDropdown');
+    const venueInput = document.getElementById('venueInput');
+    const venueAddressInput = document.getElementById('venueAddressInput');
+    const latitudeInput = document.getElementById('latitudeInput');
+    const longitudeInput = document.getElementById('longitudeInput');
+    const latitudeDisplay = document.getElementById('latitudeDisplay');
+    const longitudeDisplay = document.getElementById('longitudeDisplay');
+    
+    // Initialize map with default center (Indonesia center - Bandung/Tangerang area)
+    function initMap(lat = -6.9175, lng = 107.6062, zoom = 13) {
+        if (map) {
+            map.remove();
+        }
+        
+        map = L.map('mapContainer').setView([lat, lng], zoom);
+        
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '© OpenStreetMap contributors',
+            maxZoom: 19,
+            noWrap: true
+        }).addTo(map);
+        
+        // Allow clicking on map to set marker
+        map.on('click', function(e) {
+            const clickLat = e.latlng.lat;
+            const clickLng = e.latlng.lng;
+            updateMarker(clickLat, clickLng);
+            reverseGeocode(clickLat, clickLng);
+        });
+
+        // Force Leaflet to recalculate container bounds after rendering starts
+        setTimeout(() => {
+            map.invalidateSize(true);
+        }, 400);
+    }
+    
+    // Update marker on map
+    function updateMarker(lat, lng) {
+        if (marker) {
+            marker.setLatLng([lat, lng]);
+        } else {
+            marker = L.marker([lat, lng], {
+                draggable: true
+            }).addTo(map);
+            
+            marker.on('dragend', function() {
+                const latLng = marker.getLatLng();
+                updateCoordinates(latLng.lat, latLng.lng);
+                reverseGeocode(latLng.lat, latLng.lng);
+            });
+        }
+        
+        map.panTo([lat, lng]);
+        updateCoordinates(lat, lng);
+    }
+    
+    // Update coordinate display and hidden fields
+    function updateCoordinates(lat, lng) {
+        latitudeInput.value = lat.toFixed(8);
+        longitudeInput.value = lng.toFixed(8);
+        latitudeDisplay.value = lat.toFixed(8);
+        longitudeDisplay.value = lng.toFixed(8);
+    }
+    
+    // Search addresses with autocomplete
+    let debounceTimer;
+    addressSearch.addEventListener('input', function() {
+        clearTimeout(debounceTimer);
+        const query = this.value.trim();
+        
+        if (query.length < 3) {
+            dropdown.classList.remove('active');
+            dropdown.innerHTML = '';
+            return;
+        }
+        
+        debounceTimer = setTimeout(async () => {
+            try {
+                const response = await fetch(`${API_URL}/autocomplete?q=${encodeURIComponent(query)}`);
+                const results = await response.json();
+                
+                dropdown.innerHTML = '';
+                
+                if (results.length === 0) {
+                    dropdown.innerHTML = '<div class="autocomplete-item text-gray-500 text-center py-2">Tidak ada hasil ditemukan</div>';
+                } else {
+                    results.forEach(result => {
+                        const item = document.createElement('div');
+                        item.className = 'autocomplete-item';
+                        item.textContent = result.label;
+                        item.addEventListener('click', function() {
+                            selectLocation(result.value);
+                        });
+                        dropdown.appendChild(item);
+                    });
+                }
+                
+                dropdown.classList.add('active');
+            } catch (error) {
+                console.error('Autocomplete error:', error);
+                dropdown.innerHTML = '<div class="autocomplete-item text-red-500 text-center py-2">Error memuat hasil</div>';
+            }
+        }, 300);
+    });
+    
+    // Hide dropdown when clicking outside
+    document.addEventListener('click', function(e) {
+        if (!e.target.closest('.map-search-wrapper')) {
+            dropdown.classList.remove('active');
+        }
+    });
+    
+    // Select location from autocomplete
+    function selectLocation(result) {
+        addressSearch.value = result.display_name;
+        venueAddressInput.value = result.display_name;
+        dropdown.classList.remove('active');
+        updateMarker(result.lat, result.lon);
+    }
+    
+    // Reverse geocode coordinates to get address
+    async function reverseGeocode(lat, lng) {
+        try {
+            const response = await fetch(`${API_URL}/reverse?latitude=${lat}&longitude=${lng}`);
+            const data = await response.json();
+            
+            if (data.success && data.result) {
+                venueAddressInput.value = data.result.display_name;
+                addressSearch.value = data.result.display_name;
+            }
+        } catch (error) {
+            console.error('Reverse geocode error:', error);
+        }
+    }
+    
+    // Initialize map after DOM is fully painted so Leaflet can measure container
+    requestAnimationFrame(() => {
+        setTimeout(() => {
+            initMap();
+
+            // If old data exists, restore it
+            if (venueAddressInput.value) {
+                addressSearch.value = venueAddressInput.value;
+            }
+            if (latitudeInput.value && longitudeInput.value) {
+                const lat = parseFloat(latitudeInput.value);
+                const lng = parseFloat(longitudeInput.value);
+                updateMarker(lat, lng);
+            }
+        }, 100);
     });
 });
 </script>

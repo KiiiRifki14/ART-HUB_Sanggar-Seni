@@ -10,6 +10,9 @@
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
 
+    {{-- Page-specific styles (e.g. Leaflet CSS) pushed from child views --}}
+    @stack('styles')
+
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
@@ -70,7 +73,7 @@
 
     <style>
         :root {
-            --sidebar-w: 280px;
+            --sidebar-w: 300px;
             --sidebar-mini: 72px;
             --topbar-h: 70px;
         }

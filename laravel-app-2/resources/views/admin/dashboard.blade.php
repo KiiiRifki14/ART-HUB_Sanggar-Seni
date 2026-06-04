@@ -7,68 +7,89 @@
 @section('content')
 
 {{-- ── ROW 1: STAT CARDS ── --}}
-<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-    <div class="bg-surface-container-lowest rounded-xl p-5 border border-outline-variant/30 shadow-[0_12px_24px_rgba(54,31,26,0.03)] hover:-translate-y-1 transition-all">
+<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+    {{-- Card 1 --}}
+    <div class="bg-surface-container-lowest rounded-2xl p-6 border border-outline-variant/30 shadow-sm hover:shadow-md transition-all duration-300 flex flex-col justify-between">
         <div class="flex justify-between items-start mb-4">
-            <div class="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center">
-                <i class="bi bi-safe2-fill text-primary text-xl"></i>
+            <div class="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center text-primary">
+                <i data-lucide="lock" class="w-5 h-5"></i>
             </div>
-            <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-md bg-primary/10 text-primary border border-primary/20 text-[0.65rem] font-bold uppercase tracking-wider">
-                <i class="bi bi-lock-fill"></i> Terkunci
+            <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-primary/10 text-primary border border-primary/20 text-[0.65rem] font-bold uppercase tracking-wider">
+                <i data-lucide="lock" class="w-3.5 h-3.5"></i> Terkunci
             </span>
         </div>
-        <div class="font-label text-xs uppercase tracking-widest text-outline font-bold mb-1">Laba Tetap Aman</div>
-        <div class="font-headline text-2xl text-primary font-semibold">Rp {{ number_format($lockedProfit, 0, ',', '.') }}</div>
-    </div>
-
-    <div class="bg-surface-container-lowest rounded-xl p-5 border border-outline-variant/30 shadow-[0_12px_24px_rgba(54,31,26,0.03)] hover:-translate-y-1 transition-all">
-        <div class="flex justify-between items-start mb-4">
-            <div class="w-10 h-10 rounded-lg bg-green-500/10 flex items-center justify-center">
-                <i class="bi bi-shield-check-fill text-green-600 text-xl"></i>
-            </div>
+        <div>
+            <div class="font-label text-xs uppercase tracking-widest text-outline font-bold mb-1">Laba Tetap Aman</div>
+            <div class="font-headline text-2xl text-primary font-bold">Rp {{ number_format($lockedProfit, 0, ',', '.') }}</div>
         </div>
-        <div class="font-label text-xs uppercase tracking-widest text-outline font-bold mb-1">Dana Cadangan Siap</div>
-        <div class="font-headline text-2xl text-green-600 font-semibold">Rp {{ number_format($safetyBuffer, 0, ',', '.') }}</div>
     </div>
 
-    <div class="bg-surface-container-lowest rounded-xl p-5 border border-red-500/30 shadow-[0_12px_24px_rgba(54,31,26,0.03)] hover:-translate-y-1 transition-all relative overflow-hidden">
+    {{-- Card 2 --}}
+    <div class="bg-surface-container-lowest rounded-2xl p-6 border border-outline-variant/30 shadow-sm hover:shadow-md transition-all duration-300 flex flex-col justify-between">
+        <div class="flex justify-between items-start mb-4">
+            <div class="w-10 h-10 rounded-xl bg-green-500/10 flex items-center justify-center text-green-600">
+                <i data-lucide="shield-check" class="w-5 h-5"></i>
+            </div>
+            <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-green-500/10 text-green-700 border border-green-500/20 text-[0.65rem] font-bold uppercase tracking-wider">
+                Aman
+            </span>
+        </div>
+        <div>
+            <div class="font-label text-xs uppercase tracking-widest text-outline font-bold mb-1">Dana Cadangan Siap</div>
+            <div class="font-headline text-2xl text-green-600 font-bold">Rp {{ number_format($safetyBuffer, 0, ',', '.') }}</div>
+        </div>
+    </div>
+
+    {{-- Card 3 --}}
+    <div class="bg-surface-container-lowest rounded-2xl p-6 border border-red-500/30 shadow-sm hover:shadow-md transition-all duration-300 flex flex-col justify-between relative overflow-hidden">
         @if($lateCount > 0)
-        <div class="absolute top-0 right-0 bg-red-500 text-white text-[0.6rem] font-bold px-2 py-1 rounded-bl-lg uppercase tracking-wider">
+        <div class="absolute top-0 right-0 bg-red-500 text-white text-[0.6rem] font-bold px-2.5 py-1 rounded-bl-xl uppercase tracking-wider">
             {{ $lateCount }} Insiden
         </div>
         @endif
         <div class="flex justify-between items-start mb-4">
-            <div class="w-10 h-10 rounded-lg bg-red-500/10 flex items-center justify-center">
-                <i class="bi bi-exclamation-octagon-fill text-red-600 text-xl"></i>
+            <div class="w-10 h-10 rounded-xl bg-red-500/10 flex items-center justify-center text-red-600">
+                <i data-lucide="alert-octagon" class="w-5 h-5"></i>
             </div>
+            <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-red-500/10 text-red-700 border border-red-500/20 text-[0.65rem] font-bold uppercase tracking-wider">
+                Denda
+            </span>
         </div>
-        <div class="font-label text-xs uppercase tracking-widest text-outline font-bold mb-1">Denda Kru Masuk</div>
-        <div class="font-headline text-2xl text-red-600 font-semibold">Rp {{ number_format($totalPenalty, 0, ',', '.') }}</div>
+        <div>
+            <div class="font-label text-xs uppercase tracking-widest text-outline font-bold mb-1">Denda Kru Masuk</div>
+            <div class="font-headline text-2xl text-red-600 font-bold">Rp {{ number_format($totalPenalty, 0, ',', '.') }}</div>
+        </div>
     </div>
 
-    <div class="bg-surface-container-lowest rounded-xl p-5 border border-outline-variant/30 shadow-[0_12px_24px_rgba(54,31,26,0.03)] hover:-translate-y-1 transition-all">
+    {{-- Card 4 --}}
+    <div class="bg-surface-container-lowest rounded-2xl p-6 border border-outline-variant/30 shadow-sm hover:shadow-md transition-all duration-300 flex flex-col justify-between">
         <div class="flex justify-between items-start mb-4">
-            <div class="w-10 h-10 rounded-lg bg-secondary/10 flex items-center justify-center">
-                <i class="bi bi-calendar-event-fill text-secondary text-xl"></i>
+            <div class="w-10 h-10 rounded-xl bg-secondary/10 flex items-center justify-center text-secondary">
+                <i data-lucide="calendar-days" class="w-5 h-5"></i>
             </div>
             @if($needPlotting > 0)
-            <span class="inline-flex items-center px-2.5 py-1 rounded-md bg-secondary/10 text-secondary border border-secondary/20 text-[0.65rem] font-bold uppercase tracking-wider">
+            <span class="inline-flex items-center px-2.5 py-1 rounded-full bg-secondary/10 text-secondary border border-secondary/20 text-[0.65rem] font-bold uppercase tracking-wider">
                 {{ $needPlotting }} Butuh Plot
             </span>
             @endif
         </div>
-        <div class="font-label text-xs uppercase tracking-widest text-outline font-bold mb-1">Acara Bulan Ini</div>
-        <div class="font-headline text-2xl text-on-surface font-semibold">{{ $eventCount }} <span class="text-sm font-body text-outline font-normal">acara</span></div>
+        <div>
+            <div class="font-label text-xs uppercase tracking-widest text-outline font-bold mb-1">Acara Bulan Ini</div>
+            <div class="font-headline text-2xl text-on-surface font-bold">{{ $eventCount }} <span class="text-sm font-body text-outline font-normal">acara</span></div>
+        </div>
     </div>
 </div>
 
 {{-- ── ROW 2: CHARTS ── --}}
-<div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
     {{-- Chart 1: Revenue Line Chart (6 bulan) --}}
-    <div class="lg:col-span-2 bg-surface-container-lowest rounded-xl p-6 border border-outline-variant/30 shadow-[0_12px_24px_rgba(54,31,26,0.03)]">
+    <div class="lg:col-span-2 bg-surface-container-lowest rounded-2xl p-6 border border-outline-variant/30 shadow-sm">
         <div class="flex flex-col sm:flex-row sm:justify-between sm:items-start mb-6 gap-4">
             <div>
-                <h3 class="font-headline text-lg text-primary font-semibold mb-1"><i class="bi bi-graph-up me-2 text-secondary"></i>Pendapatan & Laba Bersih</h3>
+                <h3 class="font-headline text-lg text-primary font-bold mb-1 flex items-center gap-2">
+                    <i data-lucide="trending-up" class="w-5 h-5 text-secondary"></i>
+                    Pendapatan & Laba Bersih
+                </h3>
                 <p class="font-label text-xs uppercase tracking-widest text-outline">Proyeksi 6 Bulan (Termasuk Acara Mendatang)</p>
             </div>
             <div class="flex gap-4 font-label text-xs font-bold uppercase tracking-wider text-on-surface-variant">
@@ -82,9 +103,12 @@
     </div>
 
     {{-- Chart 2: Status Donut --}}
-    <div class="bg-surface-container-lowest rounded-xl p-6 border border-outline-variant/30 shadow-[0_12px_24px_rgba(54,31,26,0.03)] flex flex-col">
+    <div class="bg-surface-container-lowest rounded-2xl p-6 border border-outline-variant/30 shadow-sm flex flex-col">
         <div class="mb-6">
-            <h3 class="font-headline text-lg text-primary font-semibold mb-1"><i class="bi bi-pie-chart-fill me-2 text-secondary"></i>Distribusi Status</h3>
+            <h3 class="font-headline text-lg text-primary font-bold mb-1 flex items-center gap-2">
+                <i data-lucide="pie-chart" class="w-5 h-5 text-secondary"></i>
+                Distribusi Status
+            </h3>
             <p class="font-label text-xs uppercase tracking-widest text-outline">Semua waktu booking</p>
         </div>
         <div class="flex-grow flex items-center justify-center relative min-h-[200px]">
@@ -95,9 +119,12 @@
 
 {{-- ── ROW 3: UPCOMING EVENTS + ALERTS ── --}}
 <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
-    <div class="lg:col-span-7 bg-surface-container-lowest rounded-xl p-6 border border-outline-variant/30 shadow-[0_12px_24px_rgba(54,31,26,0.03)]">
+    <div class="lg:col-span-7 bg-surface-container-lowest rounded-2xl p-6 border border-outline-variant/30 shadow-sm">
         <div class="flex justify-between items-center mb-6">
-            <h3 class="font-headline text-lg text-primary font-semibold"><i class="bi bi-radar me-2 text-secondary"></i>Acara Mendatang</h3>
+            <h3 class="font-headline text-lg text-primary font-bold flex items-center gap-2">
+                <i data-lucide="clock" class="w-5 h-5 text-secondary"></i>
+                Acara Mendatang
+            </h3>
             <a href="{{ route('admin.events.monitoring') }}" class="font-label text-xs font-bold uppercase tracking-widest text-secondary hover:text-primary transition-colors underline underline-offset-4 decoration-2 decoration-secondary/30">Lihat Semua</a>
         </div>
 
@@ -109,62 +136,65 @@
                 $statusColors = ['ready'=>'text-green-600 bg-green-500/10 border-green-500/20','planning'=>'text-red-600 bg-red-500/10 border-red-500/20','confirmed'=>'text-blue-600 bg-blue-500/10 border-blue-500/20'];
                 $sc = $statusColors[$ev->status] ?? 'text-gray-600 bg-gray-500/10 border-gray-500/20';
             @endphp
-            <div class="flex items-center gap-4 p-4 rounded-lg bg-surface-container-low border border-outline-variant/20 hover:bg-surface-container transition-colors">
-                <div class="flex flex-col items-center justify-center w-14 h-14 rounded-md bg-surface-container-lowest shadow-sm border border-outline-variant/30 flex-shrink-0">
+            <div class="flex items-center gap-4 p-4 rounded-xl bg-surface-container-low border border-outline-variant/20 hover:bg-surface-container transition-colors duration-200">
+                <div class="flex flex-col items-center justify-center w-14 h-14 rounded-xl bg-surface-container-lowest shadow-sm border border-outline-variant/30 flex-shrink-0">
                     <span class="font-headline text-xl font-bold text-primary leading-none">{{ $date->format('d') }}</span>
-                    <span class="font-label text-[0.65rem] uppercase tracking-widest text-outline font-bold mt-1">{{ $date->format('M') }}</span>
+                    <span class="font-label text-[0.65rem] uppercase tracking-widest text-outline font-bold mt-1.5">{{ $date->format('M') }}</span>
                 </div>
                 <div class="flex-grow min-w-0">
                     <div class="flex items-center gap-2 mb-1">
-                        <span class="font-body font-semibold text-on-surface truncate">{{ $ev->booking->client_name ?? 'Event Sanggar' }}</span>
-                        <span class="inline-block px-2 py-0.5 rounded text-[0.6rem] font-bold uppercase tracking-wider border {{ $sc }}">{{ $ev->status }}</span>
+                        <span class="font-body font-bold text-on-surface truncate">{{ $ev->booking->client_name ?? 'Event Sanggar' }}</span>
+                        <span class="inline-block px-2.5 py-0.5 rounded-full text-[0.6rem] font-bold uppercase tracking-wider border {{ $sc }}">{{ $ev->status }}</span>
                     </div>
                     <div class="font-label text-xs text-on-surface-variant flex items-center gap-2 truncate">
-                        <span><i class="bi bi-geo-alt me-1 opacity-70"></i>{{ $ev->venue }}</span>
-                        <span>&bull;</span>
-                        <span><i class="bi bi-clock me-1 opacity-70"></i>{{ \Carbon\Carbon::parse($ev->event_start)->format('H:i') }} WIB</span>
+                        <span class="flex items-center gap-1"><i data-lucide="map-pin" class="w-3.5 h-3.5 opacity-70"></i>{{ $ev->venue }}</span>
+                        <span class="text-outline">&bull;</span>
+                        <span class="flex items-center gap-1"><i data-lucide="clock" class="w-3.5 h-3.5 opacity-70"></i>{{ \Carbon\Carbon::parse($ev->event_start)->format('H:i') }} WIB</span>
                     </div>
                 </div>
                 <div class="flex-shrink-0 text-right">
                     @if($daysLeft <= 3 && $daysLeft >= 0)
-                        <span class="inline-block px-2 py-1 rounded bg-red-500/10 text-red-600 border border-red-500/20 font-label text-[0.65rem] font-bold uppercase tracking-widest">★ H-{{ $daysLeft }}</span>
+                        <span class="inline-block px-2.5 py-1 rounded-full bg-red-500/10 text-red-600 border border-red-500/20 font-label text-[0.65rem] font-bold uppercase tracking-widest">★ H-{{ $daysLeft }}</span>
                     @else
                         <span class="font-label text-xs font-bold text-outline uppercase tracking-widest">H-{{ $daysLeft }}</span>
                     @endif
                 </div>
             </div>
             @empty
-            <div class="text-center py-10 bg-surface-container-low rounded-lg border border-dashed border-outline-variant/50">
-                <i class="bi bi-calendar-x text-3xl text-outline mb-3 inline-block"></i>
+            <div class="text-center py-12 bg-surface-container-low rounded-xl border border-dashed border-outline-variant/50">
+                <i data-lucide="calendar-x" class="w-10 h-10 text-outline mx-auto mb-3 opacity-50"></i>
                 <p class="font-body text-sm text-on-surface-variant">Tidak ada event mendatang.</p>
             </div>
             @endforelse
         </div>
 
         <div class="mt-6">
-            <a href="{{ route('admin.events.monitoring') }}" class="block w-full py-3 rounded-lg text-center font-label text-xs font-bold uppercase tracking-widest bg-surface-container-high text-primary hover:bg-surface-container-highest transition-colors border border-outline-variant/30">
-                <i class="bi bi-binoculars me-2"></i>Buka Event Monitoring
+            <a href="{{ route('admin.events.monitoring') }}" class="block w-full py-3 rounded-xl text-center font-label text-xs font-bold uppercase tracking-widest bg-surface-container-high text-primary hover:bg-surface-container-highest transition-colors border border-outline-variant/30 flex items-center justify-center gap-2">
+                <i data-lucide="eye" class="w-4 h-4"></i> Buka Event Monitoring
             </a>
         </div>
     </div>
 
-    <div class="lg:col-span-5 bg-surface-container-lowest rounded-xl p-6 border border-outline-variant/30 shadow-[0_12px_24px_rgba(54,31,26,0.03)] flex flex-col h-full">
-        <h3 class="font-headline text-lg text-primary font-semibold mb-6"><i class="bi bi-bell-fill me-2 text-secondary"></i>Sistem Alert</h3>
+    <div class="lg:col-span-5 bg-surface-container-lowest rounded-2xl p-6 border border-outline-variant/30 shadow-sm flex flex-col h-full">
+        <h3 class="font-headline text-lg text-primary font-bold mb-6 flex items-center gap-2">
+            <i data-lucide="bell" class="w-5 h-5 text-secondary"></i>
+            Sistem Alert
+        </h3>
 
         <div class="space-y-4 flex-grow">
             @php $hasAlert = false; @endphp
 
-            {{-- DP Verification badge --}}
+            {{-- DP Verification alert --}}
             @php $dpPending = \App\Models\Booking::where('status','pending')->whereNotNull('payment_proof')->count(); @endphp
             @if($dpPending > 0)
             @php $hasAlert = true; @endphp
-            <div class="flex gap-4 p-4 rounded-lg bg-primary/5 border-l-4 border-primary">
-                <i class="bi bi-patch-check-fill text-primary text-xl flex-shrink-0"></i>
+            <div class="flex gap-4 p-4 rounded-xl bg-primary/5 border-l-4 border-primary">
+                <i data-lucide="check-circle" class="w-5 h-5 text-primary flex-shrink-0 mt-0.5"></i>
                 <div>
-                    <h4 class="font-body font-semibold text-primary text-sm mb-1">{{ $dpPending }} Bukti DP Menunggu Verifikasi</h4>
+                    <h4 class="font-body font-bold text-primary text-sm mb-1">{{ $dpPending }} Bukti DP Menunggu Verifikasi</h4>
                     <p class="font-label text-xs text-on-surface-variant mb-2 leading-relaxed">Konfirmasi untuk mengunci jadwal dan memulai plotting kru.</p>
-                    <a href="{{ route('admin.bookings.dp_verification') }}" class="font-label text-[0.65rem] font-bold uppercase tracking-widest text-secondary hover:text-primary transition-colors underline underline-offset-2 decoration-2">
-                        Verifikasi Sekarang &rarr;
+                    <a href="{{ route('admin.bookings.dp_verification') }}" class="font-label text-[0.65rem] font-bold uppercase tracking-widest text-secondary hover:text-primary transition-colors underline underline-offset-2 decoration-2 flex items-center gap-1">
+                        Verifikasi Sekarang <i data-lucide="arrow-right" class="w-3.5 h-3.5"></i>
                     </a>
                 </div>
             </div>
@@ -174,13 +204,13 @@
             @php $criticalBudget = \App\Models\FinancialRecord::where('budget_warning', true)->count(); @endphp
             @if($criticalBudget > 0)
             @php $hasAlert = true; @endphp
-            <div class="flex gap-4 p-4 rounded-lg bg-orange-500/5 border-l-4 border-orange-500">
-                <i class="bi bi-exclamation-circle-fill text-orange-500 text-xl flex-shrink-0"></i>
+            <div class="flex gap-4 p-4 rounded-xl bg-orange-500/5 border-l-4 border-orange-500">
+                <i data-lucide="alert-triangle" class="w-5 h-5 text-orange-500 flex-shrink-0 mt-0.5"></i>
                 <div>
-                    <h4 class="font-body font-semibold text-orange-700 text-sm mb-1">{{ $criticalBudget }} Event Budget Kritis</h4>
+                    <h4 class="font-body font-bold text-orange-700 text-sm mb-1">{{ $criticalBudget }} Event Budget Kritis</h4>
                     <p class="font-label text-xs text-on-surface-variant mb-2 leading-relaxed">Dana operasional hampir habis atau minus.</p>
-                    <a href="{{ route('admin.financials.post_event_list') }}" class="font-label text-[0.65rem] font-bold uppercase tracking-widest text-orange-600 hover:text-orange-800 transition-colors underline underline-offset-2 decoration-2">
-                        Cek Laporan &rarr;
+                    <a href="{{ route('admin.financials.post_event_list') }}" class="font-label text-[0.65rem] font-bold uppercase tracking-widest text-orange-600 hover:text-orange-800 transition-colors underline underline-offset-2 decoration-2 flex items-center gap-1">
+                        Cek Laporan <i data-lucide="arrow-right" class="w-3.5 h-3.5"></i>
                     </a>
                 </div>
             </div>
@@ -192,32 +222,32 @@
             @endphp
             @if($overdueKostum > 0)
             @php $hasAlert = true; @endphp
-            <div class="flex gap-4 p-4 rounded-lg bg-red-500/5 border-l-4 border-red-500">
-                <i class="bi bi-bag-x-fill text-red-500 text-xl flex-shrink-0"></i>
+            <div class="flex gap-4 p-4 rounded-xl bg-red-500/5 border-l-4 border-red-500">
+                <i data-lucide="archive" class="w-5 h-5 text-red-500 flex-shrink-0 mt-0.5"></i>
                 <div>
-                    <h4 class="font-body font-semibold text-red-700 text-sm mb-1">{{ $overdueKostum }} Kostum Telat</h4>
+                    <h4 class="font-body font-bold text-red-700 text-sm mb-1">{{ $overdueKostum }} Kostum Telat</h4>
                     <p class="font-label text-xs text-on-surface-variant mb-2 leading-relaxed">Vendor menunggu pengembalian kostum/logistik.</p>
-                    <a href="{{ route('admin.costumes.index') }}" class="font-label text-[0.65rem] font-bold uppercase tracking-widest text-red-600 hover:text-red-800 transition-colors underline underline-offset-2 decoration-2">
-                        Urus Pengembalian &rarr;
+                    <a href="{{ route('admin.costumes.index') }}" class="font-label text-[0.65rem] font-bold uppercase tracking-widest text-red-600 hover:text-red-800 transition-colors underline underline-offset-2 decoration-2 flex items-center gap-1">
+                        Urus Pengembalian <i data-lucide="arrow-right" class="w-3.5 h-3.5"></i>
                     </a>
                 </div>
             </div>
             @endif
 
             @if(!$hasAlert)
-            <div class="flex flex-col items-center justify-center h-full py-8 text-center">
-                <div class="w-16 h-16 rounded-full bg-green-500/10 flex items-center justify-center mb-4">
-                    <i class="bi bi-check2-all text-green-600 text-3xl"></i>
+            <div class="flex flex-col items-center justify-center h-full py-12 text-center">
+                <div class="w-16 h-16 rounded-full bg-green-500/10 flex items-center justify-center mb-4 text-green-600">
+                    <i data-lucide="check" class="w-8 h-8"></i>
                 </div>
-                <h4 class="font-headline text-lg text-on-surface font-semibold mb-1">Semua Aman</h4>
+                <h4 class="font-headline text-lg text-on-surface font-bold mb-1">Semua Aman</h4>
                 <p class="font-label text-xs text-outline uppercase tracking-widest">Tidak ada alert sistem aktif</p>
             </div>
             @endif
         </div>
 
         <div class="mt-6 pt-6 border-t border-outline-variant/30">
-            <a href="{{ route('admin.events.index') }}" class="block w-full py-3 rounded-lg text-center font-label text-xs font-bold uppercase tracking-widest bg-primary text-white hover:bg-primary-container shadow-lg transition-all">
-                <i class="bi bi-arrow-right-circle me-2"></i>Buka Event Management
+            <a href="{{ route('admin.events.index') }}" class="block w-full py-3 rounded-xl text-center font-label text-xs font-bold uppercase tracking-widest bg-primary text-white hover:bg-primary-container shadow-md transition-all flex items-center justify-center gap-2">
+                <i data-lucide="arrow-right" class="w-4 h-4"></i> Buka Event Management
             </a>
         </div>
     </div>

@@ -7,15 +7,33 @@
 @push('styles')
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css" />
 <style>
-    #mapContainer {
-        width: 100%;
-        height: 400px;
-        border-radius: 0.5rem;
-        border: 1px solid rgba(106, 90, 84, 0.2);
-        z-index: 1;
+    /* Fix Leaflet + Tailwind conflict: Tailwind resets img max-width & box-sizing */
+    .leaflet-container img {
+        max-width: none !important;
+        max-height: none !important;
+        width: auto !important;
+    }
+    .leaflet-container img.leaflet-tile {
+        width: 256px !important;
+        height: 256px !important;
+    }
+    .leaflet-container * {
+        box-sizing: content-box !important;
     }
     .leaflet-container {
+        box-sizing: border-box !important;
         border-radius: 0.5rem;
+        font-size: 12px;
+    }
+    #mapContainer {
+        width: 100%;
+        height: 350px;
+        position: relative;
+        display: block;
+        border-radius: 0.5rem;
+        border: 1px solid rgba(106, 90, 84, 0.2);
+        overflow: hidden;
+        z-index: 1;
     }
     .map-search-wrapper {
         position: relative;
@@ -237,7 +255,8 @@ document.addEventListener('DOMContentLoaded', function() {
         
         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
             attribution: '© OpenStreetMap contributors',
-            maxZoom: 19
+            maxZoom: 19,
+            noWrap: true
         }).addTo(map);
         
         // Allow clicking on map to set marker
@@ -247,6 +266,11 @@ document.addEventListener('DOMContentLoaded', function() {
             updateMarker(lat, lng);
             reverseGeocode(lat, lng);
         });
+
+        // Force Leaflet to recalculate container bounds after rendering starts
+        setTimeout(() => {
+            map.invalidateSize();
+        }, 300);
     }
     
     // Update marker on map

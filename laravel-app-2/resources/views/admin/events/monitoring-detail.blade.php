@@ -6,15 +6,33 @@
 @push('styles')
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css" />
 <style>
-    .event-map-container {
-        width: 100%;
-        height: 300px;
-        border-radius: 0.75rem;
-        border: 1px solid rgba(106, 90, 84, 0.2);
-        z-index: 1;
+    /* Fix Leaflet + Tailwind conflict */
+    .leaflet-container img {
+        max-width: none !important;
+        max-height: none !important;
+        width: auto !important;
+    }
+    .leaflet-container img.leaflet-tile {
+        width: 256px !important;
+        height: 256px !important;
+    }
+    .leaflet-container * {
+        box-sizing: content-box !important;
     }
     .leaflet-container {
+        box-sizing: border-box !important;
         border-radius: 0.75rem;
+        font-size: 12px;
+    }
+    .event-map-container {
+        width: 100%;
+        height: 280px;
+        position: relative;
+        display: block;
+        border-radius: 0.75rem;
+        border: 1px solid rgba(106, 90, 84, 0.2);
+        overflow: hidden;
+        z-index: 1;
     }
 </style>
 @endpush
@@ -160,7 +178,7 @@
                     @if($totalCrew > 0)
                     <div class="flex-1 bg-surface-container-high rounded-full h-2 overflow-hidden">
                         @php $pct = $event->personnel_count > 0 ? min(100, round($totalCrew / $event->personnel_count * 100)) : 100; @endphp
-                        <div class="h-2 rounded-full {{ $pct >= 100 ? 'bg-green-500' : 'bg-secondary' }} transition-all" style="width: {{ $pct }}%"></div>
+                        <div class="h-2 rounded-full {{ $pct >= 100 ? 'bg-green-500' : 'bg-secondary' }} transition-all" style="width: {{ $pct }}%;"></div>
                     </div>
                     @endif
                 </div>
@@ -198,7 +216,11 @@
                     <div class="font-mono text-xs text-on-surface-variant bg-surface-container rounded-lg p-2 mb-2">
                         {{ $event->latitude }}, {{ $event->longitude }}
                     </div>
-                    <div id="eventMapContainer" class="event-map-container mb-3"></div>
+                    <div id="eventMapContainer" 
+                         class="event-map-container mb-3" 
+                         data-latitude="{{ $event->latitude }}" 
+                         data-longitude="{{ $event->longitude }}"
+                         data-venue="{{ $event->venue ?? 'Event Location' }}"></div>
                     <a href="https://maps.google.com/?q={{ $event->latitude }},{{ $event->longitude }}" target="_blank"
                        class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-outline-variant/30 font-label text-xs font-bold uppercase tracking-widest text-on-surface-variant hover:bg-surface-container hover:text-primary transition-colors">
                         <i class="bi bi-map"></i> Buka Google Maps
@@ -290,7 +312,7 @@
         </div>
         <div class="w-full bg-surface-container-high rounded-full h-2.5 overflow-hidden">
             @php $payPct = $isLunas ? 100 : (in_array($bStatus, ['dp_paid','confirmed']) ? 50 : 0); @endphp
-            <div class="h-2.5 rounded-full transition-all {{ $isLunas ? 'bg-green-500' : 'bg-blue-500' }}" style="width: {{ $payPct }}%"></div>
+            <div class="h-2.5 rounded-full transition-all {{ $isLunas ? 'bg-green-500' : 'bg-blue-500' }}" style="width: {{ $payPct }}%;"></div>
         </div>
         <div class="flex justify-between font-label text-[0.55rem] text-outline mt-1">
             <span>Booking Dibuat: {{ \Carbon\Carbon::parse($booking->created_at)->format('d M Y') }}</span>
@@ -449,6 +471,8 @@
             </tfoot>
         </table>
 </div>
+    @endif
+</div>
 
 @push('scripts')
 <script>
@@ -456,10 +480,11 @@ document.addEventListener('DOMContentLoaded', function() {
     const mapContainer = document.getElementById('eventMapContainer');
     if (!mapContainer) return;
     
-    const latitude = {{ $event->latitude ?? 'null' }};
-    const longitude = {{ $event->longitude ?? 'null' }};
+    const latitude = parseFloat(mapContainer.getAttribute('data-latitude'));
+    const longitude = parseFloat(mapContainer.getAttribute('data-longitude'));
+    const venue = mapContainer.getAttribute('data-venue') || 'Event Location';
     
-    if (!latitude || !longitude) return;
+    if (isNaN(latitude) || isNaN(longitude)) return;
     
     // Initialize map
     const map = L.map(mapContainer).setView([latitude, longitude], 16);
@@ -467,16 +492,16 @@ document.addEventListener('DOMContentLoaded', function() {
     // Add tile layer
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
         attribution: '© OpenStreetMap contributors',
-        maxZoom: 19
+        maxZoom: 19,
+        noWrap: true
     }).addTo(map);
     
     // Add marker
     L.marker([latitude, longitude], {
-        title: '{{ $event->venue ?? "Event Location" }}'
-    }).addTo(map).bindPopup(`
-        <strong>{{ $event->venue ?? 'Event Venue' }}</strong><br>
-        {{ $event->latitude }}, {{ $event->longitude }}
-    `).openPopup();
+        title: venue
+    }).addTo(map).bindPopup(
+        '<strong>' + venue + '</strong><br>' + latitude + ', ' + longitude
+    ).openPopup();
 });
 </script>
 @endpush

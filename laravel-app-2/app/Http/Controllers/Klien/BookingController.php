@@ -60,6 +60,8 @@ class BookingController extends Controller
             'venue'             => 'required|string',
             'venue_address'     => 'required|string|min:10',
             'client_phone'      => 'required|string',
+            'latitude'          => 'nullable|numeric|between:-90,90',
+            'longitude'         => 'nullable|numeric|between:-180,180',
         ]);
 
         try {
@@ -92,6 +94,8 @@ class BookingController extends Controller
                     'event_end'          => $request->event_end,
                     'venue'              => $request->venue,
                     'venue_address'      => $request->venue_address,
+                    'latitude'           => $request->latitude,
+                    'longitude'          => $request->longitude,
                     'booking_source'     => 'web',
                     'status'             => 'pending',
                     'total_price'        => $basePrice,

@@ -14,7 +14,7 @@ class UserSeeder extends Seeder
         DB::table('users')->insert([
             'name'       => 'Pak Yat',
             'email'      => 'pakyat@arthub.local',
-            'password'   => Hash::make('admin123'),
+            'password'   => Hash::make('password'),
             'role'       => 'admin',
             'phone'      => '081234567890',
             'address'    => 'Jl. Sanggar Cahaya Gumilang No. 1, Tangerang',
@@ -73,8 +73,8 @@ class UserSeeder extends Seeder
         DB::table('users')->insert([
             [
                 'name'       => 'Hj. Sari Mulyani',
-                'email'      => 'sari@email.com',
-                'password'   => Hash::make('klien123'),
+                'email'      => 'faklove140605@email.com',
+                'password'   => Hash::make('password'),
                 'role'       => 'klien',
                 'phone'      => '081298765432',
                 'address'    => 'Jl. Melati No. 10, Karawaci, Tangerang',
@@ -83,8 +83,8 @@ class UserSeeder extends Seeder
             ],
             [
                 'name'       => 'Bapak Hendra Wijaya',
-                'email'      => 'hendra@email.com',
-                'password'   => Hash::make('klien123'),
+                'email'      => 'genin2202@email.com',
+                'password'   => Hash::make('password'),
                 'role'       => 'klien',
                 'phone'      => '081387654321',
                 'address'    => 'Jl. Cendana Raya No. 5, BSD, Tangerang Selatan',

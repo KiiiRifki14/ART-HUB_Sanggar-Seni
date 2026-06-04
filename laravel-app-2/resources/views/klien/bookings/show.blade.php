@@ -1,5 +1,39 @@
 @extends('layouts.klien')
 
+@push('styles')
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css" />
+<style>
+    /* Fix Leaflet + Tailwind conflict */
+    .leaflet-container img {
+        max-width: none !important;
+        max-height: none !important;
+        width: auto !important;
+    }
+    .leaflet-container img.leaflet-tile {
+        width: 256px !important;
+        height: 256px !important;
+    }
+    .leaflet-container * {
+        box-sizing: content-box !important;
+    }
+    .leaflet-container {
+        box-sizing: border-box !important;
+        border-radius: 0.75rem;
+        font-size: 12px;
+    }
+    #bookingDetailMap {
+        width: 100%;
+        height: 220px;
+        position: relative;
+        display: block;
+        border-radius: 0.75rem;
+        border: 1px solid rgba(106, 90, 84, 0.2);
+        overflow: hidden;
+        z-index: 1;
+    }
+</style>
+@endpush
+
 @section('title', 'Detail Pesanan – ART-HUB Sanggar Cahaya Gumilang')
 
 @section('content')
@@ -113,7 +147,19 @@
                         <div class="font-label text-[0.65rem] uppercase tracking-widest text-outline font-bold mb-1">Lokasi Pementasan</div>
                         <div class="font-body font-bold text-on-surface mb-1">{{ $booking->venue }}</div>
                         @if($booking->venue_address)
-                        <div class="font-body text-xs text-on-surface-variant">{{ $booking->venue_address }}</div>
+                        <div class="font-body text-xs text-on-surface-variant mb-2">{{ $booking->venue_address }}</div>
+                        @endif
+                        @if($booking->latitude && $booking->longitude)
+                            <div id="bookingDetailMap" class="w-full mt-3 z-0"
+                                 data-latitude="{{ $booking->latitude }}"
+                                 data-longitude="{{ $booking->longitude }}"
+                                 data-venue="{{ $booking->venue }}"></div>
+                            <div class="mt-2">
+                                <a href="https://maps.google.com/?q={{ $booking->latitude }},{{ $booking->longitude }}" target="_blank"
+                                   class="inline-flex items-center gap-1.5 text-xs text-secondary hover:text-primary transition-colors font-label font-bold uppercase tracking-wider">
+                                    <i class="bi bi-geo-alt"></i> Petunjuk Arah Google Maps
+                                </a>
+                            </div>
                         @endif
                     </div>
                 </div>
@@ -373,6 +419,7 @@
 </div>
 
 @push('scripts')
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
 <script>
 function previewFile(input) {
     if (input.files && input.files[0]) {
@@ -397,6 +444,29 @@ function previewFullFile(input) {
         reader.readAsDataURL(input.files[0]);
     }
 }
+
+document.addEventListener('DOMContentLoaded', function() {
+    const mapContainer = document.getElementById('bookingDetailMap');
+    if (!mapContainer) return;
+
+    const lat = parseFloat(mapContainer.getAttribute('data-latitude'));
+    const lng = parseFloat(mapContainer.getAttribute('data-longitude'));
+    const venue = mapContainer.getAttribute('data-venue') || 'Lokasi Pementasan';
+
+    if (isNaN(lat) || isNaN(lng)) return;
+
+    const map = L.map(mapContainer).setView([lat, lng], 15);
+
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '© OpenStreetMap contributors',
+        noWrap: true,
+        maxZoom: 19
+    }).addTo(map);
+
+    L.marker([lat, lng]).addTo(map)
+        .bindPopup('<strong>' + venue + '</strong><br>' + lat + ', ' + lng)
+        .openPopup();
+});
 </script>
 @endpush
 
