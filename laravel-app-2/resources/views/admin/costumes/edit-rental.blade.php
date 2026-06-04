@@ -156,7 +156,7 @@
 
                     this.isSubmitting = true;
 
-                    fetch('{{ route('admin.costumes.store-vendor-api') }}', {
+                    fetch('{{ route("admin.costumes.store-vendor-api") }}', {
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/json',
