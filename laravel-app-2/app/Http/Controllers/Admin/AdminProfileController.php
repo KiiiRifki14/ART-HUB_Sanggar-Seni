@@ -17,6 +17,7 @@ class AdminProfileController extends Controller
 
     public function update(Request $request)
     {
+        /** @var \App\Models\User $user */
         $user = Auth::user();
 
         $validated = $request->validate([
@@ -43,6 +44,7 @@ class AdminProfileController extends Controller
             'password.confirmed' => 'Konfirmasi password tidak sesuai.',
         ]);
 
+        /** @var \App\Models\User $user */
         $user = Auth::user();
         $user->password = Hash::make($validated['password']);
         $user->save();
