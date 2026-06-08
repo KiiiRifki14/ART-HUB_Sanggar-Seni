@@ -13,61 +13,130 @@ class RehearsalController extends Controller
     public function index()
     {
         $rehearsals = Rehearsal::with('event.booking')->orderBy('rehearsal_date', 'asc')->get();
-        return view('admin.rehearsals.index', compact('rehearsals'));
+        
+        // Ambil data event yang aktif (bukan completed/cancelled) untuk pilihan di modal dropdown
+        $events = \App\Models\Event::with('booking')
+            ->whereNotIn('status', ['completed', 'cancelled'])
+            ->latest()
+            ->get();
+
+        return view('admin.rehearsals.index', compact('rehearsals', 'events'));
     }
 
     /**
-     * Menjadwalkan Latihan (3-Stage Logic)
+     * Menampilkan halaman form tambah jadwal latihan (dedicated page, bukan modal)
+     */
+    public function create()
+    {
+        $events = \App\Models\Event::with('booking')
+            ->whereNotIn('status', ['completed', 'cancelled'])
+            ->latest()
+            ->get();
+
+        return view('admin.rehearsals.create', compact('events'));
+    }
+
+    /**
+     * Menjadwalkan Latihan (3-Stage Logic with fault-tolerant error handling)
+     *
+     * ARSITEKTUR:
+     * Stage 1 → Validasi input form
+     * Stage 2 → Panggil SP pengecekan bentrok jadwal personel
+     * Stage 3 → Simpan rehearsal jika tidak ada bentrok (atau admin paksa simpan)
      */
     public function store(Request $request, Event $event)
     {
         $request->validate([
-            'type' => 'required|in:musik,tari,gabungan',
+            'type'           => 'required|in:musik,tari,gabungan',
             'rehearsal_date' => 'required|date',
-            'start_time' => 'required',
-            'end_time' => 'required',
-            'location' => 'required|string',
+            'start_time'     => 'required',
+            'end_time'       => 'required',
+            'location'       => 'required|string',
         ]);
 
-        // CEK KONFLIK JADWAL VIA STORED PROCEDURE
-        // Sama dengan Smart Plotting, pastikan Latihan tidak menabrak Day-Job personel
-        // atau jadwal event sanggar yang lain.
-        DB::statement('CALL sp_check_personnel_availability(?, ?, ?, @p_avail, @p_col, @p_col_det, @p_avail_det)', [
-            $request->rehearsal_date,
-            $request->start_time,
-            $request->end_time
-        ]);
+        // ── STAGE 2: CEK KONFLIK JADWAL via Stored Procedure ─────────────────
+        // SP: sp_check_personnel_availability(IN date, IN start, IN end,
+        //     OUT available_count, OUT collision_count, OUT collision_details, OUT available_details)
+        // Dibungkus try-catch agar jika SP error (SP tidak ada, lock wait, dll),
+        // aplikasi tidak hang melainkan langsung mengembalikan pesan error ke admin.
+        $collisionCount   = 0;
+        $collisionDetails = '';
 
-        // FIX F-04: Betulkan penamaan variabel SP hasil kembalian (@p_col dan @p_col_det)
-        $spResult = DB::select('SELECT @p_col as collision_count, @p_col_det as collision_details');
-        
-        $collisionCount = $spResult[0]->collision_count ?? 0;
-        $collisionDetails = $spResult[0]->collision_details;
+        try {
+            DB::statement(
+                'CALL sp_check_personnel_availability(?, ?, ?, @p_avail, @p_col, @p_col_det, @p_avail_det)',
+                [
+                    $request->rehearsal_date,
+                    $request->start_time,
+                    $request->end_time,
+                ]
+            );
 
-        // FIX F-04: Jika terjadi bentrok, berikan conflict_warning terlebih dahulu
-        // kecuali jika admin secara sadar mencentang force_save / mengonfirmasi tetap simpan.
+            $spResult = DB::select('SELECT @p_col as collision_count, @p_col_det as collision_details');
+
+            $collisionCount   = (int) ($spResult[0]->collision_count ?? 0);
+            $collisionDetails = $spResult[0]->collision_details ?? '';
+
+        } catch (\Exception $e) {
+            // SP gagal (tidak ada, timeout, lock, dll) → log dan lanjut simpan tanpa cek konflik
+            \Illuminate\Support\Facades\Log::error('[RehearsalController] SP sp_check_personnel_availability GAGAL: ' . $e->getMessage(), [
+                'date'  => $request->rehearsal_date,
+                'start' => $request->start_time,
+                'end'   => $request->end_time,
+            ]);
+
+            // Lanjut menyimpan tanpa info konflik, beri warning ke admin
+            return $this->saveRehearsal($request, $event, 0, '')
+                ->with('warning', '⚠️ Jadwal disimpan, tapi pengecekan konflik personel gagal dijalankan. Periksa log server. Error: ' . $e->getMessage());
+        }
+
+        // ── STAGE 3A: Jika ada bentrok dan admin belum konfirmasi ─────────────
         if ($collisionCount > 0 && !$request->has('force_save')) {
             return redirect()->back()
                 ->withInput()
-                ->with('conflict_warning', '⚠️ Bentrok Jadwal! Latihan ini bentrok dengan ' . $collisionCount . ' personel: ' . $collisionDetails . '. Centang "Tetap Simpan" jika Anda ingin memaksakan jadwal ini.');
+                ->with('conflict_warning',
+                    '⚠️ Bentrok Jadwal! Latihan ini bentrok dengan ' . $collisionCount .
+                    ' personel: ' . $collisionDetails .
+                    ' Centang "Tetap Simpan" jika Anda ingin memaksakan jadwal ini.'
+                );
         }
 
-        $rehearsal = Rehearsal::create([
-            'event_id' => $event->id,
-            'type' => $request->type,
-            'rehearsal_date' => $request->rehearsal_date,
-            'start_time' => $request->start_time,
-            'end_time' => $request->end_time,
-            'location' => $request->location,
-            'notes' => $request->notes,
-        ]);
+        // ── STAGE 3B: Simpan rehearsal ────────────────────────────────────────
+        return $this->saveRehearsal($request, $event, $collisionCount, $collisionDetails);
+    }
 
-        $msg = 'Jadwal latihan (' . strtoupper($request->type) . ') berhasil dibuat!';
-        if ($collisionCount > 0) {
-            $msg .= ' (Disimpan dengan paksaan konflik jadwal)';
-            return redirect()->back()->with('warning', $msg);
+    /**
+     * Helper: simpan record Rehearsal dan return redirect dengan flash message.
+     * Dibungkus try-catch tersendiri agar error DB di level insert pun tertangkap.
+     */
+    private function saveRehearsal(Request $request, Event $event, int $collisionCount, string $collisionDetails)
+    {
+        try {
+            Rehearsal::create([
+                'event_id'       => $event->id,
+                'type'           => $request->type,
+                'rehearsal_date' => $request->rehearsal_date,
+                'start_time'     => $request->start_time,
+                'end_time'       => $request->end_time,
+                'location'       => $request->location,
+                'notes'          => $request->notes,
+            ]);
+
+            $msg = 'Jadwal latihan (' . strtoupper($request->type) . ') berhasil dibuat!';
+
+            if ($collisionCount > 0) {
+                $msg .= ' (Disimpan dengan konflik jadwal yang dipaksakan)';
+                return redirect()->route('admin.rehearsals.index')->with('warning', $msg);
+            }
+
+            return redirect()->route('admin.rehearsals.index')->with('success', $msg);
+
+        } catch (\Exception $e) {
+            \Illuminate\Support\Facades\Log::error('[RehearsalController] Gagal menyimpan rehearsal: ' . $e->getMessage());
+            return redirect()->back()
+                ->withInput()
+                ->with('error', '❌ Gagal menyimpan jadwal latihan: ' . $e->getMessage());
         }
-
-        return redirect()->back()->with('success', $msg);
     }
 }
+

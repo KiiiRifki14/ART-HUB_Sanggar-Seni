@@ -116,14 +116,14 @@
                             <div class="flex flex-col gap-1.5">
                                 <a href="{{ asset('storage/' . $booking->full_payment_proof) }}" target="_blank" class="w-full text-center py-1 rounded bg-blue-50 text-blue-600 border border-blue-200 font-label text-[0.6rem] font-bold uppercase tracking-wider hover:bg-blue-100 transition-colors">Lihat Bukti</a>
                                 <div class="flex gap-1.5">
-                                    <form action="{{ route('admin.bookings.full_payment', $booking->id) }}" method="POST" class="flex-1 m-0">
+                                    <form action="{{ route('admin.bookings.full_payment', $booking->id) }}" method="POST" class="flex-1 m-0" data-confirm="Verifikasi bukti sah & lunas?">
                                         @csrf
                                         @method('PATCH')
-                                        <button type="submit" class="w-full py-1.5 rounded bg-green-600 text-white hover:bg-green-700 transition-colors font-label text-[0.6rem] font-bold uppercase tracking-wider" onclick="return confirm('Verifikasi bukti sah & lunas?')">Sah</button>
+                                        <button type="submit" class="w-full py-1.5 rounded bg-green-600 text-white hover:bg-green-700 transition-colors font-label text-[0.6rem] font-bold uppercase tracking-wider">Sah</button>
                                     </form>
-                                    <form action="{{ route('admin.bookings.reject_full_proof', $booking->id) }}" method="POST" class="flex-1 m-0">
+                                    <form action="{{ route('admin.bookings.reject_full_proof', $booking->id) }}" method="POST" class="flex-1 m-0" data-confirm="Tolak bukti ini?">
                                         @csrf
-                                        <button type="submit" class="w-full py-1.5 rounded bg-red-100 text-red-600 hover:bg-red-200 transition-colors font-label text-[0.6rem] font-bold uppercase tracking-wider" onclick="return confirm('Tolak bukti ini?')">Tolak</button>
+                                        <button type="submit" class="w-full py-1.5 rounded bg-red-100 text-red-600 hover:bg-red-200 transition-colors font-label text-[0.6rem] font-bold uppercase tracking-wider">Tolak</button>
                                     </form>
                                 </div>
                             </div>
@@ -260,7 +260,7 @@
             </button>
         </div>
 
-        <form id="formLunasOffline" method="POST">
+        <form id="formLunasOffline" method="POST" data-confirm="Apakah Anda yakin ingin memproses pelunasan offline ini?">
             @csrf
             <div class="mb-5">
                 <p class="font-body text-xs text-on-surface-variant leading-relaxed mb-4">Gunakan opsi ini jika Klien membayar sisa tagihan secara langsung (tunai/transfer langsung) di luar portal klien.</p>

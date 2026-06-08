@@ -5,7 +5,7 @@
 @section('page_subtitle', 'Kelola seluruh permintaan pementasan masuk.')
 
 @section('content')
-<div x-data="{ showNewBookingModal: {{ $errors->any() ? 'true' : 'false' }} }">
+<div x-data="{ showNewBookingModal: {{ $errors->any() ? 'true' : 'false' }}, totalPrice: {{ old('total_price') ?: 0 }}, dpAmount: {{ old('dp_amount') ?: 0 }} }" x-init="$watch('totalPrice', val => dpAmount = Math.round(val * 0.5))">
 
 @php
     $total    = $bookings->count();
@@ -256,18 +256,38 @@
 
     {{-- Backdrop --}}
     <div @click="showNewBookingModal = false"
-         class="absolute inset-0 bg-black/50 backdrop-blur-sm"></div>
+         class="absolute inset-0 bg-black/60 backdrop-blur-sm"
+         x-show="showNewBookingModal"
+         x-transition:enter="transition ease-out duration-300"
+         x-transition:enter-start="opacity-0"
+         x-transition:enter-end="opacity-100"
+         x-transition:leave="transition ease-in duration-200"
+         x-transition:leave-start="opacity-100"
+         x-transition:leave-end="opacity-0"></div>
 
     {{-- Dialog --}}
-    <div class="relative w-full max-w-2xl bg-surface-container-lowest rounded-2xl shadow-2xl overflow-hidden border border-outline-variant/30 max-h-[90vh] flex flex-col transform transition-all" x-transition.scale.95>
+    <div class="relative w-full max-w-2xl bg-surface-container-lowest rounded-2xl shadow-2xl overflow-hidden border border-outline-variant/30 max-h-[90vh] flex flex-col transform transition-all z-10"
+         x-show="showNewBookingModal"
+         x-transition:enter="transition ease-out duration-300"
+         x-transition:enter-start="opacity-0 translate-y-4 scale-95"
+         x-transition:enter-end="opacity-100 translate-y-0 scale-100"
+         x-transition:leave="transition ease-in duration-200"
+         x-transition:leave-start="opacity-100 translate-y-0 scale-100"
+         x-transition:leave-end="opacity-0 translate-y-4 scale-95">
+
+        {{-- Accent bar --}}
+        <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-primary to-secondary"></div>
 
         {{-- Header --}}
-        <div class="px-6 py-5 border-b border-outline-variant/20 bg-surface-container-low flex items-center justify-between flex-shrink-0">
-            <h3 class="font-headline font-bold text-lg text-primary flex items-center gap-2">
-                <i data-lucide="plus-circle" class="w-5 h-5 text-secondary"></i> Booking Manual Baru
+        <div class="px-6 py-5 border-b border-outline-variant/20 bg-surface-container-low/50 flex items-center justify-between flex-shrink-0 mt-1">
+            <h3 class="font-headline font-bold text-base text-primary flex items-center gap-2.5">
+                <div class="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center shadow-inner text-primary">
+                    <i class="bi bi-calendar-plus-fill"></i>
+                </div>
+                Booking Manual Baru
             </h3>
-            <button @click="showNewBookingModal = false" class="w-8 h-8 flex items-center justify-center rounded-lg text-on-surface-variant hover:text-primary hover:bg-surface-container transition-colors">
-                <i data-lucide="x" class="w-5 h-5"></i>
+            <button @click="showNewBookingModal = false" class="w-8 h-8 flex items-center justify-center rounded-lg text-outline hover:text-primary hover:bg-surface-container transition-colors">
+                <i class="bi bi-x-lg text-sm"></i>
             </button>
         </div>
 
@@ -275,93 +295,152 @@
         <div class="overflow-y-auto flex-1">
             <form action="{{ route('admin.bookings.manual.store') }}" method="POST">
                 @csrf
-                <div class="p-6 space-y-6">
+                <div class="p-6 space-y-5">
 
                     {{-- Info Klien --}}
                     <div>
-                        <div class="font-label text-[0.65rem] uppercase tracking-widest text-primary font-bold flex items-center gap-2 mb-4">
-                            <i data-lucide="user" class="w-4 h-4"></i> Informasi Klien
+                        <div class="font-label text-[0.65rem] uppercase tracking-widest text-primary font-bold flex items-center gap-2 mb-3 ml-1">
+                            <i class="bi bi-person-bounding-box text-secondary"></i> Informasi Klien
                         </div>
                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                             <div>
-                                <label class="block font-label text-xs uppercase tracking-widest text-on-surface-variant font-bold mb-1.5">Nama Klien <span class="text-red-500">*</span></label>
-                                <input type="text" name="client_name" value="{{ old('client_name') }}" required
-                                       class="w-full bg-surface-container border border-outline-variant/50 rounded-xl px-4 py-3 font-body text-sm text-on-surface focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all @error('client_name') border-red-400 @enderror"
-                                       placeholder="Nama lengkap klien">
+                                <label class="block font-label text-xs uppercase tracking-widest text-on-surface-variant font-bold mb-1.5 ml-1">Nama Klien <span class="text-red-500">*</span></label>
+                                <div class="relative">
+                                    <span class="absolute left-3.5 top-1/2 -translate-y-1/2 text-outline text-sm pointer-events-none">
+                                        <i class="bi bi-person-fill"></i>
+                                    </span>
+                                    <input type="text" name="client_name" value="{{ old('client_name') }}" required
+                                           class="w-full bg-surface-container-low border border-outline-variant/50 rounded-xl pl-10 pr-4 py-2.5 font-body text-sm text-on-surface focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all @error('client_name') border-red-400 @enderror"
+                                           placeholder="Nama lengkap klien">
+                                </div>
                                 @error('client_name')<p class="text-xs text-red-500 mt-1">{{ $message }}</p>@enderror
                             </div>
                             <div>
-                                <label class="block font-label text-xs uppercase tracking-widest text-on-surface-variant font-bold mb-1.5">No. HP / WA <span class="text-red-500">*</span></label>
-                                <input type="text" name="client_phone" value="{{ old('client_phone') }}" required
-                                       class="w-full bg-surface-container border border-outline-variant/50 rounded-xl px-4 py-3 font-body text-sm text-on-surface focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all @error('client_phone') border-red-400 @enderror"
-                                       placeholder="08xxxxxxxxxx">
+                                <label class="block font-label text-xs uppercase tracking-widest text-on-surface-variant font-bold mb-1.5 ml-1">No. HP / WA <span class="text-red-500">*</span></label>
+                                <div class="relative">
+                                    <span class="absolute left-3.5 top-1/2 -translate-y-1/2 text-outline text-sm pointer-events-none">
+                                        <i class="bi bi-telephone-fill"></i>
+                                    </span>
+                                    <input type="text" name="client_phone" value="{{ old('client_phone') }}" required
+                                           class="w-full bg-surface-container-low border border-outline-variant/50 rounded-xl pl-10 pr-4 py-2.5 font-body text-sm text-on-surface focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all @error('client_phone') border-red-400 @enderror"
+                                           placeholder="08xxxxxxxxxx">
+                                </div>
                                 @error('client_phone')<p class="text-xs text-red-500 mt-1">{{ $message }}</p>@enderror
                             </div>
                         </div>
                     </div>
 
-                    <hr class="border-outline-variant/20">
+                    <hr class="border-outline-variant/15">
 
                     {{-- Info Event --}}
                     <div>
-                        <div class="font-label text-[0.65rem] uppercase tracking-widest text-primary font-bold flex items-center gap-2 mb-4">
-                            <i data-lucide="calendar" class="w-4 h-4"></i> Detail Pementasan
+                        <div class="font-label text-[0.65rem] uppercase tracking-widest text-primary font-bold flex items-center gap-2 mb-3 ml-1">
+                            <i class="bi bi-calendar3 text-secondary"></i> Detail Pementasan
                         </div>
                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                             <div>
-                                <label class="block font-label text-xs uppercase tracking-widest text-on-surface-variant font-bold mb-1.5">Jenis Pementasan <span class="text-red-500">*</span></label>
-                                <select name="event_type" required class="w-full bg-surface-container border border-outline-variant/50 rounded-xl px-4 py-3 font-body text-sm text-on-surface focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all appearance-none">
-                                    <option value="">-- Pilih Jenis --</option>
-                                    @foreach(['jaipong' => 'Tari Jaipong', 'rampak_gendang' => 'Rampak Gendang', 'mapag_panganten' => 'Mapag Panganten', 'kacapi_suling' => 'Kacapi Suling'] as $val => $label)
-                                        <option value="{{ $val }}" {{ old('event_type') === $val ? 'selected' : '' }}>{{ $label }}</option>
-                                    @endforeach
-                                </select>
+                                <label class="block font-label text-xs uppercase tracking-widest text-on-surface-variant font-bold mb-1.5 ml-1">Jenis Pementasan <span class="text-red-500">*</span></label>
+                                <div class="relative">
+                                    <span class="absolute left-3.5 top-1/2 -translate-y-1/2 text-outline text-sm pointer-events-none">
+                                        <i class="bi bi-music-note-beamed"></i>
+                                    </span>
+                                    <select name="event_type" required class="w-full bg-surface-container-low border border-outline-variant/50 rounded-xl pl-10 pr-9 py-2.5 font-body text-sm text-on-surface focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all appearance-none">
+                                        <option value="">-- Pilih Jenis --</option>
+                                        @foreach(['jaipong' => 'Tari Jaipong', 'rampak_gendang' => 'Rampak Gendang', 'mapag_panganten' => 'Mapag Panganten', 'kacapi_suling' => 'Kacapi Suling'] as $val => $label)
+                                            <option value="{{ $val }}" {{ old('event_type') === $val ? 'selected' : '' }}>{{ $label }}</option>
+                                        @endforeach
+                                    </select>
+                                    <span class="absolute right-3.5 top-1/2 -translate-y-1/2 text-outline pointer-events-none text-xs">
+                                        <i class="bi bi-chevron-down"></i>
+                                    </span>
+                                </div>
                             </div>
                             <div>
-                                <label class="block font-label text-xs uppercase tracking-widest text-on-surface-variant font-bold mb-1.5">Tanggal Acara <span class="text-red-500">*</span></label>
-                                <input type="date" name="event_date" value="{{ old('event_date') }}" required
-                                       class="w-full bg-surface-container border border-outline-variant/50 rounded-xl px-4 py-3 font-body text-sm text-on-surface focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all">
+                                <label class="block font-label text-xs uppercase tracking-widest text-on-surface-variant font-bold mb-1.5 ml-1">Tanggal Acara <span class="text-red-500">*</span></label>
+                                <div class="relative">
+                                    <span class="absolute left-3.5 top-1/2 -translate-y-1/2 text-outline text-sm pointer-events-none">
+                                        <i class="bi bi-calendar-event"></i>
+                                    </span>
+                                    <input type="date" name="event_date" value="{{ old('event_date') }}" required
+                                           class="w-full bg-surface-container-low border border-outline-variant/50 rounded-xl pl-10 pr-4 py-2.5 font-body text-sm text-on-surface focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all">
+                                </div>
                             </div>
                             <div>
-                                <label class="block font-label text-xs uppercase tracking-widest text-on-surface-variant font-bold mb-1.5">Waktu Mulai <span class="text-red-500">*</span></label>
-                                <input type="time" name="event_start" value="{{ old('event_start') }}" required
-                                       class="w-full bg-surface-container border border-outline-variant/50 rounded-xl px-4 py-3 font-body text-sm text-on-surface focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all">
+                                <label class="block font-label text-xs uppercase tracking-widest text-on-surface-variant font-bold mb-1.5 ml-1">Waktu Mulai <span class="text-red-500">*</span></label>
+                                <div class="relative">
+                                    <span class="absolute left-3.5 top-1/2 -translate-y-1/2 text-outline text-sm pointer-events-none">
+                                        <i class="bi bi-clock"></i>
+                                    </span>
+                                    <input type="time" name="event_start" value="{{ old('event_start') }}" required
+                                           class="w-full bg-surface-container-low border border-outline-variant/50 rounded-xl pl-10 pr-4 py-2.5 font-body text-sm text-on-surface focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all">
+                                </div>
                             </div>
                             <div>
-                                <label class="block font-label text-xs uppercase tracking-widest text-on-surface-variant font-bold mb-1.5">Waktu Selesai <span class="text-red-500">*</span></label>
-                                <input type="time" name="event_end" value="{{ old('event_end') }}" required
-                                       class="w-full bg-surface-container border border-outline-variant/50 rounded-xl px-4 py-3 font-body text-sm text-on-surface focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all">
+                                <label class="block font-label text-xs uppercase tracking-widest text-on-surface-variant font-bold mb-1.5 ml-1">Waktu Selesai <span class="text-red-500">*</span></label>
+                                <div class="relative">
+                                    <span class="absolute left-3.5 top-1/2 -translate-y-1/2 text-outline text-sm pointer-events-none">
+                                        <i class="bi bi-clock-history"></i>
+                                    </span>
+                                    <input type="time" name="event_end" value="{{ old('event_end') }}" required
+                                           class="w-full bg-surface-container-low border border-outline-variant/50 rounded-xl pl-10 pr-4 py-2.5 font-body text-sm text-on-surface focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all">
+                                </div>
                             </div>
                             <div class="sm:col-span-2">
-                                <label class="block font-label text-xs uppercase tracking-widest text-on-surface-variant font-bold mb-1.5">Lokasi / Venue <span class="text-red-500">*</span></label>
-                                <input type="text" name="venue" value="{{ old('venue') }}" required
-                                       class="w-full bg-surface-container border border-outline-variant/50 rounded-xl px-4 py-3 font-body text-sm text-on-surface focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all"
-                                       placeholder="Nama gedung / tempat acara">
+                                <label class="block font-label text-xs uppercase tracking-widest text-on-surface-variant font-bold mb-1.5 ml-1">Lokasi / Venue <span class="text-red-500">*</span></label>
+                                <div class="relative">
+                                    <span class="absolute left-3.5 top-1/2 -translate-y-1/2 text-outline text-sm pointer-events-none">
+                                        <i class="bi bi-geo-alt-fill"></i>
+                                    </span>
+                                    <input type="text" name="venue" value="{{ old('venue') }}" required
+                                           class="w-full bg-surface-container-low border border-outline-variant/50 rounded-xl pl-10 pr-4 py-2.5 font-body text-sm text-on-surface focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all"
+                                           placeholder="Nama gedung / tempat acara">
+                                </div>
                             </div>
                         </div>
                     </div>
 
-                    <hr class="border-outline-variant/20">
+                    <hr class="border-outline-variant/15">
 
                     {{-- Harga --}}
                     <div>
-                        <div class="font-label text-[0.65rem] uppercase tracking-widest text-primary font-bold flex items-center gap-2 mb-4">
-                            <i data-lucide="banknote" class="w-4 h-4"></i> Harga Kontrak
+                        <div class="font-label text-[0.65rem] uppercase tracking-widest text-primary font-bold flex items-center gap-2 mb-3 ml-1">
+                            <i class="bi bi-wallet2 text-secondary"></i> Nilai Kontrak & Pembayaran
                         </div>
                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                             <div>
-                                <label class="block font-label text-xs uppercase tracking-widest text-on-surface-variant font-bold mb-1.5">Total Harga (Rp) <span class="text-red-500">*</span></label>
-                                <input type="number" id="nb_total_price" name="total_price" value="{{ old('total_price') }}" required min="0"
-                                       oninput="document.getElementById('nb_dp').value = Math.round(this.value * 0.5)"
-                                       class="w-full bg-surface-container border border-outline-variant/50 rounded-xl px-4 py-3 font-body text-sm text-on-surface focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all"
-                                       placeholder="Contoh: 5000000">
+                                <label class="block font-label text-xs uppercase tracking-widest text-on-surface-variant font-bold mb-1.5 ml-1">Total Harga (Rp) <span class="text-red-500">*</span></label>
+                                <div class="relative">
+                                    <span class="absolute left-3.5 top-1/2 -translate-y-1/2 text-outline text-sm pointer-events-none font-bold">Rp</span>
+                                    <input type="number" name="total_price" x-model.number="totalPrice" required min="0"
+                                           class="w-full bg-surface-container-low border border-outline-variant/50 rounded-xl pl-9 pr-4 py-2.5 font-body text-sm text-on-surface focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all"
+                                           placeholder="Contoh: 5000000">
+                                </div>
                             </div>
                             <div>
-                                <label class="block font-label text-xs uppercase tracking-widest text-on-surface-variant font-bold mb-1.5">DP / Uang Muka (Rp) <span class="text-red-500">*</span></label>
-                                <input type="number" id="nb_dp" name="dp_amount" value="{{ old('dp_amount') }}" required min="0"
-                                       class="w-full bg-surface-container border border-outline-variant/50 rounded-xl px-4 py-3 font-body text-sm text-on-surface focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all"
-                                       placeholder="Otomatis 50% dari total">
-                                <p class="text-[0.65rem] text-outline mt-1">Otomatis terisi 50%, bisa diubah.</p>
+                                <label class="block font-label text-xs uppercase tracking-widest text-on-surface-variant font-bold mb-1.5 ml-1">DP / Uang Muka (Rp) <span class="text-red-500">*</span></label>
+                                <div class="relative">
+                                    <span class="absolute left-3.5 top-1/2 -translate-y-1/2 text-outline text-sm pointer-events-none font-bold">Rp</span>
+                                    <input type="number" name="dp_amount" x-model.number="dpAmount" required min="0"
+                                           class="w-full bg-surface-container-low border border-outline-variant/50 rounded-xl pl-9 pr-4 py-2.5 font-body text-sm text-on-surface focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all"
+                                           placeholder="Otomatis 50% dari total">
+                                </div>
+                                <p class="text-[0.65rem] text-outline mt-1 ml-1">Otomatis terisi 50%, bisa diubah secara manual.</p>
+                            </div>
+
+                            {{-- Live Payment Summary --}}
+                            <div class="sm:col-span-2 mt-1 p-4 rounded-xl bg-primary/5 border border-primary/10 flex flex-col gap-2 shadow-inner">
+                                <div class="flex justify-between text-xs text-on-surface-variant font-medium">
+                                    <span>Total Kontrak:</span>
+                                    <span class="font-bold text-primary" x-text="totalPrice ? 'Rp ' + Number(totalPrice).toLocaleString('id-ID') : 'Rp 0'"></span>
+                                </div>
+                                <div class="flex justify-between text-xs text-on-surface-variant font-medium">
+                                    <span>DP Uang Muka (50%):</span>
+                                    <span class="font-bold text-secondary" x-text="dpAmount ? 'Rp ' + Number(dpAmount).toLocaleString('id-ID') : 'Rp 0'"></span>
+                                </div>
+                                <div class="flex justify-between text-xs font-bold text-primary border-t border-outline-variant/20 pt-2 mt-1">
+                                    <span>Sisa Pelunasan:</span>
+                                    <span x-text="(totalPrice && dpAmount) ? 'Rp ' + Number(totalPrice - dpAmount).toLocaleString('id-ID') : 'Rp 0'"></span>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -369,14 +448,14 @@
                 </div>
 
                 {{-- Footer --}}
-                <div class="px-6 py-4 border-t border-outline-variant/20 bg-surface-container-low flex justify-end gap-3 flex-shrink-0">
+                <div class="px-6 py-4 border-t border-outline-variant/20 bg-surface-container-low/50 flex justify-end gap-3 flex-shrink-0">
                     <button type="button" @click="showNewBookingModal = false"
                             class="px-5 py-2.5 rounded-xl border border-outline-variant/50 font-label text-xs font-bold uppercase tracking-widest text-on-surface-variant hover:bg-surface-container transition-colors">
                         Batal
                     </button>
                     <button type="submit"
-                            class="px-5 py-2.5 rounded-xl bg-primary text-white font-label text-xs font-bold uppercase tracking-widest hover:bg-primary-container transition-all shadow-md flex items-center gap-2">
-                        <i data-lucide="plus-circle" class="w-4 h-4"></i> Simpan Pesanan
+                            class="px-6 py-2.5 rounded-xl bg-primary text-white font-label text-xs font-bold uppercase tracking-widest hover:bg-primary-container transition-all shadow-md flex items-center gap-2">
+                        <i class="bi bi-plus-circle-fill"></i> Simpan Pesanan
                     </button>
                 </div>
             </form>

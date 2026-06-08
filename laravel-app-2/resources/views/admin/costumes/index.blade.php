@@ -7,77 +7,80 @@
 @section('content')
 
 {{-- ── ASET KOSTUM SANGGAR ── --}}
-<div class="mb-12">
-    <div class="flex items-center justify-between mb-6">
-        <h2 class="font-headline text-xl text-primary font-semibold flex items-center gap-3">
-            <div class="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center text-primary">
-                <i data-lucide="shirt" class="w-5 h-5"></i>
+<div class="mb-6">
+    <div class="flex items-center justify-between mb-3">
+        <h2 class="font-headline text-base text-primary font-semibold flex items-center gap-2">
+            <div class="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center text-primary">
+                <i data-lucide="shirt" class="w-4 h-4"></i>
             </div>
             Inventaris Aset Sanggar
         </h2>
-        <a href="{{ route('admin.costumes.create-asset') }}" class="px-5 py-2.5 rounded-xl bg-primary text-white font-label text-xs font-bold uppercase tracking-widest hover:bg-primary-container transition-all shadow-sm flex items-center gap-2">
-            <i data-lucide="plus" class="w-4 h-4"></i> Tambah Aset
+        <a href="{{ route('admin.costumes.create-asset') }}" class="px-3.5 py-1.5 rounded-lg bg-primary text-white font-label text-[0.65rem] font-bold uppercase tracking-widest hover:bg-primary-container transition-all shadow-sm flex items-center gap-1.5">
+            <i data-lucide="plus" class="w-3.5 h-3.5"></i> Tambah Aset
         </a>
     </div>
 
     {{-- Grid Card Responsif untuk Aset Sanggar --}}
-    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3">
         @forelse($sanggarCostumes as $c)
         @php
             $isDamaged = $c->condition === 'damaged';
             $isMaintenance = $c->condition === 'maintenance';
             $cardBorderColor = $isDamaged ? 'border-red-200 bg-red-50/5' : ($isMaintenance ? 'border-orange-200 bg-orange-50/5' : 'border-outline-variant/30 hover:border-primary/30');
             $conditionBadge = match($c->condition) {
-                'good' => '<span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-green-500/10 text-green-700 border border-green-500/20"><span class="w-1.5 h-1.5 rounded-full bg-green-500"></span>Baik</span>',
-                'damaged' => '<span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-red-500/10 text-red-700 border border-red-500/20"><span class="w-1.5 h-1.5 rounded-full bg-red-500"></span>Rusak</span>',
-                default => '<span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-orange-500/10 text-orange-700 border border-orange-500/20"><span class="w-1.5 h-1.5 rounded-full bg-orange-500"></span>Maint.</span>',
+                'good' => '<span class="inline-flex items-center gap-1 px-2 py-0.5 rounded bg-green-500/10 text-green-700 border border-green-500/20 text-[0.6rem] font-bold"><span class="w-1.5 h-1.5 rounded-full bg-green-500"></span>Baik</span>',
+                'damaged' => '<span class="inline-flex items-center gap-1 px-2 py-0.5 rounded bg-red-500/10 text-red-700 border border-red-500/20 text-[0.6rem] font-bold"><span class="w-1.5 h-1.5 rounded-full bg-red-500"></span>Rusak</span>',
+                default => '<span class="inline-flex items-center gap-1 px-2 py-0.5 rounded bg-orange-500/10 text-orange-700 border border-orange-500/20 text-[0.6rem] font-bold"><span class="w-1.5 h-1.5 rounded-full bg-orange-500"></span>Maint.</span>',
             };
             $categoryIcons = [
                 'atasan' => 'shirt',
                 'bawahan' => 'layers',
                 'aksesoris' => 'gem',
                 'alat_musik' => 'music',
+                'musik' => 'music',
                 'properti' => 'box',
+                'tradisional' => 'palette',
+                'modern' => 'sparkles',
             ];
             $categoryIcon = $categoryIcons[strtolower($c->category)] ?? 'package';
         @endphp
-        <div class="bg-surface-container-lowest rounded-2xl border {{ $cardBorderColor }} shadow-sm hover:shadow-md transition-all duration-300 p-6 flex flex-col justify-between group">
+        <div class="bg-surface-container-lowest rounded-xl border {{ $cardBorderColor }} shadow-sm hover:shadow-md transition-all duration-300 p-3.5 flex flex-col justify-between group">
             <div>
                 <!-- Top Row: Icon Category & Quantity -->
-                <div class="flex items-center justify-between mb-4">
-                    <div class="w-10 h-10 rounded-xl bg-primary/5 text-primary flex items-center justify-center group-hover:bg-primary group-hover:text-white transition-all duration-300">
-                        <i data-lucide="{{ $categoryIcon }}" class="w-5 h-5"></i>
+                <div class="flex items-center justify-between mb-2">
+                    <div class="w-8 h-8 rounded-lg bg-primary/5 text-primary flex items-center justify-center group-hover:bg-primary group-hover:text-white transition-all duration-300">
+                        <i data-lucide="{{ $categoryIcon }}" class="w-4 h-4"></i>
                     </div>
                     <div class="flex flex-col items-end">
-                        <span class="text-[0.65rem] font-bold text-outline uppercase tracking-widest">Stok</span>
-                        <span class="text-lg font-extrabold text-primary">{{ $c->quantity }} Pcs</span>
+                        <span class="text-[0.55rem] font-bold text-outline uppercase tracking-widest leading-none">Stok</span>
+                        <span class="text-sm font-extrabold text-primary leading-tight mt-0.5">{{ $c->quantity }} Pcs</span>
                     </div>
                 </div>
                 
                 <!-- Category Tag -->
-                <span class="inline-block px-2.5 py-0.5 rounded-md bg-secondary/10 text-secondary text-[0.65rem] font-bold uppercase tracking-wider mb-2">
+                <span class="inline-block px-1.5 py-0.2 rounded bg-secondary/10 text-secondary text-[0.55rem] font-bold uppercase tracking-wider mb-1">
                     {{ str_replace('_', ' ', $c->category) }}
                 </span>
                 
                 <!-- Asset Name -->
-                <h3 class="font-headline text-base font-bold text-on-surface mb-4 leading-snug min-h-[2.5rem] flex items-center">
+                <h3 class="font-body text-xs font-bold text-on-surface mb-2 leading-snug min-h-[2rem] flex items-center">
                     {{ $c->name }}
                 </h3>
             </div>
             
             <!-- Bottom Row: Condition Status & Actions -->
-            <div class="flex items-center justify-between pt-4 border-t border-outline-variant/20">
+            <div class="flex items-center justify-between pt-2.5 border-t border-outline-variant/20">
                 {!! $conditionBadge !!}
                 
-                <div class="flex items-center gap-2">
-                    <a href="{{ route('admin.costumes.edit-asset', $c->id) }}" class="w-9 h-9 rounded-lg border border-outline-variant/40 text-outline hover:text-primary hover:border-primary flex items-center justify-center hover:bg-primary/5 transition-all" title="Edit Aset">
-                        <i data-lucide="edit-3" class="w-4 h-4"></i>
+                <div class="flex items-center gap-1.5">
+                    <a href="{{ route('admin.costumes.edit-asset', $c->id) }}" class="w-7 h-7 rounded-md border border-outline-variant/40 text-outline hover:text-primary hover:border-primary flex items-center justify-center hover:bg-primary/5 transition-all" title="Edit Aset">
+                        <i data-lucide="edit-3" class="w-3.5 h-3.5"></i>
                     </a>
-                    <form action="{{ route('admin.costumes.destroy-asset', $c->id) }}" method="POST" onsubmit="return confirm('Apakah Anda yakin ingin menghapus aset ini?');" class="inline">
+                    <form action="{{ route('admin.costumes.destroy-asset', $c->id) }}" method="POST" data-confirm="Apakah Anda yakin ingin menghapus aset ini?" class="inline m-0">
                         @csrf
                         @method('DELETE')
-                        <button type="submit" class="w-9 h-9 rounded-lg border border-red-200/50 text-red-500 hover:bg-red-50 hover:border-red-500 flex items-center justify-center transition-all" title="Hapus Aset">
-                            <i data-lucide="trash-2" class="w-4 h-4"></i>
+                        <button type="submit" class="w-7 h-7 rounded-md border border-red-200/50 text-red-500 hover:bg-red-50 hover:border-red-500 flex items-center justify-center transition-all" title="Hapus Aset">
+                            <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
                         </button>
                     </form>
                 </div>
@@ -97,16 +100,16 @@
 </div>
 
 {{-- ── SEWA VENDOR (RENTALS) ── --}}
-<div class="mb-12">
-    <div class="flex items-center justify-between mb-6">
-        <h2 class="font-headline text-xl text-primary font-semibold flex items-center gap-3">
-            <div class="w-10 h-10 rounded-xl bg-secondary/10 flex items-center justify-center text-secondary">
-                <i data-lucide="shopping-cart" class="w-5 h-5"></i>
+<div class="mb-6">
+    <div class="flex items-center justify-between mb-3">
+        <h2 class="font-headline text-base text-primary font-semibold flex items-center gap-2">
+            <div class="w-8 h-8 rounded-lg bg-secondary/10 flex items-center justify-center text-secondary">
+                <i data-lucide="shopping-cart" class="w-4 h-4"></i>
             </div>
             Transaksi Sewa Vendor Eksternal
         </h2>
-        <a href="{{ route('admin.costumes.create-rental') }}" class="px-5 py-2.5 rounded-xl bg-secondary text-white font-label text-xs font-bold uppercase tracking-widest hover:bg-secondary-container transition-all shadow-sm flex items-center gap-2">
-            <i data-lucide="plus" class="w-4 h-4"></i> Tambah Sewaan
+        <a href="{{ route('admin.costumes.create-rental') }}" class="px-3.5 py-1.5 rounded-lg bg-secondary text-white font-label text-[0.65rem] font-bold uppercase tracking-widest hover:bg-secondary-container transition-all shadow-sm flex items-center gap-1.5">
+            <i data-lucide="plus" class="w-3.5 h-3.5"></i> Tambah Sewaan
         </a>
     </div>
 
@@ -116,13 +119,13 @@
             <table class="w-full min-w-[900px]">
                 <thead class="bg-surface-container-low border-b border-outline-variant/20">
                     <tr>
-                        <th class="font-label text-[0.65rem] uppercase tracking-widest text-outline font-bold px-6 py-4 text-left">Event</th>
-                        <th class="font-label text-[0.65rem] uppercase tracking-widest text-outline font-bold px-6 py-4 text-left">Vendor & Item</th>
-                        <th class="font-label text-[0.65rem] uppercase tracking-widest text-outline font-bold px-6 py-4 text-center">Jumlah</th>
-                        <th class="font-label text-[0.65rem] uppercase tracking-widest text-outline font-bold px-6 py-4 text-left">Tgl Kembali</th>
-                        <th class="font-label text-[0.65rem] uppercase tracking-widest text-outline font-bold px-6 py-4 text-center">Status</th>
-                        <th class="font-label text-[0.65rem] uppercase tracking-widest text-outline font-bold px-6 py-4 text-right">Denda Telat</th>
-                        <th class="font-label text-[0.65rem] uppercase tracking-widest text-outline font-bold px-6 py-4 text-right">Aksi</th>
+                        <th class="font-label text-[0.55rem] uppercase tracking-widest text-outline font-bold px-3 py-1.5 text-left">Event</th>
+                        <th class="font-label text-[0.55rem] uppercase tracking-widest text-outline font-bold px-3 py-1.5 text-left">Vendor & Item</th>
+                        <th class="font-label text-[0.55rem] uppercase tracking-widest text-outline font-bold px-3 py-1.5 text-center">Jumlah</th>
+                        <th class="font-label text-[0.55rem] uppercase tracking-widest text-outline font-bold px-3 py-1.5 text-left">Tgl Kembali</th>
+                        <th class="font-label text-[0.55rem] uppercase tracking-widest text-outline font-bold px-3 py-1.5 text-center">Status</th>
+                        <th class="font-label text-[0.55rem] uppercase tracking-widest text-outline font-bold px-3 py-1.5 text-right">Denda Telat</th>
+                        <th class="font-label text-[0.55rem] uppercase tracking-widest text-outline font-bold px-3 py-1.5 text-right">Aksi</th>
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-outline-variant/15">
@@ -132,56 +135,56 @@
                         $rowClass = $isOverdue ? 'bg-red-500/5 hover:bg-red-500/10' : 'hover:bg-surface-container-low/50';
                     @endphp
                     <tr class="{{ $rowClass }} transition-colors">
-                        <td class="px-6 py-4">
-                            <span class="inline-block px-3 py-1 rounded-md bg-secondary-container/40 text-on-secondary-container border border-secondary/20 font-label text-[0.65rem] font-bold tracking-wider">
+                        <td class="px-3 py-1.5">
+                            <span class="inline-block px-2 py-0.5 rounded bg-secondary-container/40 text-on-secondary-container border border-secondary/20 font-label text-[0.55rem] font-bold tracking-wider">
                                 {{ $r->event->event_code ?? '-' }}
                             </span>
                         </td>
-                        <td class="px-6 py-4">
-                            <div class="font-body font-semibold text-on-surface text-sm">{{ $r->vendor->name ?? '-' }}</div>
-                            <div class="font-label text-xs text-outline mt-0.5">{{ $r->costume_type }}</div>
+                        <td class="px-3 py-1.5">
+                            <div class="font-body font-semibold text-on-surface text-xs">{{ $r->vendor->name ?? '-' }}</div>
+                            <div class="font-label text-[0.58rem] text-outline mt-0.5">{{ $r->costume_type }}</div>
                         </td>
-                        <td class="px-6 py-4 text-center">
-                            <span class="inline-flex items-center justify-center px-3 py-1 rounded-full bg-surface-container font-headline font-bold text-primary text-xs">
+                        <td class="px-3 py-1.5 text-center">
+                            <span class="inline-flex items-center justify-center px-2 py-0.5 rounded-full bg-surface-container font-headline font-bold text-primary text-[0.65rem]">
                                 {{ $r->quantity }} Pcs
                             </span>
                         </td>
-                        <td class="px-6 py-4">
-                            <div class="font-body text-sm {{ $isOverdue ? 'text-red-600 font-bold' : 'text-on-surface' }}">
+                        <td class="px-3 py-1.5">
+                            <div class="font-body text-xs {{ $isOverdue ? 'text-red-600 font-bold' : 'text-on-surface' }}">
                                 {{ \Carbon\Carbon::parse($r->due_date)->format('d M Y') }}
                             </div>
                             @if($isOverdue)
-                                <div class="font-label text-[0.65rem] text-red-500 font-bold uppercase tracking-widest flex items-center gap-1 mt-1">
-                                    <i data-lucide="alert-triangle" class="w-3.5 h-3.5"></i> Lewat Deadline
+                                <div class="font-label text-[0.55rem] text-red-500 font-bold uppercase tracking-widest flex items-center gap-1 mt-0.5">
+                                    <i data-lucide="alert-triangle" class="w-3 h-3"></i> Lewat Deadline
                                 </div>
                             @endif
                         </td>
-                        <td class="px-6 py-4 text-center">
+                        <td class="px-3 py-1.5 text-center">
                             @if($r->status === 'rented' && $isOverdue)
-                                <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold bg-red-500/10 text-red-700 border border-red-500/20">TERLAMBAT</span>
+                                <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded bg-red-500/10 text-red-700 border border-red-500/20 text-[0.55rem] font-bold uppercase">TERLAMBAT</span>
                             @elseif($r->status === 'rented')
-                                <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold bg-orange-500/10 text-orange-700 border border-orange-500/20">DIPINJAM</span>
+                                <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded bg-orange-500/10 text-orange-700 border border-orange-500/20 text-[0.55rem] font-bold uppercase">DIPINJAM</span>
                             @else
-                                <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold bg-green-500/10 text-green-700 border border-green-500/20">KEMBALI</span>
+                                <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded bg-green-500/10 text-green-700 border border-green-500/20 text-[0.55rem] font-bold uppercase">KEMBALI</span>
                             @endif
                         </td>
-                        <td class="px-6 py-4 text-right">
+                        <td class="px-3 py-1.5 text-right">
                             @if($r->overdue_fine > 0)
-                                <div class="font-headline font-bold text-red-600 text-sm">Rp {{ number_format($r->overdue_fine, 0, ',', '.') }}</div>
-                                <div class="font-label text-[0.65rem] text-outline mt-0.5">{{ $r->overdue_days }} hari &times; Rp50k</div>
+                                <div class="font-headline font-bold text-red-600 text-xs">Rp {{ number_format($r->overdue_fine, 0, ',', '.') }}</div>
+                                <div class="font-label text-[0.55rem] text-outline mt-0.5">{{ $r->overdue_days }} hari &times; Rp50k</div>
                             @else
-                                <span class="font-label text-xs text-outline">—</span>
+                                <span class="font-label text-[0.55rem] text-outline">—</span>
                             @endif
                         </td>
-                        <td class="px-6 py-4">
-                            <div class="flex items-center justify-end gap-2">
+                        <td class="px-3 py-1.5">
+                            <div class="flex items-center justify-end gap-1.5">
                                 @if(!$r->returned_date)
-                                <a href="{{ route('admin.costumes.edit-rental', $r->id) }}" class="w-9 h-9 rounded-lg border border-outline-variant/40 text-outline hover:text-primary hover:border-primary flex items-center justify-center hover:bg-primary/5 transition-all" title="Edit Sewaan">
-                                    <i data-lucide="edit-3" class="w-4 h-4"></i>
+                                <a href="{{ route('admin.costumes.edit-rental', $r->id) }}" class="w-7 h-7 rounded-md border border-outline-variant/40 text-outline hover:text-primary hover:border-primary flex items-center justify-center hover:bg-primary/5 transition-all" title="Edit Sewaan">
+                                    <i data-lucide="edit-3" class="w-3.5 h-3.5"></i>
                                 </a>
                                 @endif
-                                <button type="button" @click="openReturnModal({{ $r->id }}, '{{ $r->costume_type }}')" class="w-9 h-9 rounded-lg border border-secondary/40 text-secondary hover:bg-secondary/10 flex items-center justify-center transition-all" title="Tandai Kembali">
-                                    <i data-lucide="check-circle" class="w-4 h-4"></i>
+                                <button type="button" @click="openReturnModal({{ $r->id }}, '{{ $r->costume_type }}')" class="w-7 h-7 rounded-md border border-secondary/40 text-secondary hover:bg-secondary/10 flex items-center justify-center transition-all" title="Tandai Kembali">
+                                    <i data-lucide="check-circle" class="w-3.5 h-3.5"></i>
                                 </button>
                             </div>
                         </td>
@@ -206,56 +209,56 @@
                 $isOverdue = !$r->returned_date && \Carbon\Carbon::parse($r->due_date)->isPast();
                 $cardClass = $isOverdue ? 'bg-red-500/5 border-l-4 border-l-red-500' : 'hover:bg-surface-container-low/50 border-l-4 border-l-transparent';
             @endphp
-            <div class="p-4 space-y-3 {{ $cardClass }}">
+            <div class="p-2.5 space-y-2 {{ $cardClass }}">
                 <div class="flex justify-between items-center">
-                    <span class="inline-block px-2.5 py-0.5 rounded bg-secondary-container/40 text-on-secondary-container border border-secondary/20 font-label text-[0.65rem] font-bold tracking-wider">
+                    <span class="inline-block px-2 py-0.5 rounded bg-secondary-container/40 text-on-secondary-container border border-secondary/20 font-label text-[0.55rem] font-bold tracking-wider">
                         {{ $r->event->event_code ?? '-' }}
                     </span>
                     <div>
                         @if($r->status === 'rented' && $isOverdue)
-                            <span class="inline-flex px-2 py-0.5 rounded-full text-[0.65rem] font-semibold bg-red-500/10 text-red-700">TERLAMBAT</span>
+                            <span class="inline-flex px-2 py-0.5 rounded-full text-[0.55rem] font-semibold bg-red-500/10 text-red-700">TERLAMBAT</span>
                         @elseif($r->status === 'rented')
-                            <span class="inline-flex px-2 py-0.5 rounded-full text-[0.65rem] font-semibold bg-orange-500/10 text-orange-700">DIPINJAM</span>
+                            <span class="inline-flex px-2 py-0.5 rounded-full text-[0.55rem] font-semibold bg-orange-500/10 text-orange-700">DIPINJAM</span>
                         @else
-                            <span class="inline-flex px-2 py-0.5 rounded-full text-[0.65rem] font-semibold bg-green-500/10 text-green-700">KEMBALI</span>
+                            <span class="inline-flex px-2 py-0.5 rounded-full text-[0.55rem] font-semibold bg-green-500/10 text-green-700">KEMBALI</span>
                         @endif
                     </div>
                 </div>
-                <div class="flex justify-between items-start gap-4">
+                <div class="flex justify-between items-start gap-2">
                     <div>
-                        <div class="font-body font-bold text-on-surface text-sm">{{ $r->vendor->name ?? '-' }}</div>
-                        <div class="font-label text-xs text-outline mt-1">{{ $r->costume_type }}</div>
+                        <div class="font-body font-bold text-on-surface text-xs">{{ $r->vendor->name ?? '-' }}</div>
+                        <div class="font-label text-[0.58rem] text-outline mt-0.5">{{ $r->costume_type }}</div>
                     </div>
                     <div class="text-right">
-                        <span class="inline-flex items-center justify-center px-2 py-0.5 rounded-full bg-surface-container font-headline font-bold text-primary text-xs">
+                        <span class="inline-flex items-center justify-center px-1.5 py-0.2 rounded bg-surface-container font-headline font-bold text-primary text-[0.58rem]">
                             {{ $r->quantity }} Pcs
                         </span>
                     </div>
                 </div>
-                <div class="flex justify-between items-end pt-2 border-t border-outline-variant/10 gap-2">
+                <div class="flex justify-between items-end pt-1.5 border-t border-outline-variant/10 gap-2">
                     <div>
-                        <div class="font-label text-[0.55rem] uppercase tracking-widest text-outline font-bold">Tgl Kembali</div>
+                        <div class="font-label text-[0.5rem] uppercase tracking-widest text-outline font-bold">Tgl Kembali</div>
                         <div class="font-body text-xs {{ $isOverdue ? 'text-red-600 font-bold' : 'text-on-surface' }} mt-0.5">
                             {{ \Carbon\Carbon::parse($r->due_date)->format('d M Y') }}
                         </div>
                     </div>
                     <div class="text-right flex flex-col items-end">
                         @if($r->overdue_fine > 0)
-                            <div class="font-label text-[0.55rem] uppercase tracking-widest text-outline font-bold">Denda</div>
+                            <div class="font-label text-[0.5rem] uppercase tracking-widest text-outline font-bold">Denda</div>
                             <div class="font-headline font-bold text-red-600 text-xs mt-0.5">Rp {{ number_format($r->overdue_fine, 0, ',', '.') }}</div>
                         @else
                             <span class="font-label text-xs text-outline">—</span>
                         @endif
                     </div>
                 </div>
-                <div class="flex justify-end gap-2 pt-2 border-t border-outline-variant/10">
+                <div class="flex justify-end gap-1.5 pt-1.5 border-t border-outline-variant/10">
                     @if(!$r->returned_date)
-                    <a href="{{ route('admin.costumes.edit-rental', $r->id) }}" class="w-9 h-9 rounded-lg border border-outline-variant/40 text-outline hover:text-primary hover:border-primary flex items-center justify-center hover:bg-primary/5 transition-all" title="Edit Sewaan">
-                        <i data-lucide="edit-3" class="w-4 h-4"></i>
+                    <a href="{{ route('admin.costumes.edit-rental', $r->id) }}" class="w-7 h-7 rounded-md border border-outline-variant/40 text-outline hover:text-primary hover:border-primary flex items-center justify-center hover:bg-primary/5 transition-all" title="Edit Sewaan">
+                        <i data-lucide="edit-3" class="w-3.5 h-3.5"></i>
                     </a>
                     @endif
-                    <button type="button" @click="openReturnModal({{ $r->id }}, '{{ $r->costume_type }}')" class="w-9 h-9 rounded-lg border border-secondary/40 text-secondary hover:bg-secondary/10 flex items-center justify-center transition-all" title="Tandai Kembali">
-                        <i data-lucide="check-circle" class="w-4 h-4"></i>
+                    <button type="button" @click="openReturnModal({{ $r->id }}, '{{ $r->costume_type }}')" class="w-7 h-7 rounded-md border border-secondary/40 text-secondary hover:bg-secondary/10 flex items-center justify-center transition-all" title="Tandai Kembali">
+                        <i data-lucide="check-circle" class="w-3.5 h-3.5"></i>
                     </button>
                 </div>
             </div>
@@ -271,10 +274,10 @@
 
 {{-- ── RIWAYAT PENGGUNAAN KOSTUM ── --}}
 <div>
-    <div class="flex items-center justify-between mb-6">
-        <h2 class="font-headline text-xl text-primary font-semibold flex items-center gap-3">
-            <div class="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center text-primary">
-                <i data-lucide="history" class="w-5 h-5"></i>
+    <div class="flex items-center justify-between mb-3">
+        <h2 class="font-headline text-base text-primary font-semibold flex items-center gap-2">
+            <div class="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center text-primary">
+                <i data-lucide="history" class="w-4 h-4"></i>
             </div>
             Riwayat Penggunaan Aset Sanggar
         </h2>
@@ -286,12 +289,12 @@
             <table class="w-full min-w-[900px]">
                 <thead class="bg-surface-container-low border-b border-outline-variant/20">
                     <tr>
-                        <th class="font-label text-[0.65rem] uppercase tracking-widest text-outline font-bold px-6 py-4 text-left">Kostum</th>
-                        <th class="font-label text-[0.65rem] uppercase tracking-widest text-outline font-bold px-6 py-4 text-left">Event</th>
-                        <th class="font-label text-[0.65rem] uppercase tracking-widest text-outline font-bold px-6 py-4 text-center">Status</th>
-                        <th class="font-label text-[0.65rem] uppercase tracking-widest text-outline font-bold px-6 py-4 text-left">Tgl Diambil</th>
-                        <th class="font-label text-[0.65rem] uppercase tracking-widest text-outline font-bold px-6 py-4 text-left">Tgl Dikembalikan</th>
-                        <th class="font-label text-[0.65rem] uppercase tracking-widest text-outline font-bold px-6 py-4 text-right">Aksi</th>
+                        <th class="font-label text-[0.55rem] uppercase tracking-widest text-outline font-bold px-3 py-1.5 text-left">Kostum</th>
+                        <th class="font-label text-[0.55rem] uppercase tracking-widest text-outline font-bold px-3 py-1.5 text-left">Event</th>
+                        <th class="font-label text-[0.55rem] uppercase tracking-widest text-outline font-bold px-3 py-1.5 text-center">Status</th>
+                        <th class="font-label text-[0.55rem] uppercase tracking-widest text-outline font-bold px-3 py-1.5 text-left">Tgl Diambil</th>
+                        <th class="font-label text-[0.55rem] uppercase tracking-widest text-outline font-bold px-3 py-1.5 text-left">Tgl Dikembalikan</th>
+                        <th class="font-label text-[0.55rem] uppercase tracking-widest text-outline font-bold px-3 py-1.5 text-right">Aksi</th>
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-outline-variant/15">
@@ -313,38 +316,38 @@
                         $rowClass = in_array($usage->status, ['damaged', 'lost']) ? 'bg-red-500/5 hover:bg-red-500/10' : 'hover:bg-surface-container-low/50';
                     @endphp
                     <tr class="transition-colors {{ $rowClass }}">
-                        <td class="px-6 py-4">
-                            <div class="font-body font-semibold text-on-surface text-sm">{{ $usage->costume->name ?? '-' }}</div>
-                            <div class="font-label text-xs text-outline mt-0.5">Qty: {{ $usage->quantity ?? '-' }} Pcs</div>
+                        <td class="px-3 py-1.5">
+                            <div class="font-body font-semibold text-on-surface text-xs">{{ $usage->costume->name ?? '-' }}</div>
+                            <div class="font-label text-[0.58rem] text-outline mt-0.5">Qty: {{ $usage->quantity ?? '-' }} Pcs</div>
                         </td>
-                        <td class="px-6 py-4">
-                            <span class="inline-block px-3 py-1 rounded-md bg-primary-container/40 text-on-primary-container border border-primary/20 font-label text-[0.65rem] font-bold tracking-wider">
+                        <td class="px-3 py-1.5">
+                            <span class="inline-block px-2 py-0.5 rounded bg-primary-container/40 text-on-primary-container border border-primary/20 font-label text-[0.55rem] font-bold tracking-wider">
                                 {{ $usage->event->event_code ?? '-' }}
                             </span>
                         </td>
-                        <td class="px-6 py-4 text-center">
-                            <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold border {{ $statusColor }} font-label uppercase tracking-wider">
+                        <td class="px-3 py-1.5 text-center">
+                            <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded border {{ $statusColor }} font-label text-[0.55rem] font-bold uppercase tracking-wider">
                                 {{ $statusLabel[$usage->status] ?? ucfirst($usage->status) }}
                             </span>
                         </td>
-                        <td class="px-6 py-4">
-                            <div class="font-body text-sm text-on-surface">{{ \Carbon\Carbon::parse($usage->checked_out_date)->format('d M Y') ?? '-' }}</div>
+                        <td class="px-3 py-1.5">
+                            <div class="font-body text-xs text-on-surface">{{ \Carbon\Carbon::parse($usage->checked_out_date)->format('d M Y') ?? '-' }}</div>
                         </td>
-                        <td class="px-6 py-4">
+                        <td class="px-3 py-1.5">
                             @if($usage->actual_return_date)
-                                <div class="font-body text-sm text-on-surface">{{ \Carbon\Carbon::parse($usage->actual_return_date)->format('d M Y') }}</div>
+                                <div class="font-body text-xs text-on-surface">{{ \Carbon\Carbon::parse($usage->actual_return_date)->format('d M Y') }}</div>
                             @else
-                                <span class="font-label text-xs text-outline italic">Belum dikembalikan</span>
+                                <span class="font-label text-[0.55rem] text-outline italic">Belum dikembalikan</span>
                             @endif
                         </td>
-                        <td class="px-6 py-4">
+                        <td class="px-3 py-1.5">
                             <div class="flex items-center justify-end">
                                 @if($usage->status === 'checked_out')
-                                <button type="button" @click="openReturnUsageModal({{ $usage->id }}, '{{ $usage->costume->name }}')" class="w-9 h-9 rounded-lg border border-primary/40 text-primary hover:bg-primary/10 flex items-center justify-center transition-all" title="Tandai Kembali">
-                                    <i data-lucide="check-circle" class="w-4 h-4"></i>
+                                <button type="button" @click="openReturnUsageModal({{ $usage->id }}, '{{ $usage->costume->name }}')" class="w-7 h-7 rounded-md border border-primary/40 text-primary hover:bg-primary/10 flex items-center justify-center transition-all" title="Tandai Kembali">
+                                    <i data-lucide="check-circle" class="w-3.5 h-3.5"></i>
                                 </button>
                                 @else
-                                <span class="font-label text-xs text-outline">—</span>
+                                <span class="font-label text-[0.55rem] text-outline">—</span>
                                 @endif
                             </div>
                         </td>
@@ -380,39 +383,39 @@
                 ];
                 $cardClass = $statusColors[$usage->status] ?? 'border-l-4 border-l-transparent';
             @endphp
-            <div class="p-4 space-y-3 {{ $cardClass }}">
+            <div class="p-2.5 space-y-2 {{ $cardClass }}">
                 <div class="flex justify-between items-center">
-                    <span class="inline-block px-2.5 py-0.5 rounded bg-primary-container/40 text-on-primary-container border border-primary/20 font-label text-[0.65rem] font-bold tracking-wider">
+                    <span class="inline-block px-2 py-0.5 rounded bg-primary-container/40 text-on-primary-container border border-primary/20 font-label text-[0.55rem] font-bold tracking-wider">
                         {{ $usage->event->event_code ?? '-' }}
                     </span>
-                    <span class="font-label text-xs font-bold uppercase tracking-wider text-primary">
+                    <span class="font-label text-[0.55rem] font-bold uppercase tracking-wider text-primary">
                         {{ $statusLabel[$usage->status] ?? ucfirst($usage->status) }}
                     </span>
                 </div>
-                <div class="flex justify-between items-start gap-4">
+                <div class="flex justify-between items-start gap-2">
                     <div>
-                        <div class="font-body font-bold text-on-surface text-sm">{{ $usage->costume->name ?? '-' }}</div>
-                        <div class="font-label text-xs text-outline mt-1 font-semibold">Qty: {{ $usage->quantity ?? '-' }} Pcs</div>
+                        <div class="font-body font-bold text-on-surface text-xs">{{ $usage->costume->name ?? '-' }}</div>
+                        <div class="font-label text-[0.58rem] text-outline mt-0.5 font-semibold">Qty: {{ $usage->quantity ?? '-' }} Pcs</div>
                     </div>
                 </div>
-                <div class="flex justify-between items-end pt-2 border-t border-outline-variant/10 gap-2">
+                <div class="flex justify-between items-end pt-1.5 border-t border-outline-variant/10 gap-2">
                     <div>
-                        <div class="font-label text-[0.55rem] uppercase tracking-widest text-outline font-bold">Diambil</div>
+                        <div class="font-label text-[0.5rem] uppercase tracking-widest text-outline font-bold">Diambil</div>
                         <div class="font-body text-xs text-on-surface mt-0.5">{{ \Carbon\Carbon::parse($usage->checked_out_date)->format('d M Y') }}</div>
                     </div>
                     <div class="text-right">
-                        <div class="font-label text-[0.55rem] uppercase tracking-widest text-outline font-bold">Dikembalikan</div>
+                        <div class="font-label text-[0.5rem] uppercase tracking-widest text-outline font-bold">Dikembalikan</div>
                         @if($usage->actual_return_date)
                             <div class="font-body text-xs text-on-surface mt-0.5">{{ \Carbon\Carbon::parse($usage->actual_return_date)->format('d M Y') }}</div>
                         @else
-                            <span class="font-label text-[0.65rem] text-outline italic mt-0.5 block">Belum</span>
+                            <span class="font-label text-[0.58rem] text-outline italic mt-0.5 block">Belum</span>
                         @endif
                     </div>
                 </div>
                 @if($usage->status === 'checked_out')
-                <div class="flex justify-end pt-2 border-t border-outline-variant/10">
-                    <button type="button" @click="openReturnUsageModal({{ $usage->id }}, '{{ $usage->costume->name }}')" class="w-9 h-9 rounded-lg border border-primary/40 text-primary hover:bg-primary/10 flex items-center justify-center transition-all" title="Tandai Kembali">
-                        <i data-lucide="check-circle" class="w-4 h-4"></i>
+                <div class="flex justify-end pt-1.5 border-t border-outline-variant/10">
+                    <button type="button" @click="openReturnUsageModal({{ $usage->id }}, '{{ $usage->costume->name }}')" class="w-7 h-7 rounded-md border border-primary/40 text-primary hover:bg-primary/10 flex items-center justify-center transition-all" title="Tandai Kembali">
+                        <i data-lucide="check-circle" class="w-3.5 h-3.5"></i>
                     </button>
                 </div>
                 @endif

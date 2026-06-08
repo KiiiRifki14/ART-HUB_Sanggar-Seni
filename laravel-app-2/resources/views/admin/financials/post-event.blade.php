@@ -154,7 +154,7 @@
     </div>
 
     @if($event->status !== 'completed' && $event->status !== 'cancelled')
-    <form action="{{ route('admin.events.mark_completed', $event->id) }}" method="POST" class="m-0 w-full sm:w-auto" onsubmit="return confirm('Tandai event ini sebagai SELESAI?\nPastikan semua biaya riil lapangan sudah direkam.')">
+    <form action="{{ route('admin.events.mark_completed', $event->id) }}" method="POST" class="m-0 w-full sm:w-auto" data-confirm="Tandai event ini sebagai SELESAI? Pastikan semua biaya riil lapangan sudah direkam.">
         @csrf
         @method('PATCH')
         <button type="submit" class="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-2.5 rounded-lg bg-green-600 text-white font-label text-[0.65rem] font-bold uppercase tracking-widest hover:bg-green-700 transition-colors shadow-md">

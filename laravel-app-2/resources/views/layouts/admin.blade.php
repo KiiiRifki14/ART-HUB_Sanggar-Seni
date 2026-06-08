@@ -15,6 +15,7 @@
 
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
     <script>
         tailwind.config = {
@@ -696,6 +697,46 @@
     // Auto-dismiss alerts after 5s
     document.querySelectorAll('[class^="alert-heritage"]').forEach(el => {
         setTimeout(() => el.remove(), 5000);
+    });
+
+    // Global Form Confirmation using SweetAlert2
+    document.addEventListener('submit', function(e) {
+        const form = e.target;
+        if (form.tagName !== 'FORM') return;
+
+        const confirmMsg = form.getAttribute('data-confirm');
+        if (confirmMsg && !form._confirmed) {
+            e.preventDefault();
+            Swal.fire({
+                title: 'Konfirmasi Tindakan',
+                text: confirmMsg,
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#361f1a', // Maroon
+                cancelButtonColor: '#827471',  // Outline grey
+                confirmButtonText: 'Ya, Lanjutkan',
+                cancelButtonText: 'Batal',
+                reverseButtons: true,
+                background: '#ffffff',
+                customClass: {
+                    popup: 'rounded-2xl border border-outline-variant/30 shadow-xl font-body',
+                    title: 'font-headline text-lg font-bold text-primary',
+                    htmlContainer: 'font-body text-sm text-on-surface-variant',
+                    confirmButton: 'px-4 py-2.5 rounded-lg font-label font-bold text-xs uppercase tracking-wider',
+                    cancelButton: 'px-4 py-2.5 rounded-lg font-label font-bold text-xs uppercase tracking-wider'
+                }
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    form._confirmed = true;
+                    // Trigger modern submit flow to run validation and subsequent submit handlers
+                    if (typeof form.requestSubmit === 'function') {
+                        form.requestSubmit();
+                    } else {
+                        form.submit();
+                    }
+                }
+            });
+        }
     });
 
     // Prevent double-submit

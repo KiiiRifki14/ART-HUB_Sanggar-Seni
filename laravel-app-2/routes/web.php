@@ -183,6 +183,7 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
     // CANCELLATION HANDLER
     Route::get('/cancellations', [CancellationController::class, 'index'])->name('cancellations.index');
     Route::post('/bookings/{booking}/cancel', [CancellationController::class, 'store'])->name('bookings.cancel');
+    Route::post('/cancellations/penalty-settings', [CancellationController::class, 'updatePenaltySettings'])->name('cancellations.penalty_settings');
 
     // REHEARSALS
     Route::get('/rehearsals', [RehearsalController::class, 'index'])->name('rehearsals.index');

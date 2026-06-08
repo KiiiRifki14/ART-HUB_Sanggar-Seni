@@ -120,16 +120,16 @@
 
     {{-- ══ TABLE (Desktop) ══ --}}
     <div class="hidden md:block bg-surface-container-lowest rounded-xl border border-outline-variant/30 shadow-[0_12px_24px_rgba(54,31,26,0.03)] overflow-hidden overflow-x-auto mb-10">
-        <table class="w-full min-w-[900px]">
-            <thead class="bg-surface-container-low">
+        <table class="w-full min-w-[960px]">
+            <thead class="bg-surface-container-low border-b border-outline-variant/30">
                 <tr>
-                    <th class="font-label text-[0.65rem] uppercase tracking-widest text-outline font-bold px-6 py-4 text-left w-8">#</th>
-                    <th class="font-label text-[0.65rem] uppercase tracking-widest text-outline font-bold px-6 py-4 text-left">Personel</th>
-                    <th class="font-label text-[0.65rem] uppercase tracking-widest text-outline font-bold px-6 py-4 text-left">Spesialisasi</th>
-                    <th class="font-label text-[0.65rem] uppercase tracking-widest text-outline font-bold px-6 py-4 text-left">Kontak</th>
-                    <th class="font-label text-[0.65rem] uppercase tracking-widest text-outline font-bold px-6 py-4 text-left">Pekerjaan Utama</th>
-                    <th class="font-label text-[0.65rem] uppercase tracking-widest text-outline font-bold px-6 py-4 text-center">Status</th>
-                    <th class="font-label text-[0.65rem] uppercase tracking-widest text-outline font-bold px-6 py-4 text-center">Aksi</th>
+                    <th class="font-label text-xs uppercase tracking-wider text-outline font-bold px-6 py-[18px] text-left w-12">#</th>
+                    <th class="font-label text-xs uppercase tracking-wider text-outline font-bold px-6 py-[18px] text-left">Personel</th>
+                    <th class="font-label text-xs uppercase tracking-wider text-outline font-bold px-6 py-[18px] text-left">Spesialisasi</th>
+                    <th class="font-label text-xs uppercase tracking-wider text-outline font-bold px-6 py-[18px] text-left">Kontak</th>
+                    <th class="font-label text-xs uppercase tracking-wider text-outline font-bold px-6 py-[18px] text-left">Pekerjaan Utama</th>
+                    <th class="font-label text-xs uppercase tracking-wider text-outline font-bold px-6 py-[18px] text-center">Status</th>
+                    <th class="font-label text-xs uppercase tracking-wider text-outline font-bold px-6 py-[18px] text-center">Aksi</th>
                 </tr>
             </thead>
             <tbody class="divide-y divide-outline-variant/20">
@@ -140,41 +140,41 @@
                 @endphp
                 <tr class="hover:bg-surface-container-low/50 transition-colors" 
                     x-show="activeTab === 'semua' || activeTab === '{{ $p->status }}'" x-transition.opacity>
-                    <td class="px-6 py-4 font-label text-xs text-outline">{{ $idx + 1 }}</td>
-                    <td class="px-6 py-4">
-                        <div class="flex items-center gap-3">
-                            <div class="w-10 h-10 rounded-full flex-shrink-0 flex items-center justify-center
-                                        bg-gradient-to-br from-primary-container to-primary text-white font-bold text-xs">
+                    <td class="px-6 py-[18px] font-label text-sm text-outline">{{ $idx + 1 }}</td>
+                    <td class="px-6 py-[18px]">
+                        <div class="flex items-center gap-3.5">
+                            <div class="w-11 h-11 rounded-full flex-shrink-0 flex items-center justify-center
+                                        bg-gradient-to-br from-primary-container to-primary text-white font-bold text-sm">
                                 {{ $initials }}
                             </div>
                             <div>
-                                <div class="font-body font-semibold text-on-surface text-sm">{{ $p->user->name ?? 'Tanpa Akun' }}</div>
-                                <div class="font-label text-xs text-outline">{{ $p->user->email ?? '-' }}</div>
+                                <div class="font-body font-semibold text-on-surface text-base leading-tight">{{ $p->user->name ?? 'Tanpa Akun' }}</div>
+                                <div class="font-label text-xs text-outline leading-tight mt-1">{{ $p->user->email ?? '-' }}</div>
                             </div>
                         </div>
                     </td>
-                    <td class="px-6 py-4">
-                        <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded border font-label text-[0.65rem] font-bold uppercase tracking-wider {{ $specClass }}">
+                    <td class="px-6 py-[18px]">
+                        <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded border font-label text-xs font-bold uppercase tracking-wider {{ $specClass }}">
                             <i class="bi {{ $specIcon }}"></i> {{ $specLabel }}
                         </span>
                         @if($p->is_backup)
-                        <span class="ml-1 inline-block px-2 py-1 rounded bg-blue-500/10 text-blue-600 border border-blue-500/20 font-label text-[0.6rem] font-bold uppercase tracking-wider">Cadangan</span>
+                        <span class="ml-1 inline-flex items-center px-3 py-1 rounded bg-blue-500/10 text-blue-600 border border-blue-500/20 font-label text-xs font-bold uppercase tracking-wider">Cadangan</span>
                         @endif
                     </td>
-                    <td class="px-6 py-4">
+                    <td class="px-6 py-[18px]">
                         @if($p->user && $p->user->phone)
                         <a href="tel:{{ $p->user->phone }}" class="font-body text-sm text-on-surface-variant hover:text-primary transition-colors flex items-center gap-1.5">
                             <i class="bi bi-telephone-fill text-xs"></i> {{ $p->user->phone }}
                         </a>
                         @else
-                        <span class="font-label text-xs text-outline">—</span>
+                        <span class="font-label text-sm text-outline">—</span>
                         @endif
                     </td>
-                    <td class="px-6 py-4">
+                    <td class="px-6 py-[18px]">
                         @if($p->has_day_job)
-                        <div class="flex items-center gap-1.5 mb-0.5">
+                        <div class="flex items-center gap-1.5 mb-1">
                             <i class="bi bi-briefcase-fill text-orange-500 text-xs"></i>
-                            <span class="font-body text-sm text-on-surface">{{ $p->day_job_desc ?? 'Ada' }}</span>
+                            <span class="font-body text-sm text-on-surface font-medium">{{ $p->day_job_desc ?? 'Ada' }}</span>
                         </div>
                         <div class="font-label text-xs text-outline">
                             {{ $p->day_job_start ? \Carbon\Carbon::parse($p->day_job_start)->format('H:i') : '' }}
@@ -182,41 +182,41 @@
                             {{ $p->day_job_end ? \Carbon\Carbon::parse($p->day_job_end)->format('H:i') : '' }}
                         </div>
                         @else
-                        <span class="font-label text-xs text-outline">Tidak ada</span>
+                        <span class="font-label text-sm text-outline">Tidak ada</span>
                         @endif
                     </td>
-                    <td class="px-6 py-4 text-center">
+                    <td class="px-6 py-[18px] text-center">
                         @if($p->status === 'active')
-                        <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded bg-green-500/10 text-green-600 border border-green-500/20 font-label text-[0.65rem] font-bold uppercase tracking-wider">
+                        <span class="inline-flex items-center gap-1 px-3 py-1 rounded bg-green-500/10 text-green-600 border border-green-500/20 font-label text-xs font-bold uppercase tracking-wider">
                             <i class="bi bi-check-circle-fill"></i> Aktif
                         </span>
                         @elseif($p->status === 'pending_verification')
-                        <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded bg-orange-500/10 text-orange-600 border border-orange-500/20 font-label text-[0.65rem] font-bold uppercase tracking-wider">
+                        <span class="inline-flex items-center gap-1 px-3 py-1 rounded bg-orange-500/10 text-orange-600 border border-orange-500/20 font-label text-xs font-bold uppercase tracking-wider">
                             <i class="bi bi-person-fill-exclamation"></i> Menunggu Verifikasi
                         </span>
                         @elseif($p->status === 'deactivated')
-                        <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded bg-surface-container-high text-outline border border-outline-variant/50 font-label text-[0.65rem] font-bold uppercase tracking-wider">
+                        <span class="inline-flex items-center gap-1 px-3 py-1 rounded bg-surface-container-high text-outline border border-outline-variant/50 font-label text-xs font-bold uppercase tracking-wider">
                             <i class="bi bi-person-dash-fill"></i> Dinonaktifkan
                         </span>
                         @endif
                     </td>
-                    <td class="px-6 py-4 text-center">
+                    <td class="px-6 py-[18px] text-center">
                         <div class="flex items-center justify-center gap-2">
                             
                             @if($p->status === 'pending_verification')
                             {{-- Tombol Setujui / Tolak untuk personel pending --}}
-                            <form method="POST" action="{{ route('admin.personnel.approve', $p->id) }}" class="m-0" onsubmit="return confirm('Setujui {{ addslashes($p->user->name ?? '') }} sebagai Personel Aktif?')">
+                            <form method="POST" action="{{ route('admin.personnel.approve', $p->id) }}" class="m-0" data-confirm="Setujui {{ addslashes($p->user->name ?? '') }} sebagai Personel Aktif?">
                                 @csrf
                                 <button type="submit"
-                                        class="h-8 px-3 rounded-lg bg-green-500/10 text-green-600 border border-green-500/20 hover:bg-green-500 hover:text-white transition-all font-label text-[0.65rem] font-bold uppercase tracking-wider flex items-center gap-1"
+                                        class="h-9 px-3.5 rounded-lg bg-green-500/10 text-green-600 border border-green-500/20 hover:bg-green-500 hover:text-white transition-all font-label text-xs font-bold uppercase tracking-wider flex items-center gap-1"
                                         title="Setujui Pendaftaran">
                                     <i class="bi bi-check-circle-fill"></i> Setujui
                                 </button>
                             </form>
-                            <form method="POST" action="{{ route('admin.personnel.reject', $p->id) }}" class="m-0" onsubmit="return confirm('Tolak dan hapus akun {{ addslashes($p->user->name ?? '') }}? Data tidak bisa dikembalikan.')">
+                            <form method="POST" action="{{ route('admin.personnel.reject', $p->id) }}" class="m-0" data-confirm="Tolak dan hapus akun {{ addslashes($p->user->name ?? '') }}? Data tidak bisa dikembalikan.">
                                 @csrf @method('DELETE')
                                 <button type="submit"
-                                        class="h-8 px-3 rounded-lg bg-red-500/10 text-red-600 border border-red-500/20 hover:bg-red-500 hover:text-white transition-all font-label text-[0.65rem] font-bold uppercase tracking-wider flex items-center gap-1"
+                                        class="h-9 px-3.5 rounded-lg bg-red-500/10 text-red-600 border border-red-500/20 hover:bg-red-500 hover:text-white transition-all font-label text-xs font-bold uppercase tracking-wider flex items-center gap-1"
                                         title="Tolak & Hapus Akun">
                                     <i class="bi bi-x-circle-fill"></i> Tolak
                                 </button>
@@ -225,21 +225,21 @@
                             @elseif($p->status === 'active')
                             {{-- Tombol Edit, Nonaktifkan, Hapus untuk personel aktif --}}
                             <a href="{{ route('admin.personnel.edit', $p->id) }}"
-                               class="w-8 h-8 rounded-lg bg-surface-container flex items-center justify-center text-on-surface-variant hover:bg-secondary hover:text-white transition-all"
+                               class="w-9 h-9 rounded-lg bg-surface-container flex items-center justify-center text-on-surface-variant hover:bg-secondary hover:text-white transition-all animate-press"
                                title="Edit"><i class="bi bi-pencil-fill text-sm"></i></a>
-                            <form method="POST" action="{{ route('admin.personnel.toggle_status', $p->id) }}" class="m-0" onsubmit="return confirm('Non-aktifkan sementara {{ addslashes($p->user->name ?? '') }}? Personel tidak akan muncul di plotting event.')">
+                            <form method="POST" action="{{ route('admin.personnel.toggle_status', $p->id) }}" class="m-0" data-confirm="Non-aktifkan sementara {{ addslashes($p->user->name ?? '') }}? Personel tidak akan muncul di plotting event.">
                                 @csrf @method('PATCH')
                                 <button type="submit"
-                                        class="w-8 h-8 rounded-lg bg-orange-500/10 text-orange-600 border border-orange-500/20 hover:bg-orange-500 hover:text-white transition-all"
+                                        class="w-9 h-9 rounded-lg bg-orange-500/10 text-orange-600 border border-orange-500/20 hover:bg-orange-500 hover:text-white transition-all flex items-center justify-center"
                                         title="Non-aktifkan Sementara">
                                     <i class="bi bi-pause-circle-fill text-sm"></i>
                                 </button>
                             </form>
                             <form method="POST" action="{{ route('admin.personnel.destroy', $p->id) }}" class="m-0"
-                                  onsubmit="return confirm('Hapus {{ addslashes($p->user->name ?? '') }}? Data tidak bisa dikembalikan.')">
+                                  data-confirm="Hapus {{ addslashes($p->user->name ?? '') }}? Data tidak bisa dikembalikan.">
                                 @csrf @method('DELETE')
                                 <button type="submit"
-                                        class="w-8 h-8 rounded-lg bg-surface-container flex items-center justify-center text-on-surface-variant hover:bg-red-500 hover:text-white transition-all"
+                                        class="w-9 h-9 rounded-lg bg-surface-container flex items-center justify-center text-on-surface-variant hover:bg-red-500 hover:text-white transition-all"
                                         title="Hapus">
                                     <i class="bi bi-trash3-fill text-sm"></i>
                                 </button>
@@ -248,21 +248,21 @@
                             @elseif($p->status === 'deactivated')
                             {{-- Tombol Edit, Aktifkan Kembali, Hapus untuk personel dinonaktifkan --}}
                             <a href="{{ route('admin.personnel.edit', $p->id) }}"
-                               class="w-8 h-8 rounded-lg bg-surface-container flex items-center justify-center text-on-surface-variant hover:bg-secondary hover:text-white transition-all"
+                               class="w-9 h-9 rounded-lg bg-surface-container flex items-center justify-center text-on-surface-variant hover:bg-secondary hover:text-white transition-all"
                                title="Edit"><i class="bi bi-pencil-fill text-sm"></i></a>
-                            <form method="POST" action="{{ route('admin.personnel.toggle_status', $p->id) }}" class="m-0" onsubmit="return confirm('Aktifkan kembali {{ addslashes($p->user->name ?? '') }}?')">
+                            <form method="POST" action="{{ route('admin.personnel.toggle_status', $p->id) }}" class="m-0" data-confirm="Aktifkan kembali {{ addslashes($p->user->name ?? '') }}?">
                                 @csrf @method('PATCH')
                                 <button type="submit"
-                                        class="w-8 h-8 rounded-lg bg-green-500/10 text-green-600 border border-green-500/20 hover:bg-green-500 hover:text-white transition-all"
+                                        class="w-9 h-9 rounded-lg bg-green-500/10 text-green-600 border border-green-500/20 hover:bg-green-500 hover:text-white transition-all flex items-center justify-center"
                                         title="Aktifkan Kembali">
                                     <i class="bi bi-play-circle-fill text-sm"></i>
                                 </button>
                             </form>
                             <form method="POST" action="{{ route('admin.personnel.destroy', $p->id) }}" class="m-0"
-                                  onsubmit="return confirm('Hapus {{ addslashes($p->user->name ?? '') }}? Data tidak bisa dikembalikan.')">
+                                  data-confirm="Hapus {{ addslashes($p->user->name ?? '') }}? Data tidak bisa dikembalikan.">
                                 @csrf @method('DELETE')
                                 <button type="submit"
-                                        class="w-8 h-8 rounded-lg bg-surface-container flex items-center justify-center text-on-surface-variant hover:bg-red-500 hover:text-white transition-all"
+                                        class="w-9 h-9 rounded-lg bg-surface-container flex items-center justify-center text-on-surface-variant hover:bg-red-500 hover:text-white transition-all"
                                         title="Hapus">
                                     <i class="bi bi-trash3-fill text-sm"></i>
                                 </button>
@@ -320,28 +320,28 @@
                 </div>
                 <div class="flex gap-2 justify-end mt-1">
                     @if($p->status === 'pending_verification')
-                    <form method="POST" action="{{ route('admin.personnel.approve', $p->id) }}" onsubmit="return confirm('Setujui {{ addslashes($p->user->name ?? '') }}?')">@csrf
+                    <form method="POST" action="{{ route('admin.personnel.approve', $p->id) }}" data-confirm="Setujui {{ addslashes($p->user->name ?? '') }}?">@csrf
                         <button type="submit" class="h-8 px-3 rounded-lg bg-green-500/10 text-green-600 border border-green-500/20 hover:bg-green-500 hover:text-white transition-all font-label text-[0.6rem] font-bold uppercase"><i class="bi bi-check-circle-fill"></i> Setujui</button>
                     </form>
-                    <form method="POST" action="{{ route('admin.personnel.reject', $p->id) }}" onsubmit="return confirm('Tolak {{ addslashes($p->user->name ?? '') }}?')">@csrf @method('DELETE')
+                    <form method="POST" action="{{ route('admin.personnel.reject', $p->id) }}" data-confirm="Tolak {{ addslashes($p->user->name ?? '') }}?">@csrf @method('DELETE')
                         <button type="submit" class="h-8 w-8 rounded-lg bg-red-500/10 text-red-600 border border-red-500/20 hover:bg-red-500 hover:text-white transition-all flex items-center justify-center"><i class="bi bi-x-circle-fill"></i></button>
                     </form>
 
                     @elseif($p->status === 'active')
                     <a href="{{ route('admin.personnel.edit', $p->id) }}" class="w-8 h-8 rounded-lg bg-surface-container flex items-center justify-center text-on-surface-variant hover:bg-secondary hover:text-white transition-all"><i class="bi bi-pencil-fill text-sm"></i></a>
-                    <form method="POST" action="{{ route('admin.personnel.toggle_status', $p->id) }}" onsubmit="return confirm('Non-aktifkan sementara {{ addslashes($p->user->name ?? '') }}?')">@csrf @method('PATCH')
+                    <form method="POST" action="{{ route('admin.personnel.toggle_status', $p->id) }}" data-confirm="Non-aktifkan sementara {{ addslashes($p->user->name ?? '') }}?">@csrf @method('PATCH')
                         <button type="submit" class="w-8 h-8 rounded-lg bg-orange-500/10 text-orange-600 border border-orange-500/20 hover:bg-orange-500 hover:text-white transition-all" title="Non-aktifkan Sementara"><i class="bi bi-pause-circle-fill text-sm"></i></button>
                     </form>
-                    <form method="POST" action="{{ route('admin.personnel.destroy', $p->id) }}" onsubmit="return confirm('Hapus {{ addslashes($p->user->name ?? '') }}?')">@csrf @method('DELETE')
+                    <form method="POST" action="{{ route('admin.personnel.destroy', $p->id) }}" data-confirm="Hapus {{ addslashes($p->user->name ?? '') }}?">@csrf @method('DELETE')
                         <button type="submit" class="w-8 h-8 rounded-lg bg-surface-container flex items-center justify-center text-on-surface-variant hover:bg-red-500 hover:text-white transition-all"><i class="bi bi-trash3-fill text-sm"></i></button>
                     </form>
 
                     @elseif($p->status === 'deactivated')
                     <a href="{{ route('admin.personnel.edit', $p->id) }}" class="w-8 h-8 rounded-lg bg-surface-container flex items-center justify-center text-on-surface-variant hover:bg-secondary hover:text-white transition-all"><i class="bi bi-pencil-fill text-sm"></i></a>
-                    <form method="POST" action="{{ route('admin.personnel.toggle_status', $p->id) }}" onsubmit="return confirm('Aktifkan kembali {{ addslashes($p->user->name ?? '') }}?')">@csrf @method('PATCH')
+                    <form method="POST" action="{{ route('admin.personnel.toggle_status', $p->id) }}" data-confirm="Aktifkan kembali {{ addslashes($p->user->name ?? '') }}?">@csrf @method('PATCH')
                         <button type="submit" class="w-8 h-8 rounded-lg bg-green-500/10 text-green-600 border border-green-500/20 hover:bg-green-500 hover:text-white transition-all" title="Aktifkan Kembali"><i class="bi bi-play-circle-fill text-sm"></i></button>
                     </form>
-                    <form method="POST" action="{{ route('admin.personnel.destroy', $p->id) }}" onsubmit="return confirm('Hapus {{ addslashes($p->user->name ?? '') }}?')">@csrf @method('DELETE')
+                    <form method="POST" action="{{ route('admin.personnel.destroy', $p->id) }}" data-confirm="Hapus {{ addslashes($p->user->name ?? '') }}?">@csrf @method('DELETE')
                         <button type="submit" class="w-8 h-8 rounded-lg bg-surface-container flex items-center justify-center text-on-surface-variant hover:bg-red-500 hover:text-white transition-all"><i class="bi bi-trash3-fill text-sm"></i></button>
                     </form>
                     @endif

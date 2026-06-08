@@ -266,7 +266,7 @@
     @endif
 
     @if($eventDateCarbon->isPast() && !in_array($event->status, ['completed', 'cancelled']))
-    <form method="POST" action="{{ route('admin.events.mark_completed', $event->id) }}" onsubmit="return confirm('Tandai acara ini sebagai SELESAI? Langkah ini tidak dapat dibatalkan.')">
+    <form method="POST" action="{{ route('admin.events.mark_completed', $event->id) }}" data-confirm="Tandai acara ini sebagai SELESAI? Langkah ini tidak dapat dibatalkan.">
         @csrf
         @method('PATCH')
         <button type="submit" class="inline-flex items-center gap-1.5 px-5 py-2.5 rounded-lg bg-green-600 text-white font-label text-[0.65rem] font-bold uppercase tracking-widest hover:bg-green-700 transition-colors shadow-md">

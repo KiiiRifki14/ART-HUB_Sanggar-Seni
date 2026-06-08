@@ -175,12 +175,16 @@ class PersonnelController extends Controller
      */
     public function approve(Personnel $personnel)
     {
-        $personnel->update([
-            'is_active' => true,
-            'status' => 'active'
-        ]);
+        // 🛠 FIX: Gunakan explicit assignment & save() untuk melewati proteksi $fillable
+        $personnel->is_active = true;
+        $personnel->status    = 'active';
+        $personnel->save();
+
+        // 🛠 FIX: Amankan pengambilan nama jika relasi user kosong
+        $name = $personnel->user->name ?? 'Personel';
+
         return redirect()->route('admin.personnel.index')
-            ->with('success', "✅ {$personnel->user->name} telah disetujui dan sekarang bisa mengakses Portal Kru!");
+            ->with('success', "✅ {$name} telah disetujui dan sekarang bisa mengakses Portal Kru!");
     }
 
     /**
@@ -189,9 +193,21 @@ class PersonnelController extends Controller
     public function reject(Personnel $personnel)
     {
         $name = $personnel->user->name ?? 'Personel';
-        $personnel->user->delete(); // cascades ke personnel via FK
-        return redirect()->route('admin.personnel.index')
-            ->with('warning', "❌ Pendaftaran {$name} telah DITOLAK dan akun dihapus.");
+
+        try {
+            // 🛠 FIX: Validasi keberadaan user sebelum memanggil delete() agar tidak fatal error
+            if ($personnel->user) {
+                $personnel->user->delete(); // cascades ke personnel otomatis via database FK
+            } else {
+                $personnel->delete(); // hapus manual record personnel jika user-nya memang ga ada
+            }
+
+            return redirect()->route('admin.personnel.index')
+                ->with('warning', "❌ Pendaftaran {$name} telah DITOLAK dan akun dihapus.");
+
+        } catch (\Exception $e) {
+            return back()->with('error', 'Gagal menolak pendaftaran: ' . $e->getMessage());
+        }
     }
     /**
      * Toggle status aktif/non-aktif sementara personel

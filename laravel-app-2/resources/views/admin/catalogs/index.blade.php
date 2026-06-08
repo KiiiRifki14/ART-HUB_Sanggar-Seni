@@ -8,31 +8,42 @@
 
 {{-- ALERT --}}
 @if(session('success'))
-    <div class="p-4 mb-6 text-sm text-green-700 bg-green-500/10 border border-green-500/20 rounded-xl flex items-center gap-2 font-bold">
-        <i class="bi bi-check-circle-fill text-green-500"></i> {{ session('success') }}
+    <div class="p-4 mb-5 text-sm text-green-700 bg-green-500/10 border border-green-500/20 rounded-xl flex items-center gap-2.5 font-bold shadow-sm">
+        <div class="w-7 h-7 rounded-lg bg-green-500/20 flex items-center justify-center flex-shrink-0">
+            <i class="bi bi-check-circle-fill text-green-500 text-sm"></i>
+        </div>
+        {{ session('success') }}
     </div>
 @endif
 
 {{-- HEADER BAR --}}
-<div class="flex items-center justify-between mb-6">
-    <div>
-        <p class="font-body text-sm text-on-surface-variant">Total <span class="font-bold text-primary">{{ $catalogs->count() }}</span> paket jasa terdaftar.</p>
+<div class="flex items-center justify-between mb-5">
+    <div class="flex items-center gap-3">
+        <div class="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center">
+            <i class="bi bi-collection-fill text-primary"></i>
+        </div>
+        <div>
+            <p class="font-headline text-sm font-bold text-primary">Semua Paket Jasa</p>
+            <p class="font-body text-xs text-on-surface-variant">Total <span class="font-bold text-primary">{{ $catalogs->total() }}</span> paket terdaftar</p>
+        </div>
     </div>
     <a href="{{ route('admin.catalogs.create') }}"
-       class="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-primary text-white font-label text-xs font-bold uppercase tracking-widest hover:bg-primary-container transition-colors shadow-md">
+       class="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-gradient-to-br from-primary-container to-primary text-white font-label text-xs font-bold uppercase tracking-widest hover:opacity-90 transition-all shadow-md">
         <i class="bi bi-plus-lg"></i> Tambah Katalog
     </a>
 </div>
 
 {{-- TABLE (Desktop) --}}
-<div class="hidden md:block bg-surface-container-lowest border border-outline-variant/30 rounded-2xl shadow-sm overflow-hidden">
+<div class="hidden md:block bg-surface-container-lowest border border-outline-variant/30 rounded-2xl shadow-sm overflow-hidden mb-4">
     @if($catalogs->isEmpty())
-        <div class="text-center py-20 text-on-surface-variant">
-            <i class="bi bi-collection text-5xl mb-4 block text-outline/50"></i>
+        <div class="text-center py-20">
+            <div class="w-20 h-20 rounded-2xl bg-surface-container mx-auto flex items-center justify-center mb-5">
+                <i class="bi bi-collection text-4xl text-outline/50"></i>
+            </div>
             <p class="font-headline text-lg font-semibold text-primary mb-2">Belum ada katalog jasa</p>
-            <p class="font-body text-sm mb-6">Tambahkan paket jasa pertama untuk ditampilkan di landing page.</p>
+            <p class="font-body text-sm text-on-surface-variant mb-6">Tambahkan paket jasa pertama untuk ditampilkan di landing page.</p>
             <a href="{{ route('admin.catalogs.create') }}"
-               class="inline-flex items-center gap-2 px-6 py-2.5 rounded-xl bg-primary text-white font-label text-xs font-bold uppercase tracking-widest hover:bg-primary-container transition-colors">
+               class="inline-flex items-center gap-2 px-6 py-2.5 rounded-xl bg-primary text-white font-label text-xs font-bold uppercase tracking-widest hover:opacity-90 transition-all">
                 <i class="bi bi-plus-lg"></i> Tambah Sekarang
             </a>
         </div>
@@ -53,10 +64,14 @@
                 </thead>
                 <tbody class="divide-y divide-outline-variant/10">
                     @foreach($catalogs as $catalog)
-                    <tr class="hover:bg-surface-container/50 transition-colors" id="catalog-row-{{ $catalog->id }}">
-                        <td class="px-5 py-4 font-label text-xs text-outline font-bold">{{ $catalog->sort_order ?: $loop->iteration }}</td>
+                    <tr class="hover:bg-surface-container/50 transition-colors group" id="catalog-row-{{ $catalog->id }}">
                         <td class="px-5 py-4">
-                            <div class="w-16 h-12 rounded-lg overflow-hidden bg-surface-container flex-shrink-0">
+                            <span class="w-7 h-7 rounded-lg bg-surface-container-low border border-outline-variant/30 flex items-center justify-center font-label text-xs text-outline font-bold">
+                                {{ $catalog->sort_order ?: $loop->iteration }}
+                            </span>
+                        </td>
+                        <td class="px-5 py-4">
+                            <div class="w-16 h-12 rounded-xl overflow-hidden bg-surface-container flex-shrink-0 border border-outline-variant/20 shadow-sm">
                                 @if($catalog->image)
                                     <img src="{{ asset('storage/' . $catalog->image) }}"
                                          class="w-full h-full object-cover" alt="{{ $catalog->name }}">
@@ -77,7 +92,7 @@
                         <td class="px-5 py-4">
                             <div class="flex items-center gap-1 font-headline font-bold text-sm {{ $catalog->average_rating > 0 ? 'text-secondary' : 'text-outline-variant' }}">
                                 <i class="bi bi-star-fill text-xs"></i>
-                                <span>{{ $catalog->average_rating > 0 ? $catalog->average_rating : '-' }}</span>
+                                <span>{{ $catalog->average_rating > 0 ? $catalog->average_rating : '—' }}</span>
                             </div>
                         </td>
                         <td class="px-5 py-4">
@@ -90,28 +105,25 @@
                             @endif
                         </td>
                         <td class="px-5 py-4 text-center">
-                            {{-- Toggle Switch --}}
                             <button type="button"
                                     onclick="toggleCatalog(this)"
                                     data-url="{{ route('admin.catalogs.toggle', $catalog->id) }}"
                                     data-active="{{ $catalog->is_active ? '1' : '0' }}"
                                     data-id="{{ $catalog->id }}"
-                                    class="relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none
-                                           {{ $catalog->is_active ? 'bg-green-500' : 'bg-surface-container-high' }}"
+                                    class="relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none {{ $catalog->is_active ? 'bg-green-500' : 'bg-surface-container-high' }}"
                                     title="{{ $catalog->is_active ? 'Klik untuk sembunyikan' : 'Klik untuk tampilkan' }}">
-                                <span class="inline-block h-4 w-4 transform rounded-full bg-white shadow transition-transform
-                                             {{ $catalog->is_active ? 'translate-x-6' : 'translate-x-1' }}"
+                                <span class="inline-block h-4 w-4 transform rounded-full bg-white shadow transition-transform {{ $catalog->is_active ? 'translate-x-6' : 'translate-x-1' }}"
                                       id="toggle-dot-{{ $catalog->id }}"></span>
                             </button>
                         </td>
                         <td class="px-5 py-4">
-                            <div class="flex items-center justify-center gap-2">
+                            <div class="flex items-center justify-center gap-2 opacity-60 group-hover:opacity-100 transition-opacity">
                                 <a href="{{ route('admin.catalogs.edit', $catalog) }}"
                                    class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-outline-variant/50 font-label text-[0.65rem] font-bold uppercase tracking-widest text-on-surface-variant hover:bg-surface-container hover:border-primary/30 hover:text-primary transition-colors">
                                     <i class="bi bi-pencil-fill"></i> Edit
                                 </a>
                                 <form action="{{ route('admin.catalogs.destroy', $catalog) }}" method="POST"
-                                      onsubmit="return confirm('Hapus katalog \'{{ addslashes($catalog->name) }}\'? Gambar juga akan ikut terhapus.')">
+                                      data-confirm="Hapus katalog '{{ addslashes($catalog->name) }}'? Gambar juga akan ikut terhapus.">
                                     @csrf @method('DELETE')
                                     <button type="submit"
                                             class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-red-200 font-label text-[0.65rem] font-bold uppercase tracking-widest text-red-500 hover:bg-red-50 hover:border-red-400 transition-colors">
@@ -128,13 +140,13 @@
     @endif
 </div>
 
-{{-- MOBILE CARDS (Mobile only) --}}
+{{-- MOBILE CARDS --}}
 @if(!$catalogs->isEmpty())
 <div class="md:hidden space-y-3 mb-4 mt-0">
     @foreach($catalogs as $catalog)
     <div class="bg-surface-container-lowest rounded-xl border border-outline-variant/30 shadow-sm overflow-hidden">
         <div class="flex items-center gap-3 px-4 py-3 bg-surface-container-low border-b border-outline-variant/20">
-            <div class="w-14 h-10 rounded-lg overflow-hidden bg-surface-container flex-shrink-0">
+            <div class="w-14 h-10 rounded-lg overflow-hidden bg-surface-container flex-shrink-0 border border-outline-variant/20">
                 @if($catalog->image)
                     <img src="{{ asset('storage/' . $catalog->image) }}" class="w-full h-full object-cover" alt="{{ $catalog->name }}">
                 @else
@@ -147,7 +159,7 @@
             </div>
             <div class="flex items-center gap-1 mr-2 font-headline font-bold text-sm {{ $catalog->average_rating > 0 ? 'text-secondary' : 'text-outline-variant' }}">
                 <i class="bi bi-star-fill text-xs"></i>
-                <span>{{ $catalog->average_rating > 0 ? $catalog->average_rating : '-' }}</span>
+                <span>{{ $catalog->average_rating > 0 ? $catalog->average_rating : '—' }}</span>
             </div>
             <button type="button" onclick="toggleCatalog(this)"
                     data-url="{{ route('admin.catalogs.toggle', $catalog->id) }}"
@@ -166,7 +178,7 @@
             </div>
             <div class="flex gap-2">
                 <a href="{{ route('admin.catalogs.edit', $catalog) }}" class="h-8 px-3 inline-flex items-center gap-1 rounded-lg border border-outline-variant/50 font-label text-[0.6rem] font-bold uppercase tracking-wider text-on-surface-variant hover:bg-surface-container hover:text-primary transition-colors"><i class="bi bi-pencil-fill"></i> Edit</a>
-                <form action="{{ route('admin.catalogs.destroy', $catalog) }}" method="POST" onsubmit="return confirm('Hapus katalog \'{{ addslashes($catalog->name) }}\'?')">@csrf @method('DELETE')
+                <form action="{{ route('admin.catalogs.destroy', $catalog) }}" method="POST" data-confirm="Hapus katalog '{{ addslashes($catalog->name) }}'?">@csrf @method('DELETE')
                     <button type="submit" class="h-8 px-3 inline-flex items-center gap-1 rounded-lg border border-red-200 font-label text-[0.6rem] font-bold uppercase tracking-wider text-red-500 hover:bg-red-50 transition-colors"><i class="bi bi-trash3-fill"></i></button>
                 </form>
             </div>
@@ -176,14 +188,62 @@
 </div>
 @endif
 
-<div class="mt-4 flex items-start gap-2 text-xs text-on-surface-variant font-body">
+{{-- INFO BAR --}}
+<div class="flex items-start gap-2 text-xs text-on-surface-variant font-body mb-5">
     <i class="bi bi-info-circle-fill text-secondary flex-shrink-0 mt-0.5"></i>
     <p>Katalog yang ditampilkan di landing page hanya yang <strong>status tampilnya aktif (hijau)</strong>. Urutan tampil diatur via kolom <strong>#</strong> (sort order) di form edit.</p>
 </div>
 
+{{-- ══ PAGINATION PREMIUM ══ --}}
 @if($catalogs->hasPages())
-<div class="mt-6 mb-8">
-    {{ $catalogs->links() }}
+<div class="mt-2 mb-8">
+    <div class="flex items-center justify-between">
+        {{-- Info --}}
+        <p class="font-body text-xs text-on-surface-variant">
+            Menampilkan <span class="font-bold text-primary">{{ $catalogs->firstItem() }}–{{ $catalogs->lastItem() }}</span> dari <span class="font-bold text-primary">{{ $catalogs->total() }}</span> katalog
+        </p>
+
+        {{-- Page Links --}}
+        <div class="flex items-center gap-1">
+            {{-- Prev --}}
+            @if($catalogs->onFirstPage())
+                <span class="inline-flex items-center justify-center w-9 h-9 rounded-xl border border-outline-variant/30 text-outline/40 cursor-not-allowed">
+                    <i class="bi bi-chevron-left text-xs"></i>
+                </span>
+            @else
+                <a href="{{ $catalogs->previousPageUrl() }}"
+                   class="inline-flex items-center justify-center w-9 h-9 rounded-xl border border-outline-variant/40 text-on-surface-variant hover:border-primary hover:text-primary hover:bg-surface-container transition-colors">
+                    <i class="bi bi-chevron-left text-xs"></i>
+                </a>
+            @endif
+
+            {{-- Page Numbers --}}
+            @foreach($catalogs->getUrlRange(max(1, $catalogs->currentPage()-2), min($catalogs->lastPage(), $catalogs->currentPage()+2)) as $page => $url)
+                @if($page === $catalogs->currentPage())
+                    <span class="inline-flex items-center justify-center w-9 h-9 rounded-xl bg-primary text-white font-label text-xs font-bold shadow-sm">
+                        {{ $page }}
+                    </span>
+                @else
+                    <a href="{{ $url }}"
+                       class="inline-flex items-center justify-center w-9 h-9 rounded-xl border border-outline-variant/40 text-on-surface-variant font-label text-xs font-bold hover:border-primary hover:text-primary hover:bg-surface-container transition-colors">
+                        {{ $page }}
+                    </a>
+                @endif
+            @endforeach
+
+            {{-- Next --}}
+            @if($catalogs->hasMorePages())
+                <a href="{{ $catalogs->nextPageUrl() }}"
+                   class="inline-flex items-center justify-center w-9 h-9 rounded-xl border border-outline-variant/40 text-on-surface-variant hover:border-primary hover:text-primary hover:bg-surface-container transition-colors">
+                    <i class="bi bi-chevron-right text-xs"></i>
+                </a>
+            @else
+                <span class="inline-flex items-center justify-center w-9 h-9 rounded-xl border border-outline-variant/30 text-outline/40 cursor-not-allowed">
+                    <i class="bi bi-chevron-right text-xs"></i>
+                </span>
+            @endif
+        </div>
+    </div>
 </div>
 @endif
 
@@ -193,11 +253,8 @@ function toggleCatalog(btn) {
     const isActive = btn.dataset.active === '1';
     const url = btn.dataset.url;
     const id = btn.dataset.id;
-
-    // Tambahkan efek loading sementara
     btn.style.opacity = '0.5';
     btn.style.pointerEvents = 'none';
-
     fetch(url, {
         method: 'POST',
         headers: {
@@ -205,15 +262,9 @@ function toggleCatalog(btn) {
             'Accept': 'application/json',
             'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ _method: 'PATCH' }) // Gunakan method spoofing Laravel
+        body: JSON.stringify({ _method: 'PATCH' })
     })
-    .then(async r => {
-        if (!r.ok) {
-            const err = await r.text();
-            throw new Error('Network response was not ok');
-        }
-        return r.json();
-    })
+    .then(async r => { if (!r.ok) throw new Error('Network error'); return r.json(); })
     .then(data => {
         if (data.success) {
             const newActive = data.is_active;
@@ -221,19 +272,12 @@ function toggleCatalog(btn) {
             btn.classList.toggle('bg-green-500', newActive);
             btn.classList.toggle('bg-surface-container-high', !newActive);
             const dot = document.getElementById(`toggle-dot-${id}`);
-            dot.classList.toggle('translate-x-6', newActive);
-            dot.classList.toggle('translate-x-1', !newActive);
+            if (dot) { dot.classList.toggle('translate-x-6', newActive); dot.classList.toggle('translate-x-1', !newActive); }
             btn.title = newActive ? 'Klik untuk sembunyikan' : 'Klik untuk tampilkan';
         }
     })
-    .catch((e) => {
-        console.error(e);
-        alert('Gagal memperbarui status. Pastikan koneksi stabil dan coba lagi.');
-    })
-    .finally(() => {
-        btn.style.opacity = '1';
-        btn.style.pointerEvents = 'auto';
-    });
+    .catch(e => { console.error(e); alert('Gagal memperbarui status.'); })
+    .finally(() => { btn.style.opacity = '1'; btn.style.pointerEvents = 'auto'; });
 }
 </script>
 @endpush

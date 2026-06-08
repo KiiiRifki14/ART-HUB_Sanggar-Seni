@@ -99,7 +99,7 @@
                         </button>
                         @php $rjMsg = "Tolak & hapus bukti transfer dari " . addslashes($booking->client_name) . "? Klien akan diwajibkan upload ulang."; @endphp
                         <form action="{{ route('admin.bookings.reject_proof', $booking->id) }}" method="POST" class="m-0"
-                              onsubmit="return confirm('{{ $rjMsg }}')">
+                              data-confirm="{{ $rjMsg }}">
                             @csrf
                             <button type="submit" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md border border-red-500/50 bg-transparent text-red-500 font-label text-[0.65rem] font-bold uppercase tracking-widest hover:bg-red-500/10 transition-colors">
                                 <i class="bi bi-x-lg"></i> Tolak
@@ -160,7 +160,7 @@
                     </button>
                     @php $rjMsg = "Tolak & hapus bukti transfer dari " . addslashes($booking->client_name) . "? Klien akan diwajibkan upload ulang."; @endphp
                     <form action="{{ route('admin.bookings.reject_proof', $booking->id) }}" method="POST" class="m-0"
-                          onsubmit="return confirm('{{ $rjMsg }}')">
+                          data-confirm="{{ $rjMsg }}">
                         @csrf
                         <button type="submit" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded border border-red-500/50 bg-transparent text-red-500 font-label text-[0.65rem] font-bold uppercase tracking-widest hover:bg-red-500/10 transition-colors">
                             <i class="bi bi-x-lg"></i> Tolak
@@ -335,14 +335,14 @@
                     onclick="closeVerifyModal({{ $booking->id }})">Batal</button>
             <div class="flex gap-2">
                 @php $rjMsg2 = "Tolak & hapus bukti transfer dari " . addslashes($booking->client_name) . "?"; @endphp
-                <form action="{{ route('admin.bookings.reject_proof', $booking->id) }}" method="POST" class="m-0" onsubmit="return confirm('{{ $rjMsg2 }}')">
+                <form action="{{ route('admin.bookings.reject_proof', $booking->id) }}" method="POST" class="m-0" data-confirm="{{ $rjMsg2 }}">
                     @csrf
                     <button type="submit" class="px-3 py-2 rounded-lg border border-red-500/30 bg-red-500/10 text-red-600 font-label text-xs font-bold uppercase tracking-widest hover:bg-red-500/20 transition-colors flex items-center gap-1.5">
                         <i class="bi bi-x-circle"></i> Tolak
                     </button>
                 </form>
                 <form action="{{ route('admin.bookings.confirm', $booking->id) }}" method="POST" class="m-0" id="formConfirm{{ $booking->id }}"
-                      onsubmit="return confirm('Konfirmasi DP & Kunci Laba untuk {{ addslashes($booking->client_name) }}?')">
+                      data-confirm="Konfirmasi DP & Kunci Laba untuk {{ addslashes($booking->client_name) }}?">
                     @csrf
                     <button type="submit" class="px-4 py-2.5 rounded-lg bg-green-500 text-white font-label text-xs font-bold uppercase tracking-widest hover:bg-green-600 transition-colors flex items-center gap-1.5 shadow-md">
                         <i class="bi bi-check-circle"></i> Konfirmasi
@@ -369,7 +369,7 @@
                 <i class="bi bi-x-lg"></i>
             </button>
         </div>
-        <form action="{{ route('admin.bookings.confirm_cash', $booking->id) }}" method="POST" class="flex-1 overflow-y-auto">
+        <form action="{{ route('admin.bookings.confirm_cash', $booking->id) }}" method="POST" class="flex-1 overflow-y-auto" data-confirm="Proses pembayaran tunai ini?">
             @csrf
             <div class="p-4 md:p-6 space-y-4 md:space-y-5">
                 <div class="flex items-center justify-between p-3 rounded-lg border border-primary/30 bg-primary/5">
@@ -396,8 +396,7 @@
             <div class="px-4 py-4 md:px-6 md:py-4 border-t border-outline-variant/20 bg-surface-container-low flex justify-end gap-3 flex-shrink-0">
                 <button type="button" class="px-4 py-2 rounded-lg border border-outline-variant/50 font-label text-xs font-bold uppercase tracking-widest text-on-surface-variant hover:bg-surface-container transition-colors"
                         onclick="closeCashModal({{ $booking->id }})">Batal</button>
-                <button type="submit" class="px-4 py-2.5 rounded-lg bg-green-600 text-white font-label text-xs font-bold uppercase tracking-widest hover:bg-green-700 transition-colors shadow-sm"
-                        onclick="return confirm('Proses pembayaran tunai ini?')">Verifikasi Cash</button>
+                <button type="submit" class="px-4 py-2.5 rounded-lg bg-green-600 text-white font-label text-xs font-bold uppercase tracking-widest hover:bg-green-700 transition-colors shadow-sm">Verifikasi Cash</button>
             </div>
         </form>
     </div>
