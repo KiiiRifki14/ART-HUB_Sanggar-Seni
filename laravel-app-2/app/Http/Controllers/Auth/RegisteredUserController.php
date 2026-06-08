@@ -92,6 +92,7 @@ class RegisteredUserController extends Controller
                 'day_job_start' => $hasDayJob ? $request->day_job_start : null,
                 'day_job_end' => $hasDayJob ? $request->day_job_end : null,
                 'is_active' => false,
+                'status' => 'pending_verification',
                 'is_backup' => false,
             ]);
 

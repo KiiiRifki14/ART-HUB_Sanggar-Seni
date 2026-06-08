@@ -457,7 +457,7 @@
     {{-- Nav --}}
     @php
         $r = request();
-        $pendingBadge = \App\Models\Personnel::where('is_active', false)->count();
+        $pendingBadge = \App\Models\Personnel::where('status', 'pending_verification')->count();
         $pendingBookingBadge = \App\Models\Booking::where('status', 'pending')->count();
         $pendingDpVerificationBadge = \App\Models\Booking::where('status', 'pending')->whereNotNull('payment_proof')->count();
         $pendingPostEventBadge = \App\Models\Event::where(function ($q) {
@@ -700,7 +700,8 @@
 
     // Prevent double-submit
     document.querySelectorAll('form').forEach(form => {
-        form.addEventListener('submit', function() {
+        form.addEventListener('submit', function(e) {
+            if (e.defaultPrevented) return;
             if (this.checkValidity()) {
                 this.querySelectorAll('button[type="submit"]').forEach(btn => {
                     btn.disabled = true;

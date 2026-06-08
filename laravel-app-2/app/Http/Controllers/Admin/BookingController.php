@@ -518,7 +518,7 @@ class BookingController extends Controller
         $booking = Booking::create($validated);
 
         // Also create/update event with coordinates if provided
-        if ($validated['latitude'] && $validated['longitude']) {
+        if (!empty($validated['latitude']) && !empty($validated['longitude'])) {
             Event::create([
                 'booking_id' => $booking->id,
                 'event_type' => $validated['event_type'],

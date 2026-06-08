@@ -59,6 +59,7 @@ class PersonnelController extends Controller
                     'day_job_start' => $request->has_day_job ? $request->day_job_start : null,
                     'day_job_end'   => $request->has_day_job ? $request->day_job_end : null,
                     'is_active'     => true,
+                    'status'        => 'active',
                     'is_backup'     => $request->boolean('is_backup'),
                 ]);
             });
@@ -118,7 +119,17 @@ class PersonnelController extends Controller
                 $personnel->day_job_start = $request->boolean('has_day_job') ? $request->day_job_start : null;
                 $personnel->day_job_end = $request->boolean('has_day_job') ? $request->day_job_end : null;
 
-                $personnel->is_active = $request->boolean('is_active');
+                $isActive = $request->boolean('is_active');
+                $personnel->is_active = $isActive;
+                
+                if ($isActive) {
+                    $personnel->status = 'active';
+                } else {
+                    if ($personnel->status !== 'pending_verification') {
+                        $personnel->status = 'deactivated';
+                    }
+                }
+
                 $personnel->is_backup = $request->boolean('is_backup');
 
                 // Perintah save() memaksa data tersimpan meskipun tidak ada di $fillable model
@@ -164,7 +175,10 @@ class PersonnelController extends Controller
      */
     public function approve(Personnel $personnel)
     {
-        $personnel->update(['is_active' => true]);
+        $personnel->update([
+            'is_active' => true,
+            'status' => 'active'
+        ]);
         return redirect()->route('admin.personnel.index')
             ->with('success', "✅ {$personnel->user->name} telah disetujui dan sekarang bisa mengakses Portal Kru!");
     }
@@ -184,10 +198,16 @@ class PersonnelController extends Controller
      */
     public function toggleStatus(Personnel $personnel)
     {
-        $personnel->is_active = !$personnel->is_active;
+        if ($personnel->status === 'active') {
+            $personnel->is_active = false;
+            $personnel->status = 'deactivated';
+        } else {
+            $personnel->is_active = true;
+            $personnel->status = 'active';
+        }
         $personnel->save();
 
-        $statusText = $personnel->is_active ? 'diaktifkan kembali' : 'dinonaktifkan sementara';
+        $statusText = $personnel->status === 'active' ? 'diaktifkan kembali' : 'dinonaktifkan sementara';
         $name = $personnel->user->name ?? 'Personel';
 
         return redirect()->route('admin.personnel.index')

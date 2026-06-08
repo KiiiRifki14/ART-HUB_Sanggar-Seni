@@ -10,11 +10,13 @@
     $totalBuffer = $records->sum('safety_buffer_amt');
     $totalRevenue = $records->sum('total_revenue');
     $totalOps = $records->sum('actual_operational_cost');
+    $totalHonor = $records->sum('total_personnel_honor');
+    $totalBudgetOps = $records->sum('operational_budget');
 @endphp
 
 @can('view-financials')
 {{-- ══ STAT CARDS ══ --}}
-<div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+<div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
     <div class="bg-gradient-to-br from-primary-container to-primary text-white rounded-xl p-4 sm:p-6 border border-primary/20 shadow-[0_12px_24px_rgba(54,31,26,0.08)] text-center relative overflow-hidden col-span-2 lg:col-span-1">
         <div class="absolute -right-6 -bottom-6 text-white/5">
             <i class="bi bi-safe2-fill text-9xl"></i>
@@ -39,6 +41,74 @@
         <i class="bi bi-cash-stack text-2xl sm:text-3xl text-orange-500 mb-2 sm:mb-3 block"></i>
         <h3 class="font-headline text-2xl sm:text-3xl font-bold text-orange-600 mb-1">Rp {{ number_format($totalOps, 0, ',', '.') }}</h3>
         <div class="font-label text-[0.65rem] sm:text-xs uppercase tracking-widest text-outline font-bold">Realisasi Operasional</div>
+    </div>
+</div>
+
+{{-- ══ VISUALISASI ALLOKASI FIXED PROFIT FIRST ══ --}}
+<div class="bg-surface-container-lowest rounded-xl border border-outline-variant/30 shadow-[0_8px_20px_rgba(54,31,26,0.03)] p-6 mb-8">
+    <div class="flex items-center gap-2 mb-3">
+        <div class="w-1 h-6 bg-secondary rounded-full"></div>
+        <h3 class="font-headline text-base text-primary font-bold">Alokasi Anggaran: Fixed Profit First</h3>
+    </div>
+    <p class="font-body text-xs text-on-surface-variant mb-4 leading-relaxed">
+        Sistem mengamankan <strong>Laba Tetap Sanggar</strong> terlebih dahulu di setiap pementasan yang disetujui, kemudian mengalokasikan sisanya untuk <strong>Honor Kru & Penari</strong> serta <strong>Biaya Operasional Lapangan</strong>.
+    </p>
+    
+    @php
+        $profitPct = $totalRevenue > 0 ? round(($totalProfit / $totalRevenue) * 100, 1) : 0;
+        $honorPct = $totalRevenue > 0 ? round(($totalHonor / $totalRevenue) * 100, 1) : 0;
+        $budgetPct = $totalRevenue > 0 ? round(($totalBudgetOps / $totalRevenue) * 100, 1) : 0;
+        // Penyesuaian agar total persentase pas 100% jika ada desimal pembulatan
+        $totalPct = $profitPct + $honorPct + $budgetPct;
+        if ($totalPct > 100) $budgetPct = max(0, $budgetPct - ($totalPct - 100));
+        if ($totalPct < 100 && $totalPct > 0) $budgetPct = $budgetPct + (100 - $totalPct);
+    @endphp
+
+    <div class="w-full bg-surface-container-high rounded-xl h-7 overflow-hidden flex mb-5 border border-outline-variant/20">
+        @if($profitPct > 0)
+        <div class="h-full bg-[#361f1a] text-[#fcd400] flex items-center justify-center font-label text-[0.65rem] font-extrabold transition-all" style="width: {{ $profitPct }}%" title="Laba Tetap: {{ $profitPct }}%">
+            {{ $profitPct }}% Laba Tetap
+        </div>
+        @endif
+        @if($honorPct > 0)
+        <div class="h-full bg-[#fcd400] text-[#6e5c00] flex items-center justify-center font-label text-[0.65rem] font-extrabold transition-all" style="width: {{ $honorPct }}%" title="Honor Kru: {{ $honorPct }}%">
+            {{ $honorPct }}% Honor Kru
+        </div>
+        @endif
+        @if($budgetPct > 0)
+        <div class="h-full bg-[#e9e8e5] text-[#504442] flex items-center justify-center font-label text-[0.65rem] font-extrabold transition-all" style="width: {{ $budgetPct }}%" title="Anggaran Ops: {{ $budgetPct }}%">
+            {{ $budgetPct }}% Anggaran Ops
+        </div>
+        @endif
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 text-xs">
+        <div class="flex items-start gap-3 p-3 rounded-lg bg-primary/5 border border-primary/10">
+            <span class="w-3.5 h-3.5 rounded bg-[#361f1a] shrink-0 mt-0.5"></span>
+            <div>
+                <div class="font-bold text-primary">1. Laba Tetap Sanggar (Fixed Profit)</div>
+                <div class="text-[0.7rem] text-outline mt-1 leading-relaxed">Dana aman sanggar yang langsung dipotong di awal sebelum pembagian honor lapangan.</div>
+                <div class="font-headline font-bold text-sm text-[#361f1a] mt-2">Rp {{ number_format($totalProfit, 0, ',', '.') }}</div>
+            </div>
+        </div>
+        
+        <div class="flex items-start gap-3 p-3 rounded-lg bg-secondary/5 border border-secondary/15">
+            <span class="w-3.5 h-3.5 rounded bg-[#fcd400] shrink-0 mt-0.5"></span>
+            <div>
+                <div class="font-bold text-on-secondary-container">2. Alokasi Honor Personel</div>
+                <div class="text-[0.7rem] text-outline mt-1 leading-relaxed">Total hak bayaran yang dialokasikan untuk kru, penari, dan pemusik yang bertugas.</div>
+                <div class="font-headline font-bold text-sm text-[#705d00] mt-2">Rp {{ number_format($totalHonor, 0, ',', '.') }}</div>
+            </div>
+        </div>
+        
+        <div class="flex items-start gap-3 p-3 rounded-lg bg-surface-container border border-outline-variant/30">
+            <span class="w-3.5 h-3.5 rounded bg-[#e3e2e0] shrink-0 mt-0.5"></span>
+            <div>
+                <div class="font-bold text-on-surface-variant">3. Anggaran Operasional Lapangan</div>
+                <div class="text-[0.7rem] text-outline mt-1 leading-relaxed">Plafon anggaran untuk biaya logistik, konsumsi, sewa kostum vendor luar, dsb.</div>
+                <div class="font-headline font-bold text-sm text-on-surface mt-2">Rp {{ number_format($totalBudgetOps, 0, ',', '.') }}</div>
+            </div>
+        </div>
     </div>
 </div>
 

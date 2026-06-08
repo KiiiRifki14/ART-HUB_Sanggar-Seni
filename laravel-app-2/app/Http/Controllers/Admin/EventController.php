@@ -69,6 +69,9 @@ class EventController extends Controller
     public function monitoringDetail(Event $event)
     {
         $event->load([
+            'booking' => function ($query) {
+                $query->withTrashed();
+            },
             'booking.client',
             'personnel.user',
             'financialRecord.operationalCosts',

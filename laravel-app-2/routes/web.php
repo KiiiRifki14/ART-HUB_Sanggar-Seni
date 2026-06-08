@@ -115,7 +115,7 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
             'stColors' => $stColors,
         ]);
 
-        $pendingPersonnel = \App\Models\Personnel::where('is_active', false)->count();
+        $pendingPersonnel = \App\Models\Personnel::where('status', 'pending_verification')->count();
 
         return view('admin.dashboard', compact(
             'lockedProfit', 'safetyBuffer', 'totalPenalty', 'lateCount',

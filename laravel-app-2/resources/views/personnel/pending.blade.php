@@ -118,12 +118,24 @@
 <body>
 
     <div class="pending-container">
-        <div class="icon">⌛</div>
-        <h2>Menunggu Konfirmasi Admin</h2>
-        <p>Halo, <strong>{{ Auth::user()->name }}</strong>. <br><br>
-        Akun Anda sebagai Personel telah berhasil diregistrasi, namun <b>membutuhkan persetujuan dari Admin / Pimpinan Sanggar</b> sebelum dapat mengakses Dashboard Personel.</p>
-        
-        <p>Silakan hubungi staf sanggar atau tunggu beberapa saat.</p>
+        @php
+            $personnel = \App\Models\Personnel::where('user_id', Auth::id())->first();
+            $status = $personnel ? $personnel->status : 'pending_verification';
+        @endphp
+
+        @if($status === 'deactivated')
+            <div class="icon">⏸️</div>
+            <h2>Akun Dinonaktifkan Sementara</h2>
+            <p>Halo, <strong>{{ Auth::user()->name }}</strong>. <br><br>
+            Akun Anda sebagai Personel saat ini <b>sedang dinonaktifkan sementara</b> oleh Admin. Anda tidak akan muncul dalam daftar plotting pementasan.</p>
+            <p>Silakan hubungi Pimpinan Sanggar untuk informasi lebih lanjut dan pengaktifan kembali.</p>
+        @else
+            <div class="icon">⌛</div>
+            <h2>Menunggu Konfirmasi Admin</h2>
+            <p>Halo, <strong>{{ Auth::user()->name }}</strong>. <br><br>
+            Akun Anda sebagai Personel telah berhasil diregistrasi, namun <b>membutuhkan persetujuan dari Admin / Pimpinan Sanggar</b> sebelum dapat mengakses Dashboard Personel.</p>
+            <p>Silakan hubungi staf sanggar atau tunggu beberapa saat.</p>
+        @endif
         
         <div class="btn-wrapper">
             <form method="POST" action="{{ route('logout') }}">
