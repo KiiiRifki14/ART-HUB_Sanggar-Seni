@@ -152,6 +152,7 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
     Route::post('/personnel/{personnel}/approve', [PersonnelController::class, 'approve'])->name('personnel.approve');
     Route::delete('/personnel/{personnel}/reject', [PersonnelController::class, 'reject'])->name('personnel.reject');
     Route::patch('/personnel/{personnel}/toggle-status', [PersonnelController::class, 'toggleStatus'])->name('personnel.toggle_status');
+    Route::patch('/events/{event}/personnel/{personnel}/status', [PersonnelController::class, 'updateEventStatus'])->name('personnel.update_event_status');
 
 
     // PAYMENT TRACKING
@@ -400,6 +401,7 @@ Route::middleware(['auth', 'role:klien'])->prefix('klien')->name('klien.')->grou
     Route::post('/bookings/{id}/proof', [\App\Http\Controllers\Klien\BookingController::class, 'uploadProof'])->name('bookings.upload_proof');
     Route::post('/bookings/{id}/full-proof', [\App\Http\Controllers\Klien\BookingController::class, 'uploadFullProof'])->name('bookings.upload_full_proof');
     Route::post('/bookings/{booking}/feedback', [\App\Http\Controllers\Klien\ClientFeedbackController::class, 'store'])->name('bookings.feedback');
+    Route::post('/bookings/{id}/cancel', [\App\Http\Controllers\Klien\BookingController::class, 'cancel'])->name('bookings.cancel');
 
     // PENGATURAN PROFIL KLIEN
     Route::get('/profile', [\App\Http\Controllers\Klien\KlienProfileController::class, 'edit'])->name('profile.edit');

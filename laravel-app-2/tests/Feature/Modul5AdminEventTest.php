@@ -164,3 +164,35 @@ test('EVT-06: Sync Event Personnel Count on Service Catalog Update', function ()
     expect($this->event->personnel_count)->toBe(8);
 });
 
+// EVT-07: Update Status Tugas Personel Per-Event
+test('EVT-07: Update Status Tugas Personel Per-Event', function () {
+    $this->actingAs($this->admin);
+
+    // Plotting personel ke event terlebih dahulu jika belum ter-plot
+    if (!$this->event->personnel()->where('personnel.id', $this->personnel->id)->exists()) {
+        $this->event->personnel()->attach($this->personnel->id, [
+            'fee_reference_id' => $this->feeRef->id,
+            'role_in_event' => 'penari_utama',
+            'status' => 'assigned'
+        ]);
+    }
+
+    // Update status tugas menjadi 'Lagi Latihan'
+    $response = $this->patch(route('admin.personnel.update_event_status', [$this->event->id, $this->personnel->id]), [
+        'status' => 'Lagi Latihan'
+    ]);
+
+    $response->assertRedirect();
+    
+    // Verifikasi di database pivot event_personnel
+    $this->assertDatabaseHas('event_personnel', [
+        'event_id' => $this->event->id,
+        'personnel_id' => $this->personnel->id,
+        'status' => 'Lagi Latihan'
+    ]);
+
+    // Verifikasi status personel di tabel master tetap 'active' (tidak terpengaruh)
+    $this->personnel->refresh();
+    expect($this->personnel->status)->toBe('active');
+});
+

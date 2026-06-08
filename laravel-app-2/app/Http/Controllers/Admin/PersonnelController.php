@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Personnel;
 use App\Models\User;
+use App\Models\Event;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
@@ -228,5 +229,21 @@ class PersonnelController extends Controller
 
         return redirect()->route('admin.personnel.index')
             ->with('success', "Status personel {$name} berhasil {$statusText}.");
+    }
+
+    /**
+     * Memperbarui status tugas operasional personel per-event (pada tabel pivot)
+     */
+    public function updateEventStatus(Request $request, Event $event, Personnel $personnel)
+    {
+        $request->validate([
+            'status' => 'required|string|max:50',
+        ]);
+
+        $event->personnel()->updateExistingPivot($personnel->id, [
+            'status' => $request->status
+        ]);
+
+        return redirect()->back()->with('success', 'Status tugas ' . ($personnel->user->name ?? 'Kru') . ' berhasil diperbarui.');
     }
 }

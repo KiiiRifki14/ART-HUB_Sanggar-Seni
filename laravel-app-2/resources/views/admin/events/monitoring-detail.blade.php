@@ -449,6 +449,7 @@
                     <th class="font-label text-[0.65rem] uppercase tracking-widest text-outline font-bold px-4 py-3 text-right">Honor</th>
                     <th class="font-label text-[0.65rem] uppercase tracking-widest text-outline font-bold px-4 py-3 text-center">Check-in</th>
                     <th class="font-label text-[0.65rem] uppercase tracking-widest text-outline font-bold px-4 py-3 text-center">Status</th>
+                    <th class="font-label text-[0.65rem] uppercase tracking-widest text-outline font-bold px-4 py-3 text-center">Status Tugas</th>
                 </tr>
             </thead>
             <tbody class="divide-y divide-outline-variant/15">
@@ -508,6 +509,19 @@
                             <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded bg-red-500/10 text-red-500 border border-red-500/20 font-label text-[0.6rem] font-bold"><i class="bi bi-x-circle"></i> Belum Hadir</span>
                         @endif
                     </td>
+                    <td class="px-4 py-3.5 text-center">
+                        <form action="{{ route('admin.personnel.update_event_status', [$event->id, $p->id]) }}" method="POST" class="inline-block">
+                            @csrf
+                            @method('PATCH')
+                            <select name="status" onchange="this.form.submit()" class="bg-surface-container border border-outline-variant/30 rounded-lg px-2 py-1 font-body text-xs text-on-surface focus:outline-none focus:border-primary transition-all">
+                                <option value="assigned" {{ ($pivot->status ?? 'assigned') === 'assigned' ? 'selected' : '' }}>Assigned</option>
+                                <option value="Menunggu" {{ ($pivot->status ?? '') === 'Menunggu' ? 'selected' : '' }}>Menunggu</option>
+                                <option value="Lagi Latihan" {{ ($pivot->status ?? '') === 'Lagi Latihan' ? 'selected' : '' }}>Lagi Latihan</option>
+                                <option value="Sudah Siap/Standby" {{ ($pivot->status ?? '') === 'Sudah Siap/Standby' ? 'selected' : '' }}>Sudah Siap/Standby</option>
+                                <option value="Selesai Tugas" {{ ($pivot->status ?? '') === 'Selesai Tugas' ? 'selected' : '' }}>Selesai Tugas</option>
+                            </select>
+                        </form>
+                    </td>
                 </tr>
                 @endforeach
             </tbody>
@@ -517,7 +531,7 @@
                     <td class="px-4 py-3 text-right font-headline font-bold text-base text-secondary">
                         Rp {{ number_format($event->personnel->sum(fn($p) => $p->pivot->fee ?? 0), 0, ',', '.') }}
                     </td>
-                    <td colspan="2"></td>
+                    <td colspan="3"></td>
                 </tr>
             </tfoot>
         </table>

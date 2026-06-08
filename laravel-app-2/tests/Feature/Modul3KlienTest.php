@@ -52,7 +52,7 @@ test('KL-01: Booking Baru – Tanggal Kosong (Valid)', function () {
         'event_end' => '12:00',
         'venue' => 'Gedung Sate',
         'client_phone' => '081234567890',
-        'venue_address' => 'Bandung'
+        'venue_address' => 'Jl. Diponegoro No. 22, Bandung'
     ]);
 
     $booking = Booking::where('client_id', $this->klien->id)->first();
@@ -314,4 +314,152 @@ test('KL-10: Ganti Password Klien – Password Lama Salah', function () {
     ]);
 
     $response->assertSessionHasErrors('current_password');
+});
+
+// KL-11: Pembatalan Mandiri Klien – Sukses
+test('KL-11: Pembatalan Mandiri Klien – Sukses', function () {
+    $this->actingAs($this->klien);
+
+    $booking = Booking::create([
+        'client_id'          => $this->klien->id,
+        'client_name'        => $this->klien->name,
+        'client_phone'       => '081234567890',
+        'event_type'         => $this->catalog->name,
+        'service_catalog_id' => $this->catalog->id,
+        'event_date'         => now()->addDays(10)->format('Y-m-d'),
+        'event_start'        => '09:00',
+        'event_end'          => '11:00',
+        'venue'              => 'Gedung Sate',
+        'status'             => 'pending',
+        'total_price'        => 500000,
+        'dp_amount'          => 250000,
+    ]);
+
+    // Tambahkan event
+    $event = \App\Models\Event::create([
+        'booking_id' => $booking->id,
+        'event_code' => 'EVT-TEST-1',
+        'event_date' => $booking->event_date,
+        'event_start' => now()->addDays(10)->setTime(9, 0),
+        'event_end' => now()->addDays(10)->setTime(11, 0),
+        'venue' => 'Gedung Sate',
+        'status' => 'planning',
+    ]);
+
+    // Tambahkan costume usage & rental
+    $costume = \App\Models\SanggarCostume::create([
+        'name' => 'Baju Tari Test',
+        'category' => 'baju',
+        'quantity' => 10,
+        'condition' => 'good',
+    ]);
+
+    \App\Models\CostumeUsage::create([
+        'event_id' => $event->id,
+        'costume_id' => $costume->id,
+        'quantity_used' => 2,
+        'checkout_date' => $booking->event_date,
+        'expected_return_date' => $booking->event_date,
+    ]);
+
+    $vendor = \App\Models\CostumeVendor::create([
+        'name' => 'Vendor Test',
+        'city' => 'Subang',
+    ]);
+
+    \App\Models\CostumeRental::create([
+        'event_id' => $event->id,
+        'vendor_id' => $vendor->id,
+        'costume_type' => 'Aksesoris Test',
+        'quantity' => 2,
+        'rental_date' => $booking->event_date,
+        'due_date' => $booking->event_date,
+        'status' => 'rented',
+    ]);
+
+    $response = $this->post(route('klien.bookings.cancel', $booking->id), [
+        'reason' => 'Ada kendala teknis',
+        'digital_acknowledgement' => 1,
+    ]);
+
+    $response->assertRedirect();
+    $booking->refresh();
+    $event->refresh();
+
+    expect($booking->status)->toBe('cancelled');
+    expect($event->status)->toBe('cancelled');
+
+    // Pastikan logistik kostum ikut terhapus/dibersihkan
+    $this->assertDatabaseMissing('costume_usages', ['event_id' => $event->id]);
+    $this->assertDatabaseMissing('costume_rentals', ['event_id' => $event->id]);
+});
+
+// KL-12: Pembatalan Mandiri Klien – Gagal (Milik Orang Lain / IDOR Check)
+test('KL-12: Pembatalan Mandiri Klien – Gagal (Milik Orang Lain)', function () {
+    // Hapus klien lain jika ada
+    User::where('email', 'klien_lain@example.com')->delete();
+
+    $lain = User::create([
+        'name' => 'Klien Lain',
+        'email' => 'klien_lain@example.com',
+        'password' => bcrypt('password123'),
+        'role' => 'klien',
+        'phone' => '08987654321',
+    ]);
+
+    $bookingLain = Booking::create([
+        'client_id'          => $lain->id,
+        'client_name'        => $lain->name,
+        'client_phone'       => '08987654321',
+        'event_type'         => $this->catalog->name,
+        'service_catalog_id' => $this->catalog->id,
+        'event_date'         => now()->addDays(10)->format('Y-m-d'),
+        'event_start'        => '09:00',
+        'event_end'          => '11:00',
+        'venue'              => 'Gedung Sate',
+        'status'             => 'pending',
+        'total_price'        => 500000,
+        'dp_amount'          => 250000,
+    ]);
+
+    $this->actingAs($this->klien);
+
+    $response = $this->post(route('klien.bookings.cancel', $bookingLain->id), [
+        'reason' => 'Batal dong',
+        'digital_acknowledgement' => 1,
+    ]);
+
+    // Harus melempar 404 (firstOrFail dari client_id check)
+    $response->assertStatus(404);
+    $bookingLain->refresh();
+    expect($bookingLain->status)->toBe('pending');
+});
+
+// KL-13: Pembatalan Mandiri Klien – Gagal (Status Lunas)
+test('KL-13: Pembatalan Mandiri Klien – Gagal (Status Lunas)', function () {
+    $this->actingAs($this->klien);
+
+    $booking = Booking::create([
+        'client_id'          => $this->klien->id,
+        'client_name'        => $this->klien->name,
+        'client_phone'       => '081234567890',
+        'event_type'         => $this->catalog->name,
+        'service_catalog_id' => $this->catalog->id,
+        'event_date'         => now()->addDays(10)->format('Y-m-d'),
+        'event_start'        => '09:00',
+        'event_end'          => '11:00',
+        'venue'              => 'Gedung Sate',
+        'status'             => 'paid_full', // Status lunas
+        'total_price'        => 500000,
+        'dp_amount'          => 250000,
+    ]);
+
+    $response = $this->post(route('klien.bookings.cancel', $booking->id), [
+        'reason' => 'Batal dong',
+        'digital_acknowledgement' => 1,
+    ]);
+
+    $response->assertSessionHas('error');
+    $booking->refresh();
+    expect($booking->status)->toBe('paid_full');
 });

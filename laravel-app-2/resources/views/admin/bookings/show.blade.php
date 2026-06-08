@@ -172,6 +172,18 @@
                             <div class="font-body text-xs text-on-surface-variant">Sisa pembayaran / pelunasan klien dipantau di menu <strong>Pelacakan Pembayaran</strong>.</div>
                         </div>
                     @endif
+
+                    {{-- Form Pelunasan Cash Langsung --}}
+                    <div class="mt-4 p-4 rounded-xl border border-emerald-500/20 bg-emerald-500/5 text-center">
+                        <div class="font-label text-xs uppercase tracking-widest text-emerald-800 font-bold mb-2">Pelunasan Tunai (Cash)</div>
+                        <p class="font-body text-[0.7rem] text-on-surface-variant mb-3">Klik tombol di bawah jika klien membayar sisa pelunasan secara cash langsung ke sanggar.</p>
+                        <form action="{{ route('admin.bookings.full_cash_payment', $booking->id) }}" method="POST" onsubmit="return confirm('Apakah Anda yakin ingin mengonfirmasi pelunasan cash/tunai untuk pesanan ini?')">
+                            @csrf
+                            <button type="submit" class="w-full flex justify-center items-center gap-2 bg-emerald-600 text-white px-4 py-2.5 rounded-xl font-label text-xs font-bold uppercase tracking-widest hover:bg-emerald-700 transition-all shadow-md">
+                                <i class="bi bi-cash-coin"></i> Konfirmasi Lunas Cash
+                            </button>
+                        </form>
+                    </div>
                 @elseif($booking->status === 'paid_full' || $booking->status === 'completed')
                     <div class="p-4 text-center rounded-xl bg-secondary/10 border border-secondary/20 text-primary">
                         <i class="bi bi-check-all text-3xl mb-2 block text-secondary"></i>

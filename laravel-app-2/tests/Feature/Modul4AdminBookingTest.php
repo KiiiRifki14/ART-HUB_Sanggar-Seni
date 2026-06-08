@@ -253,3 +253,50 @@ test('ADM-06: Pembatalan Booking', function () {
         'booking_id' => $booking->id,
     ]);
 });
+
+// ADM-07: Konfirmasi Pelunasan Cash
+test('ADM-07: Konfirmasi Pelunasan Cash', function () {
+    $this->actingAs($this->admin);
+
+    $booking = Booking::create([
+        'client_id'          => $this->klien->id,
+        'client_name'        => $this->klien->name,
+        'client_phone'       => $this->klien->phone,
+        'event_type'         => $this->catalog->name,
+        'service_catalog_id' => $this->catalog->id,
+        'event_date'         => now()->addDays(30)->format('Y-m-d'), // Tanggal sangat jauh (30 hari ke depan)
+        'event_start'        => '09:00',
+        'event_end'          => '11:00',
+        'venue'              => 'Gedung Sate',
+        'status'             => 'dp_paid', // status awal dp_paid
+        'total_price'        => 500000,
+        'dp_amount'          => 250000,
+    ]);
+
+    // Tambah event & financial record agar controller pelunasan cash tidak error
+    $event = \App\Models\Event::create([
+        'booking_id' => $booking->id,
+        'event_code' => 'EVT-CASH-TEST',
+        'event_date' => $booking->event_date,
+        'event_start' => now()->addDays(30)->setTime(9, 0),
+        'event_end' => now()->addDays(30)->setTime(11, 0),
+        'venue' => 'Gedung Sate',
+        'status' => 'planning',
+    ]);
+
+    \App\Models\FinancialRecord::create([
+        'event_id' => $event->id,
+        'total_revenue' => $booking->total_price,
+        'fixed_profit' => 100000,
+        'operational_budget' => 150000,
+        'safety_buffer_amt' => 15000,
+        'profit_locked' => true,
+    ]);
+
+    $response = $this->post(route('admin.bookings.full_cash_payment', $booking->id));
+
+    $response->assertRedirect();
+    $booking->refresh();
+    expect($booking->status)->toBe('paid_full');
+    expect($booking->full_paid_at)->not->toBeNull();
+});

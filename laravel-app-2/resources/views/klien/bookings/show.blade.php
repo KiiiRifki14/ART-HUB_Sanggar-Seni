@@ -200,6 +200,97 @@
             </div>
         </div>
         @endif
+
+        @if(in_array($booking->status, ['pending', 'dp_paid']))
+            @php
+                $eventDate = \Carbon\Carbon::parse($booking->event_date);
+                $daysBefore = max(0, now()->diffInDays($eventDate, false));
+                
+                // Estimasi persentase denda berdasarkan tiers standard
+                if ($daysBefore >= 14) {
+                    $estPct = 10;
+                } elseif ($daysBefore >= 7) {
+                    $estPct = 30;
+                } elseif ($daysBefore >= 3) {
+                    $estPct = 50;
+                } else {
+                    $estPct = 75;
+                }
+                
+                $estPenalty = $booking->total_price * ($estPct / 100);
+                $estRefund = max(0, $booking->dp_amount - $estPenalty);
+            @endphp
+            
+            <div class="mt-6 bg-surface-container-lowest border border-red-500/20 rounded-xl p-6 shadow-[0_4px_12px_rgba(220,38,38,0.02)]">
+                <div class="font-label text-sm uppercase tracking-widest font-bold text-red-600 flex items-center gap-2 mb-4">
+                    <i class="bi bi-exclamation-triangle-fill text-lg"></i> Pengajuan Pembatalan Acara
+                </div>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                    <div>
+                        <div class="font-body text-sm text-on-surface-variant leading-relaxed mb-3">
+                            Pembatalan pesanan akan dikenakan denda berdasarkan jarak hari pembatalan ke tanggal pelaksanaan acara (<strong>H-{{ $daysBefore }}</strong>):
+                        </div>
+                        <ul class="font-body text-xs text-outline space-y-1 bg-surface-container-low rounded-lg p-3 border border-outline-variant/30">
+                            <li class="flex justify-between {{ $daysBefore >= 14 ? 'text-red-600 font-bold' : '' }}">
+                                <span>≥ H-14:</span> <span>Denda 10%</span>
+                            </li>
+                            <li class="flex justify-between {{ ($daysBefore >= 7 && $daysBefore < 14) ? 'text-red-600 font-bold' : '' }}">
+                                <span>H-7 s/d H-13:</span> <span>Denda 30%</span>
+                            </li>
+                            <li class="flex justify-between {{ ($daysBefore >= 3 && $daysBefore < 7) ? 'text-red-600 font-bold' : '' }}">
+                                <span>H-3 s/d H-6:</span> <span>Denda 50%</span>
+                            </li>
+                            <li class="flex justify-between {{ $daysBefore < 3 ? 'text-red-600 font-bold' : '' }}">
+                                <span>&lt; H-3:</span> <span>Denda 75%</span>
+                            </li>
+                        </ul>
+                    </div>
+                    
+                    <div class="flex flex-col justify-center bg-red-500/5 border border-red-500/10 rounded-xl p-4">
+                        <div class="font-label text-[0.65rem] uppercase tracking-widest text-outline font-bold mb-3 text-center">Kalkulasi Estimasi Keuangan</div>
+                        <div class="space-y-2.5 font-body text-sm">
+                            <div class="flex justify-between">
+                                <span class="text-on-surface-variant font-medium">Nilai Kontrak:</span>
+                                <span class="font-bold text-on-surface">Rp {{ number_format($booking->total_price, 0, ',', '.') }}</span>
+                            </div>
+                            <div class="flex justify-between text-red-700">
+                                <span class="font-medium">Estimasi Denda ({{ $estPct }}%):</span>
+                                <span class="font-extrabold text-red-700">Rp {{ number_format($estPenalty, 0, ',', '.') }}</span>
+                            </div>
+                            @if($booking->status === 'dp_paid')
+                            <div class="flex justify-between text-green-700 pt-2 border-t border-red-500/15">
+                                <span class="font-medium">Estimasi Pengembalian DP:</span>
+                                <span class="font-extrabold text-green-700 text-base">Rp {{ number_format($estRefund, 0, ',', '.') }}</span>
+                            </div>
+                            @endif
+                        </div>
+                    </div>
+                </div>
+                
+                <form action="{{ route('klien.bookings.cancel', $booking->id) }}" method="POST" onsubmit="return confirm('Apakah Anda yakin ingin mengajukan pembatalan pesanan ini?')">
+                    @csrf
+                    <div class="mb-4">
+                        <label class="block font-label text-xs uppercase tracking-wider text-outline font-bold mb-2">Alasan Pembatalan</label>
+                        <textarea name="reason" rows="3" required placeholder="Mohon tuliskan alasan pembatalan acara secara detail dan jelas..." 
+                                  class="w-full bg-surface-container border border-outline-variant/50 rounded-xl px-4 py-3 font-body text-sm text-on-surface focus:outline-none focus:border-red-500 focus:ring-1 focus:ring-red-500 transition-all resize-none"></textarea>
+                    </div>
+                    
+                    <div class="mb-5">
+                        <label class="flex items-start gap-2.5 cursor-pointer group">
+                            <input type="checkbox" name="digital_acknowledgement" value="1" required class="mt-0.5 rounded border-outline-variant text-red-600 focus:ring-red-500">
+                            <span class="font-body text-xs text-on-surface-variant leading-relaxed group-hover:text-on-surface transition-colors">Saya secara sadar memahami dan menyetujui ketentuan pemotongan denda pembatalan di atas sesuai kebijakan administrasi Sanggar Seni Cahaya Gumilang.</span>
+                        </label>
+                    </div>
+                    
+                    <div class="flex justify-end">
+                        <button type="submit" class="w-full md:w-auto flex justify-center items-center gap-2 bg-red-600 text-white px-6 py-3 rounded-xl font-label text-xs font-bold uppercase tracking-widest hover:bg-red-700 transition-all shadow-md active:scale-95">
+                            <i class="bi bi-x-circle text-sm"></i> Kirim Pengajuan Pembatalan
+                        </button>
+                    </div>
+                </form>
+            </div>
+        @endif
     </div>
 
     {{-- KOLOM KANAN: Pembayaran --}}
@@ -415,6 +506,7 @@
                 </div>
             @endif
         </div>
+
     </div>
 </div>
 

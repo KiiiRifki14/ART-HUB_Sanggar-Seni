@@ -157,8 +157,26 @@ class CancellationController extends Controller
 
                 $booking->update(['status' => 'cancelled']);
                 if ($booking->event) {
-                    $booking->event->update(['status' => 'cancelled']);
-                    $booking->event->personnel()->detach();
+                    $event = $booking->event;
+                    $event->update(['status' => 'cancelled']);
+                    $event->personnel()->detach();
+
+                    // Hapus pemakaian kostum sanggar
+                    \App\Models\CostumeUsage::where('event_id', $event->id)->delete();
+
+                    // Hapus sewaan kostum vendor
+                    \App\Models\CostumeRental::where('event_id', $event->id)->delete();
+
+                    // Sesuaikan operational costs dan financial record
+                    $financialRecord = \App\Models\FinancialRecord::where('event_id', $event->id)->first();
+                    if ($financialRecord) {
+                        \App\Models\OperationalCost::where('financial_record_id', $financialRecord->id)
+                            ->where('category', 'sewa_kostum')
+                            ->delete();
+
+                        $totalActual = \App\Models\OperationalCost::where('financial_record_id', $financialRecord->id)->sum('actual_amount');
+                        $financialRecord->update(['actual_operational_cost' => $totalActual]);
+                    }
                 }
             });
 
