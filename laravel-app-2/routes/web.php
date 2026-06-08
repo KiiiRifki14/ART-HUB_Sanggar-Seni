@@ -187,6 +187,7 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
 
     // REHEARSALS
     Route::get('/rehearsals', [RehearsalController::class, 'index'])->name('rehearsals.index');
+    Route::get('/rehearsals/create', [RehearsalController::class, 'create'])->name('rehearsals.create');
     Route::post('/events/{event}/rehearsals', [RehearsalController::class, 'store'])->name('rehearsals.store');
 
     // EVENT MONITORING (halaman baru)

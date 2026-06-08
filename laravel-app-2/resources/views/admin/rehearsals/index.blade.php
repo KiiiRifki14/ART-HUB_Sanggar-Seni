@@ -12,7 +12,7 @@
     $past     = $total - $upcoming;
 @endphp
 
-<div x-data="{ showModal: {{ session('conflict_warning') ? 'true' : 'false' }}, selectedEventId: '{{ old('event_id') }}' }">
+<div>
 
     {{-- ── CONFLICT ALERT ── --}}
     @if (session('conflict_warning'))
@@ -64,10 +64,10 @@
             <i class="bi bi-calendar3 text-secondary"></i>
             Daftar Jadwal Latihan
         </h2>
-        <button @click="showModal = true"
-                class="bg-gradient-to-br from-primary-container to-primary text-white px-5 py-2.5 rounded-xl font-label text-xs font-bold uppercase tracking-widest hover:opacity-90 transition-all shadow-md flex items-center gap-2">
+        <a href="{{ route('admin.rehearsals.create') }}"
+           class="bg-gradient-to-br from-primary-container to-primary text-white px-5 py-2.5 rounded-xl font-label text-xs font-bold uppercase tracking-widest hover:opacity-90 transition-all shadow-md flex items-center gap-2">
             <i class="bi bi-plus-circle-fill"></i> Tambah Latihan
-        </button>
+        </a>
     </div>
 
     {{-- ── TABLE ── --}}
@@ -156,182 +156,7 @@
         </table>
     </div>
 
-    {{-- ══ MODAL: FORM TAMBAH JADWAL LATIHAN ══ --}}
-    <div x-show="showModal"
-         class="fixed inset-0 z-50 flex items-center justify-center p-4"
-         style="display: none;"
-         x-cloak>
 
-        {{-- Backdrop --}}
-        <div class="absolute inset-0 bg-black/60 backdrop-blur-sm"
-             @click="showModal = false"
-             x-show="showModal"
-             x-transition:enter="transition ease-out duration-300"
-             x-transition:enter-start="opacity-0"
-             x-transition:enter-end="opacity-100"
-             x-transition:leave="transition ease-in duration-200"
-             x-transition:leave-start="opacity-100"
-             x-transition:leave-end="opacity-0"></div>
-
-        {{-- Modal Card --}}
-        <div class="relative bg-surface-container-lowest border border-outline-variant/40 rounded-2xl w-full max-w-lg overflow-hidden shadow-2xl z-10 transform transition-all"
-             x-show="showModal"
-             x-transition:enter="transition ease-out duration-300"
-             x-transition:enter-start="opacity-0 translate-y-4 scale-95"
-             x-transition:enter-end="opacity-100 translate-y-0 scale-100"
-             x-transition:leave="transition ease-in duration-200"
-             x-transition:leave-start="opacity-100 translate-y-0 scale-100"
-             x-transition:leave-end="opacity-0 translate-y-4 scale-95">
-
-            {{-- Accent bar --}}
-            <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-primary to-secondary"></div>
-
-            {{-- Modal Header --}}
-            <div class="px-6 py-4 border-b border-outline-variant/20 flex justify-between items-center mt-1 bg-surface-container-low/50">
-                <div class="flex items-center gap-3">
-                    <div class="w-9 h-9 rounded-xl bg-primary/10 flex items-center justify-center shadow-inner">
-                        <i class="bi bi-calendar-plus-fill text-primary"></i>
-                    </div>
-                    <div>
-                        <h3 class="font-headline font-bold text-primary text-sm">Plotting Sesi Latihan</h3>
-                        <p class="font-label text-[0.6rem] uppercase tracking-widest text-outline">Jadwal sesi latihan baru</p>
-                    </div>
-                </div>
-                <button @click="showModal = false"
-                        class="w-8 h-8 flex items-center justify-center rounded-lg text-outline hover:text-primary hover:bg-surface-container transition-colors">
-                    <i class="bi bi-x-lg text-sm"></i>
-                </button>
-            </div>
-
-            {{-- Form --}}
-            <form :action="'/admin/events/' + selectedEventId + '/rehearsals'" method="POST" class="p-6 m-0">
-                @csrf
-
-                <div class="flex flex-col gap-4">
-                    {{-- Pilih Event --}}
-                    <div>
-                        <label class="block font-label text-[0.65rem] font-bold uppercase tracking-widest text-on-surface-variant mb-1.5 ml-1">Pilih Event / Acara Klien <span class="text-red-500">*</span></label>
-                        <div class="relative">
-                            <span class="absolute left-3.5 top-1/2 -translate-y-1/2 text-outline text-sm pointer-events-none">
-                                <i class="bi bi-collection-play-fill text-primary/70"></i>
-                            </span>
-                            <select x-model="selectedEventId" name="event_id" required
-                                    class="w-full rounded-xl border border-outline-variant/50 bg-surface-container-low text-sm pl-10 pr-9 py-2.5 text-on-surface focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all appearance-none">
-                                <option value="">— Pilih Event Aktif —</option>
-                                @foreach($events as $ev)
-                                    <option value="{{ $ev->id }}">
-                                        [{{ $ev->event_code }}] {{ $ev->booking->client_name ?? ($ev->booking->client->name ?? 'Klien') }} — {{ $ev->booking->event_type ?? 'Pementasan' }}
-                                    </option>
-                                @endforeach
-                            </select>
-                            <span class="absolute right-3.5 top-1/2 -translate-y-1/2 text-outline pointer-events-none text-xs">
-                                <i class="bi bi-chevron-down"></i>
-                            </span>
-                        </div>
-                    </div>
-
-                    {{-- Tipe + Tanggal sejajar --}}
-                    <div class="grid grid-cols-2 gap-3">
-                        <div>
-                            <label class="block font-label text-[0.65rem] font-bold uppercase tracking-widest text-on-surface-variant mb-1.5 ml-1">Tipe Latihan <span class="text-red-500">*</span></label>
-                            <div class="relative">
-                                <span class="absolute left-3.5 top-1/2 -translate-y-1/2 text-outline text-sm pointer-events-none">
-                                    <i class="bi bi-filter-square-fill text-secondary"></i>
-                                </span>
-                                <select name="type" required class="w-full rounded-xl border border-outline-variant/50 bg-surface-container-low text-sm pl-10 pr-9 py-2.5 text-on-surface focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all appearance-none">
-                                    <option value="gabungan" {{ old('type') == 'gabungan' ? 'selected' : '' }}>Gabungan</option>
-                                    <option value="tari" {{ old('type') == 'tari' ? 'selected' : '' }}>Khusus Tari</option>
-                                    <option value="musik" {{ old('type') == 'musik' ? 'selected' : '' }}>Khusus Musik</option>
-                                </select>
-                                <span class="absolute right-3.5 top-1/2 -translate-y-1/2 text-outline pointer-events-none text-xs">
-                                    <i class="bi bi-chevron-down"></i>
-                                </span>
-                            </div>
-                        </div>
-                        <div>
-                            <label class="block font-label text-[0.65rem] font-bold uppercase tracking-widest text-on-surface-variant mb-1.5 ml-1">Tanggal <span class="text-red-500">*</span></label>
-                            <div class="relative">
-                                <span class="absolute left-3.5 top-1/2 -translate-y-1/2 text-outline text-sm pointer-events-none">
-                                    <i class="bi bi-calendar-date"></i>
-                                </span>
-                                <input type="date" name="rehearsal_date" value="{{ old('rehearsal_date') }}" required
-                                       class="w-full rounded-xl border border-outline-variant/50 bg-surface-container-low text-sm pl-10 pr-4 py-2.5 text-on-surface focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all">
-                            </div>
-                        </div>
-                    </div>
-
-                    {{-- Jam Mulai + Selesai sejajar --}}
-                    <div class="grid grid-cols-2 gap-3">
-                        <div>
-                            <label class="block font-label text-[0.65rem] font-bold uppercase tracking-widest text-on-surface-variant mb-1.5 ml-1">Jam Mulai <span class="text-red-500">*</span></label>
-                            <div class="relative">
-                                <span class="absolute left-3.5 top-1/2 -translate-y-1/2 text-outline text-sm pointer-events-none">
-                                    <i class="bi bi-clock"></i>
-                                </span>
-                                <input type="time" name="start_time" value="{{ old('start_time') }}" required
-                                       class="w-full rounded-xl border border-outline-variant/50 bg-surface-container-low text-sm pl-10 pr-4 py-2.5 text-on-surface focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all">
-                            </div>
-                        </div>
-                        <div>
-                            <label class="block font-label text-[0.65rem] font-bold uppercase tracking-widest text-on-surface-variant mb-1.5 ml-1">Jam Selesai <span class="text-red-500">*</span></label>
-                            <div class="relative">
-                                <span class="absolute left-3.5 top-1/2 -translate-y-1/2 text-outline text-sm pointer-events-none">
-                                    <i class="bi bi-clock-history"></i>
-                                </span>
-                                <input type="time" name="end_time" value="{{ old('end_time') }}" required
-                                       class="w-full rounded-xl border border-outline-variant/50 bg-surface-container-low text-sm pl-10 pr-4 py-2.5 text-on-surface focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all">
-                            </div>
-                        </div>
-                    </div>
-
-                    {{-- Lokasi --}}
-                    <div>
-                        <label class="block font-label text-[0.65rem] font-bold uppercase tracking-widest text-on-surface-variant mb-1.5 ml-1">Lokasi <span class="text-red-500">*</span></label>
-                        <div class="relative">
-                            <i class="bi bi-geo-alt-fill absolute left-3.5 top-1/2 -translate-y-1/2 text-outline text-sm pointer-events-none"></i>
-                            <input type="text" name="location" value="{{ old('location', 'Sanggar Cahaya Gumilang') }}" required
-                                   placeholder="Contoh: Pendopo Utama Sanggar"
-                                   class="w-full rounded-xl border border-outline-variant/50 bg-surface-container-low text-sm pl-10 pr-4 py-2.5 text-on-surface focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all">
-                        </div>
-                    </div>
-
-                    {{-- Catatan --}}
-                    <div>
-                        <label class="block font-label text-[0.65rem] font-bold uppercase tracking-widest text-on-surface-variant mb-1.5 ml-1">Catatan (Opsional)</label>
-                        <div class="relative">
-                            <span class="absolute left-3.5 top-3 text-outline text-sm pointer-events-none">
-                                <i class="bi bi-chat-left-text"></i>
-                            </span>
-                            <textarea name="notes" rows="2" placeholder="Contoh: Bawa properti selendang masing-masing..."
-                                      class="w-full rounded-xl border border-outline-variant/50 bg-surface-container-low text-sm pl-10 pr-4 py-2.5 text-on-surface focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all resize-none">{{ old('notes') }}</textarea>
-                        </div>
-                    </div>
-
-                    {{-- Force Save (jika ada conflict warning) --}}
-                    @if (session('conflict_warning'))
-                    <div class="p-3 bg-yellow-50 border border-yellow-300 rounded-xl flex items-start gap-2.5">
-                        <input type="checkbox" name="force_save" value="1" id="force_save" class="mt-0.5 rounded text-primary focus:ring-primary">
-                        <label for="force_save" class="text-xs text-yellow-900 font-medium select-none leading-relaxed">
-                            Saya sadar ada personel yang bentrok — Paksa Simpan jadwal ini.
-                        </label>
-                    </div>
-                    @endif
-                </div>
-
-                {{-- Actions --}}
-                <div class="pt-5 mt-5 flex justify-end gap-3 border-t border-outline-variant/20">
-                    <button type="button" @click="showModal = false"
-                            class="h-9 px-4 rounded-xl border border-outline-variant text-xs font-bold uppercase tracking-wider text-on-surface-variant hover:bg-surface-container transition-colors">
-                        Batal
-                    </button>
-                    <button type="submit" :disabled="!selectedEventId"
-                            class="h-9 px-5 rounded-xl bg-gradient-to-r from-primary-container to-primary text-white text-xs font-bold uppercase tracking-wider hover:opacity-90 transition-all disabled:opacity-40 disabled:cursor-not-allowed shadow-md flex items-center gap-2">
-                        <i class="bi bi-calendar-check-fill"></i> Simpan Jadwal
-                    </button>
-                </div>
-            </form>
-        </div>
-    </div>
 
 </div>
 
