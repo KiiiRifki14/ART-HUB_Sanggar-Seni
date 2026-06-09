@@ -4,6 +4,7 @@ namespace App\Providers;
 
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Pagination\Paginator;
 use Symfony\Component\Mailer\Transport\Smtp\EsmtpTransport;
 
 class AppServiceProvider extends ServiceProvider
@@ -21,6 +22,9 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        // Use Tailwind pagination view globally
+        Paginator::defaultView('vendor.pagination.tailwind');
+
         \Illuminate\Support\Facades\Gate::define('view-financials', function (\App\Models\User $user) {
             return $user->role === 'admin';
         });

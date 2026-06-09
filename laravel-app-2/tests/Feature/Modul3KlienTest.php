@@ -377,12 +377,37 @@ test('KL-11: Pembatalan Mandiri Klien – Sukses', function () {
         'status' => 'rented',
     ]);
 
+    // Buat Admin User untuk melakukan persetujuan nanti
+    $admin = User::create([
+        'name' => 'Admin Test',
+        'email' => 'admin_test_m3@example.com',
+        'password' => bcrypt('password123'),
+        'role' => 'admin',
+    ]);
+
     $response = $this->post(route('klien.bookings.cancel', $booking->id), [
         'reason' => 'Ada kendala teknis',
         'digital_acknowledgement' => 1,
     ]);
 
     $response->assertRedirect();
+    $booking->refresh();
+    $event->refresh();
+
+    // Booking dan Event tetap aktif (status pending/planning), belum dibatalkan sebelum disetujui admin
+    expect($booking->status)->toBe('pending');
+    expect($event->status)->toBe('planning');
+
+    // Pastikan data pembatalan tersimpan dengan status 'pending'
+    $cancellation = \App\Models\Cancellation::where('booking_id', $booking->id)->first();
+    expect($cancellation)->not->toBeNull();
+    expect($cancellation->status)->toBe('pending');
+
+    // Log in sebagai Admin untuk menyetujui pembatalan
+    $this->actingAs($admin);
+    $responseApprove = $this->post(route('admin.cancellations.approve', $cancellation->id));
+    $responseApprove->assertRedirect();
+
     $booking->refresh();
     $event->refresh();
 

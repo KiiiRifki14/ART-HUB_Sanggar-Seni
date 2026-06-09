@@ -97,7 +97,7 @@
                 <span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded bg-secondary"></span> Laba Tetap</span>
             </div>
         </div>
-        <div class="relative h-[210px] w-full">
+        <div class="relative h-[280px] w-full">
             <canvas id="chartRevenue"></canvas>
         </div>
     </div>
@@ -292,6 +292,14 @@
         options: {
             responsive: true,
             maintainAspectRatio: false,
+            layout: {
+                padding: {
+                    top: 15,
+                    bottom: 0,
+                    left: -5,
+                    right: 0
+                }
+            },
             plugins: {
                 legend: { display: false },
                 tooltip: {
@@ -338,7 +346,7 @@
                     bodyFont: { family: 'Manrope', size: 12, weight: 'bold' },
                     padding: 8,
                     cornerRadius: 6,
-                    callbacks: { label: ctx => ' ' + ctx.label + ': ' + ctx.parsed + ' booking' }
+                    callbacks: { label: ctx => ' Booking ' + ctx.label + ': ' + ctx.parsed }
                 }
             }
         }

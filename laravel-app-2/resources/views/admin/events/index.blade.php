@@ -10,7 +10,9 @@
 <div class="flex justify-between items-start mb-8">
     <div>
         <h2 class="font-headline text-2xl text-primary font-bold mb-1">Daftar Event</h2>
-        <p class="font-label text-xs uppercase tracking-widest text-outline">{{ $events->count() }} event terdaftar</p>
+        <p class="font-label text-xs uppercase tracking-widest text-outline">
+            {{ $events instanceof \Illuminate\Pagination\LengthAwarePaginator ? $events->total() : $events->count() }} event terdaftar
+        </p>
     </div>
 </div>
 
@@ -176,5 +178,11 @@
     </div>
     @endforelse
 </div>
+
+@if($events instanceof \Illuminate\Pagination\LengthAwarePaginator && $events->hasPages())
+    <div class="mt-6 mb-4">
+        {{ $events->links() }}
+    </div>
+@endif
 
 @endsection

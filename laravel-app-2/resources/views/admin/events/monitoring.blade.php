@@ -68,7 +68,7 @@
         }
     @endphp
     
-    <div class="group relative bg-surface-container-lowest rounded-xl border border-outline-variant/30 shadow-[0_4px_12px_rgba(54,31,26,0.03)] hover:shadow-[0_8px_16px_rgba(54,31,26,0.05)] hover:-translate-y-0.5 transition-all duration-300 flex flex-col overflow-hidden {{ $isUrgent ? 'ring-2 ring-orange-500/30' : '' }}">
+    <div class="group relative bg-surface-container-lowest rounded-xl border border-outline-variant/30 shadow-[0_4px_12px_rgba(54,31,26,0.03)] hover:shadow-[0_8px_16px_rgba(54,31,26,0.05)] hover:-translate-y-0.5 transition-all duration-300 flex flex-col h-full overflow-hidden {{ $isUrgent ? 'ring-2 ring-orange-500/30' : '' }}">
         
         {{-- Urgent Badge Overlay --}}
         @if($isUrgent)

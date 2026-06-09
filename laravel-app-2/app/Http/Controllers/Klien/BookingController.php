@@ -16,8 +16,14 @@ class BookingController extends Controller
      */
     public function index()
     {
-        $bookings = Booking::where('client_id', Auth::id())->latest()->get();
-        return view('klien.dashboard', compact('bookings'));
+        $clientId = Auth::id();
+        $bookings = Booking::where('client_id', $clientId)->latest()->paginate(5);
+        
+        $aktif   = Booking::where('client_id', $clientId)->whereIn('status', ['pending', 'dp_paid', 'confirmed'])->count();
+        $selesai = Booking::where('client_id', $clientId)->where('status', 'completed')->count();
+        $total   = Booking::where('client_id', $clientId)->count();
+
+        return view('klien.dashboard', compact('bookings', 'aktif', 'selesai', 'total'));
     }
 
     /**
@@ -246,23 +252,22 @@ class BookingController extends Controller
 
         try {
             \Illuminate\Support\Facades\DB::transaction(function () use ($booking, $request) {
-                $cancelDate = Carbon::now()->format('Y-m-d');
-                $eventDate  = is_string($booking->event_date)
+                $eventDateStr = is_string($booking->event_date)
                     ? $booking->event_date
                     : $booking->event_date->format('Y-m-d');
+                $eventStartStr = $booking->event_start instanceof \Carbon\Carbon
+                    ? $booking->event_start->format('H:i:s')
+                    : (is_string($booking->event_start) ? $booking->event_start : '00:00:00');
 
-                $daysBefore = max(0, Carbon::parse($eventDate)->diffInDays(Carbon::parse($cancelDate), false));
-
-                // Kalkulasi penalti: Coba SQL Function terlebih dahulu, jika gagal fallback ke PHP
-                try {
-                    $query = \Illuminate\Support\Facades\DB::select('SELECT fn_calculate_cancellation_penalty(?, ?, ?) AS penalty_amount', [
-                        $eventDate, $cancelDate, $booking->total_price
-                    ]);
-                    $penaltyAmount = $query[0]->penalty_amount ?? 0;
-                } catch (\Exception $sqlEx) {
-                    $tiers = $this->getPenaltyTiers();
-                    $penaltyAmount = $this->calculatePenalty($daysBefore, (float) $booking->total_price, $tiers);
+                $eventDateTime = Carbon::parse($eventDateStr . ' ' . $eventStartStr);
+                $hoursBefore = Carbon::now()->diffInHours($eventDateTime, false);
+                $daysBefore = (int) ceil($hoursBefore / 24);
+                if ($daysBefore < 0) {
+                    $daysBefore = 0;
                 }
+
+                $tiers = $this->getPenaltyTiers();
+                $penaltyAmount = $this->calculatePenalty($daysBefore, (float) $booking->total_price, $tiers);
 
                 $penaltyPct   = ($booking->total_price > 0) ? ($penaltyAmount / $booking->total_price) * 100 : 0;
                 $refundAmount = max(0, $booking->dp_amount - $penaltyAmount);
@@ -282,43 +287,19 @@ class BookingController extends Controller
                     'acknowledged_ua'         => $request->userAgent(),
                 ]);
 
-                $booking->update(['status' => 'cancelled']);
-                if ($booking->event) {
-                    $event = $booking->event;
-                    $event->update(['status' => 'cancelled']);
-                    
-                    // Detach personnel
-                    $event->personnel()->detach();
-
-                    // Hapus pemakaian kostum sanggar
-                    \App\Models\CostumeUsage::where('event_id', $event->id)->delete();
-
-                    // Hapus sewaan kostum vendor
-                    \App\Models\CostumeRental::where('event_id', $event->id)->delete();
-
-                    // Sesuaikan operational costs dan financial record
-                    $financialRecord = \App\Models\FinancialRecord::where('event_id', $event->id)->first();
-                    if ($financialRecord) {
-                        \App\Models\OperationalCost::where('financial_record_id', $financialRecord->id)
-                            ->where('category', 'sewa_kostum')
-                            ->delete();
-
-                        $totalActual = \App\Models\OperationalCost::where('financial_record_id', $financialRecord->id)->sum('actual_amount');
-                        $financialRecord->update(['actual_operational_cost' => $totalActual]);
-                    }
-                }
+                // Hapus/lepaskan status bookings dan logistik ditunda hingga Admin menyetujui pembatalan
             });
 
-            // Kirim notifikasi ke Admin bahwa klien melakukan pembatalan
+            // Kirim notifikasi ke Admin bahwa klien mengajukan pembatalan
             $admins = \App\Models\User::where('role', 'admin')->get();
             try {
-                \Illuminate\Support\Facades\Notification::send($admins, new \App\Notifications\BookingStatusChanged($booking, 'telah dibatalkan oleh klien ' . Auth::user()->name));
+                \Illuminate\Support\Facades\Notification::send($admins, new \App\Notifications\BookingStatusChanged($booking, 'mengajukan permohonan pembatalan (menunggu persetujuan admin).'));
             } catch (\Exception $notifEx) {
                 // Jangan menggagalkan transaksi jika notifikasi error
             }
 
             return redirect()->route('klien.bookings.show', $booking->id)
-                ->with('success', 'Pesanan Anda berhasil dibatalkan. Pengembalian DP (jika ada) sedang diproses oleh admin.');
+                ->with('success', 'Permohonan pembatalan pesanan Anda berhasil diajukan dan sedang menunggu persetujuan dari Admin. Denda dihitung sesuai formula yang berlaku.');
 
         } catch (\Exception $e) {
             return redirect()->back()->with('error', 'Gagal memproses pembatalan: ' . $e->getMessage());

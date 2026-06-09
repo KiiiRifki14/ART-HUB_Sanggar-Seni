@@ -16,7 +16,7 @@ class EventController extends Controller
      */
     public function index()
     {
-        $events = Event::with('booking')->orderBy('event_date', 'asc')->paginate(12)->withQueryString();
+        $events = Event::with('booking')->orderBy('event_date', 'asc')->paginate(10)->withQueryString();
         return view('admin.events.index', compact('events'));
     }
 

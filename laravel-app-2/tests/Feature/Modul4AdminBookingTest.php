@@ -243,15 +243,23 @@ test('ADM-06: Pembatalan Booking', function () {
         'digital_acknowledgement' => 1
     ]);
 
-    $response->dumpSession();
     $response->assertRedirect();
     $booking->refresh();
-    expect($booking->status)->toBe('cancelled');
     
-    // Check if cancellation log is created
-    $this->assertDatabaseHas('cancellations', [
-        'booking_id' => $booking->id,
-    ]);
+    // Booking status should still be pending before approval
+    expect($booking->status)->toBe('pending');
+    
+    // Check if cancellation log is created as pending
+    $cancellation = \App\Models\Cancellation::where('booking_id', $booking->id)->first();
+    expect($cancellation)->not->toBeNull();
+    expect($cancellation->status)->toBe('pending');
+
+    // Admin approves the cancellation
+    $responseApprove = $this->post(route('admin.cancellations.approve', $cancellation->id));
+    $responseApprove->assertRedirect();
+
+    $booking->refresh();
+    expect($booking->status)->toBe('cancelled');
 });
 
 // ADM-07: Konfirmasi Pelunasan Cash
@@ -276,7 +284,7 @@ test('ADM-07: Konfirmasi Pelunasan Cash', function () {
     // Tambah event & financial record agar controller pelunasan cash tidak error
     $event = \App\Models\Event::create([
         'booking_id' => $booking->id,
-        'event_code' => 'EVT-CASH-TEST',
+        'event_code' => 'EVT-CSH-' . rand(10, 99) . $booking->id,
         'event_date' => $booking->event_date,
         'event_start' => now()->addDays(30)->setTime(9, 0),
         'event_end' => now()->addDays(30)->setTime(11, 0),

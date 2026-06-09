@@ -51,10 +51,11 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
         // ── STAT CARDS (data nyata)
         $lockedProfit  = \App\Models\FinancialRecord::where('profit_locked', true)->sum('fixed_profit');
         $safetyBuffer  = \App\Models\FinancialRecord::sum('safety_buffer_amt');
+        $latePenaltyRate = \App\Models\FeeReference::where('role_name', 'Denda Keterlambatan')->value('base_fee') ?? 15000;
         $totalPenalty  = \Illuminate\Support\Facades\DB::table('event_personnel')
                             ->where('attendance_status', 'late')
                             ->where('late_minutes', '>', 0)
-                            ->selectRaw('SUM(late_minutes / 10 * 15000) as total')
+                            ->selectRaw('SUM(late_minutes / 10 * ?)', [$latePenaltyRate])
                             ->value('total') ?? 0;
         $lateCount     = \Illuminate\Support\Facades\DB::table('event_personnel')
                             ->where('attendance_status', 'late')->count();
@@ -185,6 +186,8 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
     Route::get('/cancellations', [CancellationController::class, 'index'])->name('cancellations.index');
     Route::post('/bookings/{booking}/cancel', [CancellationController::class, 'store'])->name('bookings.cancel');
     Route::post('/cancellations/penalty-settings', [CancellationController::class, 'updatePenaltySettings'])->name('cancellations.penalty_settings');
+    Route::post('/cancellations/{cancellation}/approve', [CancellationController::class, 'approveCancellation'])->name('cancellations.approve');
+    Route::post('/cancellations/{cancellation}/reject', [CancellationController::class, 'rejectCancellation'])->name('cancellations.reject');
 
     // REHEARSALS
     Route::get('/rehearsals', [RehearsalController::class, 'index'])->name('rehearsals.index');

@@ -17,6 +17,9 @@ class FinancialController extends Controller
             return redirect()->route('personnel.dashboard')->with('error', 'Profil tidak ditemukan.');
         }
 
+        // Ambil denda keterlambatan dinamis dari database
+        $latePenaltyRate = \App\Models\FeeReference::where('role_name', 'Denda Keterlambatan')->value('base_fee') ?? 15000;
+
         // Ambil semua event untuk rekap statistik secara penuh
         $allEvents = $personnel->events()->get();
 
@@ -27,7 +30,7 @@ class FinancialController extends Controller
         foreach ($allEvents as $ev) {
             $pivot = $ev->pivot;
             $penalty = $pivot->late_minutes
-                ? floor($pivot->late_minutes / 10) * 15000
+                ? floor($pivot->late_minutes / 10) * $latePenaltyRate
                 : 0;
             
             if ($ev->status === 'completed') {
@@ -43,7 +46,7 @@ class FinancialController extends Controller
             ->orderBy('event_date', 'desc')
             ->paginate(3);
 
-        $eventFinancials = collect($paginator->items())->map(function ($event) {
+        $eventFinancials = collect($paginator->items())->map(function ($event) use ($latePenaltyRate) {
             $pivot = $event->pivot;
             return [
                 'event'          => $event,
@@ -53,7 +56,7 @@ class FinancialController extends Controller
                 'status'         => $pivot->attendance_status ?? 'pending',
                 'late_minutes'   => $pivot->late_minutes ?? 0,
                 'penalty'        => $pivot->late_minutes
-                    ? floor($pivot->late_minutes / 10) * 15000
+                    ? floor($pivot->late_minutes / 10) * $latePenaltyRate
                     : 0,
                 'event_status'   => $event->status,
             ];

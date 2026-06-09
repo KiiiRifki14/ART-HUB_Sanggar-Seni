@@ -84,9 +84,9 @@ class AttendanceController extends Controller
             // Hitung keterlambatan riil terhadap Call Time
             $lateMinutes = $now->diffInMinutes($callTime);
             
-            // Logika Denda: Rp 15.000 untuk setiap 10 menit terlambat.
-            // (Memukul telak "Ghosting" dan ketidakdisiplinan!)
-            $penaltyAmount = floor($lateMinutes / 10) * 15000;
+            // Logika Denda: Ambil dari konfigurasi database (Fee Reference), fallback 15.000 jika kosong.
+            $latePenaltyRate = \App\Models\FeeReference::where('role_name', 'Denda Keterlambatan')->value('base_fee') ?? 15000;
+            $penaltyAmount = floor($lateMinutes / 10) * $latePenaltyRate;
         }
 
         try {
