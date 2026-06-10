@@ -14,8 +14,13 @@ class PersonnelController extends Controller
 {
     public function index()
     {
-        $personnel = Personnel::with('user')->orderBy('id')->get();
-        return view('admin.personnel.index', compact('personnel'));
+        $total = Personnel::count();
+        $active = Personnel::where('status', 'active')->count();
+        $pending = Personnel::where('status', 'pending_verification')->count();
+        $deactivated = Personnel::where('status', 'deactivated')->count();
+
+        $personnel = Personnel::with('user')->orderBy('id')->paginate(10);
+        return view('admin.personnel.index', compact('personnel', 'total', 'active', 'pending', 'deactivated'));
     }
 
     public function create()

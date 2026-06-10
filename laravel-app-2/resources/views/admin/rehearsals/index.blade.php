@@ -6,11 +6,7 @@
 
 @section('content')
 
-@php
-    $total    = $rehearsals->count();
-    $upcoming = $rehearsals->where('rehearsal_date', '>=', now()->toDateString())->count();
-    $past     = $total - $upcoming;
-@endphp
+
 
 <div>
 
@@ -156,7 +152,10 @@
         </table>
     </div>
 
-
+    {{-- Pagination links --}}
+    <div class="mt-4 px-2">
+        {{ $rehearsals->links() }}
+    </div>
 
 </div>
 

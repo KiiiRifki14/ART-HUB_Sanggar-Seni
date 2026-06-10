@@ -12,7 +12,11 @@ class RehearsalController extends Controller
 {
     public function index()
     {
-        $rehearsals = Rehearsal::with('event.booking')->orderBy('rehearsal_date', 'asc')->get();
+        $total = Rehearsal::count();
+        $upcoming = Rehearsal::where('rehearsal_date', '>=', now()->toDateString())->count();
+        $past = $total - $upcoming;
+
+        $rehearsals = Rehearsal::with('event.booking')->orderBy('rehearsal_date', 'asc')->paginate(10);
         
         // Ambil data event yang aktif (bukan completed/cancelled) untuk pilihan di modal dropdown
         $events = \App\Models\Event::with('booking')
@@ -20,7 +24,7 @@ class RehearsalController extends Controller
             ->latest()
             ->get();
 
-        return view('admin.rehearsals.index', compact('rehearsals', 'events'));
+        return view('admin.rehearsals.index', compact('rehearsals', 'events', 'total', 'upcoming', 'past'));
     }
 
     /**
@@ -52,13 +56,11 @@ class RehearsalController extends Controller
             'start_time'     => 'required',
             'end_time'       => 'required',
             'location'       => 'required|string',
+            'latitude'       => 'nullable|numeric|between:-90,90',
+            'longitude'      => 'nullable|numeric|between:-180,180',
         ]);
 
         // ── STAGE 2: CEK KONFLIK JADWAL via Stored Procedure ─────────────────
-        // SP: sp_check_personnel_availability(IN date, IN start, IN end,
-        //     OUT available_count, OUT collision_count, OUT collision_details, OUT available_details)
-        // Dibungkus try-catch agar jika SP error (SP tidak ada, lock wait, dll),
-        // aplikasi tidak hang melainkan langsung mengembalikan pesan error ke admin.
         $collisionCount   = 0;
         $collisionDetails = '';
 
@@ -119,6 +121,8 @@ class RehearsalController extends Controller
                 'start_time'     => $request->start_time,
                 'end_time'       => $request->end_time,
                 'location'       => $request->location,
+                'latitude'       => $request->latitude,
+                'longitude'      => $request->longitude,
                 'notes'          => $request->notes,
             ]);
 

@@ -4,6 +4,117 @@
 @section('page_title', 'Tambah Jadwal Latihan')
 @section('page_subtitle', 'Buat sesi latihan baru untuk event aktif.')
 
+@push('styles')
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css" />
+<style>
+    .leaflet-container img { max-width: none !important; max-height: none !important; width: auto !important; }
+    .leaflet-container img.leaflet-tile { width: 256px !important; height: 256px !important; }
+    .leaflet-container * { box-sizing: content-box !important; }
+    .leaflet-container { box-sizing: border-box !important; border-radius: 0.75rem; font-size: 12px; }
+    #mapContainer { width: 100%; height: 250px; position: relative; display: block; border-radius: 0.75rem; overflow: hidden; z-index: 1; }
+    .map-search-wrapper { position: relative; z-index: 10; }
+    .autocomplete-dropdown { position: absolute; top: 100%; left: 0; right: 0; background: white; border: 1px solid rgba(106,90,84,0.2); border-top: none; border-radius: 0 0 0.75rem 0.75rem; max-height: 200px; overflow-y: auto; box-shadow: 0 8px 24px rgba(0,0,0,0.1); display: none; z-index: 20; }
+    .autocomplete-dropdown.active { display: block; }
+    .autocomplete-item { padding: 0.65rem 1rem; cursor: pointer; border-bottom: 1px solid rgba(106,90,84,0.08); font-size: 0.8rem; color: #1a1a1a; }
+    .autocomplete-item:hover { background-color: rgba(54,31,26,0.04); }
+    .autocomplete-item:last-child { border-bottom: none; }
+</style>
+@endpush
+
+@push('scripts')
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    let map = null, marker = null;
+    const API_URL = '{{ url("/api/geocoding") }}';
+    const addressSearch   = document.getElementById('addressSearch');
+    const dropdown        = document.getElementById('autocompleteDropdown');
+    const venueInput      = document.getElementById('venueInput');
+    const latitudeInput   = document.getElementById('latitudeInput');
+    const longitudeInput  = document.getElementById('longitudeInput');
+    const latitudeDisplay = document.getElementById('latitudeDisplay');
+    const longitudeDisplay= document.getElementById('longitudeDisplay');
+
+    function initMap(lat = -6.9175, lng = 107.6062, zoom = 13) {
+        if (map) map.remove();
+        map = L.map('mapContainer').setView([lat, lng], zoom);
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '© OpenStreetMap contributors', maxZoom: 19, noWrap: true
+        }).addTo(map);
+        map.on('click', function(e) { updateMarker(e.latlng.lat, e.latlng.lng); reverseGeocode(e.latlng.lat, e.latlng.lng); });
+        
+        // Reset size peta secara paksa agar terhindar dari bug rendering abu-abu setengah layar
+        // Menggunakan ResizeObserver memastikan map ter-render sempurna saat elemen berubah ukuran/tampil.
+        const resizeObserver = new ResizeObserver(() => {
+            if (map) map.invalidateSize(true);
+        });
+        resizeObserver.observe(document.getElementById('mapContainer'));
+    }
+
+    function updateMarker(lat, lng) {
+        if (marker) { marker.setLatLng([lat, lng]); }
+        else {
+            marker = L.marker([lat, lng], { draggable: true }).addTo(map);
+            marker.on('dragend', function() {
+                const ll = marker.getLatLng();
+                updateCoordinates(ll.lat, ll.lng); reverseGeocode(ll.lat, ll.lng);
+            });
+        }
+        map.panTo([lat, lng]); updateCoordinates(lat, lng);
+    }
+
+    function updateCoordinates(lat, lng) {
+        latitudeInput.value = lat.toFixed(8); longitudeInput.value = lng.toFixed(8);
+        latitudeDisplay.value = lat.toFixed(8); longitudeDisplay.value = lng.toFixed(8);
+    }
+
+    let debounceTimer;
+    addressSearch.addEventListener('input', function() {
+        clearTimeout(debounceTimer);
+        debounceTimer = setTimeout(async () => {
+            const query = this.value.trim();
+            if (query.length < 3) { dropdown.classList.remove('active'); return; }
+            try {
+                const response = await fetch(`${API_URL}/autocomplete?q=${encodeURIComponent(query)}`);
+                const results = await response.json();
+                dropdown.innerHTML = '';
+                if (results.length === 0) {
+                    dropdown.innerHTML = '<div class="autocomplete-item text-gray-400 italic">Tidak ada hasil ditemukan</div>';
+                } else {
+                    results.forEach(r => {
+                        const item = document.createElement('div');
+                        item.className = 'autocomplete-item';
+                        item.textContent = r.label;
+                        item.addEventListener('click', () => selectLocation(r.value));
+                        dropdown.appendChild(item);
+                    });
+                }
+                dropdown.classList.add('active');
+            } catch (e) { console.error(e); }
+        }, 300);
+    });
+
+    document.addEventListener('click', e => { if (!e.target.closest('.map-search-wrapper')) dropdown.classList.remove('active'); });
+
+    function selectLocation(result) {
+        addressSearch.value = result.display_name; venueInput.value = result.display_name;
+        dropdown.classList.remove('active'); updateMarker(result.lat, result.lon);
+    }
+
+    async function reverseGeocode(lat, lng) {
+        try {
+            const response = await fetch(`${API_URL}/reverse?latitude=${lat}&longitude=${lng}`);
+            const data = await response.json();
+            if (data.success && data.result) { venueInput.value = data.result.display_name; addressSearch.value = data.result.display_name; }
+        } catch(e) {}
+    }
+
+    initMap(-6.9175, 107.6062);
+    updateMarker(-6.9175, 107.6062);
+});
+</script>
+@endpush
+
 @section('content')
 
 <div x-data="{
@@ -197,13 +308,48 @@
                 <div class="space-y-4">
                     {{-- Lokasi --}}
                     <div>
-                        <label class="block font-label text-[0.65rem] font-bold uppercase tracking-widest text-on-surface-variant mb-1.5 ml-1">Lokasi <span class="text-red-500">*</span></label>
+                        <label class="block font-label text-[0.65rem] font-bold uppercase tracking-widest text-on-surface-variant mb-1.5 ml-1">Lokasi Latihan <span class="text-red-500">*</span></label>
                         <div class="relative">
                             <i class="bi bi-geo-alt-fill absolute left-3.5 top-1/2 -translate-y-1/2 text-outline text-sm pointer-events-none text-green-600"></i>
-                            <input type="text" name="location"
+                            <input type="text" name="location" id="venueInput"
                                    value="{{ old('location', 'Sanggar Cahaya Gumilang') }}" required
                                    placeholder="Contoh: Pendopo Utama Sanggar"
                                    class="w-full rounded-xl border border-outline-variant/50 bg-surface-container-low text-sm pl-10 pr-4 py-3 text-on-surface focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all">
+                        </div>
+                    </div>
+
+                    {{-- Cari Alamat --}}
+                    <div>
+                        <label class="block font-label text-[0.65rem] font-bold uppercase tracking-widest text-on-surface-variant mb-1.5 ml-1">Cari Lokasi di Peta</label>
+                        <div class="map-search-wrapper relative z-10">
+                            <input type="text" id="addressSearch" 
+                                   placeholder="Ketik alamat atau nama tempat untuk mencari..."
+                                   autocomplete="off"
+                                   class="w-full rounded-xl border border-outline-variant/50 bg-surface-container-low text-sm px-4 py-3 text-on-surface focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all">
+                            <div class="autocomplete-dropdown" id="autocompleteDropdown"></div>
+                        </div>
+                    </div>
+
+                    <!-- Map Container -->
+                    <div id="mapContainer" class="border border-outline-variant/30"></div>
+
+                    <!-- Hidden fields for lat, lon -->
+                    <input type="hidden" name="latitude" id="latitudeInput" value="{{ old('latitude', '-6.9175') }}">
+                    <input type="hidden" name="longitude" id="longitudeInput" value="{{ old('longitude', '107.6062') }}">
+
+                    <!-- Coordinate Display -->
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label class="block font-label text-[0.65rem] font-bold uppercase tracking-widest text-on-surface-variant mb-1.5 ml-1">Latitude</label>
+                            <input type="text" id="latitudeDisplay" readonly
+                                   class="w-full rounded-xl border border-outline-variant/50 bg-surface-container-highest text-sm px-4 py-2 text-on-surface-variant outline-none"
+                                   placeholder="Auto-filled">
+                        </div>
+                        <div>
+                            <label class="block font-label text-[0.65rem] font-bold uppercase tracking-widest text-on-surface-variant mb-1.5 ml-1">Longitude</label>
+                            <input type="text" id="longitudeDisplay" readonly
+                                   class="w-full rounded-xl border border-outline-variant/50 bg-surface-container-highest text-sm px-4 py-2 text-on-surface-variant outline-none"
+                                   placeholder="Auto-filled">
                         </div>
                     </div>
 

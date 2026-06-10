@@ -7,10 +7,6 @@
 @section('content')
 
 @php
-    $total       = $personnel->count();
-    $active      = $personnel->where('status', 'active')->count();
-    $pending     = $personnel->where('status', 'pending_verification')->count();
-    $deactivated = $personnel->where('status', 'deactivated')->count();
     $specialtyMap = [
         'penari'      => ['Penari', 'bi-person-arms-up', 'bg-pink-500/10 text-pink-700 border-pink-500/20'],
         'pemusik'     => ['Pemusik', 'bi-music-note-beamed', 'bg-blue-500/10 text-blue-700 border-blue-500/20'],
@@ -140,7 +136,7 @@
                 @endphp
                 <tr class="hover:bg-surface-container-low/50 transition-colors" 
                     x-show="activeTab === 'semua' || activeTab === '{{ $p->status }}'" x-transition.opacity>
-                    <td class="px-6 py-[18px] font-label text-sm text-outline">{{ $idx + 1 }}</td>
+                    <td class="px-6 py-[18px] font-label text-sm text-outline">{{ $personnel->firstItem() + $idx }}</td>
                     <td class="px-6 py-[18px]">
                         <div class="flex items-center gap-3.5">
                             <div class="w-11 h-11 rounded-full flex-shrink-0 flex items-center justify-center
@@ -354,6 +350,11 @@
             <p class="font-headline text-base text-on-surface font-semibold">Belum ada personel</p>
         </div>
         @endforelse
+    </div>
+
+    {{-- Pagination links --}}
+    <div class="mt-4 px-2">
+        {{ $personnel->links() }}
     </div>
 
 </div>

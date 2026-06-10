@@ -274,7 +274,11 @@ document.addEventListener('DOMContentLoaded', function() {
             attribution: '© OpenStreetMap contributors', maxZoom: 19, noWrap: true
         }).addTo(map);
         map.on('click', function(e) { updateMarker(e.latlng.lat, e.latlng.lng); reverseGeocode(e.latlng.lat, e.latlng.lng); });
-        setTimeout(() => map.invalidateSize(), 300);
+        
+        // Reset size peta secara paksa agar terhindar dari bug rendering abu-abu setengah layar
+        setTimeout(() => {
+            map.invalidateSize(true);
+        }, 300);
     }
 
     function updateMarker(lat, lng) {

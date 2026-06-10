@@ -44,4 +44,11 @@ class Personnel extends Model
     {
         return $this->hasMany(PersonnelUnavailability::class);
     }
+
+    public function rehearsals(): BelongsToMany
+    {
+        return $this->belongsToMany(Rehearsal::class, 'rehearsal_personnel')
+            ->withPivot(['checked_in_at', 'attendance_status', 'late_minutes', 'latitude', 'longitude'])
+            ->withTimestamps();
+    }
 }

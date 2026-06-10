@@ -268,7 +268,9 @@ Route::middleware(['auth', 'role:personel'])->prefix('personnel')->name('personn
                 $specMap = ['penari' => 'tari', 'pemusik' => 'musik', 'multi_talent' => 'gabungan'];
                 $mappedType = $specMap[$personnel->specialty] ?? 'gabungan';
 
-                $upcomingRehearsals = \App\Models\Rehearsal::with('event.booking')
+                 $upcomingRehearsals = \App\Models\Rehearsal::with(['event.booking', 'personnel' => function($q) use ($personnel) {
+                        $q->where('personnel.id', $personnel->id);
+                    }])
                     ->whereHas('event.personnel', function($q) use ($personnel) {
                         $q->where('personnel.id', $personnel->id);
                     })
@@ -379,6 +381,7 @@ Route::middleware(['auth', 'role:personel'])->prefix('personnel')->name('personn
 
         // Check-in GPS
         Route::post('/events/{event}/check-in', [AttendanceController::class, 'checkIn'])->name('attendance.check_in');
+        Route::post('/rehearsals/{rehearsal}/check-in', [\App\Http\Controllers\Personnel\RehearsalAttendanceController::class, 'checkIn'])->middleware('throttle:6,1')->name('rehearsals.check_in');
 
         // Profil Mandiri
         Route::get('/profile', [PersonnelProfileController::class, 'edit'])->name('profile.edit');

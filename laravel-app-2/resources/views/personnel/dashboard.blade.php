@@ -325,34 +325,86 @@
     $rDate = \Carbon\Carbon::parse($rehearsal->rehearsal_date);
     $rDaysLeft = $now->startOfDay()->diffInDays($rDate->startOfDay(), false);
     $isTodayR = $rDate->isToday();
+    
+    // Ambil data pivot absensi latihan
+    $rehPivot = $rehearsal->personnel->first()?->pivot;
+    $rehCheckedIn = !empty($rehPivot?->checked_in_at);
+    $rehHasCoords = $rehearsal->latitude && $rehearsal->longitude;
+    $canRehCheckIn = $isTodayR && !$rehCheckedIn;
 @endphp
-<div id="evt-{{ $rehearsal->rehearsal_date }}" class="event-card rounded-2xl p-4 bg-white flex flex-col justify-between"
-     style="border:1px solid rgba(13,148,136,0.2);box-shadow:0 4px 15px rgba(13,148,136,0.05)">
-    <div class="flex items-start justify-between gap-3 mb-3">
-        <div>
-            <div class="font-bold text-[#1A1817] text-sm mb-1">{{ $rehearsal->event->booking->client_name ?? 'Latihan Gabungan' }}</div>
-            <div class="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[0.6rem] font-bold uppercase tracking-widest bg-teal-50 text-teal-600 border border-teal-100">
-                Latihan {{ ucfirst($rehearsal->type) }}
+<div id="evt-{{ $rehearsal->rehearsal_date }}" class="event-card rounded-2xl p-4 bg-white flex flex-col justify-between shadow-sm"
+     style="border:1px solid rgba(13,148,136,0.2)">
+    
+    <div>
+        <div class="flex items-start justify-between gap-3 mb-3">
+            <div>
+                <div class="font-bold text-[#1A1817] text-sm mb-1 leading-tight">{{ Str::limit($rehearsal->event->booking->client_name ?? 'Latihan Gabungan', 22) }}</div>
+                <div class="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[0.6rem] font-bold uppercase tracking-widest bg-teal-50 text-teal-600 border border-teal-100">
+                    Latihan {{ ucfirst($rehearsal->type) }}
+                </div>
+            </div>
+            <div class="text-right">
+                <div class="text-[0.65rem] font-bold" style="color:{{ $isTodayR ? '#0d9488' : '#847B78' }}">
+                    @if($isTodayR) Hari Ini! @elseif($rDaysLeft==1) Besok @else {{ $rDate->translatedFormat('d M Y') }} @endif
+                </div>
+                <div class="text-xs font-bold text-[#1A1817] mt-0.5">
+                    {{ \Carbon\Carbon::parse($rehearsal->start_time)->format('H:i') }} - {{ \Carbon\Carbon::parse($rehearsal->end_time)->format('H:i') }}
+                </div>
             </div>
         </div>
-        <div class="text-right">
-            <div class="text-[0.65rem] font-bold" style="color:{{ $isTodayR ? '#0d9488' : '#847B78' }}">
-                @if($isTodayR) Hari Ini! @elseif($rDaysLeft==1) Besok @else {{ $rDate->translatedFormat('d M Y') }} @endif
-            </div>
-            <div class="text-xs font-bold text-[#1A1817] mt-0.5">
-                {{ \Carbon\Carbon::parse($rehearsal->start_time)->format('H:i') }} - {{ \Carbon\Carbon::parse($rehearsal->end_time)->format('H:i') }}
+
+        <div class="flex items-center gap-2 mt-2 pt-2 border-t border-teal-50 text-xs" style="color:#4D4946">
+            <i class="bi bi-geo-alt-fill text-teal-500"></i>
+            <span class="truncate block max-w-[200px]" title="{{ $rehearsal->location }}">{{ $rehearsal->location }}</span>
+        </div>
+
+        @if($rehearsal->notes)
+        <div class="mt-2 text-[0.65rem] italic bg-gray-50 p-2 rounded-lg" style="color:#847B78">
+            "{{ $rehearsal->notes }}"
+        </div>
+        @endif
+    </div>
+
+    {{-- CTA Absen Latihan --}}
+    <div class="mt-4">
+        @if($rehCheckedIn)
+        <div class="flex items-center justify-center gap-2 p-2 rounded-xl bg-teal-50 border border-teal-200/50">
+            <i class="bi bi-shield-check text-teal-600 text-base"></i>
+            <div class="text-left">
+                <div class="text-xs font-bold text-teal-700">Absen Latihan Berhasil</div>
+                <div class="text-[0.65rem]" style="color:#847B78">
+                    Pukul {{ \Carbon\Carbon::parse($rehPivot->checked_in_at)->format('H:i') }} WIB
+                    @if(($rehPivot->attendance_status ?? '') === 'late')
+                        · <span style="color:#ea580c">Telat {{ $rehPivot->late_minutes ?? 0 }} mnt</span>
+                    @endif
+                </div>
             </div>
         </div>
+        @elseif($canRehCheckIn)
+        <button type="button" onclick="doRehearsalCheckIn('{{ $rehearsal->id }}', this)"
+                class="w-full flex items-center justify-center gap-2 py-2 rounded-xl font-bold transition-all cursor-pointer bg-gradient-to-r from-teal-600 to-teal-800 text-white border border-teal-500/20 text-xs shadow-sm hover:-translate-y-px">
+            <i class="bi bi-geo-alt-fill text-sm"></i>
+            <div class="text-left">
+                <div>Absen Latihan (GPS)</div>
+                <div class="text-[0.55rem] font-medium opacity-80">{{ $rehHasCoords ? 'Radius 200m' : 'GPS belum diset Admin' }}</div>
+            </div>
+        </button>
+        <form id="reh-cf-{{ $rehearsal->id }}" action="{{ route('personnel.rehearsals.check_in', $rehearsal->id) }}" method="POST" class="hidden">
+            @csrf
+            <input type="hidden" name="latitude" id="reh-lat-{{ $rehearsal->id }}">
+            <input type="hidden" name="longitude" id="reh-lng-{{ $rehearsal->id }}">
+            <input type="hidden" name="accuracy" id="reh-acc-{{ $rehearsal->id }}">
+        </form>
+        @else
+        <div class="flex items-center justify-center gap-2 p-2 rounded-xl bg-gray-50 border border-dashed border-gray-200">
+            <i class="bi bi-lock-fill text-gray-400"></i>
+            <div class="text-left">
+                <div class="text-xs font-bold text-gray-500">Absen Belum Dibuka</div>
+                <div class="text-[0.65rem]" style="color:#847B78">Dibuka {{ $rDate->translatedFormat('d F Y') }}</div>
+            </div>
+        </div>
+        @endif
     </div>
-    <div class="flex items-center gap-2 mt-2 pt-2 border-t border-teal-50 text-xs" style="color:#4D4946">
-        <i class="bi bi-geo-alt-fill text-teal-500"></i>
-        <span>{{ $rehearsal->location }}</span>
-    </div>
-    @if($rehearsal->notes)
-    <div class="mt-2 text-[0.65rem] italic bg-gray-50 p-2 rounded-lg" style="color:#847B78">
-        "{{ $rehearsal->notes }}"
-    </div>
-    @endif
 </div>
 @endforeach
 
@@ -409,6 +461,23 @@
 
 @push('scripts')
 <script>
+function doRehearsalCheckIn(rehearsalId, btn) {
+    if (!navigator.geolocation) { alert('GPS tidak didukung browser ini.'); return; }
+    const orig = btn.innerHTML;
+    btn.disabled = true; btn.style.opacity = '0.6';
+    btn.innerHTML = '<i class="bi bi-arrow-repeat animate-spin text-sm"></i> Mendeteksi GPS...';
+    navigator.geolocation.getCurrentPosition(
+        function(pos) {
+            document.getElementById('reh-lat-'+rehearsalId).value = pos.coords.latitude;
+            document.getElementById('reh-lng-'+rehearsalId).value = pos.coords.longitude;
+            document.getElementById('reh-acc-'+rehearsalId).value = pos.coords.accuracy;
+            document.getElementById('reh-cf-'+rehearsalId).submit();
+        },
+        function() { btn.innerHTML = orig; btn.disabled = false; btn.style.opacity = '1'; alert('❌ Gagal GPS. Pastikan GPS aktif dan izin lokasi disetujui.'); },
+        { enableHighAccuracy:true, timeout:12000, maximumAge:0 }
+    );
+}
+
 function doCheckIn(eventId, btn) {
     if (!navigator.geolocation) { alert('GPS tidak didukung browser ini.'); return; }
     const orig = btn.innerHTML;
