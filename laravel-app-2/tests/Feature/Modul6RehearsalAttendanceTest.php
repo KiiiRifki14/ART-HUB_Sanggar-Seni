@@ -1,5 +1,16 @@
 <?php
 
+/**
+ * @var Tests\TestCase $this
+ * @property \App\Models\User $admin
+ * @property \App\Models\ServiceCatalog $catalog
+ * @property \App\Models\Booking $booking
+ * @property \App\Models\Event $event
+ * @property \App\Models\User $personnelUser
+ * @property \App\Models\Personnel $personnel
+ * @property \App\Models\Rehearsal $rehearsal
+ */
+
 use App\Models\User;
 use App\Models\Booking;
 use App\Models\Event;
@@ -157,7 +168,7 @@ test('TEST-03: Absen Latihan Kru Sukses', function () {
 
     $response->assertRedirect();
     $response->assertSessionHas('success');
-    
+
     $this->assertDatabaseHas('rehearsal_personnel', [
         'rehearsal_id' => $rehearsal->id,
         'personnel_id' => $this->personnel->id,
@@ -189,7 +200,7 @@ test('TEST-04: Absen Latihan Kru Gagal Di Luar Radius 200m', function () {
 
     $response->assertRedirect();
     $response->assertSessionHas('error');
-    
+
     $this->assertDatabaseMissing('rehearsal_personnel', [
         'rehearsal_id' => $rehearsal->id,
         'personnel_id' => $this->personnel->id,
@@ -221,7 +232,7 @@ test('TEST-05: Absen Latihan Kru Gagal Di Luar Jendela Waktu', function () {
 
     $response->assertRedirect();
     $response->assertSessionHas('error');
-    
+
     $this->assertDatabaseMissing('rehearsal_personnel', [
         'rehearsal_id' => $rehearsal->id,
         'personnel_id' => $this->personnel->id,
@@ -251,7 +262,7 @@ test('TEST-06: Absen Latihan Kru Gagal Akurasi Sensor Jelek', function () {
 
     $response->assertRedirect();
     $response->assertSessionHas('error');
-    
+
     $this->assertDatabaseMissing('rehearsal_personnel', [
         'rehearsal_id' => $rehearsal->id,
         'personnel_id' => $this->personnel->id,

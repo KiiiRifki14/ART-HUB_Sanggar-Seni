@@ -5,6 +5,43 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
+/**
+ * @property int $id
+ * @property string $name
+ * @property string $description
+ * @property string|null $detail
+ * @property int $price
+ * @property string|null $image
+ * @property string|null $badge
+ * @property bool $is_active
+ * @property int $sort_order
+ * @property int $max_personnel 0 = tidak ada batas. > 0 = maks personel yang bisa di-plot
+ * @property string $specialty_type Jenis personel yang dibutuhkan katalog ini
+ * @property \Illuminate\Support\Carbon|null $created_at
+ * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Booking> $bookings
+ * @property-read int|null $bookings_count
+ * @property-read float $average_rating
+ * @property-read string $price_formatted
+ * @property-read string $specialty_label
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ServiceCatalog newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ServiceCatalog newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ServiceCatalog query()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ServiceCatalog whereBadge($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ServiceCatalog whereCreatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ServiceCatalog whereDescription($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ServiceCatalog whereDetail($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ServiceCatalog whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ServiceCatalog whereImage($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ServiceCatalog whereIsActive($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ServiceCatalog whereMaxPersonnel($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ServiceCatalog whereName($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ServiceCatalog wherePrice($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ServiceCatalog whereSortOrder($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ServiceCatalog whereSpecialtyType($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ServiceCatalog whereUpdatedAt($value)
+ * @mixin \Eloquent
+ */
 class ServiceCatalog extends Model
 {
     protected $fillable = [

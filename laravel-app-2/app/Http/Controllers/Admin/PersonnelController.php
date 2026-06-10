@@ -9,6 +9,7 @@ use App\Models\Event;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Auth;
 
 class PersonnelController extends Controller
 {
@@ -144,7 +145,7 @@ class PersonnelController extends Controller
 
             // Kirim notifikasi ke personel yang bersangkutan
             if ($personnel->user) {
-                $adminName = auth()->user()->name ?? 'Admin';
+                $adminName = Auth::user()->name ?? 'Admin';
                 $newSpecialty = $personnel->fresh()->specialty;
 
                 $personnel->user->notify(new \App\Notifications\PersonnelDataUpdated(

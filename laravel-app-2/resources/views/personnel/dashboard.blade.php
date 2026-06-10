@@ -6,10 +6,17 @@
 {{-- FLASH --}}
 @foreach(['success'=>'green','warning'=>'orange','error'=>'red','info'=>'blue'] as $type => $color)
 @if(session($type))
+@php
+    $alertBgs = ['success'=>'rgba(34,197,94,0.08)','warning'=>'rgba(251,146,60,0.08)','error'=>'rgba(239,68,68,0.08)','info'=>'rgba(96,165,250,0.08)'];
+    $alertBorders = ['success'=>'rgba(34,197,94,0.25)','warning'=>'rgba(251,146,60,0.25)','error'=>'rgba(239,68,68,0.25)','info'=>'rgba(96,165,250,0.25)'];
+    $alertIcons = ['success'=>'check-circle-fill','warning'=>'exclamation-triangle-fill','error'=>'x-circle-fill','info'=>'info-circle-fill'];
+    $alertColors = ['success'=>'#16a34a','warning'=>'#ea580c','error'=>'#dc2626','info'=>'#2563eb'];
+    $alertTextColors = ['success'=>'#15803d','warning'=>'#c2410c','error'=>'#b91c1c','info'=>'#1d4ed8'];
+@endphp
 <div class="fu flex items-start gap-3 p-3.5 rounded-2xl mb-4 border"
-     style="background:rgba({{ ['success'=>'34,197,94','warning'=>'251,146,60','error'=>'239,68,68','info'=>'96,165,250'][$type] }},0.08);border-color:rgba({{ ['success'=>'34,197,94','warning'=>'251,146,60','error'=>'239,68,68','info'=>'96,165,250'][$type] }},0.25)">
-    <i class="bi bi-{{ ['success'=>'check-circle-fill','warning'=>'exclamation-triangle-fill','error'=>'x-circle-fill','info'=>'info-circle-fill'][$type] }} text-lg mt-0.5" style="color:{{ ['success'=>'#16a34a','warning'=>'#ea580c','error'=>'#dc2626','info'=>'#2563eb'][$type] }}"></i>
-    <span class="text-sm font-semibold" style="color:{{ ['success'=>'#15803d','warning'=>'#c2410c','error'=>'#b91c1c','info'=>'#1d4ed8'][$type] }}">{{ session($type) }}</span>
+     style="background:{{ $alertBgs[$type] }};border-color:{{ $alertBorders[$type] }}">
+    <i class="bi bi-{{ $alertIcons[$type] }} text-lg mt-0.5" style="color:{{ $alertColors[$type] }}"></i>
+    <span class="text-sm font-semibold" style="color:{{ $alertTextColors[$type] }}">{{ session($type) }}</span>
 </div>
 @endif
 @endforeach
@@ -117,10 +124,34 @@
                 $hasReh = in_array($ds,$rehearsalDates);
                 $isUrg = in_array($ds,$urgentDates);
                 $isUnavail = in_array($ds, $unavailabilityDates);
+
+                $clickAction = ($hasEv || $hasReh) ? "scrollToEvent('$ds')" : "openUnavailModal('$ds')";
+                
+                $cellColor = '#4D4946';
+                if ($isTd) {
+                    $cellColor = '#FFF';
+                } elseif ($hasEv) {
+                    $cellColor = '#8B1A2A';
+                } elseif ($hasReh) {
+                    $cellColor = '#0d9488';
+                } elseif ($isUnavail) {
+                    $cellColor = '#dc2626';
+                }
+
+                $cellBg = 'transparent';
+                if ($isTd) {
+                    $cellBg = '#8B1A2A';
+                } elseif ($hasEv) {
+                    $cellBg = 'rgba(197,160,40,0.18)';
+                } elseif ($hasReh) {
+                    $cellBg = 'rgba(13,148,136,0.1)';
+                } elseif ($isUnavail) {
+                    $cellBg = 'rgba(220,38,38,0.08)';
+                }
             @endphp
-            <div onclick="{{ $hasEv||$hasReh ? "scrollToEvent('$ds')" : "openUnavailModal('$ds')" }}"
+            <div onclick="{{ $clickAction }}"
                  class="aspect-square flex flex-col items-center justify-center rounded-full relative text-[0.7rem] font-{{ $isTd||$hasEv||$hasReh?'bold':'medium' }} {{ $hasEv||$hasReh||!$isUnavail?'cursor-pointer':'' }} transition-all"
-                 style="color:{{ $isTd?'#FFF':($hasEv?'#8B1A2A':($hasReh?'#0d9488':($isUnavail?'#dc2626':'#4D4946'))) }};background:{{ $isTd?'#8B1A2A':($hasEv&&!$isTd?'rgba(197,160,40,0.18)':($hasReh&&!$isTd?'rgba(13,148,136,0.1)':($isUnavail?'rgba(220,38,38,0.08)':'transparent'))) }}">
+                 style="color:{{ $cellColor }};background:{{ $cellBg }}">
                 {{ $day }}
                 @if($hasEv && !$isTd)
                 <span class="absolute w-1 h-1 rounded-full" style="bottom:2px;background:{{ $isUrg?'#ef4444':'#C5A028' }}"></span>
@@ -148,13 +179,17 @@
             $urgent  = ($dL >= 0 && $dL <= 3);
             $isToday = $eDate->isToday();
             $chk     = !empty($event->pivot->checked_in_at);
+
+            $cardBorder = $urgent ? 'rgba(239,68,68,0.3)' : 'rgba(197,160,40,0.15)';
+            $cardShadow = $urgent ? '0 4px 16px rgba(239,68,68,0.08)' : '0 4px 20px rgba(54,31,26,0.03)';
+            $textColor  = $urgent ? '#dc2626' : '#C5A028';
         @endphp
         <div class="event-card rounded-2xl p-3 bg-white" id="evt-{{ $event->event_date }}"
-             style="border:1px solid {{ $urgent?'rgba(239,68,68,0.3)':'rgba(197,160,40,0.15)' }};{{ $urgent?'box-shadow:0 4px 16px rgba(239,68,68,0.08)':'box-shadow: 0 4px 20px rgba(54,31,26,0.03)' }}">
+             style="border:1px solid {{ $cardBorder }};box-shadow:{{ $cardShadow }}">
             <div class="flex items-start justify-between gap-2">
                 <div>
                     <div class="font-bold text-[#1A1817] text-sm leading-tight mb-0.5">{{ Str::limit($event->booking->client_name ?? 'Event',20) }}</div>
-                    <div class="text-[0.62rem] font-bold flex items-center gap-1" style="color:{{ $urgent?'#dc2626':'#C5A028' }}">
+                    <div class="text-[0.62rem] font-bold flex items-center gap-1" style="color:{{ $textColor }}">
                         <i class="bi bi-{{ $isToday?'fire':'calendar3' }}"></i>
                         @if($isToday) Hari Ini! @elseif($dL==1) Besok! @elseif($dL>0) H-{{ $dL }} @else {{ $eDate->format('d M') }} @endif
                     </div>
@@ -201,23 +236,30 @@
     $hasCoords = $event->latitude && $event->longitude;
     $canCheckIn = $isToday && !$checkedIn;
     $cardAnim  = ['fu2','fu3','fu4','fu5'][$loop->index % 4];
+
+    $cardBorder = $urgent ? 'rgba(239,68,68,0.3)' : 'rgba(197,160,40,0.15)';
+    $cardShadow = $urgent ? '0 4px 24px rgba(239,68,68,0.08)' : '0 4px 20px rgba(54,31,26,0.04)';
+    $badgeBg    = $urgent ? 'rgba(239,68,68,0.1)' : 'rgba(139,26,42,0.05)';
+    $badgeBorder= $urgent ? 'rgba(239,68,68,0.25)' : 'rgba(139,26,42,0.12)';
+    $badgeColor = $urgent ? '#dc2626' : '#8B1A2A';
+    $statusColor= $urgent ? '#dc2626' : '#C5A028';
 @endphp
 
 <div id="evt-{{ $event->event_date }}" class="{{ $cardAnim }} event-card rounded-3xl overflow-hidden bg-white flex flex-col justify-between"
-     style="border:1px solid {{ $urgent?'rgba(239,68,68,0.3)':'rgba(197,160,40,0.15)' }};{{ $urgent?'box-shadow:0 4px 24px rgba(239,68,68,0.08)':'box-shadow:0 4px 20px rgba(54,31,26,0.04)' }}">
+     style="border:1px solid {{ $cardBorder }};box-shadow:{{ $cardShadow }}">
 
     <div>
         {{-- Card Header --}}
         <div class="flex items-center gap-3 p-4 pb-3" style="border-bottom:1px solid #F4F2EE">
             {{-- Date badge --}}
-            <div class="shrink-0 w-14 h-14 rounded-2xl flex flex-col items-center justify-center" style="background:{{ $urgent?'rgba(239,68,68,0.1)':'rgba(139,26,42,0.05)' }};border:1px solid {{ $urgent?'rgba(239,68,68,0.25)':'rgba(139,26,42,0.12)' }}">
-                <span class="font-head font-bold leading-none" style="font-size:1.4rem;color:{{ $urgent?'#dc2626':'#8B1A2A' }}">{{ $eDate->format('d') }}</span>
-                <span class="text-[0.5rem] font-bold uppercase tracking-widest" style="color:{{ $urgent?'#dc2626':'#8B1A2A' }}">{{ $eDate->format('M') }}</span>
+            <div class="shrink-0 w-14 h-14 rounded-2xl flex flex-col items-center justify-center" style="background:{{ $badgeBg }};border:1px solid {{ $badgeBorder }}">
+                <span class="font-head font-bold leading-none" style="font-size:1.4rem;color:{{ $badgeColor }}">{{ $eDate->format('d') }}</span>
+                <span class="text-[0.5rem] font-bold uppercase tracking-widest" style="color:{{ $badgeColor }}">{{ $eDate->format('M') }}</span>
             </div>
 
             <div class="flex-1 min-w-0">
                 <div class="font-bold text-[#1A1817] mb-0.5" style="font-size:0.95rem">{{ $event->booking->client_name ?? 'Event Sanggar' }}</div>
-                <div class="flex items-center gap-1.5 text-[0.62rem] font-bold uppercase tracking-wide" style="color:{{ $urgent?'#dc2626':'#C5A028' }}">
+                <div class="flex items-center gap-1.5 text-[0.62rem] font-bold uppercase tracking-wide" style="color:{{ $statusColor }}">
                     <i class="bi bi-{{ $isToday?'fire':($urgent?'exclamation-diamond-fill':'calendar3') }}"></i>
                     @if($isToday) Hari Ini! @elseif($daysLeft==1) Besok! @elseif($daysLeft>0) H-{{ $daysLeft }} @else {{ $eDate->translatedFormat('d F Y') }} @endif
                 </div>
@@ -281,7 +323,7 @@
         @elseif($canCheckIn)
         <button type="button" onclick="doCheckIn('{{ $event->id }}',this)"
                 class="w-full flex items-center justify-center gap-2.5 p-3.5 rounded-2xl font-bold transition-all cursor-pointer hover:-translate-y-px"
-                style="background:linear-gradient(135deg,#8B1A2A,#5C0E19);border:1px solid rgba(197,160,40,0.35);color:#C5A028;font-size:0.85rem;box-shadow:0 4px 20px rgba(139,26,42,0.25);hover:box-shadow:0 8px 28px rgba(139,26,42,0.35)">
+                style="background:linear-gradient(135deg,#8B1A2A,#5C0E19);border:1px solid rgba(197,160,40,0.35);color:#C5A028;font-size:0.85rem;box-shadow:0 4px 20px rgba(139,26,42,0.25)">
             <i class="bi bi-geo-alt-fill text-lg"></i>
             <div class="text-left">
                 <div>Ghosting Guard – Check-in Lokasi</div>

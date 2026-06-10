@@ -58,7 +58,6 @@ class PersonnelProfileController extends Controller
                 $photoPath = $request->file('photo')->store('personnel-photos', 'public');
 
                 Log::info('Photo uploaded', ['path' => $photoPath, 'personnel_id' => $personnel->id]);
-
             } catch (\Exception $e) {
                 Log::error('Photo upload failed', ['error' => $e->getMessage()]);
                 return redirect()->route('personnel.profile.edit')
