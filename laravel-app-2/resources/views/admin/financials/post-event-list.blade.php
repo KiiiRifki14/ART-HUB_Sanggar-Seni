@@ -5,12 +5,6 @@
 
 @section('content')
 
-@php
-    $pendingCount = $events->filter(function($e) {
-        return !$e->financialRecord || !$e->financialRecord->operationalCosts || $e->financialRecord->operationalCosts->count() === 0;
-    })->count();
-@endphp
-
 @if($pendingCount > 0)
 <div class="mb-6 p-4 rounded-xl bg-orange-50 border border-orange-200 text-orange-800 flex items-center gap-3 font-body text-xs sm:text-sm shadow-sm animate-fade-up">
     <i class="bi bi-exclamation-triangle-fill text-lg text-orange-600"></i>
@@ -112,7 +106,12 @@
             <p class="font-headline text-lg text-on-surface font-semibold mb-1">Belum ada pementasan</p>
             <p class="font-label text-xs uppercase tracking-widest text-outline">Pementasan yang sudah selesai akan muncul di sini</p>
         </div>
-        @endforelse
     </div>
+
+    @if($events->hasPages())
+    <div class="px-6 py-4 border-t border-outline-variant/20 bg-surface-container-low/20">
+        {{ $events->links() }}
+    </div>
+    @endif
 </div>
 @endsection

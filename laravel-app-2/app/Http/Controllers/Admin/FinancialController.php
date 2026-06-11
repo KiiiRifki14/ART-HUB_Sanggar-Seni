@@ -37,9 +37,19 @@ class FinancialController extends Controller
             $query->whereHas('event', fn($q) => $q->where('event_date', '<=', $dateTo));
         }
 
-        $records = $query->paginate(15)->withQueryString();
+        // Hitung total akumulasi keuangan pada query penuh sebelum penarikan paginasi
+        $totals = [
+            'fixed_profit'            => (float) $query->sum('fixed_profit'),
+            'safety_buffer_amt'       => (float) $query->sum('safety_buffer_amt'),
+            'total_revenue'           => (float) $query->sum('total_revenue'),
+            'actual_operational_cost' => (float) $query->sum('actual_operational_cost'),
+            'total_personnel_honor'   => (float) $query->sum('total_personnel_honor'),
+            'operational_budget'      => (float) $query->sum('operational_budget'),
+        ];
 
-        return view('admin.financials.index', compact('records'));
+        $records = $query->paginate(10)->withQueryString();
+
+        return view('admin.financials.index', compact('records', 'totals'));
     }
 
     /**
@@ -65,6 +75,19 @@ class FinancialController extends Controller
             // Abaikan jika gagal
         }
 
+        // Hitung pending count secara efisien via database query sebelum paginasi
+        $pendingCount = \App\Models\Event::where(function ($q) {
+                $q->where('event_date', '<', now()->toDateString())
+                  ->orWhere('status', 'completed');
+            })
+            ->where(function ($q) {
+                $q->whereDoesntHave('financialRecord')
+                  ->orWhereHas('financialRecord', function ($q2) {
+                      $q2->whereDoesntHave('operationalCosts');
+                  });
+            })
+            ->count();
+
         // Event yang sudah lewat tanggalnya (selesai) atau status completed
         $events = \App\Models\Event::with(['booking', 'financialRecord.operationalCosts'])
             ->where(function ($q) {
@@ -72,9 +95,9 @@ class FinancialController extends Controller
                   ->orWhere('status', 'completed');
             })
             ->orderBy('event_date', 'desc')
-            ->get();
+            ->paginate(10);
 
-        return view('admin.financials.post-event-list', compact('events'));
+        return view('admin.financials.post-event-list', compact('events', 'pendingCount'));
     }
 
     /**

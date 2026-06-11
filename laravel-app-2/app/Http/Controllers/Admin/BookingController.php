@@ -17,7 +17,7 @@ class BookingController extends Controller
     /**
      * Menampilkan daftar semua booking
      */
-    public function index()
+    public function index(Request $request)
     {
         // Otomatis tandai event yang sudah lewat tanggalnya sebagai Selesai
         try {
@@ -26,12 +26,48 @@ class BookingController extends Controller
             // Abaikan jika gagal
         }
 
-        $bookings = Booking::with('client')
-            ->orderByRaw("CASE WHEN status = 'pending' THEN 0 ELSE 1 END")
+        // Hitung statistik data booking secara penuh (tanpa limit paginasi/filter)
+        $total    = Booking::count();
+        $pending  = Booking::where('status', 'pending')->count();
+        $dpPaid   = Booking::where('status', 'dp_paid')->count();
+        $done     = Booking::whereIn('status', ['confirmed', 'completed'])->count();
+        $canceled = Booking::where('status', 'cancelled')->count();
+
+        $status = $request->input('status', 'all');
+        $search = $request->input('search');
+
+        $query = Booking::with('client');
+
+        if ($status !== 'all') {
+            if ($status === 'completed') {
+                $query->whereIn('status', ['confirmed', 'completed']);
+            } else {
+                $query->where('status', $status);
+            }
+        }
+
+        if ($search) {
+            $query->where(function ($q) use ($search) {
+                $q->where('client_name', 'like', "%{$search}%")
+                  ->orWhere('client_phone', 'like', "%{$search}%")
+                  ->orWhere('client_email', 'like', "%{$search}%")
+                  ->orWhere('venue', 'like', "%{$search}%")
+                  ->orWhere('venue_address', 'like', "%{$search}%")
+                  ->orWhere('event_type', 'like', "%{$search}%")
+                  ->orWhereHas('client', function ($subQuery) use ($search) {
+                      $subQuery->where('name', 'like', "%{$search}%")
+                               ->orWhere('email', 'like', "%{$search}%");
+                  });
+            });
+        }
+
+        $bookings = $query->orderByRaw("CASE WHEN status = 'pending' THEN 0 ELSE 1 END")
             ->orderByRaw("CASE WHEN status = 'pending' THEN created_at END ASC")
             ->orderByRaw("CASE WHEN status != 'pending' THEN created_at END DESC")
-            ->get();
-        return view('admin.bookings.index', compact('bookings'));
+            ->paginate(10)
+            ->withQueryString();
+
+        return view('admin.bookings.index', compact('bookings', 'total', 'pending', 'dpPaid', 'done', 'canceled'));
     }
 
     /**
@@ -49,22 +85,26 @@ class BookingController extends Controller
      */
     public function dpVerification()
     {
+        // ── SUMMARY CARD 1: Jumlah antrean menunggu verifikasi (dihitung dari database secara utuh)
+        $antreanCount = Booking::where('status', 'pending')
+            ->whereNotNull('payment_proof')
+            ->count();
+
         // Booking pending dengan bukti bayar sudah di-upload (menunggu konfirmasi Admin)
         $pendingWithProof = Booking::with('client')
             ->where('status', 'pending')
             ->whereNotNull('payment_proof')
             ->orderBy('created_at', 'asc')
-            ->get();
+            ->paginate(10, ['*'], 'page_with_proof')
+            ->withQueryString();
 
         // Booking pending yang belum ada bukti bayar (menunggu Klien)
         $pendingNoProof = Booking::with('client')
             ->where('status', 'pending')
             ->whereNull('payment_proof')
             ->orderBy('created_at', 'asc')
-            ->get();
-
-        // ── SUMMARY CARD 1: Jumlah antrean menunggu verifikasi
-        $antreanCount = $pendingWithProof->count();
+            ->paginate(10, ['*'], 'page_no_proof')
+            ->withQueryString();
 
         // ── SUMMARY CARD 2: Total DP yang sudah masuk & dikonfirmasi
         $totalDpMasuk = Booking::whereIn('status', ['dp_paid', 'paid_full', 'completed'])

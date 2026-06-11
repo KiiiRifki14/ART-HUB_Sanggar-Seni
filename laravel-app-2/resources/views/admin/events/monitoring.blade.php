@@ -37,13 +37,36 @@
     </div>
     <div class="flex overflow-x-auto whitespace-nowrap scrollbar-none pb-2 -mx-4 px-4 md:flex-wrap md:mx-0 md:px-0 gap-1.5">
         @foreach($filters as $key => $f)
-            <a href="{{ route('admin.events.monitoring', $key !== 'all' ? ['filter' => $key] : []) }}"
+            <a href="{{ route('admin.events.monitoring', array_merge($key !== 'all' ? ['filter' => $key] : [], request('search') ? ['search' => request('search')] : [])) }}"
                class="flex-shrink-0 px-2.5 py-1 rounded-lg border font-label text-[0.55rem] sm:text-[0.58rem] md:text-[0.62rem] font-bold uppercase tracking-widest transition-all flex items-center gap-1.5 shadow-sm {{ $currentFilter === $key ? 'bg-primary text-white border-primary' : 'bg-surface-container-lowest text-on-surface-variant border-outline-variant/30 hover:border-primary/30 hover:text-primary hover:bg-surface-container-low' }}">
                 <i class="bi {{ $f['icon'] }}"></i> {{ $f['label'] }}
             </a>
         @endforeach
     </div>
 </div>
+
+{{-- Search Bar --}}
+<form action="{{ route('admin.events.monitoring') }}" method="GET" class="mb-6 flex flex-col sm:flex-row gap-3">
+    <input type="hidden" name="filter" value="{{ request('filter', 'all') }}">
+    <div class="relative flex-1">
+        <span class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+            <i class="bi bi-search text-outline text-xs"></i>
+        </span>
+        <input type="text" name="search" value="{{ request('search') }}" 
+               placeholder="Cari monitoring berdasarkan kode event, nama klien, telepon, jenis acara, atau lokasi..." 
+               class="w-full pl-10 pr-4 py-2.5 rounded-xl border border-outline-variant/30 bg-surface-container-lowest font-body text-xs focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all">
+    </div>
+    <div class="flex gap-2">
+        <button type="submit" class="px-5 py-2.5 rounded-xl bg-primary text-white font-label text-xs font-bold uppercase tracking-widest hover:bg-primary-container transition-all shadow-sm">
+            Cari
+        </button>
+        @if(request('search'))
+        <a href="{{ route('admin.events.monitoring', ['filter' => request('filter', 'all')]) }}" class="px-4 py-2.5 rounded-xl border border-outline-variant/30 text-outline hover:text-primary hover:bg-surface-container font-label text-xs font-bold uppercase tracking-widest transition-all flex items-center justify-center">
+            Reset
+        </a>
+        @endif
+    </div>
+</form>
 
 {{-- Event Grid --}}
 <div class="grid grid-cols-1 md:grid-cols-2 2xl:grid-cols-3 gap-3 sm:gap-4">

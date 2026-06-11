@@ -15,9 +15,9 @@ class CostumeController extends Controller
      */
     public function index()
     {
-        $sanggarCostumes = \App\Models\SanggarCostume::all();
-        $vendorRentals = \App\Models\CostumeRental::with(['event', 'vendor'])->latest()->get();
-        $costumeUsages = \App\Models\CostumeUsage::with(['costume', 'event'])->latest()->get();
+        $sanggarCostumes = \App\Models\SanggarCostume::paginate(10, ['*'], 'page_asset')->withQueryString();
+        $vendorRentals = \App\Models\CostumeRental::with(['event', 'vendor'])->latest()->paginate(10, ['*'], 'page_rental')->withQueryString();
+        $costumeUsages = \App\Models\CostumeUsage::with(['costume', 'event'])->latest()->paginate(10, ['*'], 'page_usage')->withQueryString();
         return view('admin.costumes.index', compact('sanggarCostumes', 'vendorRentals', 'costumeUsages'));
     }
     // ==========================================

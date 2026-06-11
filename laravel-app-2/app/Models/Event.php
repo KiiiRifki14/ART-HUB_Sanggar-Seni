@@ -69,6 +69,22 @@ class Event extends Model
         'event_end' => 'datetime',
     ];
 
+    protected static function boot()
+    {
+        parent::boot();
+
+        static::saving(function ($event) {
+            // Jika status baru di-set ke 'planning' atau 'ready', 
+            // tapi event ini sudah memiliki jadwal latihan, 
+            // pastikan status tetap 'rehearsal'.
+            if (in_array($event->status, ['planning', 'ready'])) {
+                if ($event->exists && $event->rehearsals()->exists()) {
+                    $event->status = 'rehearsal';
+                }
+            }
+        });
+    }
+
     public function booking(): BelongsTo
     {
         return $this->belongsTo(Booking::class);

@@ -11,12 +11,23 @@ use Illuminate\Support\Facades\DB;
 
 class EventController extends Controller
 {
-    /**
-     * Daftar Semua Event
-     */
-    public function index()
+    public function index(Request $request)
     {
-        $events = Event::with('booking')->orderBy('event_date', 'asc')->paginate(10)->withQueryString();
+        $search = $request->input('search');
+        $query = Event::with('booking')->orderBy('event_date', 'asc');
+
+        if ($search) {
+            $query->where(function ($q) use ($search) {
+                $q->where('event_code', 'like', "%{$search}%")
+                  ->orWhere('venue', 'like', "%{$search}%")
+                  ->orWhereHas('booking', function ($subQuery) use ($search) {
+                      $subQuery->where('client_name', 'like', "%{$search}%")
+                               ->orWhere('event_type', 'like', "%{$search}%");
+                  });
+            });
+        }
+
+        $events = $query->paginate(10)->withQueryString();
         return view('admin.events.index', compact('events'));
     }
 
@@ -43,7 +54,20 @@ class EventController extends Controller
             $query->where('status', $filter);
         }
 
-        $bookings = $query->paginate(6)->withQueryString();
+        $search = $request->input('search');
+        if ($search) {
+            $query->where(function ($q) use ($search) {
+                $q->where('client_name', 'like', "%{$search}%")
+                  ->orWhere('client_phone', 'like', "%{$search}%")
+                  ->orWhere('venue', 'like', "%{$search}%")
+                  ->orWhere('event_type', 'like', "%{$search}%")
+                  ->orWhereHas('event', function ($subQuery) use ($search) {
+                      $subQuery->where('event_code', 'like', "%{$search}%");
+                  });
+            });
+        }
+
+        $bookings = $query->paginate(10)->withQueryString();
 
         // Summary counts (Sekarang logis karena menggunakan base Booking)
         $summary = [
@@ -113,6 +137,11 @@ class EventController extends Controller
      */
     public function plotting(Event $event)
     {
+        if (in_array($event->status, ['completed', 'cancelled'])) {
+            return redirect()->route('admin.events.show', $event->id)
+                             ->with('error', 'Tidak dapat mengubah plotting untuk event yang sudah selesai atau dibatalkan.');
+        }
+
         $event->load(['booking.serviceCatalog', 'personnel.user', 'financialRecord']);
 
         $date  = \Carbon\Carbon::parse($event->event_date)->format('Y-m-d');
@@ -206,6 +235,11 @@ class EventController extends Controller
      */
     public function storePlotting(Request $request, Event $event)
     {
+        if (in_array($event->status, ['completed', 'cancelled'])) {
+            return redirect()->route('admin.events.show', $event->id)
+                             ->with('error', 'Tidak dapat memproses plotting untuk event yang sudah selesai atau dibatalkan.');
+        }
+
         $request->validate([
             'personnel'                        => 'required|array|min:1',
             'personnel.*.id'                   => 'required|exists:personnel,id',

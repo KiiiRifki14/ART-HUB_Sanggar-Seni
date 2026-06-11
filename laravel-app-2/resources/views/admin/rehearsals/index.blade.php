@@ -130,7 +130,7 @@
                         </div>
                     </td>
                     <td class="px-5 py-3.5 text-center">
-                        <a href="{{ route('admin.events.show', $r->event_id) }}"
+                        <a href="{{ route('admin.events.monitoring.show', $r->event_id) }}"
                            class="inline-flex items-center justify-center gap-1.5 h-8 px-3 rounded-lg border border-outline-variant/50 font-label text-[0.65rem] font-bold uppercase text-on-surface-variant hover:border-primary hover:text-primary hover:bg-surface-container transition-colors"
                            title="Lihat Event">
                             <i class="bi bi-eye text-xs"></i> Detail

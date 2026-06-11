@@ -20,59 +20,138 @@
         </a>
     </div>
 
-    {{-- Grid Card Responsif untuk Aset Sanggar --}}
-    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3">
-        @forelse($sanggarCostumes as $c)
-        @php
-            $isDamaged = $c->condition === 'damaged';
-            $isMaintenance = $c->condition === 'maintenance';
-            $cardBorderColor = $isDamaged ? 'border-red-200 bg-red-50/5' : ($isMaintenance ? 'border-orange-200 bg-orange-50/5' : 'border-outline-variant/30 hover:border-primary/30');
-            $conditionBadge = match($c->condition) {
-                'good' => '<span class="inline-flex items-center gap-1 px-2 py-0.5 rounded bg-green-500/10 text-green-700 border border-green-500/20 text-[0.6rem] font-bold"><span class="w-1.5 h-1.5 rounded-full bg-green-500"></span>Baik</span>',
-                'damaged' => '<span class="inline-flex items-center gap-1 px-2 py-0.5 rounded bg-red-500/10 text-red-700 border border-red-500/20 text-[0.6rem] font-bold"><span class="w-1.5 h-1.5 rounded-full bg-red-500"></span>Rusak</span>',
-                default => '<span class="inline-flex items-center gap-1 px-2 py-0.5 rounded bg-orange-500/10 text-orange-700 border border-orange-500/20 text-[0.6rem] font-bold"><span class="w-1.5 h-1.5 rounded-full bg-orange-500"></span>Maint.</span>',
-            };
-            $categoryIcons = [
-                'atasan' => 'shirt',
-                'bawahan' => 'layers',
-                'aksesoris' => 'gem',
-                'alat_musik' => 'music',
-                'musik' => 'music',
-                'properti' => 'box',
-                'tradisional' => 'palette',
-                'modern' => 'sparkles',
-            ];
-            $categoryIcon = $categoryIcons[strtolower($c->category)] ?? 'package';
-        @endphp
-        <div class="bg-surface-container-lowest rounded-xl border {{ $cardBorderColor }} shadow-sm hover:shadow-md transition-all duration-300 p-3.5 flex flex-col justify-between group">
-            <div>
-                <!-- Top Row: Icon Category & Quantity -->
-                <div class="flex items-center justify-between mb-2">
-                    <div class="w-8 h-8 rounded-lg bg-primary/5 text-primary flex items-center justify-center group-hover:bg-primary group-hover:text-white transition-all duration-300">
-                        <i data-lucide="{{ $categoryIcon }}" class="w-4 h-4"></i>
+    <div class="bg-surface-container-lowest rounded-xl border border-outline-variant/30 shadow-[0_12px_24px_rgba(54,31,26,0.03)] overflow-hidden">
+        {{-- Table view for larger screens --}}
+        <div class="overflow-x-auto hidden md:block">
+            <table class="w-full min-w-[800px]">
+                <thead class="bg-surface-container-low border-b border-outline-variant/20">
+                    <tr>
+                        <th class="font-label text-[0.55rem] uppercase tracking-widest text-outline font-bold px-4 py-3 text-left">Nama Aset</th>
+                        <th class="font-label text-[0.55rem] uppercase tracking-widest text-outline font-bold px-4 py-3 text-left">Kategori</th>
+                        <th class="font-label text-[0.55rem] uppercase tracking-widest text-outline font-bold px-4 py-3 text-center">Stok</th>
+                        <th class="font-label text-[0.55rem] uppercase tracking-widest text-outline font-bold px-4 py-3 text-center">Kondisi</th>
+                        <th class="font-label text-[0.55rem] uppercase tracking-widest text-outline font-bold px-4 py-3 text-right">Aksi</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-outline-variant/15">
+                    @forelse($sanggarCostumes as $c)
+                    @php
+                        $isDamaged = $c->condition === 'damaged';
+                        $isMaintenance = $c->condition === 'maintenance';
+                        $conditionBadge = match($c->condition) {
+                            'good' => '<span class="inline-flex items-center gap-1 px-2 py-0.5 rounded bg-green-500/10 text-green-700 border border-green-500/20 text-[0.55rem] font-bold uppercase"><span class="w-1.5 h-1.5 rounded-full bg-green-500"></span>Baik</span>',
+                            'damaged' => '<span class="inline-flex items-center gap-1 px-2 py-0.5 rounded bg-red-500/10 text-red-700 border border-red-500/20 text-[0.55rem] font-bold uppercase"><span class="w-1.5 h-1.5 rounded-full bg-red-500"></span>Rusak</span>',
+                            default => '<span class="inline-flex items-center gap-1 px-2 py-0.5 rounded bg-orange-500/10 text-orange-700 border border-orange-500/20 text-[0.55rem] font-bold uppercase"><span class="w-1.5 h-1.5 rounded-full bg-orange-500"></span>Maint.</span>',
+                        };
+                        $categoryIcons = [
+                            'atasan' => 'shirt',
+                            'bawahan' => 'layers',
+                            'aksesoris' => 'gem',
+                            'alat_musik' => 'music',
+                            'musik' => 'music',
+                            'properti' => 'box',
+                            'tradisional' => 'palette',
+                            'modern' => 'sparkles',
+                        ];
+                        $categoryIcon = $categoryIcons[strtolower($c->category)] ?? 'package';
+                    @endphp
+                    <tr class="hover:bg-surface-container-low/50 transition-colors">
+                        <td class="px-4 py-3">
+                            <div class="flex items-center gap-3">
+                                <div class="w-8 h-8 rounded-lg bg-primary/5 text-primary flex items-center justify-center">
+                                    <i data-lucide="{{ $categoryIcon }}" class="w-4 h-4"></i>
+                                </div>
+                                <div class="font-body font-semibold text-on-surface text-xs">{{ $c->name }}</div>
+                            </div>
+                        </td>
+                        <td class="px-4 py-3">
+                            <span class="inline-block px-2 py-0.5 rounded bg-secondary/10 text-secondary text-[0.55rem] font-bold uppercase tracking-wider">
+                                {{ str_replace('_', ' ', $c->category) }}
+                            </span>
+                        </td>
+                        <td class="px-4 py-3 text-center">
+                            <span class="inline-flex items-center justify-center px-2.5 py-0.5 rounded-full bg-surface-container font-headline font-bold text-primary text-[0.65rem]">
+                                {{ $c->quantity }} Pcs
+                            </span>
+                        </td>
+                        <td class="px-4 py-3 text-center">
+                            {!! $conditionBadge !!}
+                        </td>
+                        <td class="px-4 py-3">
+                            <div class="flex items-center justify-end gap-1.5">
+                                <a href="{{ route('admin.costumes.edit-asset', $c->id) }}" class="w-7 h-7 rounded-md border border-outline-variant/40 text-outline hover:text-primary hover:border-primary flex items-center justify-center hover:bg-primary/5 transition-all" title="Edit Aset">
+                                    <i data-lucide="edit-3" class="w-3.5 h-3.5"></i>
+                                </a>
+                                <form action="{{ route('admin.costumes.destroy-asset', $c->id) }}" method="POST" data-confirm="Apakah Anda yakin ingin menghapus aset ini?" class="inline m-0">
+                                    @csrf
+                                    @method('DELETE')
+                                    <button type="submit" class="w-7 h-7 rounded-md border border-red-200/50 text-red-500 hover:bg-red-50 hover:border-red-500 flex items-center justify-center transition-all" title="Hapus Aset">
+                                        <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
+                                    </button>
+                                </form>
+                            </div>
+                        </td>
+                    </tr>
+                    @empty
+                    <tr>
+                        <td colspan="5" class="px-6 py-16 text-center text-outline">
+                            <i data-lucide="package" class="w-12 h-12 mx-auto mb-3 opacity-30 text-primary"></i>
+                            <p class="font-headline text-lg font-bold text-on-surface mb-1">Belum Ada Aset Terdaftar</p>
+                            <p class="font-body text-sm text-outline mb-4">Tambahkan aset kostum atau properti sanggar untuk memulai.</p>
+                            <a href="{{ route('admin.costumes.create-asset') }}" class="px-4 py-2 rounded-lg bg-primary text-white font-label text-xs font-bold uppercase tracking-widest hover:bg-primary-container transition-colors shadow-sm inline-flex items-center gap-1.5">
+                                <i data-lucide="plus" class="w-4 h-4"></i> Tambah Aset Pertama
+                            </a>
+                        </td>
+                    </tr>
+                    @endforelse
+                </tbody>
+            </table>
+        </div>
+
+        {{-- Mobile View for smaller screens --}}
+        <div class="block md:hidden divide-y divide-outline-variant/20">
+            @forelse($sanggarCostumes as $c)
+            @php
+                $isDamaged = $c->condition === 'damaged';
+                $isMaintenance = $c->condition === 'maintenance';
+                $conditionBadge = match($c->condition) {
+                    'good' => '<span class="inline-flex items-center gap-1 px-2 py-0.5 rounded bg-green-500/10 text-green-700 border border-green-500/20 text-[0.55rem] font-bold uppercase"><span class="w-1 h-1 rounded-full bg-green-500"></span>Baik</span>',
+                    'damaged' => '<span class="inline-flex items-center gap-1 px-2 py-0.5 rounded bg-red-500/10 text-red-700 border border-red-500/20 text-[0.55rem] font-bold uppercase"><span class="w-1 h-1 rounded-full bg-red-500"></span>Rusak</span>',
+                    default => '<span class="inline-flex items-center gap-1 px-2 py-0.5 rounded bg-orange-500/10 text-orange-700 border border-orange-500/20 text-[0.55rem] font-bold uppercase"><span class="w-1 h-1 rounded-full bg-orange-500"></span>Maint.</span>',
+                };
+                $categoryIcons = [
+                    'atasan' => 'shirt',
+                    'bawahan' => 'layers',
+                    'aksesoris' => 'gem',
+                    'alat_musik' => 'music',
+                    'musik' => 'music',
+                    'properti' => 'box',
+                    'tradisional' => 'palette',
+                    'modern' => 'sparkles',
+                ];
+                $categoryIcon = $categoryIcons[strtolower($c->category)] ?? 'package';
+            @endphp
+            <div class="p-3.5 space-y-3 hover:bg-surface-container-low/50 transition-colors">
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center gap-2">
+                        <div class="w-7 h-7 rounded bg-primary/5 text-primary flex items-center justify-center">
+                            <i data-lucide="{{ $categoryIcon }}" class="w-3.5 h-3.5"></i>
+                        </div>
+                        <span class="inline-block px-1.5 py-0.2 rounded bg-secondary/10 text-secondary text-[0.55rem] font-bold uppercase tracking-wider">
+                            {{ str_replace('_', ' ', $c->category) }}
+                        </span>
                     </div>
-                    <div class="flex flex-col items-end">
-                        <span class="text-[0.55rem] font-bold text-outline uppercase tracking-widest leading-none">Stok</span>
-                        <span class="text-sm font-extrabold text-primary leading-tight mt-0.5">{{ $c->quantity }} Pcs</span>
+                    {!! $conditionBadge !!}
+                </div>
+                <div class="flex justify-between items-start">
+                    <div class="font-body font-bold text-on-surface text-xs max-w-[70%] leading-snug">{{ $c->name }}</div>
+                    <div class="text-right">
+                        <span class="inline-flex items-center justify-center px-2 py-0.5 rounded bg-surface-container font-headline font-bold text-primary text-[0.58rem]">
+                            {{ $c->quantity }} Pcs
+                        </span>
                     </div>
                 </div>
-                
-                <!-- Category Tag -->
-                <span class="inline-block px-1.5 py-0.2 rounded bg-secondary/10 text-secondary text-[0.55rem] font-bold uppercase tracking-wider mb-1">
-                    {{ str_replace('_', ' ', $c->category) }}
-                </span>
-                
-                <!-- Asset Name -->
-                <h3 class="font-body text-xs font-bold text-on-surface mb-2 leading-snug min-h-[2rem] flex items-center">
-                    {{ $c->name }}
-                </h3>
-            </div>
-            
-            <!-- Bottom Row: Condition Status & Actions -->
-            <div class="flex items-center justify-between pt-2.5 border-t border-outline-variant/20">
-                {!! $conditionBadge !!}
-                
-                <div class="flex items-center gap-1.5">
+                <div class="flex justify-end gap-1.5 pt-2 border-t border-outline-variant/10">
                     <a href="{{ route('admin.costumes.edit-asset', $c->id) }}" class="w-7 h-7 rounded-md border border-outline-variant/40 text-outline hover:text-primary hover:border-primary flex items-center justify-center hover:bg-primary/5 transition-all" title="Edit Aset">
                         <i data-lucide="edit-3" class="w-3.5 h-3.5"></i>
                     </a>
@@ -85,17 +164,20 @@
                     </form>
                 </div>
             </div>
+            @empty
+            <div class="p-6 text-center text-outline">
+                <i data-lucide="package" class="w-10 h-10 mx-auto mb-2 opacity-30 text-primary"></i>
+                <p class="font-body text-xs font-semibold text-on-surface">Belum ada aset terdaftar</p>
+            </div>
+            @endforelse
         </div>
-        @empty
-        <div class="col-span-full bg-surface-container-lowest rounded-2xl border border-outline-variant/30 p-12 text-center text-outline">
-            <i data-lucide="package" class="w-12 h-12 mx-auto mb-3 opacity-30 text-primary"></i>
-            <p class="font-headline text-lg font-bold text-on-surface mb-1">Belum Ada Aset Terdaftar</p>
-            <p class="font-body text-sm text-outline mb-4">Tambahkan aset kostum atau properti sanggar untuk memulai.</p>
-            <a href="{{ route('admin.costumes.create-asset') }}" class="px-4 py-2 rounded-lg bg-primary text-white font-label text-xs font-bold uppercase tracking-widest hover:bg-primary-container transition-colors shadow-sm inline-flex items-center gap-1.5">
-                <i data-lucide="plus" class="w-4 h-4"></i> Tambah Aset Pertama
-            </a>
+
+        {{-- Pagination Aset --}}
+        @if($sanggarCostumes->hasPages())
+        <div class="px-6 py-3 border-t border-outline-variant/20 bg-surface-container-low/20">
+            {{ $sanggarCostumes->appends(request()->except('page_asset'))->links() }}
         </div>
-        @endforelse
+        @endif
     </div>
 </div>
 
@@ -269,6 +351,12 @@
             </div>
             @endforelse
         </div>
+
+        @if($vendorRentals->hasPages())
+        <div class="px-6 py-3 border-t border-outline-variant/20 bg-surface-container-low/20">
+            {{ $vendorRentals->appends(request()->except('page_rental'))->links() }}
+        </div>
+        @endif
     </div>
 </div>
 
@@ -427,6 +515,12 @@
             </div>
             @endforelse
         </div>
+
+        @if($costumeUsages->hasPages())
+        <div class="px-6 py-3 border-t border-outline-variant/20 bg-surface-container-low/20">
+            {{ $costumeUsages->appends(request()->except('page_usage'))->links() }}
+        </div>
+        @endif
     </div>
 </div>
 

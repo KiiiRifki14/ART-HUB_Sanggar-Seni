@@ -126,6 +126,11 @@ class RehearsalController extends Controller
                 'notes'          => $request->notes,
             ]);
 
+            // Update parent event status to 'rehearsal' (LATIHAN) if currently in planning or ready status
+            if (in_array($event->status, ['planning', 'ready'])) {
+                $event->update(['status' => 'rehearsal']);
+            }
+
             $msg = 'Jadwal latihan (' . strtoupper($request->type) . ') berhasil dibuat!';
 
             if ($collisionCount > 0) {

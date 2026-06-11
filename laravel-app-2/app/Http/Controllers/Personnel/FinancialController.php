@@ -44,7 +44,7 @@ class FinancialController extends Controller
         // Paginate events untuk tampilan list (2 per halaman)
         $paginator = $personnel->events()
             ->orderBy('event_date', 'desc')
-            ->paginate(3);
+            ->paginate(10);
 
         $eventFinancials = collect($paginator->items())->map(function ($event) use ($latePenaltyRate) {
             $pivot = $event->pivot;

@@ -15,6 +15,27 @@
         </p>
     </div>
 </div>
+{{-- Search Bar --}}
+<form action="{{ route('admin.events.index') }}" method="GET" class="mb-6 flex flex-col sm:flex-row gap-3">
+    <div class="relative flex-1">
+        <span class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+            <i data-lucide="search" class="w-4 h-4 text-outline"></i>
+        </span>
+        <input type="text" name="search" value="{{ request('search') }}" 
+               placeholder="Cari event berdasarkan kode, venue, nama klien, atau jenis acara..." 
+               class="w-full pl-10 pr-4 py-2.5 rounded-xl border border-outline-variant/30 bg-surface-container-lowest font-body text-xs focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all">
+    </div>
+    <div class="flex gap-2">
+        <button type="submit" class="px-5 py-2.5 rounded-xl bg-primary text-white font-label text-xs font-bold uppercase tracking-widest hover:bg-primary-container transition-all shadow-sm">
+            Cari
+        </button>
+        @if(request('search'))
+        <a href="{{ route('admin.events.index') }}" class="px-4 py-2.5 rounded-xl border border-outline-variant/30 text-outline hover:text-primary hover:bg-surface-container font-label text-xs font-bold uppercase tracking-widest transition-all flex items-center justify-center">
+            Reset
+        </a>
+        @endif
+    </div>
+</form>
 
 {{-- ══ TABLE (Desktop) ══ --}}
 <div class="hidden md:block bg-surface-container-lowest rounded-2xl border border-outline-variant/30 shadow-[0_12px_24px_rgba(54,31,26,0.03)] overflow-hidden">
@@ -86,11 +107,13 @@
                                title="Detail / Kelola">
                                 <i data-lucide="eye" class="w-4 h-4"></i>
                             </a>
+                            @if(!in_array($event->status, ['completed', 'cancelled']))
                             <a href="{{ route('admin.events.plotting', $event->id) }}"
                                class="w-9 h-9 rounded-lg border border-outline-variant/40 text-outline hover:text-secondary hover:border-secondary flex items-center justify-center hover:bg-secondary/5 transition-all"
                                title="Plotting Kru">
                                 <i data-lucide="users" class="w-4 h-4"></i>
                             </a>
+                            @endif
                         </div>
                     </td>
                 </tr>
@@ -166,7 +189,9 @@
                 </div>
                 <div class="flex gap-2 flex-shrink-0">
                     <a href="{{ route('admin.events.show', $event->id) }}" class="w-9 h-9 rounded-lg bg-surface-container border border-outline-variant/30 flex items-center justify-center text-on-surface-variant hover:bg-primary hover:text-white transition-all"><i data-lucide="eye" class="w-4 h-4"></i></a>
+                    @if(!in_array($event->status, ['completed', 'cancelled']))
                     <a href="{{ route('admin.events.plotting', $event->id) }}" class="w-9 h-9 rounded-lg bg-surface-container border border-outline-variant/30 flex items-center justify-center text-on-surface-variant hover:bg-secondary hover:text-white transition-all"><i data-lucide="users" class="w-4 h-4"></i></a>
+                    @endif
                 </div>
             </div>
         </div>

@@ -8,12 +8,6 @@
 <div>
 
 @php
-    $total    = $bookings->count();
-    $pending  = $bookings->where('status','pending')->count();
-    $dpPaid   = $bookings->where('status','dp_paid')->count();
-    $done     = $bookings->whereIn('status',['confirmed','completed'])->count();
-    $canceled = $bookings->where('status','cancelled')->count();
-
     $statusMap = [
         'pending'   => ['PENDING',   'bg-orange-500/10 text-orange-600 border-orange-500/20'],
         'dp_paid'   => ['DP PAID',   'bg-secondary/10 text-secondary border-secondary/20'],
@@ -84,16 +78,40 @@
     </a>
 </div>
 
+{{-- Search Bar --}}
+<form action="{{ route('admin.bookings.index') }}" method="GET" class="mb-6 flex flex-col sm:flex-row gap-3">
+    <input type="hidden" name="status" value="{{ request('status', 'all') }}">
+    <div class="relative flex-1">
+        <span class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+            <i data-lucide="search" class="w-4 h-4 text-outline"></i>
+        </span>
+        <input type="text" name="search" value="{{ request('search') }}" 
+               placeholder="Cari booking berdasarkan nama klien, nomor telepon, tipe acara, atau lokasi..." 
+               class="w-full pl-10 pr-4 py-2.5 rounded-xl border border-outline-variant/30 bg-surface-container-lowest font-body text-xs focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all">
+    </div>
+    <div class="flex gap-2">
+        <button type="submit" class="px-5 py-2.5 rounded-xl bg-primary text-white font-label text-xs font-bold uppercase tracking-widest hover:bg-primary-container transition-all shadow-sm">
+            Cari
+        </button>
+        @if(request('search'))
+        <a href="{{ route('admin.bookings.index', ['status' => request('status', 'all')]) }}" class="px-4 py-2.5 rounded-xl border border-outline-variant/30 text-outline hover:text-primary hover:bg-surface-container font-label text-xs font-bold uppercase tracking-widest transition-all flex items-center justify-center">
+            Reset
+        </a>
+        @endif
+    </div>
+</form>
+
 {{-- Filter Tabs --}}
 <div class="flex gap-2 overflow-x-auto whitespace-nowrap scrollbar-none pb-2 -mx-4 px-4 md:flex-wrap md:mx-0 md:px-0 mb-6" id="filter-tabs">
     @php
+        $statusActive = request('status', 'all');
         $tabs = ['all'=>"Semua ({$total})",'pending'=>"Pending ({$pending})",'dp_paid'=>"DP Dibayar ({$dpPaid})",'completed'=>"Selesai ({$done})",'cancelled'=>"Batal ({$canceled})"];
     @endphp
     @foreach($tabs as $key => $label)
-    <button class="flex-shrink-0 px-4 py-2 rounded-xl font-label text-xs font-bold uppercase tracking-widest transition-all border filter-tab {{ $key === 'all' ? 'bg-primary text-white border-primary shadow-sm' : 'bg-surface-container-lowest text-on-surface-variant border-outline-variant/30 hover:border-primary/40 hover:text-primary' }}"
-            onclick="filterBooking('{{ $key }}', this)">
+    <a href="{{ route('admin.bookings.index', ['status' => $key, 'search' => request('search')]) }}"
+       class="flex-shrink-0 px-4 py-2 rounded-xl font-label text-xs font-bold uppercase tracking-widest transition-all border filter-tab {{ $statusActive === $key ? 'bg-primary text-white border-primary shadow-sm' : 'bg-surface-container-lowest text-on-surface-variant border-outline-variant/30 hover:border-primary/40 hover:text-primary' }}">
         {{ $label }}
-    </button>
+    </a>
     @endforeach
 </div>
 
@@ -248,6 +266,13 @@
     @endforelse
 </div>
 
+{{-- Pagination Links --}}
+@if($bookings->hasPages())
+<div class="mt-4 px-2">
+    {{ $bookings->links() }}
+</div>
+@endif
+
 
 
 {{-- ══ MODAL: KUNCI LABA (Konfirmasi DP) ══ --}}
@@ -311,22 +336,6 @@
 
 @section('scripts')
 <script>
-function filterBooking(status, btn) {
-    document.querySelectorAll('.filter-tab').forEach(b => {
-        b.classList.remove('bg-primary','text-white','border-primary','shadow-sm');
-        b.classList.add('bg-surface-container-lowest','text-on-surface-variant','border-outline-variant/30');
-    });
-    btn.classList.add('bg-primary','text-white','border-primary','shadow-sm');
-    btn.classList.remove('bg-surface-container-lowest','text-on-surface-variant','border-outline-variant/30');
-
-    document.querySelectorAll('#booking-tbody tr[data-status], #booking-tbody-mobile [data-status]').forEach(row => {
-        const s = row.dataset.status;
-        const show = status === 'all'
-            || s === status
-            || (status === 'completed' && (s === 'confirmed' || s === 'completed'));
-        row.style.display = show ? '' : 'none';
-    });
-}
 
 function openKunciModal(bookingId, clientName, totalPrice, dpAmount) {
     // Set form action

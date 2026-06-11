@@ -143,6 +143,8 @@ test('TEST-02: Membuat Jadwal Latihan Baru dengan Maps Koordinat', function () {
         'latitude' => -6.91750000,
         'longitude' => 107.60620000,
     ]);
+
+    expect($this->event->fresh()->status)->toBe('rehearsal');
 });
 
 // TEST-03: Absen Latihan Kru Sukses (Dalam Radius 200 Meter)

@@ -177,6 +177,12 @@
         </div>
         @endforelse
     </div>
+
+    @if($pendingWithProof->hasPages())
+    <div class="px-6 py-4 border-t border-outline-variant/20 bg-surface-container-low/20">
+        {{ $pendingWithProof->appends(request()->except('page_with_proof'))->links() }}
+    </div>
+    @endif
 </div>
 
 {{-- ═══════════════ DAFTAR MENUNGGU UPLOAD ═══════════════ --}}
@@ -184,8 +190,8 @@
     <div class="px-6 py-5 border-b border-outline-variant/20 flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-surface-container-low/30">
         <h3 class="font-headline text-base font-bold text-on-surface-variant flex items-center gap-2">
             <i class="bi bi-hourglass-split text-outline"></i> Menunggu Upload Klien
-            @if($pendingNoProof->count() > 0)
-                <span class="inline-flex items-center justify-center min-w-6 h-6 px-1.5 rounded-full bg-surface-container-highest text-on-surface font-label text-[0.65rem] font-bold">{{ $pendingNoProof->count() }}</span>
+            @if($pendingNoProof->total() > 0)
+                <span class="inline-flex items-center justify-center min-w-6 h-6 px-1.5 rounded-full bg-surface-container-highest text-on-surface font-label text-[0.65rem] font-bold">{{ $pendingNoProof->total() }}</span>
             @endif
         </h3>
     </div>
@@ -234,6 +240,12 @@
         </div>
         @endforelse
     </div>
+
+    @if($pendingNoProof->hasPages())
+    <div class="px-6 py-4 border-t border-outline-variant/20 bg-surface-container-low/20">
+        {{ $pendingNoProof->appends(request()->except('page_no_proof'))->links() }}
+    </div>
+    @endif
 </div>
 
 {{-- ═══════════════════════════════════════════════════════

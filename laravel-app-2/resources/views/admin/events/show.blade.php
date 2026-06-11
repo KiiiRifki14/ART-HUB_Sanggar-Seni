@@ -195,9 +195,11 @@
         <h3 class="font-headline text-lg font-bold text-primary flex items-center gap-2">
             <i class="bi bi-people-fill text-secondary"></i> Personel & Check-in Monitor
         </h3>
+        @if(!in_array($event->status, ['completed', 'cancelled']))
         <a href="{{ route('admin.events.plotting', $event->id) }}" class="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg bg-primary text-white font-label text-[0.65rem] font-bold uppercase tracking-widest hover:bg-primary-container transition-colors shadow-sm">
             <i class="bi bi-diagram-3"></i> Kelola Plotting
         </a>
+        @endif
     </div>
 
     <div class="overflow-x-auto">

@@ -6,12 +6,12 @@
 
 @section('content')
 @php
-    $totalProfit = $records->sum('fixed_profit');
-    $totalBuffer = $records->sum('safety_buffer_amt');
-    $totalRevenue = $records->sum('total_revenue');
-    $totalOps = $records->sum('actual_operational_cost');
-    $totalHonor = $records->sum('total_personnel_honor');
-    $totalBudgetOps = $records->sum('operational_budget');
+    $totalProfit = $totals['fixed_profit'];
+    $totalBuffer = $totals['safety_buffer_amt'];
+    $totalRevenue = $totals['total_revenue'];
+    $totalOps = $totals['actual_operational_cost'];
+    $totalHonor = $totals['total_personnel_honor'];
+    $totalBudgetOps = $totals['operational_budget'];
 @endphp
 
 @can('view-financials')
@@ -235,11 +235,6 @@
     </table>
 </div>
 
-@if ($records->hasPages())
-<div class="mt-4 px-1">
-    {{ $records->links() }}
-</div>
-@endif
 
 {{-- ══ MOBILE CARDS (Mobile only) ══ --}}
 <div class="md:hidden space-y-3">
@@ -282,6 +277,12 @@
     </div>
     @endforelse
 </div>
+
+@if ($records->hasPages())
+<div class="mt-4 px-1">
+    {{ $records->links() }}
+</div>
+@endif
 
 @else
 {{-- JIKA BUKAN VVIP --}}

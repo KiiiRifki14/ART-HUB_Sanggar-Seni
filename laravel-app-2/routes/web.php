@@ -285,13 +285,13 @@ Route::middleware(['auth', 'role:personel'])->prefix('personnel')->name('personn
                     ->get();
             }
 
-            // Paginated detailed tasks list (3 events per page)
+            // Paginated detailed tasks list (10 events per page)
             $paginatedDetailEvents = $personnel
                 ? $personnel->events()
                     ->where('event_date', '>=', $now->toDateString())
                     ->orderBy('event_date', 'asc')
-                    ->paginate(2, ['*'], 'detail_page')
-                : new \Illuminate\Pagination\LengthAwarePaginator([], 0, 3);
+                    ->paginate(10, ['*'], 'detail_page')
+                : new \Illuminate\Pagination\LengthAwarePaginator([], 0, 10);
 
             // Kalender navigation logic
             $thisMonth = request()->query('month', $now->month);

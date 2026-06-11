@@ -17,7 +17,7 @@ class BookingController extends Controller
     public function index()
     {
         $clientId = Auth::id();
-        $bookings = Booking::where('client_id', $clientId)->latest()->paginate(5);
+        $bookings = Booking::where('client_id', $clientId)->latest()->paginate(10);
         
         $aktif   = Booking::where('client_id', $clientId)->whereIn('status', ['pending', 'dp_paid', 'confirmed'])->count();
         $selesai = Booking::where('client_id', $clientId)->where('status', 'completed')->count();
