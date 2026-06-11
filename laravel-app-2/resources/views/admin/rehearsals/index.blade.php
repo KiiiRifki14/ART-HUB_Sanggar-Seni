@@ -83,8 +83,12 @@
             <tbody class="divide-y divide-outline-variant/15">
                 @forelse($rehearsals as $r)
                 @php
-                    $isPast = \Carbon\Carbon::parse($r->rehearsal_date)->isPast()
-                           && \Carbon\Carbon::parse($r->rehearsal_date)->toDateString() !== now()->toDateString();
+                    // Latihan dianggap 'selesai' jika end_time sudah terlampaui
+                    // Ekstrak date dan time secara terpisah karena Eloquent bisa kembalikan full datetime
+                    $rehDateOnly    = \Carbon\Carbon::parse($r->rehearsal_date)->toDateString();
+                    $rehEndTimeOnly = \Carbon\Carbon::parse($r->end_time ?? '23:59:00')->format('H:i:s');
+                    $rehEndDt = \Carbon\Carbon::parse($rehDateOnly . ' ' . $rehEndTimeOnly);
+                    $isPast   = $rehEndDt->isPast();
                     $typeColors = [
                         'musik'    => 'bg-blue-500/10 text-blue-700 border-blue-500/20',
                         'tari'     => 'bg-pink-500/10 text-pink-700 border-pink-500/20',
@@ -130,11 +134,26 @@
                         </div>
                     </td>
                     <td class="px-5 py-3.5 text-center">
-                        <a href="{{ route('admin.events.monitoring.show', $r->event_id) }}"
-                           class="inline-flex items-center justify-center gap-1.5 h-8 px-3 rounded-lg border border-outline-variant/50 font-label text-[0.65rem] font-bold uppercase text-on-surface-variant hover:border-primary hover:text-primary hover:bg-surface-container transition-colors"
-                           title="Lihat Event">
-                            <i class="bi bi-eye text-xs"></i> Detail
-                        </a>
+                        <div class="inline-flex items-center gap-1.5">
+                            @if($isPast)
+                            {{-- Latihan sudah selesai: tombol Edit dikunci --}}
+                            <span class="inline-flex items-center justify-center gap-1.5 h-8 px-3 rounded-lg border border-outline-variant/30 bg-surface-container font-label text-[0.65rem] font-bold uppercase text-outline cursor-not-allowed"
+                                  title="Latihan sudah selesai, tidak bisa diedit">
+                                <i class="bi bi-lock-fill text-xs"></i> Edit
+                            </span>
+                            @else
+                            <a href="{{ route('admin.rehearsals.edit', $r) }}"
+                               class="inline-flex items-center justify-center gap-1.5 h-8 px-3 rounded-lg border border-secondary/30 bg-secondary/5 font-label text-[0.65rem] font-bold uppercase text-secondary hover:border-secondary hover:bg-secondary/10 transition-colors"
+                               title="Edit Jadwal">
+                                <i class="bi bi-pencil-fill text-xs"></i> Edit
+                            </a>
+                            @endif
+                            <a href="{{ route('admin.events.monitoring.show', $r->event_id) }}"
+                               class="inline-flex items-center justify-center gap-1.5 h-8 px-3 rounded-lg border border-outline-variant/50 font-label text-[0.65rem] font-bold uppercase text-on-surface-variant hover:border-primary hover:text-primary hover:bg-surface-container transition-colors"
+                               title="Lihat Event">
+                                <i class="bi bi-eye text-xs"></i> Detail
+                            </a>
+                        </div>
                     </td>
                 </tr>
                 @empty

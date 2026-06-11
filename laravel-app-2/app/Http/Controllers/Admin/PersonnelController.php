@@ -239,17 +239,30 @@ class PersonnelController extends Controller
 
     /**
      * Memperbarui status tugas operasional personel per-event (pada tabel pivot)
+     * BUG-9 FIX: Mendukung AJAX — return JSON jika request mengharapkan JSON
      */
     public function updateEventStatus(Request $request, Event $event, Personnel $personnel)
     {
         $request->validate([
-            'status' => 'required|string|max:50',
+            'status' => 'required|string|in:assigned,confirmed,attended,absent,late',
         ]);
 
         $event->personnel()->updateExistingPivot($personnel->id, [
             'status' => $request->status
         ]);
 
-        return redirect()->back()->with('success', 'Status tugas ' . ($personnel->user->name ?? 'Kru') . ' berhasil diperbarui.');
+        $name = $personnel->user->name ?? 'Kru';
+
+        // BUG-9 FIX: Jika AJAX/JSON request → return JSON, bukan redirect
+        if ($request->expectsJson() || $request->ajax()) {
+            return response()->json([
+                'success' => true,
+                'message' => "Status tugas {$name} berhasil diperbarui menjadi {$request->status}.",
+                'new_status' => $request->status,
+                'personnel_id' => $personnel->id,
+            ]);
+        }
+
+        return redirect()->back()->with('success', "Status tugas {$name} berhasil diperbarui.");
     }
 }

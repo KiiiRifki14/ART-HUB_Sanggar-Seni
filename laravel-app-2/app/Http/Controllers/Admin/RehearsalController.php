@@ -108,6 +108,68 @@ class RehearsalController extends Controller
     }
 
     /**
+     * Menampilkan form edit jadwal latihan
+     */
+    public function edit(Rehearsal $rehearsal)
+    {
+        // Guard: latihan yang sudah selesai tidak bisa diedit
+        $dateOnly    = \Carbon\Carbon::parse($rehearsal->rehearsal_date)->toDateString();
+        $endTimeOnly = \Carbon\Carbon::parse($rehearsal->end_time ?? '23:59:00')->format('H:i:s');
+        $endDateTime = \Carbon\Carbon::parse($dateOnly . ' ' . $endTimeOnly);
+        if ($endDateTime->isPast()) {
+            return redirect()->route('admin.rehearsals.index')
+                ->with('error', '🔒 Latihan "' . \Carbon\Carbon::parse($rehearsal->rehearsal_date)->translatedFormat('d F Y') . '" sudah selesai dan tidak bisa diedit.');
+        }
+
+        $events = \App\Models\Event::with('booking')
+            ->whereNotIn('status', ['completed', 'cancelled'])
+            ->latest()
+            ->get();
+        return view('admin.rehearsals.edit', compact('rehearsal', 'events'));
+    }
+
+    /**
+     * Update jadwal latihan (tanggal, jam, lokasi, tipe, catatan)
+     */
+    public function update(Request $request, Rehearsal $rehearsal)
+    {
+        // Guard: double protection – blokir update via POST langsung jika latihan sudah selesai
+        $dateOnly    = \Carbon\Carbon::parse($rehearsal->rehearsal_date)->toDateString();
+        $endTimeOnly = \Carbon\Carbon::parse($rehearsal->end_time ?? '23:59:00')->format('H:i:s');
+        $endDateTime = \Carbon\Carbon::parse($dateOnly . ' ' . $endTimeOnly);
+        if ($endDateTime->isPast()) {
+            return redirect()->route('admin.rehearsals.index')
+                ->with('error', '🔒 Latihan pada ' . \Carbon\Carbon::parse($rehearsal->rehearsal_date)->translatedFormat('d F Y') . ' sudah selesai, tidak bisa diubah.');
+        }
+
+        $request->validate([
+            'type'           => 'required|in:gabungan,tari,musik',
+            'rehearsal_date' => 'required|date',
+            'start_time'     => 'required',
+            'end_time'       => 'required|after:start_time',
+            'location'       => 'required|string',
+            'latitude'       => 'nullable|numeric|between:-90,90',
+            'longitude'      => 'nullable|numeric|between:-180,180',
+        ], [
+            'end_time.after' => 'Jam selesai harus setelah jam mulai.',
+        ]);
+
+        $rehearsal->update([
+            'type'           => $request->type,
+            'rehearsal_date' => $request->rehearsal_date,
+            'start_time'     => $request->start_time,
+            'end_time'       => $request->end_time,
+            'location'       => $request->location,
+            'latitude'       => $request->latitude,
+            'longitude'      => $request->longitude,
+            'notes'          => $request->notes,
+        ]);
+
+        return redirect()->route('admin.rehearsals.index')
+            ->with('success', 'Jadwal latihan berhasil diperbarui!');
+    }
+
+    /**
      * Helper: simpan record Rehearsal dan return redirect dengan flash message.
      * Dibungkus try-catch tersendiri agar error DB di level insert pun tertangkap.
      */

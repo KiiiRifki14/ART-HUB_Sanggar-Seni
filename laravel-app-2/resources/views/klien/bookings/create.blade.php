@@ -167,9 +167,10 @@
                     <div>
                         <label class="block font-label text-xs uppercase tracking-widest text-on-surface-variant font-bold mb-1.5">Tanggal Acara <span class="text-red-500">*</span></label>
                         <input type="date" name="event_date"
-                               class="w-full bg-surface-container-low border border-outline-variant/50 rounded-lg px-4 py-2.5 font-body text-sm text-on-surface focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all @error('event_date') border-red-500 @enderror"
-                               min="{{ now()->addDays(7)->toDateString() }}" required>
-                        <div class="font-label text-[0.65rem] text-outline mt-1.5 flex items-center gap-1"><i class="bi bi-info-circle"></i> Minimal H-7 dari hari ini</div>
+                                class="w-full bg-surface-container-low border border-outline-variant/50 rounded-lg px-4 py-2.5 font-body text-sm text-on-surface focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all @error('event_date') border-red-500 @enderror"
+                               min="{{ now()->addDays(30)->toDateString() }}" required>
+                        <div class="font-label text-[0.65rem] text-outline mt-1.5 flex items-center gap-1"><i class="bi bi-info-circle"></i> Min. H+30 dari hari ini</div>
+
                         @error('event_date')<div class="text-red-500 text-xs mt-1 font-body">{{ $message }}</div>@enderror
                     </div>
                     <div>

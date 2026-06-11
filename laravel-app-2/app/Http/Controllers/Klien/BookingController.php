@@ -52,7 +52,7 @@ class BookingController extends Controller
             'event_date'   => [
                 'required',
                 'date',
-                'after:today',
+                'after_or_equal:' . now()->addDays(30)->toDateString(),
                 function ($attribute, $value, $fail) {
                     $exists = Booking::where('event_date', $value)
                         ->whereIn('status', ['dp_paid', 'confirmed', 'paid_full', 'completed'])
@@ -69,6 +69,8 @@ class BookingController extends Controller
             'client_phone'      => 'required|string',
             'latitude'          => 'nullable|numeric|between:-90,90',
             'longitude'         => 'nullable|numeric|between:-180,180',
+        ], [
+            'event_date.after_or_equal' => 'Tanggal pementasan minimal harus H+30 dari hari ini.',
         ]);
 
         try {

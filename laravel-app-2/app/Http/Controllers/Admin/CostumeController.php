@@ -135,6 +135,7 @@ class CostumeController extends Controller
             'costume_type'      => $request->costume_type,
             'quantity'          => $request->quantity,
             'rental_cost'       => $request->rental_cost,
+            'rental_date'       => Carbon::today()->toDateString(), // Tanggal transaksi sewa dicatat
             'due_date'          => $request->due_date,
             'status'            => 'rented', // Default status saat baru menyewa
         ]);

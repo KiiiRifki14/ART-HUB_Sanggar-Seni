@@ -235,7 +235,7 @@ class EventController extends Controller
      */
     public function storePlotting(Request $request, Event $event)
     {
-        if (in_array($event->status, ['completed', 'cancelled'])) {
+        if (in_array($event->status, ['completed', 'cancelled']) || $event->booking->status === 'cancelled') {
             return redirect()->route('admin.events.show', $event->id)
                              ->with('error', 'Tidak dapat memproses plotting untuk event yang sudah selesai atau dibatalkan.');
         }

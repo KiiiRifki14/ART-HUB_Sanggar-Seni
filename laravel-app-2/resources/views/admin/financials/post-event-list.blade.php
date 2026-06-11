@@ -106,6 +106,7 @@
             <p class="font-headline text-lg text-on-surface font-semibold mb-1">Belum ada pementasan</p>
             <p class="font-label text-xs uppercase tracking-widest text-outline">Pementasan yang sudah selesai akan muncul di sini</p>
         </div>
+        @endforelse
     </div>
 
     @if($events->hasPages())

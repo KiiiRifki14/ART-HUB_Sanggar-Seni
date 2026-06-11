@@ -9,7 +9,7 @@
     <link href="https://fonts.googleapis.com" rel="preconnect">
     <link crossorigin href="https://fonts.gstatic.com" rel="preconnect">
     <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700&family=Noto+Serif:ital,wght@0,400;0,600;0,700;1,400&display=swap" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
 
     <script src="https://cdn.tailwindcss.com?plugins=forms"></script>
@@ -48,9 +48,11 @@
         }
     </script>
     <style>
-        .material-symbols-outlined {
-            font-variation-settings: 'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 24;
-        }
+        /* Pastikan hanya satu icon eye yang terlihat */
+        .btn-toggle-password .icon-hide { display: inline-block; }
+        .btn-toggle-password .icon-show { display: none; }
+        .btn-toggle-password.is-visible .icon-hide { display: none; }
+        .btn-toggle-password.is-visible .icon-show { display: inline-block; }
     </style>
 </head>
 <body class="bg-surface font-body text-on-surface antialiased selection:bg-secondary-container selection:text-on-secondary-container h-screen flex overflow-hidden">
@@ -131,8 +133,10 @@
                             for="password">Kata Sandi</label>
                         <span class="absolute bottom-0 left-1/2 -translate-x-1/2 w-0 h-[2px] bg-secondary transition-all duration-300 peer-focus:w-full rounded-full"></span>
                         <button type="button" onclick="togglePassword(this)"
-                            class="absolute right-5 top-1/2 -translate-y-1/2 text-outline hover:text-primary transition-colors">
-                            <span class="material-symbols-outlined text-xl">visibility_off</span>
+                            class="btn-toggle-password absolute right-5 top-1/2 -translate-y-1/2 text-outline hover:text-primary transition-colors"
+                            aria-label="Tampilkan/sembunyikan kata sandi">
+                            <i class="icon-hide bi bi-eye-slash text-xl"></i>
+                            <i class="icon-show bi bi-eye text-xl"></i>
                         </button>
                     </div>
                 </div>
@@ -183,14 +187,13 @@
     AOS.init({ duration: 900, easing: 'ease-out-cubic', once: true, offset: 0 });
 
     function togglePassword(btn) {
-        const input = btn.closest('.relative').querySelector('input');
-        const icon  = btn.querySelector('span');
+        const input = btn.closest('.relative').querySelector('input[type="password"], input[type="text"]');
         if (input.type === 'password') {
             input.type = 'text';
-            icon.textContent = 'visibility';
+            btn.classList.add('is-visible');
         } else {
             input.type = 'password';
-            icon.textContent = 'visibility_off';
+            btn.classList.remove('is-visible');
         }
     }
 </script>

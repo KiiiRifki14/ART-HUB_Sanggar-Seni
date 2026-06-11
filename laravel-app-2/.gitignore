@@ -22,7 +22,18 @@
 Homestead.json
 Homestead.yaml
 Thumbs.db
-.agents/
-Transkip wawancara/
-Peraturan/
-scratch/
+
+# Agent & Documentation (diabaikan)
+/.agents/
+/Transkip wawancara/
+/Peraturan/
+/scratch/
+/md/
+
+# IDE Helpers & Scripts
+_ide_helper.php
+_ide_helper_models.php
+_pest_ide_helper.php
+.phpstorm.meta.php
+skills-lock.json
+clean_test_data.php

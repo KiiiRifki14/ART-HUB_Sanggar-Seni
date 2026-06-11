@@ -29,11 +29,20 @@ class PersonnelProfileController extends Controller
         }
 
         $validated = $request->validate([
-            'name'       => 'required|string|max:255',
-            'stage_name' => 'nullable|string|max:100',
-            'phone'      => 'nullable|string|max:20',
-            'bio'        => 'nullable|string|max:500',
-            'photo'      => 'nullable|image|mimes:jpg,jpeg,png,webp|max:4096',
+            'name'          => 'required|string|max:255',
+            'stage_name'    => 'nullable|string|max:100',
+            'phone'         => 'nullable|string|max:20',
+            'bio'           => 'nullable|string|max:500',
+            'photo'         => 'nullable|image|mimes:jpg,jpeg,png,webp|max:4096',
+            // Pekerjaan / Sekolah / Kegiatan Utama
+            'has_day_job'   => 'nullable|boolean',
+            'day_job_name'  => 'nullable|string|max:100',
+            'day_job_start' => 'nullable|date_format:H:i',
+            'day_job_end'   => 'nullable|date_format:H:i|after:day_job_start',
+        ], [
+            'day_job_end.after'           => 'Jam selesai kegiatan harus setelah jam mulai.',
+            'day_job_start.date_format'   => 'Format jam mulai tidak valid.',
+            'day_job_end.date_format'     => 'Format jam selesai tidak valid.',
         ]);
 
         // 1. Update nama & nomor HP di tabel users
@@ -46,17 +55,11 @@ class PersonnelProfileController extends Controller
 
         if ($request->hasFile('photo') && $request->file('photo')->isValid()) {
             try {
-                // Pastikan direktori ada
                 Storage::disk('public')->makeDirectory('personnel-photos');
-
-                // Hapus foto lama jika ada
                 if ($photoPath && Storage::disk('public')->exists($photoPath)) {
                     Storage::disk('public')->delete($photoPath);
                 }
-
-                // Simpan foto baru
                 $photoPath = $request->file('photo')->store('personnel-photos', 'public');
-
                 Log::info('Photo uploaded', ['path' => $photoPath, 'personnel_id' => $personnel->id]);
             } catch (\Exception $e) {
                 Log::error('Photo upload failed', ['error' => $e->getMessage()]);
@@ -66,10 +69,21 @@ class PersonnelProfileController extends Controller
             }
         }
 
-        // 3. Update data personel
-        $personnel->stage_name = $validated['stage_name'] ?? null;
-        $personnel->bio        = $validated['bio'] ?? null;
-        $personnel->photo      = $photoPath;
+        // 3. Handle pekerjaan/sekolah
+        $hasDayJob   = !empty($validated['has_day_job']);
+        $dayJobName  = $hasDayJob ? ($validated['day_job_name'] ?? null) : null;
+        $dayJobStart = $hasDayJob ? ($validated['day_job_start'] ?? null) : null;
+        $dayJobEnd   = $hasDayJob ? ($validated['day_job_end'] ?? null) : null;
+
+        // 4. Update data personel (day_job_desc di-sync sama day_job_name agar SP bentrok bisa baca)
+        $personnel->stage_name   = $validated['stage_name'] ?? null;
+        $personnel->bio          = $validated['bio'] ?? null;
+        $personnel->photo        = $photoPath;
+        $personnel->has_day_job  = $hasDayJob;
+        $personnel->day_job_name = $dayJobName;
+        $personnel->day_job_desc = $dayJobName; // sync ke day_job_desc yang dipakai SP
+        $personnel->day_job_start = $dayJobStart;
+        $personnel->day_job_end   = $dayJobEnd;
         $personnel->save();
 
         return redirect()->route('personnel.profile.edit')

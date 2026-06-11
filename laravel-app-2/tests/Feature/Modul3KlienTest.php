@@ -26,6 +26,8 @@ beforeEach(function () {
     // Hapus booking pada tanggal test agar tidak bentrok dengan data persisten
     Booking::whereIn('event_date', [
         now()->addDays(5)->format('Y-m-d'),
+        now()->addDays(8)->format('Y-m-d'),
+        now()->addDays(35)->format('Y-m-d'),
         now()->subDays(2)->format('Y-m-d')
     ])->delete();
 
@@ -43,7 +45,7 @@ beforeEach(function () {
 test('KL-01: Booking Baru – Tanggal Kosong (Valid)', function () {
     $this->actingAs($this->klien);
 
-    $date = now()->addDays(5)->format('Y-m-d');
+    $date = now()->addDays(35)->format('Y-m-d');
     
     $response = $this->post(route('klien.bookings.store'), [
         'service_catalog_id' => $this->catalog->id,
@@ -66,7 +68,7 @@ test('KL-01: Booking Baru – Tanggal Kosong (Valid)', function () {
 test('KL-02: Booking – Tanggal Sudah Penuh', function () {
     $this->actingAs($this->klien);
 
-    $date = now()->addDays(5)->format('Y-m-d');
+    $date = now()->addDays(35)->format('Y-m-d');
 
     // Booking pertama yang sudah DP paid
     Booking::create([
@@ -109,7 +111,7 @@ test('KL-03: Upload Bukti DP – File Valid (JPG < 5MB)', function () {
         'client_phone'       => '081234567890',
         'event_type'         => $this->catalog->name,
         'service_catalog_id' => $this->catalog->id,
-        'event_date'         => now()->addDays(5)->format('Y-m-d'),
+        'event_date'         => now()->addDays(8)->format('Y-m-d'),
         'event_start'        => '09:00',
         'event_end'          => '11:00',
         'venue'              => 'Gedung Sate',
@@ -144,7 +146,7 @@ test('KL-04: Upload Bukti DP – File Terlalu Besar', function () {
         'client_phone'       => '081234567890',
         'event_type'         => $this->catalog->name,
         'service_catalog_id' => $this->catalog->id,
-        'event_date'         => now()->addDays(5)->format('Y-m-d'),
+        'event_date'         => now()->addDays(8)->format('Y-m-d'),
         'event_start'        => '09:00',
         'event_end'          => '11:00',
         'venue'              => 'Gedung Sate',
@@ -177,7 +179,7 @@ test('KL-05: Upload Bukti DP – Format Tidak Didukung', function () {
         'client_phone'       => '081234567890',
         'event_type'         => $this->catalog->name,
         'service_catalog_id' => $this->catalog->id,
-        'event_date'         => now()->addDays(5)->format('Y-m-d'),
+        'event_date'         => now()->addDays(8)->format('Y-m-d'),
         'event_start'        => '09:00',
         'event_end'          => '11:00',
         'venue'              => 'Gedung Sate',
@@ -208,7 +210,7 @@ test('KL-06: Upload Bukti Pelunasan (Full Payment)', function () {
         'client_phone'       => '081234567890',
         'event_type'         => $this->catalog->name,
         'service_catalog_id' => $this->catalog->id,
-        'event_date'         => now()->addDays(5)->format('Y-m-d'),
+        'event_date'         => now()->addDays(8)->format('Y-m-d'),
         'event_start'        => '09:00',
         'event_end'          => '11:00',
         'venue'              => 'Gedung Sate',
@@ -241,7 +243,7 @@ test('KL-07: Melihat Riwayat Booking', function () {
         'client_phone'       => '081234567890',
         'event_type'         => $this->catalog->name,
         'service_catalog_id' => $this->catalog->id,
-        'event_date'         => now()->addDays(5)->format('Y-m-d'),
+        'event_date'         => now()->addDays(8)->format('Y-m-d'),
         'event_start'        => '09:00',
         'event_end'          => '11:00',
         'venue'              => 'Gedung Sate',

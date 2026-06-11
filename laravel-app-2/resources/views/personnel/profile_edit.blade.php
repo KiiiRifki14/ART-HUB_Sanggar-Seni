@@ -147,7 +147,7 @@
 
                 {{-- Nama Panggung --}}
                 <div>
-                    <label class="profile-label">Nama Panggung / Stage Name</label>
+                    <label class="profile-label">Nama Panggung / Stage Name (Opsional)</label>
                     <input type="text" name="stage_name" value="{{ old('stage_name', $personnel->stage_name) }}"
                            class="profile-input"
                            placeholder="Nama tampilan di sistem">
@@ -156,7 +156,7 @@
 
                 {{-- No HP --}}
                 <div>
-                    <label class="profile-label">No. WhatsApp</label>
+                    <label class="profile-label">No. WhatsApp (Opsional)</label>
                     <input type="tel" name="phone" value="{{ old('phone', Auth::user()->phone) }}"
                            class="profile-input"
                            placeholder="08xxxxxxxxxx">
@@ -164,12 +164,64 @@
 
                 {{-- Bio --}}
                 <div>
-                    <label class="profile-label">Bio / Deskripsi Singkat</label>
+                    <label class="profile-label">Bio / Deskripsi Singkat (Opsional)</label>
                     <textarea name="bio" rows="3"
                               class="profile-input resize-none"
                               style="border-radius: 8px 8px 0 0;"
                               placeholder="Ceritakan sedikit tentang diri Anda...">{{ old('bio', $personnel->bio) }}</textarea>
                     <div class="mt-1 text-xs text-muted">Maks 500 karakter</div>
+                </div>
+            </div>
+        </div>
+
+        {{-- Pekerjaan / Sekolah / Kegiatan Utama --}}
+        <div class="fu3 profile-card" x-data="{ hasDayJob: {{ old('has_day_job', $personnel->has_day_job) ? 'true' : 'false' }} }">
+            <div class="profile-label flex items-center gap-2">
+                <i class="bi bi-briefcase-fill" style="color:#C5A028"></i>
+                Pekerjaan / Sekolah / Kegiatan Utama
+            </div>
+            <p class="text-xs text-muted mb-4">Isi ini agar sistem bisa mendeteksi potensi bentrok jadwal latihan dengan kegiatan harianmu.</p>
+
+            {{-- Toggle checkbox --}}
+            <label class="flex items-center gap-3 cursor-pointer mb-4 p-3 rounded-xl" style="background:#F4F2EE; border:1px solid rgba(0,0,0,0.06)">
+                <input type="hidden" name="has_day_job" value="0">
+                <input type="checkbox" name="has_day_job" value="1" id="has_day_job"
+                       class="w-4 h-4 rounded accent-[#8B1A2A] cursor-pointer"
+                       x-model="hasDayJob"
+                       {{ old('has_day_job', $personnel->has_day_job) ? 'checked' : '' }}>
+                <span class="text-sm font-semibold" style="color:#1A1817">Saya punya pekerjaan / sekolah / kegiatan utama di luar sanggar</span>
+            </label>
+
+            {{-- Fields — tampil jika toggle aktif --}}
+            <div x-show="hasDayJob" x-transition class="flex flex-col gap-4">
+                <div>
+                    <label class="profile-label">Nama Pekerjaan / Institusi <span class="text-red-500">*</span></label>
+                    <input type="text" name="day_job_name"
+                           value="{{ old('day_job_name', $personnel->day_job_name ?? $personnel->day_job_desc) }}"
+                           class="profile-input"
+                           placeholder="Contoh: Kantor BRI, SMA N 1 Bandung, Kuliah Unpad..."
+                           x-bind:required="hasDayJob">
+                    <div class="mt-1 text-xs text-muted">Nama ini akan tampil di pesan peringatan bentrok jadwal.</div>
+                </div>
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="profile-label">Jam Mulai Kegiatan <span class="text-red-500">*</span></label>
+                        <input type="time" name="day_job_start"
+                               value="{{ old('day_job_start', $personnel->day_job_start ? \Carbon\Carbon::parse($personnel->day_job_start)->format('H:i') : '') }}"
+                               class="profile-input"
+                               x-bind:required="hasDayJob">
+                    </div>
+                    <div>
+                        <label class="profile-label">Jam Selesai Kegiatan <span class="text-red-500">*</span></label>
+                        <input type="time" name="day_job_end"
+                               value="{{ old('day_job_end', $personnel->day_job_end ? \Carbon\Carbon::parse($personnel->day_job_end)->format('H:i') : '') }}"
+                               class="profile-input"
+                               x-bind:required="hasDayJob">
+                    </div>
+                </div>
+                <div class="p-3 rounded-xl text-xs" style="background:rgba(197,160,40,0.08);border:1px solid rgba(197,160,40,0.2);color:#705d00">
+                    <i class="bi bi-lightbulb-fill me-1"></i>
+                    Contoh: Kuliah 08:00–16:00, Kerja kantor 07:30–15:30, Sekolah 07:00–14:00
                 </div>
             </div>
         </div>

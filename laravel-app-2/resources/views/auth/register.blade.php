@@ -159,7 +159,7 @@
                             <label for="p_skill" class="absolute left-4 top-3 text-on-surface-variant font-label text-sm transition-all duration-200 pointer-events-none
                                 peer-placeholder-shown:top-3 peer-placeholder-shown:text-sm
                                 peer-focus:-top-5 peer-focus:text-xs peer-focus:text-secondary peer-focus:uppercase peer-focus:tracking-widest">
-                                Pekerjaan Utama / Status
+                                Pekerjaan Utama / Status (Opsional)
                             </label>
                         </div>
                     </div>

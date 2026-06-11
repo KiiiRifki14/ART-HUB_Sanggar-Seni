@@ -367,12 +367,25 @@
     $rDate = \Carbon\Carbon::parse($rehearsal->rehearsal_date);
     $rDaysLeft = $now->startOfDay()->diffInDays($rDate->startOfDay(), false);
     $isTodayR = $rDate->isToday();
-    
+
+    // Cek apakah jam latihan sudah lewat (end_time sudah terlampaui)
+    $rehearsalEnded = false;
+    if ($isTodayR && $rehearsal->end_time) {
+        // Paksa Asia/Jakarta agar konsisten dengan $now dari controller
+        $dateOnly    = \Carbon\Carbon::parse($rehearsal->rehearsal_date)->toDateString(); // Y-m-d
+        $endTimeOnly = \Carbon\Carbon::parse($rehearsal->end_time)->format('H:i:s');      // H:i:s saja
+        $endDateTime = \Carbon\Carbon::createFromFormat('Y-m-d H:i:s', $dateOnly . ' ' . $endTimeOnly, 'Asia/Jakarta');
+        $rehearsalEnded = $now->gt($endDateTime);
+    } elseif ($rDate->isPast() && !$isTodayR) {
+        $rehearsalEnded = true;
+    }
+
     // Ambil data pivot absensi latihan
     $rehPivot = $rehearsal->personnel->first()?->pivot;
     $rehCheckedIn = !empty($rehPivot?->checked_in_at);
     $rehHasCoords = $rehearsal->latitude && $rehearsal->longitude;
-    $canRehCheckIn = $isTodayR && !$rehCheckedIn;
+    // Tombol absen aktif: hari ini, belum absen, dan jam latihan belum selesai
+    $canRehCheckIn = $isTodayR && !$rehCheckedIn && !$rehearsalEnded;
 @endphp
 <div id="evt-{{ $rehearsal->rehearsal_date }}" class="event-card rounded-2xl p-4 bg-white flex flex-col justify-between shadow-sm"
      style="border:1px solid rgba(13,148,136,0.2)">
@@ -437,6 +450,18 @@
             <input type="hidden" name="longitude" id="reh-lng-{{ $rehearsal->id }}">
             <input type="hidden" name="accuracy" id="reh-acc-{{ $rehearsal->id }}">
         </form>
+        @elseif($rehearsalEnded && !$rehCheckedIn)
+        {{-- Jam latihan sudah lewat tapi belum absen --}}
+        <div class="flex items-center justify-center gap-2 p-2 rounded-xl border border-dashed" style="background:rgba(251,146,60,0.06);border-color:rgba(251,146,60,0.3)">
+            <i class="bi bi-clock-history text-orange-400"></i>
+            <div class="text-left">
+                <div class="text-xs font-bold text-orange-600">Waktu Absen Habis</div>
+                <div class="text-[0.6rem]" style="color:#847B78">
+                    Latihan selesai {{ \Carbon\Carbon::parse($rehearsal->end_time)->format('H:i') }} WIB
+                    · Hubungi admin jika ada kendala
+                </div>
+            </div>
+        </div>
         @else
         <div class="flex items-center justify-center gap-2 p-2 rounded-xl bg-gray-50 border border-dashed border-gray-200">
             <i class="bi bi-lock-fill text-gray-400"></i>
@@ -452,7 +477,6 @@
 
 
 @endif
-@endsection
 
 {{-- MODAL BERHALANGAN --}}
 <div id="unavailModal" class="fixed inset-0 z-[100] hidden items-center justify-center p-4">
@@ -500,6 +524,9 @@
         </form>
     </div>
 </div>
+
+@endif
+@endsection
 
 @push('scripts')
 <script>

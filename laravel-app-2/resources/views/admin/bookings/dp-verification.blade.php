@@ -253,10 +253,13 @@
 ═══════════════════════════════════════════════════════ --}}
 @foreach($pendingWithProof as $booking)
 @php
+    // Hitung saran profit: 30% dari kontrak, dibatasi maksimal DP yang masuk
     $targetProfit = $booking->total_price * 0.30;
     $dpAmount     = $booking->dp_amount;
-    $fixedProfit  = min($dpAmount, $targetProfit);
+    $fixedProfit  = min($dpAmount, $targetProfit); // Saran: tidak boleh melebihi DP
     $opsBudget    = max(0, $dpAmount - $fixedProfit);
+    $safetyEst    = $opsBudget * 0.10;
+    $netOpsEst    = max(0, $opsBudget - $safetyEst);
     $eventDate    = \Carbon\Carbon::parse($booking->event_date)->isoFormat('D MMMM Y');
 @endphp
 
@@ -301,16 +304,38 @@
                         </div>
                     </div>
                     <div class="bg-gradient-to-br from-primary-container to-primary rounded-xl p-4 md:p-5 border border-primary/20 shadow-md">
-                        <label class="block font-label text-[0.65rem] uppercase tracking-widest text-secondary font-bold mb-1.5"><i class="bi bi-lock-fill"></i> Fixed Profit Pimpinan (Rp)</label>
-                        <p class="font-body text-[0.65rem] text-white/80 mb-2">Saran: Rp {{ number_format($fixedProfit, 0, ',', '.') }}</p>
-                        <input type="number" name="fixed_profit_nominal" min="0" value="{{ $fixedProfit }}" placeholder="Nominal Rp"
-                               class="w-full bg-white/10 border border-white/20 rounded-lg px-3 py-2 font-headline font-bold text-white placeholder-white/50 focus:border-secondary outline-none transition-all"
-                               required form="formConfirm{{ $booking->id }}">
+                        <label class="block font-label text-[0.65rem] uppercase tracking-widest text-secondary font-bold mb-1.5"
+                               for="profitInput{{ $booking->id }}">
+                            <i class="bi bi-lock-fill"></i> Fixed Profit Pimpinan (Rp) <span class="text-red-300">*</span>
+                        </label>
+                        <p class="font-body text-[0.65rem] text-white/80 mb-1">
+                            Saran: <strong class="text-secondary">Rp {{ number_format($fixedProfit, 0, ',', '.') }}</strong>
+                            (≈{{ round(($fixedProfit / $booking->total_price) * 100, 1) }}% dari kontrak)
+                            — sudah diisi otomatis, bisa diubah.
+                        </p>
+                        <input
+                            type="number"
+                            id="profitInput{{ $booking->id }}"
+                            name="fixed_profit_nominal"
+                            min="0"
+                            max="{{ $dpAmount }}"
+                            value="{{ $fixedProfit }}"
+                            class="w-full bg-white/10 border border-white/20 rounded-lg px-3 py-2 font-headline font-bold text-white placeholder-white/50 focus:border-secondary outline-none transition-all"
+                            required
+                            form="formConfirm{{ $booking->id }}"
+                            oninput="updateProfitPreview({{ $booking->id }}, {{ $dpAmount }})">
+                        {{-- Live Preview --}}
+                        <div id="profitPreview{{ $booking->id }}" class="mt-2 text-[0.6rem] text-white/70 space-y-0.5">
+                            <div>→ Ops Gross: <span id="opsGross{{ $booking->id }}">Rp {{ number_format($opsBudget, 0, ',', '.') }}</span></div>
+                            <div>→ Safety 10%: <span id="opsSafety{{ $booking->id }}">Rp {{ number_format($safetyEst, 0, ',', '.') }}</span></div>
+                            <div>→ <strong class="text-white/90">Ops Bersih: <span id="opsNet{{ $booking->id }}">Rp {{ number_format($netOpsEst, 0, ',', '.') }}</span></strong></div>
+                        </div>
                     </div>
                     @if($opsBudget > 0)
                     <div class="bg-blue-500/5 border border-blue-500/20 rounded-xl p-3 md:p-4">
-                        <div class="font-label text-[0.65rem] uppercase tracking-widest text-blue-700/70 font-bold mb-1">Sisa Budget Operasional</div>
-                        <div class="font-headline font-bold text-sm md:text-base text-blue-600">Rp {{ number_format($opsBudget, 0, ',', '.') }}</div>
+                        <div class="font-label text-[0.65rem] uppercase tracking-widest text-blue-700/70 font-bold mb-1">Estimasi Sisa Ops (jika ikut saran)</div>
+                        <div class="font-headline font-bold text-sm md:text-base text-blue-600">Rp {{ number_format($netOpsEst, 0, ',', '.') }}</div>
+                        <div class="font-label text-[0.55rem] text-blue-500/70 mt-0.5">Gross: Rp {{ number_format($opsBudget, 0, ',', '.') }} − Cadangan 10%: Rp {{ number_format($safetyEst, 0, ',', '.') }}</div>
                     </div>
                     @else
                     <div class="bg-orange-500/10 border border-orange-500/20 rounded-xl p-3 md:p-4 text-orange-700 font-body text-xs flex items-start gap-2">
@@ -353,10 +378,11 @@
                         <i class="bi bi-x-circle"></i> Tolak
                     </button>
                 </form>
-                <form action="{{ route('admin.bookings.confirm', $booking->id) }}" method="POST" class="m-0" id="formConfirm{{ $booking->id }}"
-                      data-confirm="Konfirmasi DP & Kunci Laba untuk {{ addslashes($booking->client_name) }}?">
+                <form action="{{ route('admin.bookings.confirm', $booking->id) }}" method="POST" class="m-0" id="formConfirm{{ $booking->id }}">
                     @csrf
-                    <button type="submit" class="px-4 py-2.5 rounded-lg bg-green-500 text-white font-label text-xs font-bold uppercase tracking-widest hover:bg-green-600 transition-colors flex items-center gap-1.5 shadow-md">
+                    <button type="button"
+                        onclick="submitWithValidation({{ $booking->id }}, {{ $dpAmount }}, '{{ addslashes($booking->client_name) }}')"
+                        class="px-4 py-2.5 rounded-lg bg-green-500 text-white font-label text-xs font-bold uppercase tracking-widest hover:bg-green-600 transition-colors flex items-center gap-1.5 shadow-md">
                         <i class="bi bi-check-circle"></i> Konfirmasi
                     </button>
                 </form>
@@ -455,6 +481,64 @@ document.addEventListener('keydown', function(e) {
         });
     }
 });
+
+// ── Live Preview Kalkulasi Profit ─────────────────────────────────
+function updateProfitPreview(bookingId, dpAmount) {
+    var input   = document.getElementById('profitInput' + bookingId);
+    var profit  = parseFloat(input.value) || 0;
+    var opsGross = Math.max(0, dpAmount - profit);
+    var safety   = Math.round(opsGross * 0.10);
+    var opsNet   = Math.max(0, opsGross - safety);
+
+    var fmt = function(n) {
+        return 'Rp ' + Math.round(n).toLocaleString('id-ID');
+    };
+
+    var elGross  = document.getElementById('opsGross'  + bookingId);
+    var elSafety = document.getElementById('opsSafety' + bookingId);
+    var elNet    = document.getElementById('opsNet'    + bookingId);
+
+    if (elGross)  elGross.textContent  = fmt(opsGross);
+    if (elSafety) elSafety.textContent = fmt(safety);
+    if (elNet)    elNet.textContent    = fmt(opsNet);
+
+    // Warna merah jika profit > DP (tidak valid)
+    if (profit > dpAmount) {
+        input.style.borderColor = '#f87171';
+    } else {
+        input.style.borderColor = '';
+    }
+}
+
+// ── Validasi & Submit Konfirmasi ──────────────────────────────────
+function submitWithValidation(bookingId, dpAmount, clientName) {
+    var input  = document.getElementById('profitInput' + bookingId);
+    var profit = parseFloat(input ? input.value : 0);
+
+    if (!profit || profit <= 0) {
+        alert('⚠️ Nominal Fixed Profit belum diisi!\n\nSilakan isi nominal keuntungan pimpinan sebelum konfirmasi.');
+        if (input) input.focus();
+        return;
+    }
+
+    if (profit > dpAmount) {
+        alert('⚠️ Nominal Fixed Profit (' + profit.toLocaleString('id-ID') + ') melebihi DP yang masuk (' + dpAmount.toLocaleString('id-ID') + ').\n\nMaksimum profit adalah sebesar DP yang diterima.');
+        if (input) input.focus();
+        return;
+    }
+
+    var konfirmasi = confirm(
+        'Konfirmasi DP & Kunci Laba untuk ' + clientName + '?\n\n' +
+        'Fixed Profit: Rp ' + Math.round(profit).toLocaleString('id-ID') + '\n' +
+        'Ops Budget: Rp ' + Math.max(0, dpAmount - profit).toLocaleString('id-ID') + '\n\n' +
+        'Tindakan ini tidak dapat dibatalkan.'
+    );
+
+    if (konfirmasi) {
+        var form = document.getElementById('formConfirm' + bookingId);
+        if (form) form.submit();
+    }
+}
 </script>
 
 @endsection

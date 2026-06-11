@@ -18,30 +18,40 @@
 
 @if($fr)
     {{-- ── SUMMARY CARDS ── --}}
+    @php
+        // BUG-5 FIX: Budget Ops Bersih = gross budget DIKURANGI safety buffer
+        // Safety buffer adalah cadangan yang TIDAK boleh dipakai untuk ops biasa.
+        $netOpsBudget = max(0, $fr->operational_budget - $fr->safety_buffer_amt);
+        $overBudget   = $fr->actual_operational_cost > $netOpsBudget;
+    @endphp
     <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
         <div class="bg-gradient-to-br from-primary-container to-primary text-white rounded-xl p-6 border border-primary/20 shadow-[0_12px_24px_rgba(54,31,26,0.08)] flex items-center justify-between">
             <div>
-                <div class="font-label text-[0.65rem] uppercase tracking-widest text-white/80 font-bold mb-1">Budget Ops Awal</div>
-                <div class="font-headline text-3xl font-bold text-secondary">Rp {{ number_format($fr->operational_budget, 0, ',', '.') }}</div>
+                <div class="font-label text-[0.65rem] uppercase tracking-widest text-white/80 font-bold mb-1">Budget Ops Bersih</div>
+                <div class="font-headline text-3xl font-bold text-secondary">Rp {{ number_format($netOpsBudget, 0, ',', '.') }}</div>
+                <div class="font-label text-[0.55rem] text-white/60 mt-1">(setelah dikurangi cadangan Rp {{ number_format($fr->safety_buffer_amt, 0, ',', '.') }})</div>
             </div>
             <i class="bi bi-wallet2 text-4xl text-white/10"></i>
         </div>
         
-        @php $overBudget = $fr->actual_operational_cost > $fr->operational_budget; @endphp
         <div class="bg-surface-container-lowest rounded-xl p-6 border {{ $overBudget ? 'border-red-500/30 shadow-[0_8px_20px_rgba(239,68,68,0.1)]' : 'border-outline-variant/30 shadow-[0_8px_20px_rgba(54,31,26,0.03)]' }} flex items-center justify-between">
             <div>
                 <div class="font-label text-[0.65rem] uppercase tracking-widest font-bold mb-1 {{ $overBudget ? 'text-red-500' : 'text-outline' }}">Realisasi Lapangan</div>
                 <div class="font-headline text-3xl font-bold {{ $overBudget ? 'text-red-600' : 'text-on-surface' }}">
                     Rp {{ number_format($fr->actual_operational_cost, 0, ',', '.') }}
                 </div>
+                @if($overBudget)
+                <div class="font-label text-[0.55rem] text-red-500 mt-1">⚠️ Melebihi budget bersih!</div>
+                @endif
             </div>
             <i class="bi bi-cash-stack text-4xl {{ $overBudget ? 'text-red-500/10' : 'text-outline-variant/30' }}"></i>
         </div>
         
         <div class="bg-surface-container-lowest rounded-xl p-6 border border-green-500/30 shadow-[0_8px_20px_rgba(34,197,94,0.05)] flex items-center justify-between">
             <div>
-                <div class="font-label text-[0.65rem] uppercase tracking-widest font-bold mb-1 text-green-600">Dana Cadangan</div>
+                <div class="font-label text-[0.65rem] uppercase tracking-widest font-bold mb-1 text-green-600">Dana Cadangan (Safety Buffer)</div>
                 <div class="font-headline text-3xl font-bold text-green-600">Rp {{ number_format($fr->safety_buffer_amt, 0, ',', '.') }}</div>
+                <div class="font-label text-[0.55rem] text-green-600/70 mt-1">10% dari gross budget — tidak untuk ops biasa</div>
             </div>
             <i class="bi bi-shield-check text-4xl text-green-500/10"></i>
         </div>
@@ -186,7 +196,7 @@
             @csrf
             <div class="p-6 space-y-4">
                 <div>
-                    <label class="block font-label text-[0.65rem] uppercase tracking-widest text-on-surface-variant font-bold mb-1.5">Kategori</label>
+                    <label class="block font-label text-[0.65rem] uppercase tracking-widest text-on-surface-variant font-bold mb-1.5">Kategori <span class="text-red-500">*</span></label>
                     <select name="category" class="w-full bg-surface-container border border-outline-variant/50 rounded-lg px-4 py-2.5 font-body text-sm text-on-surface focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all" required>
                         <option value="konsumsi">Konsumsi</option>
                         <option value="transportasi">Transportasi / Bensin</option>
@@ -198,16 +208,16 @@
                     </select>
                 </div>
                 <div>
-                    <label class="block font-label text-[0.65rem] uppercase tracking-widest text-on-surface-variant font-bold mb-1.5">Keterangan / Deskripsi</label>
+                    <label class="block font-label text-[0.65rem] uppercase tracking-widest text-on-surface-variant font-bold mb-1.5">Keterangan / Deskripsi <span class="text-red-500">*</span></label>
                     <input type="text" name="description" placeholder="Contoh: Beli rokok & kopi, Uang tol..." class="w-full bg-surface-container border border-outline-variant/50 rounded-lg px-4 py-2.5 font-body text-sm text-on-surface focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all" required>
                 </div>
                 <div class="grid grid-cols-2 gap-4">
                     <div>
-                        <label class="block font-label text-[0.65rem] uppercase tracking-widest text-on-surface-variant font-bold mb-1.5">Estimasi Awal (Rp)</label>
+                        <label class="block font-label text-[0.65rem] uppercase tracking-widest text-on-surface-variant font-bold mb-1.5">Estimasi Awal (Rp) <span class="text-red-500">*</span></label>
                         <input type="number" name="estimated_amount" value="0" min="0" class="w-full bg-surface-container border border-outline-variant/50 rounded-lg px-4 py-2.5 font-headline font-bold text-on-surface focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all" required>
                     </div>
                     <div>
-                        <label class="block font-label text-[0.65rem] uppercase tracking-widest text-primary font-bold mb-1.5">Realisasi Lapangan (Rp)</label>
+                        <label class="block font-label text-[0.65rem] uppercase tracking-widest text-primary font-bold mb-1.5">Realisasi Lapangan (Rp) <span class="text-red-500">*</span></label>
                         <input type="number" name="actual_amount" min="0" placeholder="Nominal Rp" class="w-full bg-primary/5 border border-primary/30 rounded-lg px-4 py-2.5 font-headline font-bold text-primary focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all" required>
                     </div>
                 </div>

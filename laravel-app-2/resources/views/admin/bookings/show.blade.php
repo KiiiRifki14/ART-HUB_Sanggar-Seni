@@ -111,20 +111,31 @@
                 
                 <hr class="border-outline-variant/20 border-dashed my-2">
                 
-                {{-- INPUT MANUAL FIXED PROFIT --}}
+                {{-- PREVIEW SARAN KALKULASI (bukan form, hanya info) --}}
                 @if($booking->status === 'pending')
-                <div class="p-3 rounded-lg border border-primary/20 bg-primary/5">
-                    <label class="block font-label text-[0.65rem] uppercase tracking-widest text-primary font-bold mb-1.5"><i class="bi bi-lock-fill me-1"></i> Fixed Profit (Nominal Manual)</label>
-                    <p class="font-body text-[0.7rem] text-on-surface-variant mb-2">Isi nominal keuntungan pimpinan sebelum mengunci laba. Wajib diisi.</p>
-                    <input type="number" id="fixedProfitInput" placeholder="Contoh: 2500000" class="w-full bg-surface-container-lowest border border-primary/30 rounded-lg px-3 py-2 font-headline text-sm font-bold text-primary focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all" min="0" required>
-                </div>
-                <div class="flex justify-between items-center text-sm">
-                    <span class="text-on-surface-variant font-medium">Budget Operasional</span>
-                    <span class="font-bold text-on-surface" id="budgetOpsDisplay">—</span>
-                </div>
-                <div class="flex justify-between items-center text-sm">
-                    <span class="text-on-surface-variant font-medium">Safety Buffer (10%)</span>
-                    <span class="font-bold text-green-600" id="safetyBufferDisplay">—</span>
+                @php
+                    $saranProfit = round($booking->total_price * 0.30);
+                    $saranOps    = $booking->dp_amount - $saranProfit;
+                    $saranOps    = max(0, $saranOps);
+                    $saranBuffer = round($saranOps * 0.10);
+                @endphp
+                <div class="p-3 rounded-lg border border-primary/10 bg-primary/5 space-y-2">
+                    <div class="font-label text-[0.6rem] uppercase tracking-widest text-primary font-bold mb-1 flex items-center gap-1.5">
+                        <i class="bi bi-calculator"></i> Saran Kalkulasi Otomatis (30%)
+                    </div>
+                    <div class="flex justify-between items-center text-xs">
+                        <span class="text-on-surface-variant">Saran Fixed Profit</span>
+                        <span class="font-bold text-primary">Rp {{ number_format($saranProfit, 0, ',', '.') }}</span>
+                    </div>
+                    <div class="flex justify-between items-center text-xs">
+                        <span class="text-on-surface-variant">Estimasi Ops Budget</span>
+                        <span class="font-bold text-on-surface">Rp {{ number_format($saranOps, 0, ',', '.') }}</span>
+                    </div>
+                    <div class="flex justify-between items-center text-xs">
+                        <span class="text-on-surface-variant">Safety Buffer (10%)</span>
+                        <span class="font-bold text-green-600">Rp {{ number_format($saranBuffer, 0, ',', '.') }}</span>
+                    </div>
+                    <p class="font-body text-[0.6rem] text-outline mt-1.5">💡 Nilai ini hanya saran. Nominal akhir diisi saat konfirmasi DP di menu <strong>DP Verification</strong>.</p>
                 </div>
                 @else
                 <div class="flex justify-between items-center text-sm">
@@ -144,11 +155,8 @@
 
             <div class="p-5 bg-surface-container-low border-t border-outline-variant/30">
                 @if($booking->status === 'pending')
-                <div class="text-center p-3 rounded-lg border border-orange-500/30 bg-orange-500/10 mb-3">
-                    <p class="font-body text-xs text-orange-700"><i class="bi bi-exclamation-triangle"></i> Penguncian laba & verifikasi DP sekarang dipusatkan di menu <b>DP Verification</b> untuk mencegah bypass antrean.</p>
-                </div>
                 <a href="{{ route('admin.bookings.dp_verification') }}" class="w-full flex justify-center items-center gap-2 bg-gradient-to-br from-primary-container to-primary text-white px-4 py-3 rounded-xl font-label text-xs font-bold uppercase tracking-widest hover:opacity-90 transition-all shadow-md">
-                    <i class="bi bi-shield-check"></i> Proses Verifikasi DP
+                    <i class="bi bi-shield-check"></i> Lanjut → Konfirmasi DP & Isi Profit
                 </a>
                 @elseif(in_array($booking->status, ['dp_paid','confirmed','paid_full','completed']))
                 <div class="p-4 text-center rounded-xl bg-green-500/10 border border-green-500/20 text-green-700 mb-4">
@@ -236,36 +244,14 @@
 
 @push('scripts')
 <script>
-    const dpAmount    = Number("{{ $booking->dp_amount ?? 0 }}");
-    const profitInput = document.getElementById('fixedProfitInput');
-    const budgetDisp  = document.getElementById('budgetOpsDisplay');
-    const bufferDisp  = document.getElementById('safetyBufferDisplay');
-    const hiddenInput = document.getElementById('hiddenFixedProfit');
-
-    function fmt(num) {
-        return 'Rp ' + Math.round(num).toLocaleString('id-ID');
-    }
-
-    if (profitInput) {
-        profitInput.addEventListener('input', function () {
-            const profit = parseFloat(this.value) || 0;
-            const ops    = Math.max(0, dpAmount - profit);
-            const safety = ops * 0.10;
-            budgetDisp.textContent = fmt(ops);
-            bufferDisp.textContent = fmt(safety);
-            if (hiddenInput) hiddenInput.value = profit;
+    // Tombol Nego: buka modal update harga
+    document.addEventListener('DOMContentLoaded', function () {
+        document.querySelectorAll('[data-confirm]').forEach(function (el) {
+            el.addEventListener('submit', function (e) {
+                var msg = el.getAttribute('data-confirm');
+                if (msg && !confirm(msg)) e.preventDefault();
+            });
         });
-    }
-
-    function validateAndConfirmKunci(e, msg) {
-        const profit = parseFloat(profitInput ? profitInput.value : 0);
-        if (!profit || profit <= 0) {
-            e.preventDefault();
-            alert('⚠️ Nominal Fixed Profit belum diisi! Silakan isi keuntungan pimpinan terlebih dahulu.');
-            return false;
-        }
-        if (hiddenInput) hiddenInput.value = profit;
-        return confirm(msg);
-    }
+    });
 </script>
 @endpush

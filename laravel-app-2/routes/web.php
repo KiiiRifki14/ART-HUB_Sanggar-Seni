@@ -193,6 +193,8 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
     Route::get('/rehearsals', [RehearsalController::class, 'index'])->name('rehearsals.index');
     Route::get('/rehearsals/create', [RehearsalController::class, 'create'])->name('rehearsals.create');
     Route::post('/events/{event}/rehearsals', [RehearsalController::class, 'store'])->name('rehearsals.store');
+    Route::get('/rehearsals/{rehearsal}/edit', [RehearsalController::class, 'edit'])->name('rehearsals.edit');
+    Route::put('/rehearsals/{rehearsal}', [RehearsalController::class, 'update'])->name('rehearsals.update');
 
     // EVENT MONITORING (halaman baru)
     Route::get('/monitoring', [EventController::class, 'monitoring'])->name('events.monitoring');

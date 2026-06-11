@@ -396,7 +396,9 @@
             <div class="font-label text-[0.55rem] uppercase tracking-widest text-outline font-bold mb-1">Realisasi Ops</div>
             <div class="font-headline text-base font-bold text-on-surface">Rp {{ number_format($finance->actual_operational_cost, 0, ',', '.') }}</div>
         </div>
-        @php $selisih = $finance->operational_budget - $finance->actual_operational_cost; @endphp
+        @php 
+            $selisih = ($finance->operational_budget - $finance->safety_buffer_amt) - $finance->actual_operational_cost;
+        @endphp
         <div class="{{ $selisih >= 0 ? 'bg-blue-500/5 border-blue-500/20' : 'bg-red-500/5 border-red-500/20' }} border rounded-xl p-3 text-center">
             <div class="font-label text-[0.55rem] uppercase tracking-widest text-outline font-bold mb-1">Efisiensi Ops</div>
             <div class="font-headline text-base font-bold {{ $selisih >= 0 ? 'text-blue-600' : 'text-red-600' }}">
@@ -510,17 +512,29 @@
                         @endif
                     </td>
                     <td class="px-4 py-3.5 text-center">
-                        <form action="{{ route('admin.personnel.update_event_status', [$event->id, $p->id]) }}" method="POST" class="inline-block">
-                            @csrf
-                            @method('PATCH')
-                            <select name="status" onchange="this.form.submit()" class="bg-surface-container border border-outline-variant/30 rounded-lg px-2 py-1 font-body text-xs text-on-surface focus:outline-none focus:border-primary transition-all">
-                                <option value="assigned" {{ ($pivot->status ?? 'assigned') === 'assigned' ? 'selected' : '' }}>Assigned</option>
-                                <option value="Menunggu" {{ ($pivot->status ?? '') === 'Menunggu' ? 'selected' : '' }}>Menunggu</option>
-                                <option value="Lagi Latihan" {{ ($pivot->status ?? '') === 'Lagi Latihan' ? 'selected' : '' }}>Lagi Latihan</option>
-                                <option value="Sudah Siap/Standby" {{ ($pivot->status ?? '') === 'Sudah Siap/Standby' ? 'selected' : '' }}>Sudah Siap/Standby</option>
-                                <option value="Selesai Tugas" {{ ($pivot->status ?? '') === 'Selesai Tugas' ? 'selected' : '' }}>Selesai Tugas</option>
-                            </select>
-                        </form>
+                        @php
+                            $taskStatusMap = [
+                                'assigned'  => ['Assigned',   'bg-surface-container text-on-surface-variant border-outline-variant/30'],
+                                'confirmed' => ['Dikonfirmasi','bg-blue-500/10 text-blue-600 border-blue-500/20'],
+                                'attended'  => ['Hadir',       'bg-green-500/10 text-green-600 border-green-500/20'],
+                                'absent'    => ['Absen',       'bg-red-500/10 text-red-500 border-red-500/20'],
+                                'late'      => ['Telat',       'bg-orange-500/10 text-orange-600 border-orange-500/20'],
+                            ];
+                            $curTaskStatus = $pivot->status ?? 'assigned';
+                            [$tsLabel, $tsClass] = $taskStatusMap[$curTaskStatus] ?? $taskStatusMap['assigned'];
+                        @endphp
+                        <select
+                            data-ajax-status
+                            data-url="{{ route('admin.personnel.update_event_status', [$event->id, $p->id]) }}"
+                            data-personnel-name="{{ $p->user->name ?? 'Kru' }}"
+                            class="bg-surface-container border border-outline-variant/30 rounded-lg px-2 py-1 font-body text-xs text-on-surface focus:outline-none focus:border-primary transition-all"
+                        >
+                            <option value="assigned"  {{ $curTaskStatus === 'assigned'  ? 'selected' : '' }}>Assigned</option>
+                            <option value="confirmed" {{ $curTaskStatus === 'confirmed' ? 'selected' : '' }}>Dikonfirmasi</option>
+                            <option value="attended"  {{ $curTaskStatus === 'attended'  ? 'selected' : '' }}>Hadir</option>
+                            <option value="absent"    {{ $curTaskStatus === 'absent'    ? 'selected' : '' }}>Absen</option>
+                            <option value="late"      {{ $curTaskStatus === 'late'      ? 'selected' : '' }}>Telat</option>
+                        </select>
                     </td>
                 </tr>
                 @endforeach
@@ -541,7 +555,88 @@
 
 @push('scripts')
 <script>
-document.addEventListener('DOMContentLoaded', function() {
+// ── AJAX Status Tugas (BUG-9 FIX) ────────────────────────────────
+document.addEventListener('DOMContentLoaded', function () {
+    // Toast container
+    const toastContainer = document.createElement('div');
+    toastContainer.id = 'toastContainer';
+    toastContainer.style.cssText = 'position:fixed;bottom:1.5rem;right:1.5rem;z-index:9999;display:flex;flex-direction:column;gap:0.5rem;';
+    document.body.appendChild(toastContainer);
+
+    function showToast(msg, isError = false) {
+        const t = document.createElement('div');
+        t.style.cssText = `
+            padding: 0.75rem 1.25rem;
+            border-radius: 0.75rem;
+            font-size: 0.75rem;
+            font-weight: 700;
+            font-family: inherit;
+            letter-spacing: 0.03em;
+            color: ${isError ? '#b91c1c' : '#166534'};
+            background: ${isError ? '#fef2f2' : '#f0fdf4'};
+            border: 1px solid ${isError ? '#fca5a5' : '#86efac'};
+            box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+            transform: translateX(2rem);
+            opacity: 0;
+            transition: all 0.25s ease;
+        `;
+        t.textContent = msg;
+        toastContainer.appendChild(t);
+        requestAnimationFrame(() => {
+            t.style.transform = 'translateX(0)';
+            t.style.opacity = '1';
+        });
+        setTimeout(() => {
+            t.style.transform = 'translateX(2rem)';
+            t.style.opacity = '0';
+            setTimeout(() => t.remove(), 300);
+        }, 3000);
+    }
+
+    const csrfToken = document.querySelector('meta[name="csrf-token"]')?.content ?? '';
+
+    document.querySelectorAll('select[data-ajax-status]').forEach(function (select) {
+        select.addEventListener('change', function () {
+            const url      = this.getAttribute('data-url');
+            const name     = this.getAttribute('data-personnel-name');
+            const newVal   = this.value;
+            const prevVal  = this.dataset.prevValue ?? this.options[this.selectedIndex === 0 ? 0 : this.selectedIndex].value;
+            this.dataset.prevValue = newVal;
+            this.disabled = true;
+            this.style.opacity = '0.5';
+
+            const formData = new FormData();
+            formData.append('_token', csrfToken);
+            formData.append('_method', 'PATCH');
+            formData.append('status', newVal);
+
+            fetch(url, {
+                method: 'POST',
+                headers: { 'X-Requested-With': 'XMLHttpRequest', 'Accept': 'application/json' },
+                body: formData,
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) {
+                    showToast('✅ ' + data.message);
+                } else {
+                    showToast('❌ Gagal memperbarui status.', true);
+                }
+            })
+            .catch(() => {
+                showToast('❌ Koneksi gagal. Coba lagi.', true);
+            })
+            .finally(() => {
+                this.disabled = false;
+                this.style.opacity = '1';
+            });
+        });
+
+        // simpan nilai awal
+        select.dataset.prevValue = select.value;
+    });
+
+    // Inisialisasi Leaflet Map
     const mapContainer = document.getElementById('eventMapContainer');
     if (!mapContainer) return;
     
@@ -551,33 +646,24 @@ document.addEventListener('DOMContentLoaded', function() {
     
     if (isNaN(latitude) || isNaN(longitude)) return;
     
-    // Initialize map
     const map = L.map(mapContainer).setView([latitude, longitude], 16);
     
-    // Add tile layer
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
         attribution: '© OpenStreetMap contributors',
         maxZoom: 19,
         noWrap: true
     }).addTo(map);
     
-    // Add marker
-    const marker = L.marker([latitude, longitude], {
-        title: venue
-    }).addTo(map);
+    const marker = L.marker([latitude, longitude], { title: venue }).addTo(map);
 
-    // Add visual geofence circle (200 meters)
-    const geofenceCircle = L.circle([latitude, longitude], {
-        color: '#8B1A2A',          // Maroon outline
-        fillColor: '#C5A028',      // Gold fill
+    L.circle([latitude, longitude], {
+        color: '#8B1A2A',
+        fillColor: '#C5A028',
         fillOpacity: 0.15,
-        radius: 200                // 200 meters radius
+        radius: 200
     }).addTo(map);
 
-    marker.bindPopup(
-        '<strong>' + venue + '</strong><br>' + 
-        'Zona Absensi Aktif (Radius 200m)'
-    ).openPopup();
+    marker.bindPopup('<strong>' + venue + '</strong><br>Zona Absensi Aktif (Radius 200m)').openPopup();
 });
 </script>
 @endpush
