@@ -536,7 +536,18 @@ function submitWithValidation(bookingId, dpAmount, clientName) {
 
     if (konfirmasi) {
         var form = document.getElementById('formConfirm' + bookingId);
-        if (form) form.submit();
+        if (form) {
+            var existingInput = form.querySelector('input[name="fixed_profit_nominal"]');
+            if (existingInput) {
+                existingInput.remove();
+            }
+            var hiddenInput = document.createElement('input');
+            hiddenInput.type = 'hidden';
+            hiddenInput.name = 'fixed_profit_nominal';
+            hiddenInput.value = profit;
+            form.appendChild(hiddenInput);
+            form.submit();
+        }
     }
 }
 </script>

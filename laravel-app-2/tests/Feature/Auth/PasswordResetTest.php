@@ -1,8 +1,9 @@
 <?php
 
 use App\Models\User;
-use Illuminate\Auth\Notifications\ResetPassword;
-use Illuminate\Support\Facades\Notification;
+use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Hash;
+use App\Mail\OtpMail;
 
 test('reset password link screen can be rendered', function () {
     $response = $this->get('/forgot-password');
@@ -10,51 +11,48 @@ test('reset password link screen can be rendered', function () {
     $response->assertStatus(200);
 });
 
-test('reset password link can be requested', function () {
-    Notification::fake();
+test('reset password OTP can be requested', function () {
+    Mail::fake();
 
     $user = User::factory()->create();
 
-    $this->post('/forgot-password', ['email' => $user->email]);
+    $response = $this->post('/forgot-password', ['email' => $user->email]);
 
-    Notification::assertSentTo($user, ResetPassword::class);
-});
+    $response->assertRedirect(route('password.reset.otp.form'));
+    $this->assertEquals($user->email, session('reset_email'));
 
-test('reset password screen can be rendered', function () {
-    Notification::fake();
-
-    $user = User::factory()->create();
-
-    $this->post('/forgot-password', ['email' => $user->email]);
-
-    Notification::assertSentTo($user, ResetPassword::class, function ($notification) {
-        $response = $this->get('/reset-password/'.$notification->token);
-
-        $response->assertStatus(200);
-
-        return true;
+    Mail::assertSent(OtpMail::class, function ($mail) use ($user) {
+        return $mail->hasTo($user->email);
     });
 });
 
-test('password can be reset with valid token', function () {
-    Notification::fake();
-
+test('reset password OTP screen can be rendered', function () {
     $user = User::factory()->create();
 
-    $this->post('/forgot-password', ['email' => $user->email]);
+    $response = $this->withSession(['reset_email' => $user->email])
+        ->get('/reset-password-otp');
 
-    Notification::assertSentTo($user, ResetPassword::class, function ($notification) use ($user) {
-        $response = $this->post('/reset-password', [
-            'token' => $notification->token,
-            'email' => $user->email,
-            'password' => 'password',
-            'password_confirmation' => 'password',
-        ]);
+    $response->assertStatus(200);
+});
 
-        $response
-            ->assertSessionHasNoErrors()
-            ->assertRedirect(route('login'));
+test('password can be reset with valid OTP', function () {
+    $user = User::factory()->create([
+        'otp_code' => '123456',
+        'otp_expires_at' => now()->addMinutes(15),
+    ]);
 
-        return true;
-    });
+    $response = $this->post('/reset-password-otp', [
+        'email' => $user->email,
+        'otp_code' => '123456',
+        'password' => 'New-password123',
+        'password_confirmation' => 'New-password123',
+    ]);
+
+    $response
+        ->assertSessionHasNoErrors()
+        ->assertRedirect(route('login'));
+
+    $this->assertTrue(Hash::check('New-password123', $user->refresh()->password));
+    $this->assertNull($user->otp_code);
+    $this->assertNull($user->otp_expires_at);
 });

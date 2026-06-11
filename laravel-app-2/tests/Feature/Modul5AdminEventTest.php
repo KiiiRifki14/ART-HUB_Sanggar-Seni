@@ -196,3 +196,29 @@ test('EVT-07: Update Status Tugas Personel Per-Event', function () {
     expect($this->personnel->status)->toBe('active');
 });
 
+test('EVT-08: Render post-event list screen successfully', function () {
+    $this->actingAs($this->admin);
+
+    $response = $this->get(route('admin.financials.post_event_list'));
+
+    $response->assertStatus(200);
+});
+
+test('EVT-09: Render post-event update detail screen successfully', function () {
+    $this->actingAs($this->admin);
+
+    // Create a financial record so that the page doesn't throw error
+    \App\Models\FinancialRecord::create([
+        'event_id' => $this->event->id,
+        'total_revenue' => 500000,
+        'fixed_profit' => 150000,
+        'operational_budget' => 350000,
+        'safety_buffer_amt' => 35000,
+        'profit_locked' => true,
+    ]);
+
+    $response = $this->get(route('admin.financials.post_event', $this->event->id));
+
+    $response->assertStatus(200);
+});
+

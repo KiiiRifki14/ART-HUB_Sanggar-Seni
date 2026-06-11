@@ -18,12 +18,15 @@ use App\Models\ServiceCatalog;
 use App\Models\Personnel;
 use App\Models\FeeReference;
 use App\Models\Rehearsal;
+use Carbon\Carbon;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Support\Facades\DB;
 
 uses(DatabaseTransactions::class);
 
 beforeEach(function () {
+    Carbon::setTestNow('2026-06-11 12:00:00');
+
     $this->admin = User::firstOrCreate(
         ['email' => 'admin_test6@example.com'],
         [
@@ -106,6 +109,10 @@ beforeEach(function () {
             'fee' => 150000,
         ]
     );
+});
+
+afterEach(function () {
+    Carbon::setTestNow(null);
 });
 
 // TEST-01: Pagination index personel dan index latihan

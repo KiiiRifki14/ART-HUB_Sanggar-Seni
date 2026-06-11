@@ -309,8 +309,14 @@ class EventController extends Controller
 
                 // 6. Update bagian Keuangan (Financial Records) 
                 if ($event->financialRecord) {
+                    $totalRev  = $event->financialRecord->total_revenue;
+                    $fixedProf = $event->financialRecord->fixed_profit;
+                    $opsBudget = max(0, $totalRev - $fixedProf - $estimatedHonor);
+
                     $event->financialRecord->update([
-                        'total_personnel_honor' => $estimatedHonor
+                        'total_personnel_honor' => $estimatedHonor,
+                        'operational_budget'    => $opsBudget,
+                        'safety_buffer_amt'     => $opsBudget * 0.10,
                     ]);
                 }
             });

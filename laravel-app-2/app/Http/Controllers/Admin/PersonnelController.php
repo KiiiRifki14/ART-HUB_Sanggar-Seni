@@ -244,7 +244,7 @@ class PersonnelController extends Controller
     public function updateEventStatus(Request $request, Event $event, Personnel $personnel)
     {
         $request->validate([
-            'status' => 'required|string|in:assigned,confirmed,attended,absent,late',
+            'status' => 'required|string|in:assigned,confirmed,attended,absent,late,Lagi Latihan',
         ]);
 
         $event->personnel()->updateExistingPivot($personnel->id, [

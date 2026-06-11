@@ -417,5 +417,11 @@ Route::middleware(['auth', 'role:klien'])->prefix('klien')->name('klien.')->grou
     Route::put('/profile/password', [\App\Http\Controllers\Klien\KlienProfileController::class, 'updatePassword'])->name('profile.password');
 });
 
+Route::middleware('auth')->group(function () {
+    Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
+    Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
+    Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+});
+
 // Memuat Rute Login/Register yang dibuat oleh Breeze
 require __DIR__ . '/auth.php';
