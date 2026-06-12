@@ -29,16 +29,16 @@
 
 {{-- Progress Steps --}}
 <div class="flex items-center justify-center gap-0 mb-8">
-    @foreach([['bi-person-circle','Data Klien'],['bi-calendar-event','Detail Event'],['bi-wallet2','Kontrak']] as $i => [$icon, $label])
+    @foreach([['lucide-user','Data Klien'],['lucide-calendar','Detail Event'],['lucide-wallet','Kontrak']] as $i => [$icon, $label])
     <div class="flex items-center {{ $i > 0 ? '' : '' }}">
         <div class="flex flex-col items-center">
-            <div class="w-9 h-9 rounded-full {{ $i === 0 ? 'bg-primary text-white' : 'bg-surface-container-low text-outline border border-outline-variant/40' }} flex items-center justify-center text-sm font-bold shadow-sm transition-all">
-                <i class="bi {{ $icon }} text-sm"></i>
+            <div class="w-10 h-10 rounded-full {{ $i === 0 ? 'bg-gradient-to-br from-[#fcd400] to-[#C5A028] text-[#1A1817] shadow-lg' : 'bg-[#fff] border border-[#d4af37] text-[#C5A028] shadow-sm' }} flex items-center justify-center font-bold transition-all">
+                <i data-lucide="{{ str_replace('lucide-', '', $icon) }}" class="w-5 h-5"></i>
             </div>
-            <span class="font-label text-[0.6rem] uppercase tracking-widest mt-1.5 {{ $i === 0 ? 'text-primary font-bold' : 'text-outline' }}">{{ $label }}</span>
+            <span class="font-label text-[0.65rem] uppercase tracking-widest mt-2 {{ $i === 0 ? 'text-[#8B1A2A] font-bold' : 'text-[#847B78]' }}">{{ $label }}</span>
         </div>
         @if($i < 2)
-        <div class="w-24 h-px bg-outline-variant/30 mx-1 mb-5"></div>
+        <div class="w-24 h-px mx-2 mb-6" style="background:linear-gradient(to right, rgba(197,160,40,0.5), transparent);"></div>
         @endif
     </div>
     @endforeach
@@ -51,31 +51,32 @@
             @csrf
 
             {{-- ══ SECTION: Data Klien ══ --}}
-            <div class="bg-surface-container-lowest rounded-2xl border border-outline-variant/30 shadow-sm overflow-hidden">
-                <div class="px-6 py-4 border-b border-outline-variant/20 bg-surface-container-low/50 flex items-center gap-3">
-                    <div class="w-9 h-9 rounded-xl bg-primary/10 flex items-center justify-center flex-shrink-0">
-                        <i class="bi bi-person-fill text-primary"></i>
+            <div class="card-gold overflow-hidden">
+                <div class="px-6 py-4 border-b flex items-center gap-3" style="border-color:rgba(197,160,40,0.2); background:rgba(197,160,40,0.02);">
+                    <div class="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0" style="background:rgba(139,26,42,0.1);">
+                        <i data-lucide="user" class="w-5 h-5" style="color:#8B1A2A;"></i>
                     </div>
                     <div>
-                        <div class="font-headline text-sm font-bold text-primary">Data Klien</div>
-                        <p class="font-label text-[0.6rem] uppercase tracking-widest text-outline">Informasi identitas pemesan</p>
+                        <div class="title-gold" style="font-size:1.1rem;">Data Klien</div>
+                        <p class="subtitle-gold" style="font-size:0.65rem;">Informasi identitas pemesan</p>
                     </div>
                 </div>
                 <div class="p-6 space-y-4">
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
-                            <label class="block font-label text-xs uppercase tracking-widest text-on-surface-variant font-bold mb-2">Nama Klien <span class="text-red-500">*</span></label>
+                            <label class="block subtitle-gold mb-2">Nama Klien <span class="text-red-500">*</span></label>
                             <input type="text" name="client_name" value="{{ old('client_name') }}" required
-                                   class="w-full bg-surface-container-low border border-outline-variant/50 rounded-xl px-4 py-2.5 font-body text-sm text-on-surface focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all @error('client_name') border-red-500 @enderror"
+                                   class="input-gold @error('client_name') border-red-500 @enderror"
                                    placeholder="Bpk./Ibu Siapa">
                             @error('client_name') <p class="text-red-500 text-xs mt-1 font-body">{{ $message }}</p> @enderror
                         </div>
                         <div>
-                            <label class="block font-label text-xs uppercase tracking-widest text-on-surface-variant font-bold mb-2">No. Telepon / WA <span class="text-red-500">*</span></label>
+                            <label class="block subtitle-gold mb-2">No. Telepon / WA <span class="text-red-500">*</span></label>
                             <div class="flex">
-                                <span class="inline-flex items-center px-3.5 rounded-l-xl border border-r-0 border-outline-variant/50 bg-surface-container-highest text-on-surface-variant font-body text-sm font-semibold">+62</span>
+                                <span class="inline-flex items-center px-4 rounded-l-xl border border-r-0 font-bold" style="background:rgba(197,160,40,0.1); border-color:rgba(197,160,40,0.4); color:#8B1A2A;">+62</span>
                                 <input type="text" name="client_phone" value="{{ old('client_phone') }}" required
-                                       class="w-full bg-surface-container-low border border-outline-variant/50 rounded-r-xl px-4 py-2.5 font-body text-sm text-on-surface focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all @error('client_phone') border-red-500 @enderror"
+                                       class="w-full bg-white border rounded-r-xl px-4 py-3 focus:outline-none focus:border-yellow-600 focus:ring-1 focus:ring-yellow-600 transition-all font-body text-sm @error('client_phone') border-red-500 @enderror"
+                                       style="border-color:rgba(197,160,40,0.4); color:#1A1817;"
                                        placeholder="81xxxxxxxxx">
                             </div>
                             @error('client_phone') <p class="text-red-500 text-xs mt-1 font-body">{{ $message }}</p> @enderror
@@ -85,22 +86,22 @@
             </div>
 
             {{-- ══ SECTION: Detail Event ══ --}}
-            <div class="bg-surface-container-lowest rounded-2xl border border-outline-variant/30 shadow-sm overflow-hidden">
-                <div class="px-6 py-4 border-b border-outline-variant/20 bg-surface-container-low/50 flex items-center gap-3">
-                    <div class="w-9 h-9 rounded-xl bg-secondary/10 flex items-center justify-center flex-shrink-0">
-                        <i class="bi bi-calendar-event text-secondary"></i>
+            <div class="card-gold overflow-hidden">
+                <div class="px-6 py-4 border-b flex items-center gap-3" style="border-color:rgba(197,160,40,0.2); background:rgba(197,160,40,0.02);">
+                    <div class="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0" style="background:rgba(197,160,40,0.1);">
+                        <i data-lucide="calendar" class="w-5 h-5 text-yellow-600"></i>
                     </div>
                     <div>
-                        <div class="font-headline text-sm font-bold text-primary">Detail Event</div>
-                        <p class="font-label text-[0.6rem] uppercase tracking-widest text-outline">Jenis, tanggal, waktu & lokasi pementasan</p>
+                        <div class="title-gold" style="font-size:1.1rem;">Detail Event</div>
+                        <p class="subtitle-gold" style="font-size:0.65rem;">Jenis, tanggal, waktu & lokasi pementasan</p>
                     </div>
                 </div>
                 <div class="p-6 space-y-4">
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
-                            <label class="block font-label text-xs uppercase tracking-widest text-on-surface-variant font-bold mb-2">Jenis Event <span class="text-red-500">*</span></label>
+                            <label class="block subtitle-gold mb-2">Jenis Event <span class="text-red-500">*</span></label>
                             <select name="event_type" required
-                                    class="w-full bg-surface-container-low border border-outline-variant/50 rounded-xl px-4 py-2.5 font-body text-sm text-on-surface focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all appearance-none @error('event_type') border-red-500 @enderror">
+                                    class="input-gold appearance-none @error('event_type') border-red-500 @enderror">
                                 <option value="">— Pilih Jenis —</option>
                                 @foreach(['jaipong'=>'Jaipong','degung'=>'Degung','rampak_gendang'=>'Rampak Gendang','wayang_golek'=>'Wayang Golek','campuran'=>'Campuran'] as $k => $v)
                                     <option value="{{ $k }}" {{ old('event_type') === $k ? 'selected' : '' }}>{{ $v }}</option>
@@ -109,35 +110,35 @@
                             @error('event_type') <p class="text-red-500 text-xs mt-1 font-body">{{ $message }}</p> @enderror
                         </div>
                         <div>
-                            <label class="block font-label text-xs uppercase tracking-widest text-on-surface-variant font-bold mb-2">Tanggal Pelaksanaan <span class="text-red-500">*</span></label>
+                            <label class="block subtitle-gold mb-2">Tanggal Pelaksanaan <span class="text-red-500">*</span></label>
                             <input type="date" name="event_date" value="{{ old('event_date') }}" required
-                                   class="w-full bg-surface-container-low border border-outline-variant/50 rounded-xl px-4 py-2.5 font-body text-sm text-on-surface focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all @error('event_date') border-red-500 @enderror">
+                                   class="input-gold @error('event_date') border-red-500 @enderror">
                             @error('event_date') <p class="text-red-500 text-xs mt-1 font-body">{{ $message }}</p> @enderror
                         </div>
                         <div>
-                            <label class="block font-label text-xs uppercase tracking-widest text-on-surface-variant font-bold mb-2">Jam Mulai <span class="text-red-500">*</span></label>
+                            <label class="block subtitle-gold mb-2">Jam Mulai <span class="text-red-500">*</span></label>
                             <input type="time" name="event_start" value="{{ old('event_start') }}" required
-                                   class="w-full bg-surface-container-low border border-outline-variant/50 rounded-xl px-4 py-2.5 font-body text-sm text-on-surface focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all @error('event_start') border-red-500 @enderror">
+                                   class="input-gold @error('event_start') border-red-500 @enderror">
                             @error('event_start') <p class="text-red-500 text-xs mt-1 font-body">{{ $message }}</p> @enderror
                         </div>
                         <div>
-                            <label class="block font-label text-xs uppercase tracking-widest text-on-surface-variant font-bold mb-2">Jam Selesai <span class="text-red-500">*</span></label>
+                            <label class="block subtitle-gold mb-2">Jam Selesai <span class="text-red-500">*</span></label>
                             <input type="time" name="event_end" value="{{ old('event_end') }}" required
-                                   class="w-full bg-surface-container-low border border-outline-variant/50 rounded-xl px-4 py-2.5 font-body text-sm text-on-surface focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all @error('event_end') border-red-500 @enderror">
+                                   class="input-gold @error('event_end') border-red-500 @enderror">
                             @error('event_end') <p class="text-red-500 text-xs mt-1 font-body">{{ $message }}</p> @enderror
                         </div>
                     </div>
 
                     {{-- Venue / Peta --}}
                     <div>
-                        <label class="block font-label text-xs uppercase tracking-widest text-on-surface-variant font-bold mb-2">Venue / Lokasi Acara <span class="text-red-500">*</span></label>
+                        <label class="block subtitle-gold mb-2">Venue / Lokasi Acara <span class="text-red-500">*</span></label>
                         <div class="map-search-wrapper mb-3">
                             <div class="relative">
-                                <i class="bi bi-search absolute left-3.5 top-1/2 -translate-y-1/2 text-outline text-sm pointer-events-none"></i>
+                                <i data-lucide="search" class="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none"></i>
                                 <input type="text" id="addressSearch"
                                        placeholder="Ketik alamat atau nama tempat (min. 3 karakter)..."
                                        autocomplete="off"
-                                       class="w-full bg-surface-container-low border border-outline-variant/50 rounded-xl pl-10 pr-4 py-2.5 font-body text-sm text-on-surface focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all">
+                                       class="input-gold" style="padding-left:40px;">
                             </div>
                             <div class="autocomplete-dropdown" id="autocompleteDropdown"></div>
                         </div>
@@ -148,27 +149,27 @@
                         <input type="hidden" name="longitude" id="longitudeInput" value="{{ old('longitude') }}">
 
                         <!-- Map Container -->
-                        <div id="mapContainer" class="border border-outline-variant/30"></div>
+                        <div id="mapContainer" style="border:1px solid rgba(197,160,40,0.4);"></div>
 
                         <!-- Coordinates -->
                         <div class="mt-3 grid grid-cols-2 gap-3">
                             <div>
-                                <label class="block font-label text-[0.6rem] uppercase tracking-widest text-outline font-bold mb-1">Latitude</label>
+                                <label class="block subtitle-gold mb-1" style="font-size:0.6rem;">Latitude</label>
                                 <input type="text" id="latitudeDisplay" readonly
-                                       class="w-full bg-surface-container-highest border border-outline-variant/30 rounded-xl px-4 py-2 font-body text-xs text-on-surface-variant outline-none"
+                                       class="input-gold bg-gray-50" style="color:#847B78;"
                                        placeholder="Auto-filled">
                             </div>
                             <div>
-                                <label class="block font-label text-[0.6rem] uppercase tracking-widest text-outline font-bold mb-1">Longitude</label>
+                                <label class="block subtitle-gold mb-1" style="font-size:0.6rem;">Longitude</label>
                                 <input type="text" id="longitudeDisplay" readonly
-                                       class="w-full bg-surface-container-highest border border-outline-variant/30 rounded-xl px-4 py-2 font-body text-xs text-on-surface-variant outline-none"
+                                       class="input-gold bg-gray-50" style="color:#847B78;"
                                        placeholder="Auto-filled">
                             </div>
                         </div>
 
-                        <div class="flex items-start gap-2 mt-2.5 p-3 bg-secondary/5 border border-secondary/20 rounded-xl">
-                            <i class="bi bi-lightbulb-fill text-secondary text-sm flex-shrink-0 mt-0.5"></i>
-                            <p class="font-body text-xs text-on-surface-variant">Cari alamat di atas, pilih dari hasil, dan klik peta untuk menyesuaikan lokasi tepat.</p>
+                        <div class="flex items-start gap-2 mt-2.5 p-3 rounded-xl" style="background:rgba(197,160,40,0.05); border:1px solid rgba(197,160,40,0.2);">
+                            <i data-lucide="lightbulb" class="w-4 h-4 text-yellow-600 flex-shrink-0 mt-0.5"></i>
+                            <p class="font-body text-xs" style="color:#504442;">Cari alamat di atas, pilih dari hasil, dan klik peta untuk menyesuaikan lokasi tepat.</p>
                         </div>
 
                         @error('venue') <p class="text-red-500 text-xs mt-1 font-body">{{ $message }}</p> @enderror
@@ -177,48 +178,48 @@
             </div>
 
             {{-- ══ SECTION: Nilai Kontrak ══ --}}
-            <div class="bg-surface-container-lowest rounded-2xl border border-outline-variant/30 shadow-sm overflow-hidden">
-                <div class="px-6 py-4 border-b border-outline-variant/20 bg-surface-container-low/50 flex items-center gap-3">
-                    <div class="w-9 h-9 rounded-xl bg-green-500/10 flex items-center justify-center flex-shrink-0">
-                        <i class="bi bi-wallet2 text-green-600"></i>
+            <div class="card-gold overflow-hidden">
+                <div class="px-6 py-4 border-b flex items-center gap-3" style="border-color:rgba(197,160,40,0.2); background:rgba(197,160,40,0.02);">
+                    <div class="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0" style="background:rgba(22,163,74,0.1);">
+                        <i data-lucide="wallet" class="w-5 h-5 text-green-600"></i>
                     </div>
                     <div>
-                        <div class="font-headline text-sm font-bold text-primary">Nilai Kontrak</div>
-                        <p class="font-label text-[0.6rem] uppercase tracking-widest text-outline">Total harga deal & jumlah uang muka (DP)</p>
+                        <div class="title-gold" style="font-size:1.1rem;">Nilai Kontrak</div>
+                        <p class="subtitle-gold" style="font-size:0.65rem;">Total harga deal & jumlah uang muka (DP)</p>
                     </div>
                 </div>
                 <div class="p-6">
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
-                            <label class="block font-label text-xs uppercase tracking-widest text-on-surface-variant font-bold mb-2">Total Harga Deal (Rp) <span class="text-red-500">*</span></label>
+                            <label class="block subtitle-gold mb-2">Total Harga Deal (Rp) <span class="text-red-500">*</span></label>
                             <div class="relative">
-                                <span class="absolute inset-y-0 left-0 pl-4 flex items-center text-outline font-bold text-sm">Rp</span>
+                                <span class="absolute inset-y-0 left-0 pl-4 flex items-center font-bold text-sm" style="color:#1A1817; font-family:'Inter',sans-serif;">Rp</span>
                                 <input type="number" name="total_price" value="{{ old('total_price') }}" required
-                                       class="w-full bg-surface-container-low border border-outline-variant/50 rounded-xl pl-10 pr-4 py-2.5 font-body text-sm text-on-surface font-semibold focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all @error('total_price') border-red-500 @enderror"
+                                       class="input-gold" style="padding-left:40px; font-weight:700; color:#1A1817;"
                                        placeholder="15000000" id="totalPriceInput" oninput="calcSisa()">
                             </div>
                             @error('total_price') <p class="text-red-500 text-xs mt-1 font-body">{{ $message }}</p> @enderror
                         </div>
                         <div>
-                            <label class="block font-label text-xs uppercase tracking-widest text-on-surface-variant font-bold mb-2">Jumlah DP Masuk (Rp) <span class="text-red-500">*</span></label>
+                            <label class="block subtitle-gold mb-2">Jumlah DP Masuk (Rp) <span class="text-red-500">*</span></label>
                             <div class="relative">
-                                <span class="absolute inset-y-0 left-0 pl-4 flex items-center text-green-600 font-bold text-sm">Rp</span>
+                                <span class="absolute inset-y-0 left-0 pl-4 flex items-center font-bold text-sm" style="color:#16a34a; font-family:'Inter',sans-serif;">Rp</span>
                                 <input type="number" name="dp_amount" value="{{ old('dp_amount') }}" required
-                                       class="w-full bg-surface-container-low border border-outline-variant/50 rounded-xl pl-10 pr-4 py-2.5 font-body text-sm text-green-600 font-semibold focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all @error('dp_amount') border-red-500 @enderror"
+                                       class="input-gold" style="padding-left:40px; font-weight:700; color:#16a34a;"
                                        placeholder="7500000" id="dpAmountInput" oninput="calcSisa()">
                             </div>
                             @error('dp_amount') <p class="text-red-500 text-xs mt-1 font-body">{{ $message }}</p> @enderror
                         </div>
                     </div>
                     {{-- Sisa Pelunasan Preview --}}
-                    <div id="sisaPreview" class="mt-4 p-4 bg-surface-container-low rounded-xl border border-outline-variant/30 hidden">
+                    <div id="sisaPreview" class="mt-4 p-4 rounded-xl hidden" style="background:rgba(139,26,42,0.03); border:1px solid rgba(139,26,42,0.1);">
                         <div class="flex items-center justify-between">
                             <div>
-                                <p class="font-label text-[0.6rem] uppercase tracking-widest text-outline font-bold">Sisa Pelunasan</p>
-                                <p id="sisaAmount" class="font-headline text-xl font-bold text-primary mt-0.5">Rp 0</p>
+                                <p class="subtitle-gold" style="font-size:0.6rem;">Sisa Pelunasan</p>
+                                <p id="sisaAmount" class="title-gold mt-1" style="font-size:1.4rem; color:#8B1A2A;">Rp 0</p>
                             </div>
-                            <div class="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center">
-                                <i class="bi bi-cash-coin text-primary"></i>
+                            <div class="w-12 h-12 rounded-xl flex items-center justify-center" style="background:rgba(139,26,42,0.1);">
+                                <i data-lucide="coins" class="w-6 h-6" style="color:#8B1A2A;"></i>
                             </div>
                         </div>
                     </div>
@@ -227,13 +228,11 @@
 
             {{-- ══ ACTIONS ══ --}}
             <div class="flex justify-end gap-3 pt-2">
-                <a href="{{ route('admin.bookings.index') }}"
-                   class="px-5 py-2.5 rounded-xl border border-outline-variant/50 text-on-surface-variant hover:bg-surface-container-low transition-colors font-label text-xs font-bold uppercase tracking-widest flex items-center gap-2">
-                    <i class="bi bi-x-circle"></i> Batal
+                <a href="{{ route('admin.bookings.index') }}" class="arh-btn-secondary px-6 py-2.5">
+                    <i data-lucide="x" class="w-4 h-4 mr-2 inline-block"></i> Batal
                 </a>
-                <button type="submit"
-                        class="bg-gradient-to-br from-primary-container to-primary text-white px-7 py-2.5 rounded-xl font-label text-xs font-bold uppercase tracking-widest hover:opacity-90 transition-all shadow-md flex items-center gap-2">
-                    <i class="bi bi-save2-fill"></i> Simpan Booking
+                <button type="submit" class="arh-btn-primary px-8 py-2.5" style="background:linear-gradient(135deg, #fcd400, #C5A028); color:#1A1817; border:none;">
+                    <i data-lucide="save" class="w-4 h-4 mr-2 inline-block"></i> Simpan Booking
                 </button>
             </div>
         </form>

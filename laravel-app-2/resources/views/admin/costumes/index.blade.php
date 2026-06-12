@@ -265,7 +265,7 @@
                                     <i data-lucide="edit-3" class="w-3.5 h-3.5"></i>
                                 </a>
                                 @endif
-                                <button type="button" @click="openReturnModal({{ $r->id }}, '{{ $r->costume_type }}')" class="w-7 h-7 rounded-md border border-secondary/40 text-secondary hover:bg-secondary/10 flex items-center justify-center transition-all" title="Tandai Kembali">
+                                <button type="button" onclick="openReturnModal({{ $r->id }}, '{{ addslashes($r->costume_type) }}')" class="w-7 h-7 rounded-md border border-secondary/40 text-secondary hover:bg-secondary/10 flex items-center justify-center transition-all" title="Tandai Kembali">
                                     <i data-lucide="check-circle" class="w-3.5 h-3.5"></i>
                                 </button>
                             </div>
@@ -339,7 +339,7 @@
                         <i data-lucide="edit-3" class="w-3.5 h-3.5"></i>
                     </a>
                     @endif
-                    <button type="button" @click="openReturnModal({{ $r->id }}, '{{ $r->costume_type }}')" class="w-7 h-7 rounded-md border border-secondary/40 text-secondary hover:bg-secondary/10 flex items-center justify-center transition-all" title="Tandai Kembali">
+                    <button type="button" onclick="openReturnModal({{ $r->id }}, '{{ addslashes($r->costume_type) }}')" class="w-7 h-7 rounded-md border border-secondary/40 text-secondary hover:bg-secondary/10 flex items-center justify-center transition-all" title="Tandai Kembali">
                         <i data-lucide="check-circle" class="w-3.5 h-3.5"></i>
                     </button>
                 </div>
@@ -431,7 +431,7 @@
                         <td class="px-3 py-1.5">
                             <div class="flex items-center justify-end">
                                 @if($usage->status === 'checked_out')
-                                <button type="button" @click="openReturnUsageModal({{ $usage->id }}, '{{ $usage->costume->name }}')" class="w-7 h-7 rounded-md border border-primary/40 text-primary hover:bg-primary/10 flex items-center justify-center transition-all" title="Tandai Kembali">
+                                <button type="button" onclick="openReturnUsageModal({{ $usage->id }}, '{{ addslashes($usage->costume->name) }}')" class="w-7 h-7 rounded-md border border-primary/40 text-primary hover:bg-primary/10 flex items-center justify-center transition-all" title="Tandai Kembali">
                                     <i data-lucide="check-circle" class="w-3.5 h-3.5"></i>
                                 </button>
                                 @else
@@ -502,7 +502,7 @@
                 </div>
                 @if($usage->status === 'checked_out')
                 <div class="flex justify-end pt-1.5 border-t border-outline-variant/10">
-                    <button type="button" @click="openReturnUsageModal({{ $usage->id }}, '{{ $usage->costume->name }}')" class="w-7 h-7 rounded-md border border-primary/40 text-primary hover:bg-primary/10 flex items-center justify-center transition-all" title="Tandai Kembali">
+                    <button type="button" onclick="openReturnUsageModal({{ $usage->id }}, '{{ addslashes($usage->costume->name) }}')" class="w-7 h-7 rounded-md border border-primary/40 text-primary hover:bg-primary/10 flex items-center justify-center transition-all" title="Tandai Kembali">
                         <i data-lucide="check-circle" class="w-3.5 h-3.5"></i>
                     </button>
                 </div>

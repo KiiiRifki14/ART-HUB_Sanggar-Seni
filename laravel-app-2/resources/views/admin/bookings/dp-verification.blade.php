@@ -7,102 +7,102 @@
 
 {{-- ═══════════════════════════ SUMMARY CARDS ═══════════════════════════ --}}
 <div class="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6 mb-6 md:mb-8">
-    <div class="bg-surface-container-lowest rounded-xl p-4 md:p-6 border border-outline-variant/30 shadow-[0_8px_20px_rgba(54,31,26,0.03)] flex items-center gap-4 md:gap-5 group hover:-translate-y-1 transition-all">
-        <div class="w-11 h-11 md:w-14 md:h-14 rounded-xl bg-orange-500/10 text-orange-600 flex items-center justify-center text-lg md:text-2xl flex-shrink-0 group-hover:scale-110 transition-transform">
-            <i class="bi bi-clock-history"></i>
+    <div class="card-gold p-4 md:p-6 flex items-center gap-4 md:gap-5 group hover:-translate-y-1 transition-all">
+        <div class="w-11 h-11 md:w-14 md:h-14 rounded-xl flex items-center justify-center text-lg md:text-2xl flex-shrink-0 group-hover:scale-110 transition-transform" style="background:rgba(234,88,12,0.1); color:#ea580c;">
+            <i data-lucide="clock" class="w-6 h-6"></i>
         </div>
         <div>
-            <div class="font-label text-[0.55rem] md:text-[0.65rem] uppercase tracking-widest text-outline font-bold mb-1">Menunggu Verifikasi</div>
-            <div class="font-headline text-xl md:text-2xl font-bold text-on-surface leading-none">{{ $antreanCount }} <span class="font-body text-xs md:text-sm font-medium text-on-surface-variant">Antrean</span></div>
+            <div class="subtitle-gold mb-1" style="font-size:0.65rem;">Menunggu Verifikasi</div>
+            <div class="title-gold" style="font-size:1.5rem; line-height:1;">{{ $antreanCount }} <span class="subtitle-gold" style="font-size:0.8rem; text-transform:none; letter-spacing:normal;">Antrean</span></div>
         </div>
     </div>
-    <div class="bg-surface-container-lowest rounded-xl p-4 md:p-6 border border-outline-variant/30 shadow-[0_8px_20px_rgba(54,31,26,0.03)] flex items-center gap-4 md:gap-5 group hover:-translate-y-1 transition-all">
-        <div class="w-11 h-11 md:w-14 md:h-14 rounded-xl bg-green-500/10 text-green-600 flex items-center justify-center text-lg md:text-2xl flex-shrink-0 group-hover:scale-110 transition-transform">
-            <i class="bi bi-wallet2"></i>
+    <div class="card-gold p-4 md:p-6 flex items-center gap-4 md:gap-5 group hover:-translate-y-1 transition-all">
+        <div class="w-11 h-11 md:w-14 md:h-14 rounded-xl flex items-center justify-center text-lg md:text-2xl flex-shrink-0 group-hover:scale-110 transition-transform" style="background:rgba(22,163,74,0.1); color:#16a34a;">
+            <i data-lucide="wallet" class="w-6 h-6"></i>
         </div>
         <div>
-            <div class="font-label text-[0.55rem] md:text-[0.65rem] uppercase tracking-widest text-outline font-bold mb-1">Total DP Masuk</div>
-            <div class="font-headline text-xl md:text-2xl font-bold text-green-600 leading-none">Rp {{ number_format($totalDpMasuk, 0, ',', '.') }}</div>
+            <div class="subtitle-gold mb-1" style="font-size:0.65rem;">Total DP Masuk</div>
+            <div class="title-gold" style="font-size:1.5rem; line-height:1; color:#16a34a;">Rp {{ number_format($totalDpMasuk, 0, ',', '.') }}</div>
         </div>
     </div>
-    <div class="bg-gradient-to-br from-primary-container to-primary rounded-xl p-4 md:p-6 border border-primary/20 shadow-[0_8px_20px_rgba(54,31,26,0.08)] flex items-center gap-4 md:gap-5 group hover:-translate-y-1 transition-all">
-        <div class="w-11 h-11 md:w-14 md:h-14 rounded-xl bg-white/10 text-secondary flex items-center justify-center text-lg md:text-2xl flex-shrink-0 group-hover:scale-110 transition-transform">
-            <i class="bi bi-lock-fill"></i>
+    <div class="card-gold p-4 md:p-6 flex items-center gap-4 md:gap-5 group hover:-translate-y-1 transition-all" style="background:linear-gradient(135deg, #8B1A2A, #5C0E19);">
+        <div class="w-11 h-11 md:w-14 md:h-14 rounded-xl flex items-center justify-center text-lg md:text-2xl flex-shrink-0 group-hover:scale-110 transition-transform" style="background:rgba(255,255,255,0.1); color:#fcd400;">
+            <i data-lucide="lock" class="w-6 h-6"></i>
         </div>
         <div>
-            <div class="font-label text-[0.55rem] md:text-[0.65rem] uppercase tracking-widest text-white/70 font-bold mb-1">Profit Aman (Locked)</div>
-            <div class="font-headline text-xl md:text-2xl font-bold text-secondary leading-none">Rp {{ number_format($totalProfitLocked, 0, ',', '.') }}</div>
+            <div class="subtitle-gold mb-1" style="font-size:0.65rem; color:rgba(255,255,255,0.7);">Profit Aman (Locked)</div>
+            <div class="title-gold" style="font-size:1.5rem; line-height:1; color:#fcd400;">Rp {{ number_format($totalProfitLocked, 0, ',', '.') }}</div>
         </div>
     </div>
 </div>
 
 {{-- ═══════════════════ TABEL ANTREAN VERIFIKASI ═══════════════════ --}}
-<div class="bg-surface-container-lowest rounded-xl border border-outline-variant/30 shadow-[0_12px_24px_rgba(54,31,26,0.03)] overflow-hidden mb-8">
-    <div class="px-6 py-5 border-b border-outline-variant/20 flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-surface-container-low/30">
-        <h3 class="font-headline text-lg font-bold text-primary flex items-center gap-2">
-            <i class="bi bi-shield-check text-secondary"></i> Antrean Verifikasi
+<div class="card-gold overflow-hidden mb-8">
+    <div class="px-6 py-4 border-b flex flex-col sm:flex-row sm:items-center justify-between gap-4" style="border-color:rgba(197,160,40,0.2); background:rgba(197,160,40,0.02);">
+        <h3 class="title-gold flex items-center gap-2" style="font-size:1.3rem;">
+            <i data-lucide="shield-check" class="w-5 h-5 text-yellow-600"></i> Antrean Verifikasi
             @if($antreanCount > 0)
-                <span class="inline-flex items-center justify-center min-w-6 h-6 px-1.5 rounded-full bg-primary text-secondary font-label text-[0.65rem] font-bold">{{ $antreanCount }}</span>
+                <span class="inline-flex items-center justify-center min-w-6 h-6 px-1.5 rounded-full font-bold" style="background:#8B1A2A; color:#fcd400; font-size:0.65rem;">{{ $antreanCount }}</span>
             @endif
         </h3>
         <div class="relative">
-            <i class="bi bi-search absolute left-3 top-1/2 -translate-y-1/2 text-outline-variant"></i>
-            <input type="text" id="searchKlien" placeholder="Cari Klien..." oninput="filterTable()" class="w-full sm:w-64 bg-surface-container-lowest border border-outline-variant/50 rounded-lg pl-9 pr-4 py-2 font-body text-sm text-on-surface focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all">
+            <i data-lucide="search" class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400"></i>
+            <input type="text" id="searchKlien" placeholder="Cari Klien..." oninput="filterTable()" class="input-gold w-full sm:w-64" style="padding-left:36px; padding-top:8px; padding-bottom:8px;">
         </div>
     </div>
 
-    <table class="w-full hidden md:table" id="dpvTable">
-        <thead class="bg-surface-container-low">
+    <table class="w-full hidden md:table table-gold" id="dpvTable">
+        <thead>
             <tr>
-                <th class="font-label text-[0.65rem] uppercase tracking-widest text-outline font-bold px-6 py-4 text-left">Kode Booking</th>
-                <th class="font-label text-[0.65rem] uppercase tracking-widest text-outline font-bold px-6 py-4 text-left">Klien & Acara</th>
-                <th class="font-label text-[0.65rem] uppercase tracking-widest text-outline font-bold px-6 py-4 text-right">Total Deal</th>
-                <th class="font-label text-[0.65rem] uppercase tracking-widest text-outline font-bold px-6 py-4 text-right">Nominal DP</th>
-                <th class="font-label text-[0.65rem] uppercase tracking-widest text-outline font-bold px-6 py-4 text-center">Bukti</th>
-                <th class="font-label text-[0.65rem] uppercase tracking-widest text-outline font-bold px-6 py-4 text-right">Aksi</th>
+                <th class="text-left">Kode Booking</th>
+                <th class="text-left">Klien & Acara</th>
+                <th class="text-right">Total Deal</th>
+                <th class="text-right">Nominal DP</th>
+                <th class="text-center">Bukti</th>
+                <th class="text-right">Aksi</th>
             </tr>
         </thead>
-        <tbody class="divide-y divide-outline-variant/20">
+        <tbody>
             @forelse($pendingWithProof as $booking)
-            <tr data-client="{{ strtolower($booking->client_name) }}" class="hover:bg-surface-container-low/50 transition-colors">
-                <td class="px-6 py-4 pl-5">
-                    <span class="inline-block px-2.5 py-1 rounded bg-secondary-container/40 text-on-secondary-container border border-secondary/20 font-label text-[0.65rem] font-bold tracking-wider">
+            <tr data-client="{{ strtolower($booking->client_name) }}">
+                <td class="pl-5">
+                    <span class="badge-gold">
                         BK-{{ str_pad($booking->id, 3, '0', STR_PAD_LEFT) }}
                     </span>
                 </td>
-                <td class="px-6 py-4">
-                    <div class="font-body font-bold text-sm text-on-surface mb-1">{{ $booking->client_name }}</div>
-                    <span class="inline-block px-2 py-0.5 rounded border border-outline-variant/50 bg-surface-container text-on-surface-variant font-label text-[0.6rem] font-bold uppercase tracking-wider">
+                <td>
+                    <div style="font-weight:700; color:#1A1817; font-size:0.95rem;">{{ $booking->client_name }}</div>
+                    <span class="badge-gold mt-1">
                         {{ ucwords(str_replace('_', ' ', $booking->event_type)) }}
                     </span>
                 </td>
-                <td class="px-6 py-4 text-right font-body text-sm font-semibold text-on-surface">Rp {{ number_format($booking->total_price, 0, ',', '.') }}</td>
-                <td class="px-6 py-4 text-right">
-                    <div class="font-headline font-bold text-green-600 text-sm">Rp {{ number_format($booking->dp_amount, 0, ',', '.') }}</div>
-                    <div class="font-label text-[0.6rem] uppercase tracking-widest text-outline font-bold">50% FEE</div>
+                <td class="text-right" style="font-family:'Inter',sans-serif; color:#1A1817; font-weight:600;">Rp {{ number_format($booking->total_price, 0, ',', '.') }}</td>
+                <td class="text-right">
+                    <div style="font-weight:700; color:#16a34a; font-size:1.1rem;">Rp {{ number_format($booking->dp_amount, 0, ',', '.') }}</div>
+                    <div class="subtitle-gold" style="font-size:0.6rem;">50% FEE</div>
                 </td>
-                <td class="px-6 py-4 text-center">
+                <td class="text-center">
                     @if($booking->payment_proof)
-                        <button type="button" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md border border-outline-variant/50 bg-surface-container-lowest font-label text-[0.65rem] font-bold uppercase tracking-widest text-on-surface-variant hover:border-primary hover:text-primary hover:bg-surface-container transition-all"
+                        <button type="button" class="arh-btn-secondary py-1.5 px-3"
                             onclick="openVerifyModal({{ $booking->id }})">
-                            <i class="bi bi-eye"></i> Lihat Bukti
+                            <i data-lucide="eye" class="w-4 h-4 mr-1 inline-block -mt-1"></i> Lihat Bukti
                         </button>
                     @else
-                        <span class="text-outline text-xs font-body italic"><i class="bi bi-image me-1"></i>Belum ada</span>
+                        <span class="subtitle-gold italic" style="text-transform:none; letter-spacing:normal;"><i data-lucide="image" class="w-3 h-3 mr-1 inline-block -mt-0.5"></i>Belum ada</span>
                     @endif
                 </td>
-                <td class="px-6 py-4">
+                <td>
                     <div class="flex justify-end gap-2">
-                        <button type="button" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md bg-primary text-white font-label text-[0.65rem] font-bold uppercase tracking-widest hover:bg-primary-container transition-colors shadow-sm"
+                        <button type="button" class="arh-btn-primary py-1.5 px-3" style="background:linear-gradient(135deg, #fcd400, #C5A028); color:#1A1817; border:none;"
                             onclick="openVerifyModal({{ $booking->id }})">
-                            <i class="bi bi-check-lg"></i> Verifikasi
+                            <i data-lucide="check" class="w-4 h-4 mr-1 inline-block -mt-1"></i> Verifikasi
                         </button>
                         @php $rjMsg = "Tolak & hapus bukti transfer dari " . addslashes($booking->client_name) . "? Klien akan diwajibkan upload ulang."; @endphp
                         <form action="{{ route('admin.bookings.reject_proof', $booking->id) }}" method="POST" class="m-0"
                               data-confirm="{{ $rjMsg }}">
                             @csrf
-                            <button type="submit" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md border border-red-500/50 bg-transparent text-red-500 font-label text-[0.65rem] font-bold uppercase tracking-widest hover:bg-red-500/10 transition-colors">
-                                <i class="bi bi-x-lg"></i> Tolak
+                            <button type="submit" class="arh-btn-secondary py-1.5 px-3" style="color:#ef4444; border-color:rgba(239,68,68,0.3); background:rgba(239,68,68,0.05);">
+                                <i data-lucide="x" class="w-4 h-4 mr-1 inline-block -mt-1"></i> Tolak
                             </button>
                         </form>
                     </div>
@@ -110,41 +110,39 @@
             </tr>
             @empty
             <tr>
-                <td colspan="6" class="px-6 py-16 text-center">
-                    <i class="bi bi-patch-check text-5xl text-green-500/50 mb-4 block"></i>
-                    <p class="font-headline text-lg text-on-surface font-semibold mb-1">Tidak ada bukti transfer yang menunggu</p>
-                    <p class="font-label text-xs uppercase tracking-widest text-outline">Semua DP sudah diverifikasi! ✅</p>
+                <td colspan="6" class="py-16 text-center">
+                    <i data-lucide="check-circle" class="w-12 h-12 text-green-500 mx-auto mb-3 opacity-50"></i>
+                    <p class="title-gold" style="font-size:1.2rem; margin-bottom:4px;">Tidak ada bukti transfer yang menunggu</p>
+                    <p class="subtitle-gold" style="font-size:0.7rem;">Semua DP sudah diverifikasi! ✅</p>
                 </td>
             </tr>
             @endforelse
-        </tbody>
-    </table>
 
     {{-- Mobile Cards View --}}
-    <div class="block md:hidden divide-y divide-outline-variant/20" id="dpvMobileCards">
+    <div class="block md:hidden" style="border-top:1px solid rgba(197,160,40,0.2);" id="dpvMobileCards">
         @forelse($pendingWithProof as $booking)
-        <div data-client="{{ strtolower($booking->client_name) }}" class="p-4 hover:bg-surface-container-low/50 transition-colors space-y-3">
+        <div data-client="{{ strtolower($booking->client_name) }}" class="p-4 border-b space-y-3" style="border-color:rgba(197,160,40,0.15);">
             <div class="flex justify-between items-center">
-                <span class="inline-block px-2.5 py-1 rounded bg-secondary-container/40 text-on-secondary-container border border-secondary/20 font-label text-[0.65rem] font-bold tracking-wider">
+                <span class="badge-gold">
                     BK-{{ str_pad($booking->id, 3, '0', STR_PAD_LEFT) }}
                 </span>
                 @if($booking->payment_proof)
-                    <button type="button" class="inline-flex items-center gap-1 px-2.5 py-1 rounded border border-outline-variant/50 bg-surface-container-lowest font-label text-[0.6rem] font-bold uppercase tracking-widest text-on-surface-variant hover:border-primary hover:text-primary hover:bg-surface-container transition-all"
+                    <button type="button" class="arh-btn-secondary py-1 px-2" style="font-size:0.6rem;"
                         onclick="openVerifyModal({{ $booking->id }})">
-                        <i class="bi bi-eye"></i> Detail Bukti
+                        <i data-lucide="eye" class="w-3 h-3 mr-1 inline-block -mt-0.5"></i> Detail Bukti
                     </button>
                 @else
-                    <span class="text-outline text-xs font-body italic"><i class="bi bi-image me-1"></i>Belum ada</span>
+                    <span class="subtitle-gold italic" style="text-transform:none; letter-spacing:normal;"><i data-lucide="image" class="w-3 h-3 mr-1 inline-block -mt-0.5"></i>Belum ada</span>
                 @endif
             </div>
             <div>
-                <div class="font-body font-bold text-sm text-on-surface mb-1">{{ $booking->client_name }}</div>
+                <div style="font-weight:700; color:#1A1817; font-size:1rem; margin-bottom:4px;">{{ $booking->client_name }}</div>
                 <div class="flex items-center justify-between gap-2">
-                    <span class="inline-block px-2 py-0.5 rounded border border-outline-variant/50 bg-surface-container text-on-surface-variant font-label text-[0.6rem] font-bold uppercase tracking-wider">
+                    <span class="badge-gold" style="background:transparent; border-color:rgba(197,160,40,0.3);">
                         {{ ucwords(str_replace('_', ' ', $booking->event_type)) }}
                     </span>
-                    <span class="font-body text-xs text-outline">
-                        Deal: <strong class="text-on-surface">Rp {{ number_format($booking->total_price, 0, ',', '.') }}</strong>
+                    <span class="subtitle-gold" style="text-transform:none; letter-spacing:normal;">
+                        Deal: <strong style="color:#1A1817;">Rp {{ number_format($booking->total_price, 0, ',', '.') }}</strong>
                     </span>
                 </div>
             </div>
@@ -186,63 +184,63 @@
 </div>
 
 {{-- ═══════════════ DAFTAR MENUNGGU UPLOAD ═══════════════ --}}
-<div class="bg-surface-container-lowest rounded-xl border border-outline-variant/30 shadow-[0_12px_24px_rgba(54,31,26,0.03)] overflow-hidden">
-    <div class="px-6 py-5 border-b border-outline-variant/20 flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-surface-container-low/30">
-        <h3 class="font-headline text-base font-bold text-on-surface-variant flex items-center gap-2">
-            <i class="bi bi-hourglass-split text-outline"></i> Menunggu Upload Klien
+<div class="card-gold overflow-hidden">
+    <div class="px-6 py-4 border-b flex flex-col sm:flex-row sm:items-center justify-between gap-4" style="border-color:rgba(197,160,40,0.2); background:rgba(197,160,40,0.02);">
+        <h3 class="title-gold flex items-center gap-2" style="font-size:1.3rem;">
+            <i data-lucide="hourglass" class="w-5 h-5 text-gray-400"></i> Menunggu Upload Klien
             @if($pendingNoProof->total() > 0)
-                <span class="inline-flex items-center justify-center min-w-6 h-6 px-1.5 rounded-full bg-surface-container-highest text-on-surface font-label text-[0.65rem] font-bold">{{ $pendingNoProof->total() }}</span>
+                <span class="inline-flex items-center justify-center min-w-6 h-6 px-1.5 rounded-full font-bold" style="background:#e5e7eb; color:#4b5563; font-size:0.65rem;">{{ $pendingNoProof->total() }}</span>
             @endif
         </h3>
     </div>
 
-    <div class="divide-y divide-outline-variant/20">
+    <div class="divide-y" style="border-color:rgba(197,160,40,0.15);">
         @forelse($pendingNoProof as $booking)
-        <div class="flex flex-col sm:flex-row sm:items-center p-4 sm:p-5 gap-4 sm:gap-5 hover:bg-surface-container-low/50 transition-colors">
+        <div class="flex flex-col sm:flex-row sm:items-center p-4 sm:p-5 gap-4 sm:gap-5 transition-colors" style="background:rgba(255,255,255,0.01);">
             <div class="flex items-center gap-4 flex-grow min-w-0">
-                <div class="w-12 h-12 rounded-lg bg-surface-container border border-outline-variant/50 border-dashed flex items-center justify-center text-outline flex-shrink-0">
-                    <i class="bi bi-cloud-upload text-xl"></i>
+                <div class="w-12 h-12 rounded-lg border flex items-center justify-center flex-shrink-0" style="border:1px dashed rgba(197,160,40,0.4); background:rgba(197,160,40,0.03);">
+                    <i data-lucide="upload-cloud" class="w-5 h-5 text-gray-400"></i>
                 </div>
                 <div class="min-w-0">
-                    <div class="font-body font-bold text-sm text-on-surface mb-1 truncate">{{ $booking->client_name }}</div>
-                    <div class="font-label text-[0.65rem] text-on-surface-variant flex items-center gap-2 flex-wrap uppercase tracking-widest font-bold">
-                        <span><i class="bi bi-calendar"></i> {{ \Carbon\Carbon::parse($booking->event_date)->format('d M Y') }}</span>
-                        <span class="text-outline-variant">•</span>
-                        <span><i class="bi bi-phone"></i> {{ $booking->client_phone }}</span>
+                    <div style="font-weight:700; color:#1A1817; font-size:0.95rem; margin-bottom:4px;" class="truncate">{{ $booking->client_name }}</div>
+                    <div class="subtitle-gold flex items-center gap-2 flex-wrap" style="font-size:0.65rem;">
+                        <span class="flex items-center"><i data-lucide="calendar" class="w-3 h-3 mr-1 inline-block -mt-0.5"></i> {{ \Carbon\Carbon::parse($booking->event_date)->format('d M Y') }}</span>
+                        <span style="color:rgba(132,123,120,0.5);">•</span>
+                        <span class="flex items-center"><i data-lucide="smartphone" class="w-3 h-3 mr-1 inline-block -mt-0.5"></i> {{ $booking->client_phone }}</span>
                         
                         @php $createdDays = \Carbon\Carbon::parse($booking->created_at)->diffInDays(now()); @endphp
                         @if($createdDays > 3)
-                            <span class="px-1.5 py-0.5 bg-red-500/10 border border-red-500/20 text-red-600 rounded text-[0.55rem]">Overdue {{ $createdDays }} hari</span>
+                            <span class="px-2 py-0.5 rounded" style="background:rgba(239,68,68,0.1); border:1px solid rgba(239,68,68,0.2); color:#ef4444; text-transform:none; letter-spacing:normal;">Overdue {{ $createdDays }} hari</span>
                         @endif
                     </div>
                 </div>
             </div>
             <div class="flex justify-between items-center sm:text-right sm:block">
-                <div class="sm:hidden font-label text-[0.6rem] uppercase tracking-widest text-outline font-bold">Total Kontrak</div>
+                <div class="sm:hidden subtitle-gold" style="font-size:0.6rem;">Total Kontrak</div>
                 <div>
-                    <div class="hidden sm:block font-label text-[0.6rem] uppercase tracking-widest text-outline font-bold mb-0.5">Total Kontrak</div>
-                    <div class="font-headline font-bold text-primary text-sm">Rp {{ number_format($booking->total_price, 0, ',', '.') }}</div>
+                    <div class="hidden sm:block subtitle-gold mb-1" style="font-size:0.6rem;">Total Kontrak</div>
+                    <div style="font-weight:700; color:#8B1A2A; font-size:1.1rem;">Rp {{ number_format($booking->total_price, 0, ',', '.') }}</div>
                 </div>
             </div>
             <div class="flex-shrink-0 flex gap-2 justify-end sm:ml-4">
-                <button type="button" onclick="openCashModal({{ $booking->id }})" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-green-600 text-white font-label text-[0.65rem] font-bold uppercase tracking-widest hover:bg-green-700 transition-colors shadow-sm text-xs" title="Terima Pembayaran Tunai (Offline)">
-                    <i class="bi bi-cash-stack"></i> <span class="hidden xs:inline">Terima</span> Cash
+                <button type="button" onclick="openCashModal({{ $booking->id }})" class="arh-btn-primary py-1.5 px-3 text-xs" style="background:linear-gradient(135deg, #16a34a, #15803d); color:white; border:none;" title="Terima Pembayaran Tunai (Offline)">
+                    <i data-lucide="banknote" class="w-4 h-4 mr-1 inline-block -mt-1"></i> <span class="hidden xs:inline">Terima</span> Cash
                 </button>
-                <a href="{{ route('admin.bookings.show', $booking->id) }}" class="inline-flex items-center justify-center w-8 h-8 rounded-lg border border-outline-variant/50 bg-surface-container-highest text-on-surface-variant hover:border-primary hover:text-primary hover:bg-surface-container-lowest transition-all" title="Detail & Nego Harga">
-                    <i class="bi bi-arrow-right"></i>
+                <a href="{{ route('admin.bookings.show', $booking->id) }}" class="arh-btn-secondary py-1.5 px-2.5" title="Detail & Nego Harga">
+                    <i data-lucide="arrow-right" class="w-4 h-4"></i>
                 </a>
             </div>
         </div>
         @empty
-        <div class="p-12 text-center text-outline">
-            <i class="bi bi-inbox text-4xl mb-3 block"></i>
-            <p class="font-body text-sm">Tidak ada booking yang sedang menunggu upload.</p>
+        <div class="p-12 text-center">
+            <i data-lucide="inbox" class="w-12 h-12 text-gray-300 mx-auto mb-3"></i>
+            <p class="subtitle-gold" style="text-transform:none; letter-spacing:normal;">Tidak ada booking yang sedang menunggu upload.</p>
         </div>
         @endforelse
     </div>
 
     @if($pendingNoProof->hasPages())
-    <div class="px-6 py-4 border-t border-outline-variant/20 bg-surface-container-low/20">
+    <div class="px-6 py-4 border-t" style="border-color:rgba(197,160,40,0.2); background:rgba(197,160,40,0.01);">
         {{ $pendingNoProof->appends(request()->except('page_no_proof'))->links() }}
     </div>
     @endif

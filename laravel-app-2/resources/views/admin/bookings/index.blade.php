@@ -18,83 +18,82 @@
 @endphp
 
 {{-- Stat Cards --}}
-<div class="grid grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-    <div class="bg-surface-container-lowest rounded-2xl p-6 border border-outline-variant/30 shadow-sm hover:shadow-md transition-all duration-300 flex flex-col justify-between">
-        <div class="flex items-center justify-between mb-4">
-            <div class="w-10 h-10 rounded-xl bg-secondary/10 flex items-center justify-center text-secondary">
+<div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+    <div class="card-gold p-5 flex flex-col justify-between">
+        <div class="flex items-center justify-between mb-3">
+            <div style="width:40px;height:40px;border-radius:10px;background:linear-gradient(135deg,rgba(197,160,40,0.2),rgba(197,160,40,0.05));border:1px solid rgba(197,160,40,0.3);display:flex;align-items:center;justify-content:center;color:#bfa000;">
                 <i data-lucide="file-text" class="w-5 h-5"></i>
             </div>
-            <span class="text-[0.65rem] font-bold text-outline uppercase tracking-widest">Total</span>
+            <span class="subtitle-gold" style="font-size:0.6rem;">Total</span>
         </div>
         <div>
-            <div class="font-headline text-2xl font-bold text-primary mb-1">{{ $total }}</div>
-            <div class="font-label text-[0.65rem] uppercase tracking-widest text-outline font-bold">Total Booking</div>
+            <div class="title-gold" style="font-size:1.8rem; line-height:1;">{{ $total }}</div>
+            <div class="subtitle-gold mt-1">Total Booking</div>
         </div>
     </div>
-    <div class="bg-surface-container-lowest rounded-2xl p-6 border border-orange-500/20 shadow-sm hover:shadow-md transition-all duration-300 flex flex-col justify-between">
-        <div class="flex items-center justify-between mb-4">
-            <div class="w-10 h-10 rounded-xl bg-orange-500/10 flex items-center justify-center text-orange-500">
+    <div class="card-gold p-5 flex flex-col justify-between" style="border-color:rgba(234,88,12,0.2);">
+        <div class="flex items-center justify-between mb-3">
+            <div style="width:40px;height:40px;border-radius:10px;background:linear-gradient(135deg,rgba(234,88,12,0.15),rgba(234,88,12,0.05));border:1px solid rgba(234,88,12,0.3);display:flex;align-items:center;justify-content:center;color:#ea580c;">
                 <i data-lucide="hourglass" class="w-5 h-5"></i>
             </div>
-            <span class="text-[0.65rem] font-bold text-orange-500 uppercase tracking-widest">Pending</span>
+            <span class="subtitle-gold" style="font-size:0.6rem; color:#ea580c;">Pending</span>
         </div>
         <div>
-            <div class="font-headline text-2xl font-bold text-orange-600 mb-1">{{ $pending }}</div>
-            <div class="font-label text-[0.65rem] uppercase tracking-widest text-outline font-bold">Menunggu DP</div>
+            <div class="title-gold" style="font-size:1.8rem; line-height:1; color:#ea580c;">{{ $pending }}</div>
+            <div class="subtitle-gold mt-1">Menunggu DP</div>
         </div>
     </div>
-    <div class="bg-surface-container-lowest rounded-2xl p-6 border border-secondary/20 shadow-sm hover:shadow-md transition-all duration-300 flex flex-col justify-between">
-        <div class="flex items-center justify-between mb-4">
-            <div class="w-10 h-10 rounded-xl bg-secondary/10 flex items-center justify-center text-secondary">
+    <div class="card-gold p-5 flex flex-col justify-between" style="border-color:rgba(197,160,40,0.3);">
+        <div class="flex items-center justify-between mb-3">
+            <div style="width:40px;height:40px;border-radius:10px;background:linear-gradient(135deg,rgba(197,160,40,0.2),rgba(197,160,40,0.05));border:1px solid rgba(197,160,40,0.3);display:flex;align-items:center;justify-content:center;color:#bfa000;">
                 <i data-lucide="lock" class="w-5 h-5"></i>
             </div>
-            <span class="text-[0.65rem] font-bold text-secondary uppercase tracking-widest">Locked</span>
+            <span class="subtitle-gold" style="font-size:0.6rem; color:#bfa000;">Locked</span>
         </div>
         <div>
-            <div class="font-headline text-2xl font-bold text-secondary mb-1">{{ $dpPaid }}</div>
-            <div class="font-label text-[0.65rem] uppercase tracking-widest text-outline font-bold">Laba Terkunci</div>
+            <div class="title-gold" style="font-size:1.8rem; line-height:1; color:#bfa000;">{{ $dpPaid }}</div>
+            <div class="subtitle-gold mt-1">Laba Terkunci</div>
         </div>
     </div>
-    <div class="bg-surface-container-lowest rounded-2xl p-6 border border-green-500/20 shadow-sm hover:shadow-md transition-all duration-300 flex flex-col justify-between">
-        <div class="flex items-center justify-between mb-4">
-            <div class="w-10 h-10 rounded-xl bg-green-500/10 flex items-center justify-center text-green-500">
+    <div class="card-gold p-5 flex flex-col justify-between" style="border-color:rgba(22,163,74,0.3);">
+        <div class="flex items-center justify-between mb-3">
+            <div style="width:40px;height:40px;border-radius:10px;background:linear-gradient(135deg,rgba(22,163,74,0.15),rgba(22,163,74,0.05));border:1px solid rgba(22,163,74,0.3);display:flex;align-items:center;justify-content:center;color:#16a34a;">
                 <i data-lucide="check-circle" class="w-5 h-5"></i>
             </div>
-            <span class="text-[0.65rem] font-bold text-green-500 uppercase tracking-widest">Done</span>
+            <span class="subtitle-gold" style="font-size:0.6rem; color:#16a34a;">Done</span>
         </div>
         <div>
-            <div class="font-headline text-2xl font-bold text-green-600 mb-1">{{ $done }}</div>
-            <div class="font-label text-[0.65rem] uppercase tracking-widest text-outline font-bold">Selesai</div>
+            <div class="title-gold" style="font-size:1.8rem; line-height:1; color:#16a34a;">{{ $done }}</div>
+            <div class="subtitle-gold mt-1">Selesai</div>
         </div>
     </div>
 </div>
 
 {{-- Header + Filter --}}
-<div class="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 mb-6">
-    <h2 class="font-headline text-xl text-primary font-bold">Semua Permintaan</h2>
-    <a href="{{ route('admin.bookings.create') }}"
-       class="bg-primary text-white px-5 py-2.5 rounded-xl font-label text-xs font-bold uppercase tracking-widest hover:bg-primary-container transition-all shadow-sm flex items-center gap-2 self-start">
+<div class="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 mb-5">
+    <h2 class="title-gold" style="font-size:1.6rem;">Semua Permintaan</h2>
+    <a href="{{ route('admin.bookings.create') }}" class="arh-btn-primary self-start">
         <i data-lucide="plus-circle" class="w-4 h-4"></i> Pesanan Baru
     </a>
 </div>
 
 {{-- Search Bar --}}
-<form action="{{ route('admin.bookings.index') }}" method="GET" class="mb-6 flex flex-col sm:flex-row gap-3">
+<form action="{{ route('admin.bookings.index') }}" method="GET" class="mb-5 flex flex-col sm:flex-row gap-3">
     <input type="hidden" name="status" value="{{ request('status', 'all') }}">
     <div class="relative flex-1">
         <span class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
             <i data-lucide="search" class="w-4 h-4 text-outline"></i>
         </span>
         <input type="text" name="search" value="{{ request('search') }}" 
-               placeholder="Cari booking berdasarkan nama klien, nomor telepon, tipe acara, atau lokasi..." 
-               class="w-full pl-10 pr-4 py-2.5 rounded-xl border border-outline-variant/30 bg-surface-container-lowest font-body text-xs focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all">
+               placeholder="Cari booking berdasarkan nama klien..." 
+               class="input-gold pl-10" style="padding:12px 14px 12px 40px;">
     </div>
     <div class="flex gap-2">
-        <button type="submit" class="px-5 py-2.5 rounded-xl bg-primary text-white font-label text-xs font-bold uppercase tracking-widest hover:bg-primary-container transition-all shadow-sm">
+        <button type="submit" class="arh-btn-primary py-3">
             Cari
         </button>
         @if(request('search'))
-        <a href="{{ route('admin.bookings.index', ['status' => request('status', 'all')]) }}" class="px-4 py-2.5 rounded-xl border border-outline-variant/30 text-outline hover:text-primary hover:bg-surface-container font-label text-xs font-bold uppercase tracking-widest transition-all flex items-center justify-center">
+        <a href="{{ route('admin.bookings.index', ['status' => request('status', 'all')]) }}" class="subtitle-gold" style="display:flex;align-items:center;padding:0 16px;text-decoration:underline;">
             Reset
         </a>
         @endif
@@ -109,84 +108,86 @@
     @endphp
     @foreach($tabs as $key => $label)
     <a href="{{ route('admin.bookings.index', ['status' => $key, 'search' => request('search')]) }}"
-       class="flex-shrink-0 px-4 py-2 rounded-xl font-label text-xs font-bold uppercase tracking-widest transition-all border filter-tab {{ $statusActive === $key ? 'bg-primary text-white border-primary shadow-sm' : 'bg-surface-container-lowest text-on-surface-variant border-outline-variant/30 hover:border-primary/40 hover:text-primary' }}">
+       class="flex-shrink-0 px-4 py-2 rounded-xl font-label text-xs font-bold uppercase tracking-widest transition-all border filter-tab {{ $statusActive === $key ? 'bg-maroon-900 text-gold-light border-gold-light shadow-sm' : 'bg-white text-gray-500 border-gray-200 hover:border-gold-light hover:text-maroon-800' }}" style="{{ $statusActive === $key ? 'background:#8B1A2A; color:#fcd400; border-color:#8B1A2A;' : '' }}">
         {{ $label }}
     </a>
     @endforeach
 </div>
 
 {{-- ════ TABLE (Desktop) ════ --}}
-<div class="hidden md:block bg-surface-container-lowest rounded-2xl border border-outline-variant/30 shadow-[0_12px_24px_rgba(54,31,26,0.03)] overflow-hidden">
+<div class="hidden md:block card-gold overflow-hidden">
     <div class="overflow-x-auto">
-        <table class="w-full min-w-[1000px]">
-            <thead class="bg-surface-container-low border-b border-outline-variant/20">
+        <table class="table-gold">
+            <thead>
                 <tr>
-                    <th class="font-label text-[0.65rem] uppercase tracking-widest text-outline font-bold px-6 py-4 text-left">#Booking</th>
-                    <th class="font-label text-[0.65rem] uppercase tracking-widest text-outline font-bold px-6 py-4 text-left">Klien</th>
-                    <th class="font-label text-[0.65rem] uppercase tracking-widest text-outline font-bold px-6 py-4 text-left">Event</th>
-                    <th class="font-label text-[0.65rem] uppercase tracking-widest text-outline font-bold px-6 py-4 text-right">Kontrak</th>
-                    <th class="font-label text-[0.65rem] uppercase tracking-widest text-outline font-bold px-6 py-4 text-right">DP</th>
-                    <th class="font-label text-[0.65rem] uppercase tracking-widest text-outline font-bold px-6 py-4 text-center">Status</th>
-                    <th class="font-label text-[0.65rem] uppercase tracking-widest text-outline font-bold px-6 py-4 text-right">Aksi</th>
+                    <th>#Booking</th>
+                    <th>Klien</th>
+                    <th>Event</th>
+                    <th class="text-right">Kontrak</th>
+                    <th class="text-right">DP</th>
+                    <th class="text-center">Status</th>
+                    <th class="text-right">Aksi</th>
                 </tr>
             </thead>
-            <tbody id="booking-tbody" class="divide-y divide-outline-variant/15">
+            <tbody id="booking-tbody">
                 @forelse($bookings as $booking)
                 @php
-                    [$stLabel, $stClass] = $statusMap[$booking->status] ?? [strtoupper($booking->status), 'bg-surface-container text-outline border-outline-variant/30'];
+                    // Adjust status mapping for badges
+                    $sm = [
+                        'pending'   => ['PENDING',   'badge-gold'],
+                        'dp_paid'   => ['DP PAID',   'badge-maroon'],
+                        'confirmed' => ['CONFIRMED', 'badge-maroon'],
+                        'completed' => ['SELESAI',   'badge-green'],
+                        'cancelled' => ['BATAL',     'badge-gold border-red-500 text-red-600'],
+                    ];
+                    [$stLabel, $stClass] = $sm[$booking->status] ?? [strtoupper($booking->status), 'badge-gold'];
                     $daysLeft = (int) now()->startOfDay()->diffInDays(\Carbon\Carbon::parse($booking->event_date)->startOfDay(), false);
                 @endphp
-                <tr data-status="{{ $booking->status }}" class="hover:bg-surface-container-low/50 transition-colors">
-                    <td class="px-6 py-4">
-                        <span class="inline-block px-2.5 py-1 rounded bg-secondary-container/40 text-on-secondary-container border border-secondary/20 font-label text-[0.65rem] font-bold tracking-wider">
+                <tr data-status="{{ $booking->status }}">
+                    <td>
+                        <span class="badge-gold">
                             #{{ str_pad($booking->id, 4, '0', STR_PAD_LEFT) }}
                         </span>
-                        <div class="font-label text-[0.65rem] text-outline mt-1">{{ $booking->created_at->format('d M Y') }}</div>
+                        <div class="subtitle-gold mt-2" style="font-size:0.65rem;">{{ $booking->created_at->format('d M Y') }}</div>
                     </td>
-                    <td class="px-6 py-4">
-                        <div class="font-body font-semibold text-on-surface text-sm">{{ $booking->client_name ?? ($booking->client->name ?? 'Klien Manual') }}</div>
+                    <td>
+                        <div style="font-weight:700; color:#1A1817;">{{ $booking->client_name ?? ($booking->client->name ?? 'Klien Manual') }}</div>
                         <div class="font-label text-xs text-outline">{{ $booking->client_phone ?? '—' }}</div>
                     </td>
-                    <td class="px-6 py-4">
-                        <div class="font-body font-semibold text-on-surface text-sm capitalize">{{ str_replace('_', ' ', $booking->event_type) }}</div>
-                        <div class="font-label text-xs text-outline flex items-center gap-1.5 mt-1">
-                            <i data-lucide="calendar" class="w-3.5 h-3.5 opacity-60"></i> {{ \Carbon\Carbon::parse($booking->event_date)->format('d M Y') }}
-                        </div>
+                    <td class="text-right">
+                        <div style="font-weight:700; color:#1A1817; font-size:0.9rem;">Rp {{ number_format($booking->total_price, 0, ',', '.') }}</div>
+                        <div class="subtitle-gold mt-1" style="color:#C5A028; font-weight:700;">Laba (30%): Rp {{ number_format($booking->total_price * 0.30, 0, ',', '.') }}</div>
                     </td>
-                    <td class="px-6 py-4 text-right">
-                        <div class="font-body font-semibold text-on-surface text-sm">Rp {{ number_format($booking->total_price, 0, ',', '.') }}</div>
-                        <div class="font-label text-xs text-secondary font-semibold">Laba (30%): Rp {{ number_format($booking->total_price * 0.30, 0, ',', '.') }}</div>
-                    </td>
-                    <td class="px-6 py-4 text-right">
-                        <div class="font-body font-semibold text-on-surface text-sm">Rp {{ number_format($booking->dp_amount, 0, ',', '.') }}</div>
+                    <td class="text-right">
+                        <div style="font-weight:700; color:#1A1817; font-size:0.9rem;">Rp {{ number_format($booking->dp_amount, 0, ',', '.') }}</div>
                         @if($booking->dp_paid_at)
-                        <div class="font-label text-xs text-outline mt-1">{{ \Carbon\Carbon::parse($booking->dp_paid_at)->format('d M Y') }}</div>
+                        <div class="subtitle-gold mt-1" style="font-size:0.65rem;">{{ \Carbon\Carbon::parse($booking->dp_paid_at)->format('d M Y') }}</div>
                         @elseif(!in_array($booking->status, ['pending', 'cancelled']))
-                        <div class="font-label text-xs text-secondary font-bold mt-1">{{ \Carbon\Carbon::parse($booking->updated_at)->format('d M Y') }}</div>
+                        <div class="subtitle-gold mt-1" style="font-size:0.65rem; color:#8B1A2A; font-weight:700;">{{ \Carbon\Carbon::parse($booking->updated_at)->format('d M Y') }}</div>
                         @else
-                        <div class="font-label text-xs text-orange-500 font-bold mt-1">Belum bayar</div>
+                        <div class="subtitle-gold mt-1" style="font-size:0.65rem; color:#ea580c; font-weight:700;">Belum bayar</div>
                         @endif
                     </td>
-                    <td class="px-6 py-4 text-center">
-                        <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full border font-label text-[0.65rem] font-bold uppercase tracking-wider {{ $stClass }}">{{ $stLabel }}</span>
+                    <td class="text-center">
+                        <span class="{{ $stClass }}">{{ $stLabel }}</span>
                         @if($booking->status === 'pending' && $daysLeft <= 7 && $daysLeft >= 0)
-                        <div class="font-label text-[0.6rem] text-red-500 font-bold mt-1">⚠ H-{{ $daysLeft }}</div>
+                        <div style="font-size:0.6rem; color:#dc2626; font-weight:700; margin-top:4px;">⚠ H-{{ $daysLeft }}</div>
                         @endif
                     </td>
-                    <td class="px-6 py-4">
+                    <td>
                         <div class="flex items-center justify-end gap-2">
-                            <a href="{{ route('admin.bookings.show', $booking->id) }}" class="w-9 h-9 rounded-lg border border-outline-variant/40 text-outline hover:text-primary hover:border-primary flex items-center justify-center hover:bg-primary/5 transition-all" title="Detail"><i data-lucide="eye" class="w-4 h-4"></i></a>
+                            <a href="{{ route('admin.bookings.show', $booking->id) }}" class="arh-btn-secondary" style="padding:6px 10px;" title="Detail"><i data-lucide="eye" class="w-4 h-4"></i></a>
                             @if($booking->status === 'pending')
-                            <button type="button" onclick="openKunciModal({{ $booking->id }}, '{{ addslashes($booking->client_name) }}', {{ $booking->total_price }}, {{ $booking->dp_amount }})" class="w-9 h-9 rounded-lg border border-secondary/40 text-secondary hover:bg-secondary/10 flex items-center justify-center transition-all" title="Kunci Laba & Konfirmasi DP"><i data-lucide="lock" class="w-4 h-4"></i></button>
+                            <button type="button" onclick="openKunciModal({{ $booking->id }}, '{{ addslashes($booking->client_name) }}', {{ $booking->total_price }}, {{ $booking->dp_amount }})" class="arh-btn-primary" style="padding:6px 10px; background:linear-gradient(135deg, #fcd400, #C5A028); color:#1A1817; border:none;" title="Kunci Laba & Konfirmasi DP"><i data-lucide="lock" class="w-4 h-4"></i></button>
                             @endif
                         </div>
                     </td>
                 </tr>
                 @empty
-                <tr><td colspan="7" class="px-6 py-16 text-center text-outline">
-                    <i data-lucide="inbox" class="w-12 h-12 mx-auto mb-3 opacity-30 text-primary"></i>
-                    <p class="font-headline text-lg font-bold text-on-surface mb-2">Belum ada data booking</p>
-                    <a href="{{ route('admin.bookings.create') }}" class="inline-block mt-2 bg-primary text-white px-5 py-2.5 rounded-xl font-label text-xs font-bold uppercase tracking-widest hover:bg-primary-container transition-all shadow-sm">+ Buat Pesanan Manual</a>
+                <tr><td colspan="7" class="py-16 text-center">
+                    <i data-lucide="inbox" class="w-12 h-12 mx-auto mb-3 text-yellow-600 opacity-50"></i>
+                    <p class="title-gold" style="font-size:1.2rem; margin-bottom:8px;">Belum ada data booking</p>
+                    <a href="{{ route('admin.bookings.create') }}" class="arh-btn-primary" style="display:inline-flex;">+ Buat Pesanan Manual</a>
                 </td></tr>
                 @endforelse
             </tbody>
@@ -198,70 +199,77 @@
 <div class="md:hidden space-y-4" id="booking-tbody-mobile">
     @forelse($bookings as $booking)
     @php
-        [$stLabel, $stClass] = $statusMap[$booking->status] ?? [strtoupper($booking->status), 'bg-surface-container text-outline border-outline-variant/30'];
+        $sm = [
+            'pending'   => ['PENDING',   'badge-gold'],
+            'dp_paid'   => ['DP PAID',   'badge-maroon'],
+            'confirmed' => ['CONFIRMED', 'badge-maroon'],
+            'completed' => ['SELESAI',   'badge-green'],
+            'cancelled' => ['BATAL',     'badge-gold border-red-500 text-red-600'],
+        ];
+        [$stLabel, $stClass] = $sm[$booking->status] ?? [strtoupper($booking->status), 'badge-gold'];
         $daysLeft = (int) now()->startOfDay()->diffInDays(\Carbon\Carbon::parse($booking->event_date)->startOfDay(), false);
     @endphp
-    <div data-status="{{ $booking->status }}" class="bg-surface-container-lowest rounded-2xl border border-outline-variant/30 shadow-sm overflow-hidden">
+    <div data-status="{{ $booking->status }}" class="card-gold p-4">
         {{-- Card Header --}}
-        <div class="flex items-center justify-between px-4 py-3 bg-surface-container-low border-b border-outline-variant/20">
-            <span class="inline-block px-2.5 py-1 rounded bg-secondary-container/40 text-on-secondary-container border border-secondary/20 font-label text-[0.65rem] font-bold tracking-wider">#{{ str_pad($booking->id, 4, '0', STR_PAD_LEFT) }}</span>
-            <span class="inline-flex px-2 py-0.5 rounded-full border font-label text-[0.6rem] font-bold uppercase tracking-wider {{ $stClass }}">{{ $stLabel }}</span>
+        <div class="flex items-center justify-between mb-3 border-b pb-3" style="border-color:rgba(197,160,40,0.15);">
+            <span class="badge-gold">#{{ str_pad($booking->id, 4, '0', STR_PAD_LEFT) }}</span>
+            <span class="{{ $stClass }}">{{ $stLabel }}</span>
         </div>
         {{-- Card Body --}}
-        <div class="px-4 py-4 space-y-3">
+        <div class="space-y-3">
             <div class="flex justify-between items-start gap-2">
                 <div>
-                    <div class="font-body font-bold text-sm text-on-surface leading-tight">{{ $booking->client_name ?? ($booking->client->name ?? 'Klien Manual') }}</div>
-                    <div class="font-label text-xs text-outline mt-1">{{ $booking->client_phone ?? '—' }}</div>
+                    <div style="font-weight:700; color:#1A1817; font-size:1rem;">{{ $booking->client_name ?? ($booking->client->name ?? 'Klien Manual') }}</div>
+                    <div class="subtitle-gold mt-1" style="font-size:0.65rem;">{{ $booking->client_phone ?? '—' }}</div>
                 </div>
                 <div class="text-right flex-shrink-0">
-                    <div class="font-label text-[0.55rem] uppercase tracking-widest text-outline">Tanggal</div>
-                    <div class="font-body text-xs font-bold text-on-surface mt-0.5">{{ \Carbon\Carbon::parse($booking->event_date)->format('d M Y') }}</div>
+                    <div class="subtitle-gold" style="font-size:0.6rem;">Tanggal</div>
+                    <div style="font-weight:700; font-size:0.85rem; color:#8B1A2A;">{{ \Carbon\Carbon::parse($booking->event_date)->format('d M Y') }}</div>
                 </div>
             </div>
-            <div class="flex items-center gap-1.5 font-label text-xs text-on-surface-variant">
-                <i data-lucide="calendar" class="w-4 h-4 text-secondary"></i>
-                <span class="capitalize font-bold">{{ str_replace('_', ' ', $booking->event_type) }}</span>
-                <span class="text-outline">•</span>
+            <div class="flex items-center gap-1.5 subtitle-gold" style="font-size:0.7rem; color:#847B78;">
+                <i data-lucide="calendar" class="w-4 h-4 text-yellow-600"></i>
+                <span class="capitalize" style="font-weight:700;">{{ str_replace('_', ' ', $booking->event_type) }}</span>
+                <span>•</span>
                 <span>{{ $booking->created_at->format('d M Y') }}</span>
             </div>
-            <div class="grid grid-cols-2 gap-3">
-                <div class="bg-surface-container rounded-xl p-3">
-                    <div class="font-label text-[0.55rem] uppercase tracking-widest text-outline mb-1">Kontrak</div>
-                    <div class="font-headline font-bold text-sm text-primary">Rp {{ number_format($booking->total_price, 0, ',', '.') }}</div>
+            <div class="grid grid-cols-2 gap-3 mt-3">
+                <div style="background:rgba(139,26,42,0.03); border:1px solid rgba(139,26,42,0.1); border-radius:10px; padding:10px;">
+                    <div class="subtitle-gold mb-1" style="font-size:0.6rem;">Kontrak</div>
+                    <div style="font-weight:700; font-size:0.9rem; color:#1A1817;">Rp {{ number_format($booking->total_price, 0, ',', '.') }}</div>
                 </div>
-                <div class="bg-surface-container rounded-xl p-3">
-                    <div class="font-label text-[0.55rem] uppercase tracking-widest text-outline mb-1">DP</div>
-                    <div class="font-headline font-bold text-sm text-secondary">Rp {{ number_format($booking->dp_amount, 0, ',', '.') }}</div>
+                <div style="background:rgba(197,160,40,0.05); border:1px solid rgba(197,160,40,0.2); border-radius:10px; padding:10px;">
+                    <div class="subtitle-gold mb-1" style="font-size:0.6rem;">DP</div>
+                    <div style="font-weight:700; font-size:0.9rem; color:#8B1A2A;">Rp {{ number_format($booking->dp_amount, 0, ',', '.') }}</div>
                     @if($booking->dp_paid_at)
-                    <div class="font-label text-[0.55rem] text-outline font-bold mt-1">{{ \Carbon\Carbon::parse($booking->dp_paid_at)->format('d M Y') }}</div>
+                    <div class="subtitle-gold mt-1" style="font-size:0.6rem;">{{ \Carbon\Carbon::parse($booking->dp_paid_at)->format('d M Y') }}</div>
                     @elseif(!in_array($booking->status, ['pending', 'cancelled']))
-                    <div class="font-label text-[0.55rem] text-secondary font-bold mt-1">{{ \Carbon\Carbon::parse($booking->updated_at)->format('d M Y') }}</div>
+                    <div class="subtitle-gold mt-1" style="font-size:0.6rem; color:#8B1A2A;">{{ \Carbon\Carbon::parse($booking->updated_at)->format('d M Y') }}</div>
                     @else
-                    <div class="font-label text-[0.55rem] text-orange-500 font-bold mt-1">Belum bayar</div>
+                    <div class="subtitle-gold mt-1" style="font-size:0.6rem; color:#ea580c;">Belum bayar</div>
                     @endif
                 </div>
             </div>
             @if($booking->status === 'pending' && $daysLeft <= 7 && $daysLeft >= 0)
-            <div class="font-label text-xs text-red-500 font-bold flex items-center gap-1.5 mt-2"><i data-lucide="alert-triangle" class="w-4 h-4"></i> Acara H-{{ $daysLeft }}</div>
+            <div style="font-size:0.6rem; color:#dc2626; font-weight:700; margin-top:8px;">⚠ Acara H-{{ $daysLeft }}</div>
             @endif
         </div>
         {{-- Card Footer --}}
-        <div class="px-4 py-3 border-t border-outline-variant/20 bg-surface-container-low/30 flex gap-2">
-            <a href="{{ route('admin.bookings.show', $booking->id) }}" class="flex-1 flex items-center justify-center gap-1.5 py-2.5 rounded-xl bg-primary text-white font-label text-xs font-bold uppercase tracking-widest hover:bg-primary-container transition-colors">
+        <div class="px-4 py-3 border-t flex gap-2" style="border-color:rgba(197,160,40,0.15); background:rgba(197,160,40,0.02);">
+            <a href="{{ route('admin.bookings.show', $booking->id) }}" class="arh-btn-secondary flex-1 py-2" style="text-align:center;">
                 <i data-lucide="eye" class="w-4 h-4"></i> Detail
             </a>
             @if($booking->status === 'pending')
-            <button type="button" onclick="openKunciModal({{ $booking->id }}, '{{ addslashes($booking->client_name) }}', {{ $booking->total_price }}, {{ $booking->dp_amount }})" class="flex-1 flex items-center justify-center gap-1.5 py-2.5 rounded-xl bg-secondary/10 border border-secondary/30 text-secondary font-label text-xs font-bold uppercase tracking-widest hover:bg-secondary hover:text-white transition-colors">
+            <button type="button" onclick="openKunciModal({{ $booking->id }}, '{{ addslashes($booking->client_name) }}', {{ $booking->total_price }}, {{ $booking->dp_amount }})" class="arh-btn-primary flex-1 py-2" style="background:linear-gradient(135deg, #fcd400, #C5A028); color:#1A1817; border:none; text-align:center;">
                 <i data-lucide="lock" class="w-4 h-4"></i> Kunci DP
             </button>
             @endif
         </div>
     </div>
     @empty
-    <div class="py-14 flex flex-col items-center justify-center bg-surface-container-lowest border border-outline-variant/30 border-dashed rounded-2xl">
-        <i data-lucide="inbox" class="w-12 h-12 text-outline mb-2 opacity-30"></i>
-        <p class="font-headline text-base text-on-surface font-bold">Belum ada data booking</p>
+    <div class="py-14 flex flex-col items-center justify-center card-gold" style="border-style:dashed;">
+        <i data-lucide="inbox" class="w-12 h-12 text-yellow-600 mb-2 opacity-50"></i>
+        <p class="title-gold" style="font-size:1.1rem;">Belum ada data booking</p>
     </div>
     @endforelse
 </div>
@@ -277,53 +285,53 @@
 
 {{-- ══ MODAL: KUNCI LABA (Konfirmasi DP) ══ --}}
 <div id="modalKunciLaba" class="fixed inset-0 z-[100] hidden items-center justify-center p-4">
-    <div class="absolute inset-0 bg-black/50 backdrop-blur-sm" onclick="closeKunciModal()"></div>
-    <div id="modalKunciContent" class="relative w-full max-w-sm bg-surface-container-lowest rounded-2xl shadow-2xl border border-outline-variant/30 p-6 transition-all scale-95 opacity-0">
+    <div class="absolute inset-0 bg-black/60 backdrop-blur-md" onclick="closeKunciModal()"></div>
+    <div id="modalKunciContent" class="relative w-full max-w-sm card-gold p-6 transition-all scale-95 opacity-0">
 
-        <div class="flex items-center justify-between mb-4 pb-3 border-b border-outline-variant/20">
-            <h5 class="font-headline font-bold text-lg text-primary flex items-center gap-2">
-                <i data-lucide="lock" class="w-5 h-5 text-secondary"></i> Kunci Laba & Konfirmasi DP
+        <div class="flex items-center justify-between mb-4 pb-3 border-b" style="border-color:rgba(197,160,40,0.2);">
+            <h5 class="title-gold flex items-center gap-2" style="font-size:1.3rem;">
+                <i data-lucide="lock" class="w-5 h-5 text-yellow-600"></i> Kunci Laba & DP
             </h5>
-            <button onclick="closeKunciModal()" class="text-on-surface-variant hover:text-primary"><i data-lucide="x" class="w-5 h-5"></i></button>
+            <button onclick="closeKunciModal()" class="text-gray-400 hover:text-gray-600"><i data-lucide="x" class="w-5 h-5"></i></button>
         </div>
 
         <form id="formKunciLaba" method="POST">
             @csrf
             <div class="mb-5 space-y-4">
-                <div class="p-4 bg-surface-container-low rounded-xl border border-outline-variant/25">
-                    <div class="font-label text-[0.65rem] font-bold uppercase tracking-widest text-outline mb-1">Klien</div>
-                    <div id="kunci_client" class="font-body font-semibold text-on-surface text-sm"></div>
+                <div style="background:rgba(197,160,40,0.05); border:1px solid rgba(197,160,40,0.2); border-radius:10px; padding:12px;">
+                    <div class="subtitle-gold mb-1" style="font-size:0.6rem;">Klien</div>
+                    <div id="kunci_client" style="font-weight:700; color:#1A1817; font-size:0.95rem;"></div>
                 </div>
                 <div class="grid grid-cols-2 gap-3">
-                    <div class="p-3 bg-surface-container-low border border-outline-variant/25 rounded-xl text-center">
-                        <div class="font-label text-[0.65rem] font-bold uppercase tracking-widest text-outline mb-1">Total Kontrak</div>
-                        <div id="kunci_total" class="font-headline font-bold text-primary text-sm"></div>
+                    <div style="border:1px solid rgba(139,26,42,0.1); border-radius:10px; padding:10px; text-align:center;">
+                        <div class="subtitle-gold mb-1" style="font-size:0.6rem;">Total Kontrak</div>
+                        <div id="kunci_total" style="font-weight:700; color:#1A1817; font-size:0.9rem;"></div>
                     </div>
-                    <div class="p-3 bg-secondary/5 border border-secondary/20 rounded-xl text-center">
-                        <div class="font-label text-[0.65rem] font-bold uppercase tracking-widest text-outline mb-1">DP Masuk</div>
-                        <div id="kunci_dp" class="font-headline font-bold text-secondary text-sm"></div>
+                    <div style="background:rgba(139,26,42,0.05); border:1px solid rgba(139,26,42,0.15); border-radius:10px; padding:10px; text-align:center;">
+                        <div class="subtitle-gold mb-1" style="font-size:0.6rem; color:#8B1A2A;">DP Masuk</div>
+                        <div id="kunci_dp" style="font-weight:700; color:#8B1A2A; font-size:0.9rem;"></div>
                     </div>
                 </div>
 
                 <div>
-                    <label class="block font-label text-[0.65rem] uppercase tracking-widest text-on-surface-variant font-bold mb-1.5 ml-1">
-                        Fixed Profit (Laba Bersih Sanggar) <span class="text-red-500">*</span>
+                    <label class="block subtitle-gold mb-1.5 ml-1">
+                        Fixed Profit (Laba Bersih) <span class="text-red-600">*</span>
                     </label>
                     <div class="relative">
-                        <span class="absolute left-3 top-1/2 -translate-y-1/2 font-body text-sm text-outline">Rp</span>
+                        <span class="absolute left-3 top-1/2 -translate-y-1/2 font-bold" style="color:#8B1A2A; font-family:'Inter',sans-serif;">Rp</span>
                         <input type="number" name="fixed_profit_nominal" id="kunci_profit_input"
                                required min="0"
-                               class="w-full bg-surface-container border border-outline-variant/50 rounded-xl pl-10 pr-4 py-3 font-body text-sm text-on-surface focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all"
+                               class="input-gold" style="padding-left:40px;"
                                placeholder="Misal: 2000000">
                     </div>
-                    <p id="kunci_profit_hint" class="text-[0.65rem] text-outline mt-1.5 ml-1 leading-relaxed"></p>
+                    <p id="kunci_profit_hint" class="subtitle-gold mt-1.5 ml-1" style="text-transform:none; letter-spacing:normal;"></p>
                 </div>
             </div>
 
-            <div class="flex gap-2 pt-4 border-t border-outline-variant/20">
-                <button type="button" onclick="closeKunciModal()" class="flex-1 py-2.5 rounded-xl border border-outline-variant/50 font-label text-xs font-bold uppercase tracking-widest text-on-surface-variant hover:bg-surface-container transition-all">Batal</button>
-                <button type="submit" class="flex-1 py-2.5 rounded-xl bg-secondary text-primary font-label text-xs font-bold uppercase tracking-widest hover:bg-secondary-container transition-all shadow-sm flex items-center justify-center gap-1.5">
-                    <i data-lucide="lock" class="w-4 h-4"></i> Kunci Laba
+            <div class="flex gap-2 pt-4 border-t" style="border-color:rgba(197,160,40,0.2);">
+                <button type="button" onclick="closeKunciModal()" class="arh-btn-secondary flex-1 py-3 text-center" style="display:block;">Batal</button>
+                <button type="submit" class="arh-btn-primary flex-1 py-3 text-center" style="display:block;">
+                    <i data-lucide="lock" class="w-4 h-4 inline-block -mt-1"></i> Kunci Laba
                 </button>
             </div>
         </form>

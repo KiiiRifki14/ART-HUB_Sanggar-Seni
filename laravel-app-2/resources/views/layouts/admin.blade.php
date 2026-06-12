@@ -93,14 +93,14 @@
         #sidebar {
             width: var(--sidebar-w);
             height: 100vh;
-            height: 100dvh; /* fix iOS safari */
-            background: linear-gradient(185deg, #23120f 0%, #150907 100%);
-            border-right: 1px solid rgba(255,255,255,0.05);
+            height: 100dvh;
+            background: linear-gradient(185deg, #1e0d0a 0%, #2a1410 50%, #150907 100%);
+            border-right: 1px solid rgba(252,212,0,0.05);
             display: flex; flex-direction: column;
-            position: fixed; top: 0; left: 0; z-index: 1050; /* high z-index to hover above all */
-            transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: fixed; top: 0; left: 0; z-index: 1050;
+            transition: width 0.4s cubic-bezier(0.16, 1, 0.3, 1);
             overflow: hidden;
-            box-shadow: 6px 0 30px rgba(0,0,0,0.25);
+            box-shadow: 4px 0 32px rgba(0,0,0,0.3);
         }
         #sidebar.mini { width: var(--sidebar-mini); }
 
@@ -196,22 +196,22 @@
         .arh-nav-link {
             position: relative;
             display: flex; align-items: center; gap: 12px;
-            padding: 12px 14px; border-radius: 10px; margin-bottom: 6px;
-            color: rgba(255,255,255,0.65); text-decoration: none;
-            font-size: 0.9rem; font-weight: 500;
-            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1); white-space: nowrap; overflow: hidden;
+            padding: 11px 14px; border-radius: 10px; margin-bottom: 4px;
+            color: rgba(255,255,255,0.55); text-decoration: none;
+            font-size: 0.88rem; font-weight: 500;
+            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1); white-space: nowrap; overflow: hidden;
             border: 1px solid transparent;
         }
         .arh-nav-link::before {
-            content: ''; position: absolute; left: 0; top: 25%; height: 50%; width: 3px;
+            content: ''; position: absolute; left: 0; top: 20%; height: 60%; width: 2.5px;
             background: #fcd400; border-radius: 0 4px 4px 0; opacity: 0;
-            transition: opacity 0.2s, transform 0.2s; transform: scaleY(0.3);
+            transition: opacity 0.3s, transform 0.35s cubic-bezier(0.16, 1, 0.3, 1); transform: scaleY(0);
         }
         .arh-nav-link:hover::before { opacity: 0.5; transform: scaleY(1); }
-        .arh-nav-link.active::before { opacity: 1; transform: scaleY(1.3); }
+        .arh-nav-link.active::before { opacity: 1; transform: scaleY(1.2); }
 
         .arh-nav-link:hover {
-            background: rgba(255,255,255,0.03);
+            background: rgba(255,255,255,0.04);
             color: #fff;
             padding-left: 18px;
         }
@@ -300,13 +300,27 @@
         /* ── TOPBAR ── */
         #topbar {
             height: var(--topbar-h);
-            background: #ffffff;
-            border-bottom: 1px solid #efeeeb;
+            background: rgba(255,255,255,0.95);
+            backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(197,160,40,0.12);
             display: flex; align-items: center; padding: 0 28px;
             position: fixed; top: 0; left: var(--sidebar-w); right: 0;
-            z-index: 1030; transition: left 0.3s cubic-bezier(0.4, 0, 0.2, 1); gap: 16px;
+            z-index: 1030; transition: left 0.4s cubic-bezier(0.16, 1, 0.3, 1); gap: 16px;
         }
         #topbar.mini { left: var(--sidebar-mini); }
+
+        /* ── BREADCRUMB ── */
+        .arh-breadcrumb {
+            display: flex; align-items: center; gap: 6px;
+            font-size: 0.7rem; color: #827471; margin-top: 2px; flex-wrap: wrap;
+        }
+        .arh-breadcrumb a {
+            color: #827471; text-decoration: none; font-weight: 500;
+            transition: color 0.25s;
+        }
+        .arh-breadcrumb a:hover { color: #8B1A2A; }
+        .arh-breadcrumb-sep { color: rgba(197,160,40,0.5); font-size: 0.65rem; }
+        .arh-breadcrumb-current { color: #8B1A2A; font-weight: 700; }
 
         /* ── CONTENT ── */
         #page-content {
@@ -366,6 +380,77 @@
             background: #fef2f2; border-left: 3px solid #dc2626;
             border-radius: 8px; padding: 12px 16px;
             font-family: 'Manrope', sans-serif; font-size: 0.85rem; color: #b91c1c;
+        }
+
+        /* ── GLOBAL ADMIN TOKENS ── */
+        .card-gold {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(197, 160, 40, 0.15);
+            border-radius: 16px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03);
+            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        .card-gold:hover {
+            box-shadow: 0 8px 30px rgba(139, 26, 42, 0.06);
+            border-color: rgba(197, 160, 40, 0.3);
+        }
+        .title-gold {
+            font-family: 'Cormorant Garamond', serif;
+            color: #1A1817; font-weight: 700;
+        }
+        .subtitle-gold {
+            font-family: 'Inter', sans-serif;
+            color: #847B78; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.05em; font-weight: 600;
+        }
+        .table-gold { width: 100%; border-collapse: separate; border-spacing: 0; }
+        .table-gold th {
+            background: rgba(139, 26, 42, 0.03); padding: 12px 16px;
+            font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em;
+            color: #8B1A2A; font-weight: 700; text-align: left;
+            border-bottom: 2px solid rgba(197, 160, 40, 0.15);
+        }
+        .table-gold td {
+            padding: 14px 16px; font-size: 0.88rem; color: #504442;
+            border-bottom: 1px solid rgba(0,0,0,0.04);
+            vertical-align: middle;
+        }
+        .table-gold tbody tr:hover td { background: rgba(197, 160, 40, 0.02); }
+        .table-gold tbody tr:last-child td { border-bottom: none; }
+        
+        .badge-gold {
+            display: inline-flex; align-items: center; gap: 4px;
+            padding: 4px 10px; border-radius: 6px; font-size: 0.7rem; font-weight: 700;
+            text-transform: uppercase; letter-spacing: 0.05em;
+            background: linear-gradient(135deg, rgba(197,160,40,0.1), rgba(197,160,40,0.02));
+            color: #bfa000; border: 1px solid rgba(197,160,40,0.2);
+        }
+        .badge-maroon {
+            display: inline-flex; align-items: center; gap: 4px;
+            padding: 4px 10px; border-radius: 6px; font-size: 0.7rem; font-weight: 700;
+            text-transform: uppercase; letter-spacing: 0.05em;
+            background: linear-gradient(135deg, rgba(139,26,42,0.1), rgba(139,26,42,0.02));
+            color: #8B1A2A; border: 1px solid rgba(139,26,42,0.2);
+        }
+        .badge-green {
+            display: inline-flex; align-items: center; gap: 4px;
+            padding: 4px 10px; border-radius: 6px; font-size: 0.7rem; font-weight: 700;
+            text-transform: uppercase; letter-spacing: 0.05em;
+            background: linear-gradient(135deg, rgba(22,163,74,0.1), rgba(22,163,74,0.02));
+            color: #16a34a; border: 1px solid rgba(22,163,74,0.2);
+        }
+
+        .input-gold {
+            width: 100%; padding: 10px 14px; border-radius: 10px;
+            border: 1px solid rgba(197, 160, 40, 0.3);
+            background: rgba(255,255,255,0.8);
+            font-family: 'Inter', sans-serif; font-size: 0.9rem; color: #1A1817;
+            transition: all 0.3s ease;
+        }
+        .input-gold:focus {
+            outline: none; border-color: #8B1A2A;
+            box-shadow: 0 0 0 3px rgba(139, 26, 42, 0.1);
+            background: #fff;
         }
 
         /* ── AUTO-STAGGER PAGE ANIMATIONS ── */
@@ -535,17 +620,28 @@
 
 {{-- ════ TOPBAR ════ --}}
 <nav id="topbar">
-    <button id="sidebarToggle" type="button" class="hidden md:flex items-center justify-center mr-2 w-9 h-9 rounded-lg border border-outline-variant/30 bg-white text-primary hover:border-secondary hover:text-secondary hover:bg-secondary/5 transition-all shadow-sm flex-shrink-0" title="Toggle Sidebar">
-        <i class="bi bi-layout-sidebar-reverse" style="font-size: 1.1rem;"></i>
+    <button id="sidebarToggle" type="button"
+        style="display:none;align-items:center;justify-content:center;width:36px;height:36px;border-radius:8px;border:1px solid rgba(197,160,40,0.2);background:#fff;color:#361f1a;cursor:pointer;flex-shrink:0;transition:all 0.35s cubic-bezier(0.16,1,0.3,1);margin-right:8px"
+        class="md:flex" title="Toggle Sidebar">
+        <i class="bi bi-layout-sidebar-reverse" style="font-size:1.05rem"></i>
     </button>
-    
-    <div style="flex:1; min-width:0;">
-        <div style="font-family:'Noto Serif',serif;font-size:1.1rem;font-weight:700;color:#361f1a;line-height:1.2; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">
+
+    <div style="flex:1;min-width:0">
+        <div style="font-family:'Noto Serif',serif;font-size:1.05rem;font-weight:700;color:#361f1a;line-height:1.2;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">
             @yield('page_title', 'Admin Panel')
         </div>
-        <div style="font-size:0.72rem;color:#827471;font-family:'Manrope',sans-serif;text-transform:uppercase;letter-spacing:0.05em; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; margin-top: 2px;">
-            @yield('page_subtitle')
-        </div>
+        {{-- Breadcrumb --}}
+        <nav class="arh-breadcrumb">
+            <a href="{{ route('admin.dashboard') }}">Dashboard</a>
+            @hasSection('breadcrumb_parent')
+            <span class="arh-breadcrumb-sep">›</span>
+            <a href="@yield('breadcrumb_parent_url', '#')">@yield('breadcrumb_parent')</a>
+            @endif
+            @hasSection('page_title')
+            <span class="arh-breadcrumb-sep">›</span>
+            <span class="arh-breadcrumb-current">@yield('page_title')</span>
+            @endif
+        </nav>
     </div>
 
     <div style="display:flex;align-items:center;gap:12px;">

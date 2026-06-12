@@ -8,12 +8,12 @@
 @php $fr = $event->financialRecord; @endphp
 
 {{-- Back Nav --}}
-<div class="flex items-center gap-2 mb-6 font-label text-xs uppercase tracking-widest font-bold">
-    <a href="{{ route('admin.financials.post_event_list') }}" class="text-on-surface-variant hover:text-secondary transition-colors flex items-center gap-1.5">
-        <i class="bi bi-arrow-left"></i> Daftar Pasca-Acara
+<div class="flex items-center gap-2 mb-6 subtitle-gold font-bold">
+    <a href="{{ route('admin.financials.index') }}" class="text-gray-500 hover:text-yellow-600 transition-colors flex items-center gap-1.5" style="text-transform:none;">
+        <i data-lucide="arrow-left" class="w-4 h-4 -mt-0.5"></i> Kembali ke Laporan
     </a>
-    <span class="text-outline-variant">/</span>
-    <span class="text-outline">Detail Audit</span>
+    <span class="text-gray-300">/</span>
+    <span style="color:#8B1A2A;">Detail Audit</span>
 </div>
 
 @if($fr)
@@ -25,118 +25,120 @@
         $overBudget   = $fr->actual_operational_cost > $netOpsBudget;
     @endphp
     <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-        <div class="bg-gradient-to-br from-primary-container to-primary text-white rounded-xl p-6 border border-primary/20 shadow-[0_12px_24px_rgba(54,31,26,0.08)] flex items-center justify-between">
+        <div class="card-gold text-white p-6 flex items-center justify-between" style="background:linear-gradient(135deg, #8B1A2A, #5C0E19);">
             <div>
-                <div class="font-label text-[0.65rem] uppercase tracking-widest text-white/80 font-bold mb-1">Budget Ops Bersih</div>
-                <div class="font-headline text-3xl font-bold text-secondary">Rp {{ number_format($netOpsBudget, 0, ',', '.') }}</div>
-                <div class="font-label text-[0.55rem] text-white/60 mt-1">(setelah dikurangi cadangan Rp {{ number_format($fr->safety_buffer_amt, 0, ',', '.') }})</div>
+                <div class="subtitle-gold mb-1" style="color:rgba(255,255,255,0.8);">Budget Ops Bersih</div>
+                <div class="title-gold" style="font-size:1.8rem; color:#fcd400;">Rp {{ number_format($netOpsBudget, 0, ',', '.') }}</div>
+                <div class="subtitle-gold mt-1" style="font-size:0.55rem; color:rgba(255,255,255,0.6); text-transform:none; letter-spacing:normal;">(setelah dikurangi cadangan Rp {{ number_format($fr->safety_buffer_amt, 0, ',', '.') }})</div>
             </div>
-            <i class="bi bi-wallet2 text-4xl text-white/10"></i>
+            <i data-lucide="wallet" class="w-10 h-10 text-white/10"></i>
         </div>
         
-        <div class="bg-surface-container-lowest rounded-xl p-6 border {{ $overBudget ? 'border-red-500/30 shadow-[0_8px_20px_rgba(239,68,68,0.1)]' : 'border-outline-variant/30 shadow-[0_8px_20px_rgba(54,31,26,0.03)]' }} flex items-center justify-between">
+        <div class="card-gold p-6 flex items-center justify-between" style="{{ $overBudget ? 'border-color:rgba(239,68,68,0.3); background:rgba(239,68,68,0.02);' : '' }}">
             <div>
-                <div class="font-label text-[0.65rem] uppercase tracking-widest font-bold mb-1 {{ $overBudget ? 'text-red-500' : 'text-outline' }}">Realisasi Lapangan</div>
-                <div class="font-headline text-3xl font-bold {{ $overBudget ? 'text-red-600' : 'text-on-surface' }}">
+                <div class="subtitle-gold mb-1" style="{{ $overBudget ? 'color:#ef4444;' : '' }}">Realisasi Lapangan</div>
+                <div class="title-gold" style="font-size:1.8rem; {{ $overBudget ? 'color:#dc2626;' : 'color:#1A1817;' }}">
                     Rp {{ number_format($fr->actual_operational_cost, 0, ',', '.') }}
                 </div>
                 @if($overBudget)
-                <div class="font-label text-[0.55rem] text-red-500 mt-1">⚠️ Melebihi budget bersih!</div>
+                <div class="subtitle-gold mt-1 flex items-center gap-1" style="font-size:0.55rem; color:#ef4444; text-transform:none; letter-spacing:normal;">
+                    <i data-lucide="alert-triangle" class="w-3 h-3"></i> Melebihi budget bersih!
+                </div>
                 @endif
             </div>
-            <i class="bi bi-cash-stack text-4xl {{ $overBudget ? 'text-red-500/10' : 'text-outline-variant/30' }}"></i>
+            <i data-lucide="banknote" class="w-10 h-10" style="{{ $overBudget ? 'color:rgba(239,68,68,0.2);' : 'color:rgba(197,160,40,0.2);' }}"></i>
         </div>
         
-        <div class="bg-surface-container-lowest rounded-xl p-6 border border-green-500/30 shadow-[0_8px_20px_rgba(34,197,94,0.05)] flex items-center justify-between">
+        <div class="card-gold p-6 flex items-center justify-between" style="border-color:rgba(22,163,74,0.3); background:rgba(22,163,74,0.02);">
             <div>
-                <div class="font-label text-[0.65rem] uppercase tracking-widest font-bold mb-1 text-green-600">Dana Cadangan (Safety Buffer)</div>
-                <div class="font-headline text-3xl font-bold text-green-600">Rp {{ number_format($fr->safety_buffer_amt, 0, ',', '.') }}</div>
-                <div class="font-label text-[0.55rem] text-green-600/70 mt-1">10% dari gross budget — tidak untuk ops biasa</div>
+                <div class="subtitle-gold mb-1" style="color:#16a34a;">Dana Cadangan (Safety Buffer)</div>
+                <div class="title-gold" style="font-size:1.8rem; color:#16a34a;">Rp {{ number_format($fr->safety_buffer_amt, 0, ',', '.') }}</div>
+                <div class="subtitle-gold mt-1" style="font-size:0.55rem; color:rgba(22,163,74,0.7); text-transform:none; letter-spacing:normal;">10% dari gross budget — tidak untuk ops biasa</div>
             </div>
-            <i class="bi bi-shield-check text-4xl text-green-500/10"></i>
+            <i data-lucide="shield-check" class="w-10 h-10 text-green-500/20"></i>
         </div>
     </div>
 
     {{-- ── BUDGET WARNING ── --}}
     @if($fr->budget_warning)
-    <div class="bg-orange-500/10 border border-orange-500/20 text-orange-700 rounded-xl p-5 mb-8 flex items-start gap-4 shadow-sm">
-        <i class="bi bi-exclamation-triangle-fill text-3xl mt-0.5"></i>
+    <div class="card-gold p-5 mb-8 flex items-start gap-4 shadow-sm" style="background:rgba(234,88,12,0.05); border-color:rgba(234,88,12,0.2);">
+        <i data-lucide="alert-triangle" class="w-8 h-8 text-orange-500 mt-0.5"></i>
         <div>
-            <h6 class="font-headline font-bold text-lg mb-1">Budget Warning Aktif!</h6>
-            <p class="font-body text-sm opacity-90">{{ $fr->warning_message }}</p>
+            <h6 class="title-gold mb-1" style="font-size:1.1rem; color:#c2410c;">Budget Warning Aktif!</h6>
+            <p class="subtitle-gold" style="font-size:0.75rem; color:#ea580c; text-transform:none; letter-spacing:normal;">{{ $fr->warning_message }}</p>
         </div>
     </div>
     @endif
 
     {{-- ── RINCIAN BIAYA OPS ── --}}
-    <div class="bg-surface-container-lowest rounded-xl border border-outline-variant/30 shadow-[0_12px_24px_rgba(54,31,26,0.03)] overflow-hidden">
-        <div class="px-6 py-5 border-b border-outline-variant/20 flex items-center justify-between bg-surface-container-low/30">
-            <h3 class="font-headline text-lg font-bold text-primary flex items-center gap-2">
-                <i class="bi bi-list-check text-secondary"></i> Rincian Biaya Operasional
+    <div class="card-gold overflow-hidden">
+        <div class="px-6 py-5 border-b flex items-center justify-between" style="border-color:rgba(197,160,40,0.2); background:rgba(197,160,40,0.02);">
+            <h3 class="title-gold flex items-center gap-2" style="font-size:1.3rem;">
+                <i data-lucide="list-checks" class="w-5 h-5 text-gray-400"></i> Rincian Biaya Operasional
             </h3>
-            <button type="button" onclick="document.getElementById('modalAddCost').classList.remove('hidden');document.getElementById('modalAddCost').classList.add('flex');" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-primary text-white font-label text-[0.65rem] font-bold uppercase tracking-widest hover:bg-primary-container transition-colors shadow-sm">
-                <i class="bi bi-plus-lg"></i> Tambah Biaya
+            <button type="button" onclick="document.getElementById('modalAddCost').classList.remove('hidden');document.getElementById('modalAddCost').classList.add('flex');" class="arh-btn-primary py-1.5 px-3 text-xs" style="background:linear-gradient(135deg, #fcd400, #C5A028); color:#1A1817; border:none;">
+                <i data-lucide="plus" class="w-4 h-4 mr-1 inline-block -mt-1"></i> Tambah Biaya
             </button>
         </div>
         
-        <table class="w-full">
-            <thead class="bg-surface-container-low">
+        <table class="w-full table-gold">
+            <thead>
                 <tr>
-                    <th class="font-label text-[0.65rem] uppercase tracking-widest text-outline font-bold px-6 py-4 text-left">Kategori</th>
-                    <th class="font-label text-[0.65rem] uppercase tracking-widest text-outline font-bold px-6 py-4 text-left">Keterangan</th>
-                    <th class="font-label text-[0.65rem] uppercase tracking-widest text-outline font-bold px-6 py-4 text-right">Estimasi</th>
-                    <th class="font-label text-[0.65rem] uppercase tracking-widest text-outline font-bold px-6 py-4 text-right">Realisasi Lapangan</th>
-                    <th class="font-label text-[0.65rem] uppercase tracking-widest text-outline font-bold px-6 py-4 text-right">Selisih</th>
+                    <th class="text-left">Kategori</th>
+                    <th class="text-left">Keterangan</th>
+                    <th class="text-right">Estimasi</th>
+                    <th class="text-right">Realisasi Lapangan</th>
+                    <th class="text-right">Selisih</th>
                 </tr>
             </thead>
-            <tbody class="divide-y divide-outline-variant/20">
+            <tbody>
                 @forelse($fr->operationalCosts as $index => $cost)
                 @php $diff = $cost->actual_amount - $cost->estimated_amount; @endphp
-                <tr class="{{ $index % 2 === 0 ? 'bg-surface-container-lowest' : 'bg-surface-container-low/30' }} hover:bg-surface-container-low transition-colors group">
-                    <td class="px-6 py-4">
-                        <span class="inline-block px-2.5 py-1 rounded border border-outline-variant/50 bg-surface-container-highest text-on-surface-variant font-label text-[0.65rem] font-bold uppercase tracking-wider">
+                <tr>
+                    <td>
+                        <span class="badge-gold">
                             {{ ucwords(str_replace('_', ' ', $cost->category)) }}
                         </span>
                     </td>
-                    <td class="px-6 py-4 font-body text-sm font-semibold text-on-surface">{{ $cost->description }}</td>
-                    <td class="px-6 py-4 text-right font-body text-sm text-outline font-medium">Rp {{ number_format($cost->estimated_amount, 0, ',', '.') }}</td>
-                    <td class="px-6 py-4 text-right">
-                        <form action="{{ route('admin.financials.operational_costs.update', $cost->id) }}" method="POST" class="flex items-center justify-end gap-2">
+                    <td style="font-family:'Inter',sans-serif; color:#1A1817; font-weight:600; font-size:0.85rem;">{{ $cost->description }}</td>
+                    <td class="text-right" style="font-family:'Inter',sans-serif; color:#847B78;">Rp {{ number_format($cost->estimated_amount, 0, ',', '.') }}</td>
+                    <td class="text-right">
+                        <form action="{{ route('admin.financials.operational_costs.update', $cost->id) }}" method="POST" class="flex items-center justify-end gap-2 group">
                             @csrf
-                            <span class="font-body text-sm text-on-surface font-bold">Rp</span>
-                            <input type="number" name="actual_amount" value="{{ $cost->actual_amount }}" class="w-32 bg-surface-container-highest border border-outline-variant/50 rounded-lg px-3 py-1.5 font-headline text-sm font-bold text-primary focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-colors text-right" required>
-                            <button type="submit" class="w-8 h-8 rounded-lg bg-primary/10 text-primary hover:bg-primary hover:text-white transition-colors flex items-center justify-center opacity-0 group-hover:opacity-100 shadow-sm border border-primary/20" title="Simpan Perubahan">
-                                <i class="bi bi-check-lg"></i>
+                            <span style="font-weight:700; color:#504442;">Rp</span>
+                            <input type="number" name="actual_amount" value="{{ $cost->actual_amount }}" class="input-gold w-32 text-right" style="padding:6px 12px; font-weight:700; color:#8B1A2A;" required>
+                            <button type="submit" class="w-8 h-8 rounded-lg flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all" style="background:rgba(22,163,74,0.1); color:#16a34a; border:1px solid rgba(22,163,74,0.2);" title="Simpan Perubahan">
+                                <i data-lucide="check" class="w-4 h-4"></i>
                             </button>
                         </form>
                     </td>
-                    <td class="px-6 py-4 text-right font-body text-sm font-bold">
+                    <td class="text-right">
                         @if($diff > 0) 
-                            <span class="inline-flex items-center gap-1 text-red-600 bg-red-500/10 px-2 py-0.5 rounded border border-red-500/20"><i class="bi bi-arrow-up-short"></i> Rp {{ number_format($diff, 0, ',', '.') }}</span>
+                            <span class="inline-flex items-center gap-1 rounded border font-bold" style="border-color:rgba(239,68,68,0.2); background:rgba(239,68,68,0.1); color:#dc2626; font-size:0.75rem; padding:2px 6px;"><i data-lucide="arrow-up" class="w-3 h-3"></i> Rp {{ number_format($diff, 0, ',', '.') }}</span>
                         @elseif($diff < 0) 
-                            <span class="inline-flex items-center gap-1 text-green-600 bg-green-500/10 px-2 py-0.5 rounded border border-green-500/20"><i class="bi bi-arrow-down-short"></i> Rp {{ number_format(abs($diff), 0, ',', '.') }}</span>
+                            <span class="inline-flex items-center gap-1 rounded border font-bold" style="border-color:rgba(34,197,94,0.2); background:rgba(34,197,94,0.1); color:#16a34a; font-size:0.75rem; padding:2px 6px;"><i data-lucide="arrow-down" class="w-3 h-3"></i> Rp {{ number_format(abs($diff), 0, ',', '.') }}</span>
                         @else 
-                            <span class="text-outline-variant">—</span>
+                            <span style="color:#847B78;">—</span>
                         @endif
                     </td>
                 </tr>
                 @empty
                 <tr>
-                    <td colspan="5" class="px-6 py-12 text-center text-outline">Belum ada data input biaya operasional tambahan.</td>
+                    <td colspan="5" class="py-12 text-center text-gray-400" style="font-size:0.85rem;">Belum ada data input biaya operasional tambahan.</td>
                 </tr>
                 @endforelse
             </tbody>
-            <tfoot class="bg-primary/5 border-t-2 border-primary/20">
-                <tr>
-                    <td colspan="2" class="px-6 py-4 text-right font-label text-[0.65rem] uppercase tracking-widest font-bold text-primary">TOTAL KESELURUHAN</td>
-                    <td class="px-6 py-4 text-right font-body text-sm font-bold text-on-surface-variant">Rp {{ number_format($fr->operationalCosts->sum('estimated_amount'), 0, ',', '.') }}</td>
-                    <td class="px-6 py-4 text-right font-headline text-base font-bold text-primary">Rp {{ number_format($fr->operationalCosts->sum('actual_amount'), 0, ',', '.') }}</td>
-                    <td class="px-6 py-4 text-right font-body text-sm font-bold">
+            <tfoot>
+                <tr style="background:rgba(197,160,40,0.05); border-top:2px solid rgba(197,160,40,0.2);">
+                    <td colspan="2" class="text-right subtitle-gold" style="padding:14px 16px; color:#8B1A2A;">TOTAL KESELURUHAN</td>
+                    <td class="text-right" style="font-family:'Inter',sans-serif; color:#847B78; font-weight:700; padding:14px 16px;">Rp {{ number_format($fr->operationalCosts->sum('estimated_amount'), 0, ',', '.') }}</td>
+                    <td class="text-right" style="font-family:'Inter',sans-serif; color:#8B1A2A; font-weight:800; font-size:1.1rem; padding:14px 16px;">Rp {{ number_format($fr->operationalCosts->sum('actual_amount'), 0, ',', '.') }}</td>
+                    <td class="text-right" style="font-family:'Inter',sans-serif; font-weight:700; padding:14px 16px;">
                         @php $totalDiff = $fr->operationalCosts->sum('actual_amount') - $fr->operationalCosts->sum('estimated_amount'); @endphp
                         @if($totalDiff > 0) 
-                            <span class="text-red-600">+Rp {{ number_format($totalDiff, 0, ',', '.') }}</span>
+                            <span style="color:#dc2626;">+Rp {{ number_format($totalDiff, 0, ',', '.') }}</span>
                         @else 
-                            <span class="text-green-600">-Rp {{ number_format(abs($totalDiff), 0, ',', '.') }}</span>
+                            <span style="color:#16a34a;">-Rp {{ number_format(abs($totalDiff), 0, ',', '.') }}</span>
                         @endif
                     </td>
                 </tr>
@@ -145,35 +147,35 @@
     </div>
 @else
     {{-- NO DATA STATE --}}
-    <div class="bg-surface-container border border-outline-variant/30 border-dashed rounded-xl p-12 text-center shadow-sm max-w-2xl mx-auto">
-        <i class="bi bi-file-earmark-x text-5xl text-outline/50 mb-4 block"></i>
-        <p class="font-headline font-bold text-lg text-on-surface mb-2">Belum ada data keuangan</p>
-        <p class="font-body text-sm text-on-surface-variant">Data keuangan untuk event ini belum terbentuk.<br>Pastikan DP sudah dikonfirmasi terlebih dahulu dari halaman Booking.</p>
+    <div class="card-gold border-dashed p-12 text-center max-w-2xl mx-auto">
+        <i data-lucide="file-x" class="w-12 h-12 text-gray-300 mx-auto mb-4"></i>
+        <p class="title-gold" style="font-size:1.2rem; margin-bottom:8px;">Belum ada data keuangan</p>
+        <p class="subtitle-gold" style="font-size:0.75rem; text-transform:none; letter-spacing:normal;">Data keuangan untuk event ini belum terbentuk.<br>Pastikan DP sudah dikonfirmasi terlebih dahulu dari halaman Booking.</p>
     </div>
 @endif
 
 {{-- ── TOMBOL NAVIGASI & AKSI SELESAI ── --}}
 <div class="mt-8 flex flex-col sm:flex-row items-center justify-between gap-4">
     <div class="flex gap-3 w-full sm:w-auto">
-        <a href="{{ route('admin.events.show', $event->id) }}" class="inline-flex items-center gap-2 px-5 py-2.5 rounded-lg border border-outline-variant/50 font-label text-[0.65rem] font-bold uppercase tracking-widest text-on-surface hover:bg-surface-container transition-colors">
-            <i class="bi bi-arrow-left"></i> Kembali ke Event
+        <a href="{{ route('admin.events.show', $event->id) }}" class="arh-btn-secondary px-5 py-2.5" style="border-color:rgba(132,123,120,0.3); color:#504442;">
+            <i data-lucide="arrow-left" class="w-4 h-4 mr-1 inline-block -mt-1"></i> Kembali ke Event
         </a>
-        <a href="{{ route('admin.financials.index') }}" class="inline-flex items-center gap-2 px-5 py-2.5 rounded-lg border border-secondary/30 font-label text-[0.65rem] font-bold uppercase tracking-widest text-secondary hover:bg-secondary/10 transition-colors">
-            <i class="bi bi-graph-up-arrow"></i> Laporan Keuangan
+        <a href="{{ route('admin.financials.index') }}" class="arh-btn-secondary px-5 py-2.5">
+            <i data-lucide="trending-up" class="w-4 h-4 mr-1 inline-block -mt-1"></i> Laporan Keuangan
         </a>
     </div>
 
     @if($event->status !== 'completed' && $event->status !== 'cancelled')
-    <form action="{{ route('admin.events.mark_completed', $event->id) }}" method="POST" class="m-0 w-full sm:w-auto" data-confirm="Tandai event ini sebagai SELESAI? Pastikan semua biaya riil lapangan sudah direkam.">
+    <form action="{{ route('admin.events.mark_completed', $event->id) }}" method="POST" class="m-0 w-full sm:w-auto" onsubmit="return confirm('Tandai event ini sebagai SELESAI? Pastikan semua biaya riil lapangan sudah direkam.');">
         @csrf
         @method('PATCH')
-        <button type="submit" class="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-2.5 rounded-lg bg-green-600 text-white font-label text-[0.65rem] font-bold uppercase tracking-widest hover:bg-green-700 transition-colors shadow-md">
-            <i class="bi bi-check2-all"></i> Tandai Event Selesai
+        <button type="submit" class="arh-btn-primary w-full sm:w-auto px-6 py-2.5" style="background:linear-gradient(135deg, #16a34a, #15803d); border:none; color:white;">
+            <i data-lucide="check-check" class="w-4 h-4 mr-1 inline-block -mt-1"></i> Tandai Event Selesai
         </button>
     </form>
     @elseif($event->status === 'completed')
-    <div class="px-4 py-2 rounded-lg bg-green-500/10 border border-green-500/20 text-green-700 font-label text-[0.65rem] font-bold uppercase tracking-widest flex items-center gap-2">
-        <i class="bi bi-patch-check-fill"></i> Event Telah Selesai
+    <div class="badge-green px-4 py-2 flex items-center gap-2">
+        <i data-lucide="check-circle" class="w-4 h-4"></i> Event Telah Selesai
     </div>
     @endif
 </div>
@@ -181,23 +183,23 @@
 {{-- MODAL TAMBAH BIAYA OPERASIONAL --}}
 @if($fr)
 <div id="modalAddCost" class="fixed inset-0 z-[100] hidden items-center justify-center p-4">
-    <div class="absolute inset-0 bg-black/50 backdrop-blur-sm" onclick="this.parentElement.classList.add('hidden');this.parentElement.classList.remove('flex');"></div>
-    <div class="relative w-full max-w-lg bg-surface-container-lowest rounded-2xl shadow-2xl border border-outline-variant/30 overflow-hidden">
-        <div class="px-6 py-5 border-b border-outline-variant/20 flex justify-between items-center bg-surface-container-low">
-            <h5 class="font-headline font-bold text-lg text-primary flex items-center gap-2">
-                <i class="bi bi-plus-circle-fill text-secondary"></i> Tambah Biaya Baru
+    <div class="absolute inset-0 bg-black/60 backdrop-blur-sm" onclick="this.parentElement.classList.add('hidden');this.parentElement.classList.remove('flex');"></div>
+    <div class="relative w-full max-w-lg card-gold p-0 overflow-hidden">
+        <div class="px-6 py-5 border-b flex justify-between items-center" style="border-color:rgba(197,160,40,0.2); background:rgba(197,160,40,0.02);">
+            <h5 class="title-gold flex items-center gap-2" style="font-size:1.3rem;">
+                <i data-lucide="plus-circle" class="w-5 h-5" style="color:#fcd400;"></i> Tambah Biaya Baru
             </h5>
-            <button type="button" class="text-on-surface-variant hover:text-primary transition-colors"
+            <button type="button" class="text-gray-400 hover:text-gray-600 transition-colors"
                 onclick="document.getElementById('modalAddCost').classList.add('hidden');document.getElementById('modalAddCost').classList.remove('flex');">
-                <i class="bi bi-x-lg"></i>
+                <i data-lucide="x" class="w-5 h-5"></i>
             </button>
         </div>
         <form action="{{ route('admin.financials.operational_costs.store', $event->id) }}" method="POST">
             @csrf
             <div class="p-6 space-y-4">
                 <div>
-                    <label class="block font-label text-[0.65rem] uppercase tracking-widest text-on-surface-variant font-bold mb-1.5">Kategori <span class="text-red-500">*</span></label>
-                    <select name="category" class="w-full bg-surface-container border border-outline-variant/50 rounded-lg px-4 py-2.5 font-body text-sm text-on-surface focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all" required>
+                    <label class="block subtitle-gold mb-1.5" style="font-size:0.65rem;">Kategori <span class="text-red-500">*</span></label>
+                    <select name="category" class="input-gold w-full" required>
                         <option value="konsumsi">Konsumsi</option>
                         <option value="transportasi">Transportasi / Bensin</option>
                         <option value="sewa_kostum">Sewa Kostum Luar</option>
@@ -208,24 +210,24 @@
                     </select>
                 </div>
                 <div>
-                    <label class="block font-label text-[0.65rem] uppercase tracking-widest text-on-surface-variant font-bold mb-1.5">Keterangan / Deskripsi <span class="text-red-500">*</span></label>
-                    <input type="text" name="description" placeholder="Contoh: Beli rokok & kopi, Uang tol..." class="w-full bg-surface-container border border-outline-variant/50 rounded-lg px-4 py-2.5 font-body text-sm text-on-surface focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all" required>
+                    <label class="block subtitle-gold mb-1.5" style="font-size:0.65rem;">Keterangan / Deskripsi <span class="text-red-500">*</span></label>
+                    <input type="text" name="description" placeholder="Contoh: Beli rokok & kopi, Uang tol..." class="input-gold w-full" required>
                 </div>
                 <div class="grid grid-cols-2 gap-4">
                     <div>
-                        <label class="block font-label text-[0.65rem] uppercase tracking-widest text-on-surface-variant font-bold mb-1.5">Estimasi Awal (Rp) <span class="text-red-500">*</span></label>
-                        <input type="number" name="estimated_amount" value="0" min="0" class="w-full bg-surface-container border border-outline-variant/50 rounded-lg px-4 py-2.5 font-headline font-bold text-on-surface focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all" required>
+                        <label class="block subtitle-gold mb-1.5" style="font-size:0.65rem;">Estimasi Awal (Rp) <span class="text-red-500">*</span></label>
+                        <input type="number" name="estimated_amount" value="0" min="0" class="input-gold w-full font-bold" required>
                     </div>
                     <div>
-                        <label class="block font-label text-[0.65rem] uppercase tracking-widest text-primary font-bold mb-1.5">Realisasi Lapangan (Rp) <span class="text-red-500">*</span></label>
-                        <input type="number" name="actual_amount" min="0" placeholder="Nominal Rp" class="w-full bg-primary/5 border border-primary/30 rounded-lg px-4 py-2.5 font-headline font-bold text-primary focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all" required>
+                        <label class="block subtitle-gold mb-1.5" style="font-size:0.65rem; color:#8B1A2A;">Realisasi Lapangan (Rp) <span class="text-red-500">*</span></label>
+                        <input type="number" name="actual_amount" min="0" placeholder="Nominal Rp" class="input-gold w-full font-bold" style="border-color:rgba(139,26,42,0.4); color:#8B1A2A;" required>
                     </div>
                 </div>
             </div>
-            <div class="px-6 py-4 border-t border-outline-variant/20 bg-surface-container-low flex justify-end gap-3">
-                <button type="button" class="px-5 py-2.5 rounded-lg border border-outline-variant/50 font-label text-xs font-bold uppercase tracking-widest text-on-surface-variant hover:bg-surface-container transition-colors"
+            <div class="px-6 py-4 border-t flex justify-end gap-3" style="border-color:rgba(197,160,40,0.2); background:rgba(197,160,40,0.02);">
+                <button type="button" class="arh-btn-secondary px-5 py-2.5"
                     onclick="document.getElementById('modalAddCost').classList.add('hidden');document.getElementById('modalAddCost').classList.remove('flex');">Batal</button>
-                <button type="submit" class="px-5 py-2.5 rounded-lg bg-primary text-white font-label text-xs font-bold uppercase tracking-widest hover:bg-primary-container transition-colors">Simpan Biaya</button>
+                <button type="submit" class="arh-btn-primary px-5 py-2.5">Simpan Biaya</button>
             </div>
         </form>
     </div>

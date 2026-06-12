@@ -85,7 +85,7 @@
                     <label class="font-label text-xs font-bold text-on-surface block mb-1 ml-1">Batas Waktu Pengembalian</label>
                     <input type="date" name="due_date"
                            class="w-full bg-surface-container border border-outline-variant/50 rounded-lg px-3 py-2 font-body text-xs focus:outline-none focus:border-secondary focus:ring-1 focus:ring-secondary transition-colors"
-                           value="{{ old('due_date', $rental->due_date) }}" required>
+                           value="{{ old('due_date', $rental->due_date ? \Carbon\Carbon::parse($rental->due_date)->format('Y-m-d') : '') }}" required>
                     <p class="text-[9px] text-on-surface-variant mt-1.5 ml-1 italic">*Keterlambatan akan dikenakan denda otomatis oleh sistem Rp 50.000/hari.</p>
                     @error('due_date') <p class="text-red-500 text-[0.68rem] mt-1 ml-1">{{ $message }}</p> @enderror
                 </div>

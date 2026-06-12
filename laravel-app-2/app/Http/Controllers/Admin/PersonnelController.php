@@ -53,7 +53,7 @@ class PersonnelController extends Controller
                     'name'     => $request->name,
                     'email'    => $request->email,
                     'phone'    => $request->phone,
-                    'password' => Hash::make($tempPassword),
+                    'password' => $tempPassword,
                     'role'     => 'personel',
                 ]);
 
