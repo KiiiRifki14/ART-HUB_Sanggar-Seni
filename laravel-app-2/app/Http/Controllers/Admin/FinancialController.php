@@ -49,7 +49,29 @@ class FinancialController extends Controller
 
         $records = $query->paginate(10)->withQueryString();
 
-        return view('admin.financials.index', compact('records', 'totals'));
+        // --- Data untuk section Post-Event yang digabung di halaman ini ---
+        $pendingCount = \App\Models\Event::where(function ($q) {
+                $q->where('event_date', '<', now()->toDateString())
+                  ->orWhere('status', 'completed');
+            })
+            ->where(function ($q) {
+                $q->whereDoesntHave('financialRecord')
+                  ->orWhereHas('financialRecord', function ($q2) {
+                      $q2->whereDoesntHave('operationalCosts');
+                  });
+            })
+            ->count();
+
+        $postEvents = \App\Models\Event::with(['booking', 'financialRecord.operationalCosts'])
+            ->where(function ($q) {
+                $q->where('event_date', '<', now()->toDateString())
+                  ->orWhere('status', 'completed');
+            })
+            ->orderBy('event_date', 'desc')
+            ->paginate(8, ['*'], 'post_page')
+            ->withQueryString();
+
+        return view('admin.financials.index', compact('records', 'totals', 'pendingCount', 'postEvents'));
     }
 
     /**

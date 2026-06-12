@@ -484,8 +484,7 @@
                 ['Daftar Booking',    'book-open',                'admin.bookings.index',             $r->routeIs('admin.bookings.index'),              $pendingBookingBadge],
                 ['DP Verification',   'check-circle',             'admin.bookings.dp_verification',   $r->routeIs('admin.bookings.dp_verification'),    $pendingDpVerificationBadge],
                 ['Payment Tracking',  'receipt',                  'admin.payments.index',             $r->routeIs('admin.payments.*'),                  0],
-                ['Financial Report',  'trending-up',              'admin.financials.index',           $r->routeIs('admin.financials.index'),            0],
-                ['Post-Event Update', 'clipboard-check',          'admin.financials.post_event_list', $r->routeIs('admin.financials.post_event_list'),  $pendingPostEventBadge],
+                ['Financial Report',  'trending-up',              'admin.financials.index',           $r->routeIs('admin.financials.index') || $r->routeIs('admin.financials.post_event_list'), $pendingPostEventBadge],
             ],
             'MANAJEMEN' => [
                 ['Cancellation',      'shield-alert',             'admin.cancellations.index',        $r->routeIs('admin.cancellations.*'),             0],

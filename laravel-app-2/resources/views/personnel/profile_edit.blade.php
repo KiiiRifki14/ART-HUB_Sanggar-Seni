@@ -219,6 +219,24 @@
                                x-bind:required="hasDayJob">
                     </div>
                 </div>
+
+                <div>
+                    <label class="profile-label">Hari Kegiatan <span class="text-red-500">*</span></label>
+                    @php
+                        $selectedDays = old('day_job_days', $personnel->day_job_days ?? []);
+                    @endphp
+                    <div class="grid grid-cols-2 sm:grid-cols-4 gap-2">
+                        @foreach(['Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu', 'Minggu'] as $day)
+                            <label class="flex items-center gap-2 cursor-pointer p-2 rounded-lg border bg-white hover:bg-[#F4F2EE] transition-colors" style="border-color: rgba(0,0,0,0.1)">
+                                <input type="checkbox" name="day_job_days[]" value="{{ $day }}" 
+                                       class="rounded accent-[#8B1A2A]"
+                                       {{ in_array($day, (array)$selectedDays) ? 'checked' : '' }}>
+                                <span class="text-sm font-medium" style="color:#1A1817">{{ $day }}</span>
+                            </label>
+                        @endforeach
+                    </div>
+                    <div class="mt-1 text-xs text-muted">Pilih hari-hari di mana kegiatan ini rutin dilakukan. (Kosongkan jika jadwal tiap hari).</div>
+                </div>
                 <div class="p-3 rounded-xl text-xs" style="background:rgba(197,160,40,0.08);border:1px solid rgba(197,160,40,0.2);color:#705d00">
                     <i class="bi bi-lightbulb-fill me-1"></i>
                     Contoh: Kuliah 08:00–16:00, Kerja kantor 07:30–15:30, Sekolah 07:00–14:00

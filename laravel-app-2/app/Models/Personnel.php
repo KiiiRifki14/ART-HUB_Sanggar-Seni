@@ -69,6 +69,7 @@ class Personnel extends Model
         'is_backup' => 'boolean',
         'day_job_start' => 'datetime:H:i',
         'day_job_end' => 'datetime:H:i',
+        'day_job_days' => 'array',
     ];
 
     public function user(): BelongsTo

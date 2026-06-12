@@ -44,7 +44,7 @@ class PersonnelController extends Controller
 
         $tempPassword = $request->filled('password')
             ? $request->input('password')
-            : \Illuminate\Support\Str::random(8);
+            : 'sanggar123'; // Password default sistem untuk personel baru
 
         try {
             DB::transaction(function () use ($request, $tempPassword) {

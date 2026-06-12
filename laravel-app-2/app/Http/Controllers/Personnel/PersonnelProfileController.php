@@ -39,6 +39,8 @@ class PersonnelProfileController extends Controller
             'day_job_name'  => 'nullable|string|max:100',
             'day_job_start' => 'nullable|date_format:H:i',
             'day_job_end'   => 'nullable|date_format:H:i|after:day_job_start',
+            'day_job_days'   => 'nullable|array',
+            'day_job_days.*' => 'string|in:Senin,Selasa,Rabu,Kamis,Jumat,Sabtu,Minggu',
         ], [
             'day_job_end.after'           => 'Jam selesai kegiatan harus setelah jam mulai.',
             'day_job_start.date_format'   => 'Format jam mulai tidak valid.',
@@ -74,16 +76,17 @@ class PersonnelProfileController extends Controller
         $dayJobName  = $hasDayJob ? ($validated['day_job_name'] ?? null) : null;
         $dayJobStart = $hasDayJob ? ($validated['day_job_start'] ?? null) : null;
         $dayJobEnd   = $hasDayJob ? ($validated['day_job_end'] ?? null) : null;
+        $dayJobDays  = $hasDayJob ? ($validated['day_job_days'] ?? null) : null;
 
         // 4. Update data personel (day_job_desc di-sync sama day_job_name agar SP bentrok bisa baca)
         $personnel->stage_name   = $validated['stage_name'] ?? null;
         $personnel->bio          = $validated['bio'] ?? null;
         $personnel->photo        = $photoPath;
         $personnel->has_day_job  = $hasDayJob;
-        $personnel->day_job_name = $dayJobName;
-        $personnel->day_job_desc = $dayJobName; // sync ke day_job_desc yang dipakai SP
+        $personnel->day_job_desc = $dayJobName; // kolom yang dipakai SP untuk label bentrok
         $personnel->day_job_start = $dayJobStart;
         $personnel->day_job_end   = $dayJobEnd;
+        $personnel->day_job_days  = $dayJobDays;
         $personnel->save();
 
         return redirect()->route('personnel.profile.edit')

@@ -9,6 +9,7 @@
     <link href="https://fonts.googleapis.com" rel="preconnect">
     <link crossorigin href="https://fonts.gstatic.com" rel="preconnect">
     <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700&family=Noto+Serif:ital,wght@0,400;0,600;0,700;1,400&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
 
@@ -53,6 +54,9 @@
         .btn-toggle-password .icon-show { display: none; }
         .btn-toggle-password.is-visible .icon-hide { display: none; }
         .btn-toggle-password.is-visible .icon-show { display: inline-block; }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 24;
+        }
     </style>
 </head>
 <body class="bg-surface font-body text-on-surface antialiased selection:bg-secondary-container selection:text-on-secondary-container h-screen flex overflow-hidden">
@@ -145,7 +149,7 @@
                 <div class="flex items-center justify-between mb-10" data-aos="fade-up" data-aos-delay="520">
                     <label class="flex items-center gap-3 cursor-pointer group">
                         <div class="w-5 h-5 rounded border border-outline-variant/50 bg-surface-container-lowest group-hover:border-primary flex items-center justify-center transition-colors relative">
-                            <input type="checkbox" name="remember" id="remember" class="absolute opacity-0 w-full h-full cursor-pointer">
+                            <input type="checkbox" name="remember" id="remember" class="peer absolute opacity-0 w-full h-full cursor-pointer">
                             <span class="material-symbols-outlined text-sm text-primary opacity-0 peer-checked:opacity-100 transition-opacity" style="font-variation-settings:'FILL' 1;">check</span>
                         </div>
                         <span class="font-body text-sm text-on-surface-variant group-hover:text-primary transition-colors">Ingat Saya</span>
