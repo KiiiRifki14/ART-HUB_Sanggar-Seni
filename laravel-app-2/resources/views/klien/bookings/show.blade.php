@@ -164,13 +164,23 @@
         </div>
 
         {{-- Status Context Banner --}}
-        @if($booking->status === 'pending' && !$booking->payment_proof)
+        @if($booking->status === 'pending' && !$booking->is_admin_confirmed)
+        <div class="flex items-start gap-4 p-6 rounded-2xl bg-amber-500/10 border border-amber-500/20 text-amber-900 shadow-sm">
+            <i class="bi bi-hourglass-split text-2xl mt-0.5 text-amber-600"></i>
+            <div>
+                <div class="font-headline font-bold text-base mb-1">Menunggu Konfirmasi Admin</div>
+                <div class="font-body text-xs leading-relaxed opacity-90">
+                    Booking Anda sedang direview ketersediaannya oleh admin. Pembayaran DP baru dapat dilakukan setelah booking dikonfirmasi.
+                </div>
+            </div>
+        </div>
+        @elseif($booking->status === 'pending' && !$booking->payment_proof && $booking->is_admin_confirmed)
         <div class="flex items-start gap-4 p-6 rounded-2xl bg-amber-500/10 border border-amber-500/20 text-amber-900 shadow-sm">
             <i class="bi bi-info-circle-fill text-2xl mt-0.5 text-amber-600"></i>
             <div>
-                <div class="font-headline font-bold text-base mb-1">Menunggu Kesepakatan Harga</div>
+                <div class="font-headline font-bold text-base mb-1">Menunggu Kesepakatan Harga & Pembayaran DP</div>
                 <div class="font-body text-xs leading-relaxed opacity-90">
-                    Pimpinan sanggar akan menghubungi Anda melalui WhatsApp untuk mendiskusikan harga final berdasarkan kebutuhan pementasan. Setelah disepakati, silakan transfer commitment fee (DP) Anda.
+                    Booking Anda telah diterima! Pimpinan sanggar akan menghubungi Anda melalui WhatsApp untuk mendiskusikan harga final berdasarkan kebutuhan pementasan. Setelah disepakati, silakan transfer commitment fee (DP) Anda.
                 </div>
             </div>
         </div>
@@ -390,7 +400,15 @@
             <hr class="border-outline-variant/10 m-0">
 
             {{-- PANEL PEMBAYARAN DAN BUKTI TRANSFER --}}
-            @if($booking->status === 'pending' && !$booking->payment_proof)
+            @if($booking->status === 'pending' && !$booking->is_admin_confirmed)
+                <div class="p-8 text-center bg-orange-500/5">
+                    <i class="bi bi-hourglass-split text-5xl text-orange-500 mb-3 block animate-pulse"></i>
+                    <div class="font-headline font-bold text-base text-primary mb-1">Menunggu Konfirmasi Jadwal</div>
+                    <div class="font-body text-xs text-on-surface-variant leading-relaxed">
+                        Pemesanan Anda telah kami terima dan sedang direview oleh admin untuk memastikan ketersediaan jadwal dan personel. Mohon menunggu.
+                    </div>
+                </div>
+            @elseif($booking->status === 'pending' && !$booking->payment_proof && $booking->is_admin_confirmed)
                 @php
                     $siteContents = \Illuminate\Support\Facades\Cache::remember(
                         'site_contents',

@@ -46,21 +46,41 @@
 </div>
 
 {{-- Search Bar --}}
-<form action="{{ route('admin.events.monitoring') }}" method="GET" class="mb-6 flex flex-col sm:flex-row gap-3">
+<form action="{{ route('admin.events.monitoring') }}" method="GET" class="mb-6 flex flex-col md:flex-row gap-3">
     <input type="hidden" name="filter" value="{{ request('filter', 'all') }}">
+    
     <div class="relative flex-1">
         <span class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
             <i class="bi bi-search text-outline text-xs"></i>
         </span>
         <input type="text" name="search" value="{{ request('search') }}" 
-               placeholder="Cari monitoring berdasarkan kode event, nama klien, telepon, jenis acara, atau lokasi..." 
+               placeholder="Cari monitoring berdasarkan kode, klien, telepon, jenis acara, atau lokasi..." 
                class="w-full pl-10 pr-4 py-2.5 rounded-xl border border-outline-variant/30 bg-surface-container-lowest font-body text-xs focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all">
     </div>
-    <div class="flex gap-2">
-        <button type="submit" class="px-5 py-2.5 rounded-xl bg-primary text-white font-label text-xs font-bold uppercase tracking-widest hover:bg-primary-container transition-all shadow-sm">
-            Cari
+    
+    <div class="flex gap-2 w-full md:w-auto">
+        <div class="relative flex-1 md:w-36">
+            <span class="absolute inset-y-0 left-0 pl-2.5 flex items-center pointer-events-none">
+                <i class="bi bi-calendar-event text-outline text-xs"></i>
+            </span>
+            <input type="date" name="start_date" value="{{ request('start_date') }}" title="Tanggal Mulai"
+                   class="w-full pl-8 pr-3 py-2.5 rounded-xl border border-outline-variant/30 bg-surface-container-lowest font-body text-xs focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all">
+        </div>
+        
+        <div class="relative flex-1 md:w-36">
+            <span class="absolute inset-y-0 left-0 pl-2.5 flex items-center pointer-events-none">
+                <i class="bi bi-calendar-event-fill text-outline text-xs"></i>
+            </span>
+            <input type="date" name="end_date" value="{{ request('end_date') }}" title="Tanggal Selesai"
+                   class="w-full pl-8 pr-3 py-2.5 rounded-xl border border-outline-variant/30 bg-surface-container-lowest font-body text-xs focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all">
+        </div>
+    </div>
+
+    <div class="flex gap-2 w-full md:w-auto justify-end">
+        <button type="submit" class="px-5 py-2.5 rounded-xl bg-primary text-white font-label text-xs font-bold uppercase tracking-widest hover:bg-primary-container transition-all shadow-sm flex-1 md:flex-none">
+            Filter
         </button>
-        @if(request('search'))
+        @if(request('search') || request('start_date') || request('end_date'))
         <a href="{{ route('admin.events.monitoring', ['filter' => request('filter', 'all')]) }}" class="px-4 py-2.5 rounded-xl border border-outline-variant/30 text-outline hover:text-primary hover:bg-surface-container font-label text-xs font-bold uppercase tracking-widest transition-all flex items-center justify-center">
             Reset
         </a>

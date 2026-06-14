@@ -53,14 +53,6 @@ class BookingController extends Controller
                 'required',
                 'date',
                 'after_or_equal:' . now()->addDays(30)->toDateString(),
-                function ($attribute, $value, $fail) {
-                    $exists = Booking::where('event_date', $value)
-                        ->whereIn('status', ['dp_paid', 'confirmed', 'paid_full', 'completed'])
-                        ->exists();
-                    if ($exists) {
-                        $fail('Tanggal ' . \Carbon\Carbon::parse($value)->format('d M Y') . ' sudah penuh/di-booking. Silakan pilih tanggal lain.');
-                    }
-                },
             ],
             'event_start'       => 'required',
             'event_end'         => 'required',
@@ -76,17 +68,6 @@ class BookingController extends Controller
         try {
             $booking = \Illuminate\Support\Facades\DB::transaction(function () use ($request, $catalog) {
 
-                // FIX A-02: Cek ketersediaan tanggal DALAM transaksi dengan lockForUpdate
-                // Ini memastikan tidak ada booking lain yang bisa masuk untuk tanggal ini
-                // sebelum insert kita selesai (Pessimistic Locking).
-                $conflict = \App\Models\Booking::where('event_date', $request->event_date)
-                    ->whereIn('status', ['dp_paid', 'confirmed', 'paid_full', 'completed'])
-                    ->lockForUpdate()
-                    ->exists();
-
-                if ($conflict) {
-                    throw new \Exception('Tanggal ' . \Carbon\Carbon::parse($request->event_date)->format('d M Y') . ' sudah penuh/di-booking. Silakan pilih tanggal lain.');
-                }
 
                 // Harga dari catalog di server — immune dari manipulasi
                 $basePrice = $catalog->price;
@@ -139,6 +120,10 @@ class BookingController extends Controller
     public function uploadProof(Request $request, $id)
     {
         $booking = Booking::where('id', $id)->where('client_id', Auth::id())->firstOrFail();
+
+        if (!$booking->is_admin_confirmed) {
+            return redirect()->back()->with('error', 'Pemesanan Anda masih direview oleh admin. Anda belum bisa mengunggah bukti pembayaran.');
+        }
 
         $request->validate([
             // FIX B-04: Tambahkan validasi mimetypes berbasis finfo untuk mencegah bypass ekstensi

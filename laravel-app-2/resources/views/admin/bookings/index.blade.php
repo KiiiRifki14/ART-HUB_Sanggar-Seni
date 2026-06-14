@@ -178,7 +178,12 @@
                         <div class="flex items-center justify-end gap-2">
                             <a href="{{ route('admin.bookings.show', $booking->id) }}" class="arh-btn-secondary" style="padding:6px 10px;" title="Detail"><i data-lucide="eye" class="w-4 h-4"></i></a>
                             @if($booking->status === 'pending')
-                            <button type="button" onclick="openKunciModal({{ $booking->id }}, '{{ addslashes($booking->client_name) }}', {{ $booking->total_price }}, {{ $booking->dp_amount }})" class="arh-btn-primary" style="padding:6px 10px; background:linear-gradient(135deg, #fcd400, #C5A028); color:#1A1817; border:none;" title="Kunci Laba & Konfirmasi DP"><i data-lucide="lock" class="w-4 h-4"></i></button>
+                                @if(!$booking->is_admin_confirmed)
+                                    <button type="button" onclick="openAcceptModal({{ $booking->id }}, '{{ addslashes($booking->client_name) }}', '{{ $booking->smart_warning->class ?? 'info' }}', '{{ addslashes($booking->smart_warning->message ?? '') }}')" class="arh-btn-primary" style="padding:6px 10px; background-color:#16a34a; border:none; color:white;" title="Terima Booking"><i data-lucide="check" class="w-4 h-4"></i></button>
+                                    <button type="button" onclick="openRejectModal({{ $booking->id }}, '{{ addslashes($booking->client_name) }}')" class="arh-btn-primary" style="padding:6px 10px; background-color:#dc2626; border:none; color:white;" title="Tolak Booking"><i data-lucide="x" class="w-4 h-4"></i></button>
+                                @else
+                                    <button type="button" onclick="openKunciModal({{ $booking->id }}, '{{ addslashes($booking->client_name) }}', {{ $booking->total_price }}, {{ $booking->dp_amount }})" class="arh-btn-primary" style="padding:6px 10px; background:linear-gradient(135deg, #fcd400, #C5A028); color:#1A1817; border:none;" title="Kunci Laba & Konfirmasi DP"><i data-lucide="lock" class="w-4 h-4"></i></button>
+                                @endif
                             @endif
                         </div>
                     </td>
@@ -260,9 +265,14 @@
                 <i data-lucide="eye" class="w-4 h-4"></i> Detail
             </a>
             @if($booking->status === 'pending')
-            <button type="button" onclick="openKunciModal({{ $booking->id }}, '{{ addslashes($booking->client_name) }}', {{ $booking->total_price }}, {{ $booking->dp_amount }})" class="arh-btn-primary flex-1 py-2" style="background:linear-gradient(135deg, #fcd400, #C5A028); color:#1A1817; border:none; text-align:center;">
-                <i data-lucide="lock" class="w-4 h-4"></i> Kunci DP
-            </button>
+                @if(!$booking->is_admin_confirmed)
+                    <button type="button" onclick="openAcceptModal({{ $booking->id }}, '{{ addslashes($booking->client_name) }}', '{{ $booking->smart_warning->class ?? 'info' }}', '{{ addslashes($booking->smart_warning->message ?? '') }}')" class="arh-btn-primary flex-1 py-2" style="background-color:#16a34a; border:none; color:white; text-align:center;"><i data-lucide="check" class="w-4 h-4"></i> Terima</button>
+                    <button type="button" onclick="openRejectModal({{ $booking->id }}, '{{ addslashes($booking->client_name) }}')" class="arh-btn-primary flex-1 py-2" style="background-color:#dc2626; border:none; color:white; text-align:center;"><i data-lucide="x" class="w-4 h-4"></i> Tolak</button>
+                @else
+                    <button type="button" onclick="openKunciModal({{ $booking->id }}, '{{ addslashes($booking->client_name) }}', {{ $booking->total_price }}, {{ $booking->dp_amount }})" class="arh-btn-primary flex-1 py-2" style="background:linear-gradient(135deg, #fcd400, #C5A028); color:#1A1817; border:none; text-align:center;">
+                        <i data-lucide="lock" class="w-4 h-4"></i> Kunci DP
+                    </button>
+                @endif
             @endif
         </div>
     </div>
@@ -340,6 +350,69 @@
 
 </div>
 
+{{-- ══ MODAL: TERIMA BOOKING (Smart Warning) ══ --}}
+<div id="modalAccept" class="fixed inset-0 z-[100] hidden items-center justify-center p-4">
+    <div class="absolute inset-0 bg-black/60 backdrop-blur-md" onclick="closeAcceptModal()"></div>
+    <div id="modalAcceptContent" class="relative w-full max-w-sm card-gold p-6 transition-all scale-95 opacity-0">
+        <div class="flex items-center justify-between mb-4 pb-3 border-b" style="border-color:rgba(197,160,40,0.2);">
+            <h5 class="title-gold flex items-center gap-2" style="font-size:1.3rem;">
+                <i data-lucide="check-circle" class="w-5 h-5 text-green-600"></i> Konfirmasi Booking
+            </h5>
+            <button onclick="closeAcceptModal()" class="text-gray-400 hover:text-gray-600"><i data-lucide="x" class="w-5 h-5"></i></button>
+        </div>
+        <form id="formAcceptBooking" method="POST">
+            @csrf
+            <div class="mb-5 space-y-4">
+                <p class="subtitle-gold" style="text-transform:none; letter-spacing:normal;">Apakah Anda yakin ingin menerima booking dari <strong id="accept_client_name" class="text-gray-800"></strong>?</p>
+                
+                <div id="smart_warning_container" class="p-3 rounded-lg border">
+                    <div class="flex gap-2">
+                        <i id="smart_warning_icon" data-lucide="info" class="w-5 h-5 flex-shrink-0"></i>
+                        <p id="smart_warning_text" class="text-sm font-medium"></p>
+                    </div>
+                </div>
+            </div>
+            <div class="flex gap-2 pt-4 border-t" style="border-color:rgba(197,160,40,0.2);">
+                <button type="button" onclick="closeAcceptModal()" class="arh-btn-secondary flex-1 py-3 text-center" style="display:block;">Batal</button>
+                <button type="submit" class="arh-btn-primary flex-1 py-3 text-center" style="display:block; background-color:#16a34a; color:white; border:none;">
+                    Terima Booking
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+{{-- ══ MODAL: TOLAK BOOKING ══ --}}
+<div id="modalReject" class="fixed inset-0 z-[100] hidden items-center justify-center p-4">
+    <div class="absolute inset-0 bg-black/60 backdrop-blur-md" onclick="closeRejectModal()"></div>
+    <div id="modalRejectContent" class="relative w-full max-w-sm card-gold p-6 transition-all scale-95 opacity-0">
+        <div class="flex items-center justify-between mb-4 pb-3 border-b" style="border-color:rgba(197,160,40,0.2);">
+            <h5 class="title-gold flex items-center gap-2" style="font-size:1.3rem;">
+                <i data-lucide="x-circle" class="w-5 h-5 text-red-600"></i> Tolak Booking
+            </h5>
+            <button onclick="closeRejectModal()" class="text-gray-400 hover:text-gray-600"><i data-lucide="x" class="w-5 h-5"></i></button>
+        </div>
+        <form id="formRejectBooking" method="POST">
+            @csrf
+            <div class="mb-5 space-y-4">
+                <p class="subtitle-gold" style="text-transform:none; letter-spacing:normal;">Tolak booking dari <strong id="reject_client_name" class="text-gray-800"></strong>?</p>
+                <div>
+                    <label class="block subtitle-gold mb-1.5 ml-1">Alasan Penolakan <span class="text-red-600">*</span></label>
+                    <textarea name="admin_note" required rows="3" class="input-gold" placeholder="Jelaskan alasan penolakan (misal: personel tidak mencukupi)..."></textarea>
+                </div>
+            </div>
+            <div class="flex gap-2 pt-4 border-t" style="border-color:rgba(197,160,40,0.2);">
+                <button type="button" onclick="closeRejectModal()" class="arh-btn-secondary flex-1 py-3 text-center" style="display:block;">Batal</button>
+                <button type="submit" class="arh-btn-primary flex-1 py-3 text-center" style="display:block; background-color:#dc2626; color:white; border:none;">
+                    Tolak Booking
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+</div>
+
 @endsection
 
 @section('scripts')
@@ -374,6 +447,78 @@ function openKunciModal(bookingId, clientName, totalPrice, dpAmount) {
 function closeKunciModal() {
     const modal = document.getElementById('modalKunciLaba');
     const content = document.getElementById('modalKunciContent');
+    content.classList.remove('scale-100', 'opacity-100');
+    content.classList.add('scale-95', 'opacity-0');
+    setTimeout(() => {
+        modal.classList.add('hidden');
+        modal.classList.remove('flex');
+    }, 200);
+}
+
+function openAcceptModal(bookingId, clientName, warningClass, warningMessage) {
+    document.getElementById('formAcceptBooking').action = `/admin/bookings/${bookingId}/accept`;
+    document.getElementById('accept_client_name').textContent = clientName;
+    
+    const container = document.getElementById('smart_warning_container');
+    const text = document.getElementById('smart_warning_text');
+    const icon = document.getElementById('smart_warning_icon');
+    
+    text.textContent = warningMessage;
+    
+    // reset classes
+    container.className = 'p-3 rounded-lg border mt-3 ';
+    icon.setAttribute('data-lucide', 'info');
+    
+    if (warningClass === 'danger') {
+        container.classList.add('bg-red-50', 'border-red-200', 'text-red-700');
+        icon.setAttribute('data-lucide', 'alert-triangle');
+    } else if (warningClass === 'warning') {
+        container.classList.add('bg-orange-50', 'border-orange-200', 'text-orange-700');
+        icon.setAttribute('data-lucide', 'alert-circle');
+    } else {
+        container.classList.add('bg-green-50', 'border-green-200', 'text-green-700');
+        icon.setAttribute('data-lucide', 'check-circle');
+    }
+    lucide.createIcons();
+
+    const modal = document.getElementById('modalAccept');
+    const content = document.getElementById('modalAcceptContent');
+    modal.classList.remove('hidden');
+    modal.classList.add('flex');
+    setTimeout(() => {
+        content.classList.remove('scale-95', 'opacity-0');
+        content.classList.add('scale-100', 'opacity-100');
+    }, 10);
+}
+
+function closeAcceptModal() {
+    const modal = document.getElementById('modalAccept');
+    const content = document.getElementById('modalAcceptContent');
+    content.classList.remove('scale-100', 'opacity-100');
+    content.classList.add('scale-95', 'opacity-0');
+    setTimeout(() => {
+        modal.classList.add('hidden');
+        modal.classList.remove('flex');
+    }, 200);
+}
+
+function openRejectModal(bookingId, clientName) {
+    document.getElementById('formRejectBooking').action = `/admin/bookings/${bookingId}/reject`;
+    document.getElementById('reject_client_name').textContent = clientName;
+
+    const modal = document.getElementById('modalReject');
+    const content = document.getElementById('modalRejectContent');
+    modal.classList.remove('hidden');
+    modal.classList.add('flex');
+    setTimeout(() => {
+        content.classList.remove('scale-95', 'opacity-0');
+        content.classList.add('scale-100', 'opacity-100');
+    }, 10);
+}
+
+function closeRejectModal() {
+    const modal = document.getElementById('modalReject');
+    const content = document.getElementById('modalRejectContent');
     content.classList.remove('scale-100', 'opacity-100');
     content.classList.add('scale-95', 'opacity-0');
     setTimeout(() => {

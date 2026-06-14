@@ -99,6 +99,11 @@
             color: #92400e;
             border: 1px solid #fde68a;
         }
+        .badge-info {
+            background-color: #e0f2fe;
+            color: #0369a1;
+            border: 1px solid #bae6fd;
+        }
         .badge-event-code {
             background-color: #efeeeb;
             color: #361f1a;
@@ -218,8 +223,14 @@
                 <td class="text-right">Rp {{ number_format($rec->actual_operational_cost, 0, ',', '.') }}</td>
                 <td class="text-right font-bold" style="color: #705d00;">Rp {{ number_format($rec->fixed_profit, 0, ',', '.') }}</td>
                 <td class="text-center">
-                    @if($rec->profit_locked)
-                        <span class="badge badge-success">Lunas/Lock</span>
+                    @php
+                        $booking = $rec->event->booking ?? null;
+                        $isLunas = $booking ? (!is_null($booking->full_paid_at) || $booking->status === 'paid_full') : false;
+                    @endphp
+                    @if($isLunas)
+                        <span class="badge badge-success">Lunas</span>
+                    @elseif($rec->profit_locked)
+                        <span class="badge badge-info">Terkunci</span>
                     @else
                         <span class="badge badge-warning">Draft</span>
                     @endif

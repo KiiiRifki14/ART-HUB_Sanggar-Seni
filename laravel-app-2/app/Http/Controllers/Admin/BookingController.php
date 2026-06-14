@@ -67,6 +67,13 @@ class BookingController extends Controller
             ->paginate(10)
             ->withQueryString();
 
+        // Inject Smart Warning into pending bookings
+        foreach ($bookings as $b) {
+            if ($b->status === 'pending' && !$b->is_admin_confirmed) {
+                $b->smart_warning = $this->calculateSmartWarning($b);
+            }
+        }
+
         return view('admin.bookings.index', compact('bookings', 'total', 'pending', 'dpPaid', 'done', 'canceled'));
     }
 
@@ -76,6 +83,9 @@ class BookingController extends Controller
     public function show(Booking $booking)
     {
         $booking->load(['client', 'event.financialRecord']);
+        if ($booking->status === 'pending' && !$booking->is_admin_confirmed) {
+            $booking->smart_warning = $this->calculateSmartWarning($booking);
+        }
         return view('admin.bookings.show', compact('booking'));
     }
 
@@ -151,6 +161,166 @@ class BookingController extends Controller
 
         return redirect()->back()->with('warning',
             '⚠️ Bukti Transfer dari ' . $booking->client_name . ' telah DITOLAK dan dihapus. Klien dapat melakukan upload ulang.');
+    }
+
+    /**
+     * TERIMA BOOKING (Konfirmasi Awal)
+     * Klien baru bisa bayar DP setelah ini.
+     */
+    public function acceptBooking(Booking $booking)
+    {
+        if ($booking->status !== 'pending' || $booking->is_admin_confirmed) {
+            return redirect()->back()->with('error', 'Status booking tidak valid untuk konfirmasi awal.');
+        }
+
+        $booking->update([
+            'is_admin_confirmed' => true,
+        ]);
+
+        $user = \App\Models\User::find($booking->client_id);
+        if ($user) {
+            $user->notify(new BookingStatusChanged($booking, 'telah DITERIMA oleh Admin. Silakan lanjutkan ke pembayaran DP.'));
+        }
+
+        return redirect()->back()->with('success', 'Booking berhasil dikonfirmasi. Klien sekarang dapat mengunggah bukti pembayaran DP.');
+    }
+
+    /**
+     * TOLAK BOOKING
+     * Membatalkan pesanan dari klien dengan alasan tertentu.
+     */
+    public function rejectBooking(Request $request, Booking $booking)
+    {
+        if ($booking->status !== 'pending' || $booking->is_admin_confirmed) {
+            return redirect()->back()->with('error', 'Status booking tidak valid untuk penolakan.');
+        }
+
+        $request->validate([
+            'admin_note' => 'required|string|max:500',
+        ]);
+
+        $booking->update([
+            'status' => 'cancelled',
+            'admin_note' => $request->admin_note,
+        ]);
+
+        $user = \App\Models\User::find($booking->client_id);
+        if ($user) {
+            $user->notify(new BookingStatusChanged($booking, 'DITOLAK oleh Admin. Alasan: ' . $request->admin_note));
+        }
+
+        return redirect()->back()->with('warning', 'Booking berhasil ditolak dan statusnya telah diubah menjadi Cancelled.');
+    }
+
+    /**
+     * Hitung Smart Warning untuk Ketersediaan Personel
+     */
+    public function calculateSmartWarning(Booking $booking)
+    {
+        $date = Carbon::parse($booking->event_date)->format('Y-m-d');
+        $catalog = $booking->serviceCatalog;
+        
+        // 1. Total Personel Aktif
+        $availableTotal = \App\Models\Personnel::where('is_active', true)->count();
+        $availablePenari = \App\Models\Personnel::where('is_active', true)->whereIn('specialty', ['penari', 'multi_talent'])->count();
+        $availablePemusik = \App\Models\Personnel::where('is_active', true)->whereIn('specialty', ['pemusik', 'multi_talent'])->count();
+        
+        // 2. Personel yang berhalangan
+        $unavailableIds = \App\Models\PersonnelUnavailability::where('start_date', '<=', $date)
+            ->where('end_date', '>=', $date)
+            ->pluck('personnel_id')
+            ->toArray();
+            
+        if (!empty($unavailableIds)) {
+            $availableTotal -= count($unavailableIds);
+            $availablePenari -= \App\Models\Personnel::whereIn('id', $unavailableIds)->whereIn('specialty', ['penari', 'multi_talent'])->count();
+            $availablePemusik -= \App\Models\Personnel::whereIn('id', $unavailableIds)->whereIn('specialty', ['pemusik', 'multi_talent'])->count();
+        }
+        
+        // 3. Personel terpakai di booking lain (tanggal sama, sudah bayar DP/Lunas/Selesai)
+        $otherBookings = Booking::with('serviceCatalog', 'event')
+            ->where('event_date', $date)
+            ->where('id', '!=', $booking->id)
+            ->whereIn('status', ['dp_paid', 'paid_full', 'completed'])
+            ->get();
+            
+        $usedTotal = 0;
+        $usedPenari = 0;
+        $usedPemusik = 0;
+        
+        foreach($otherBookings as $ob) {
+            $req = $ob->event ? ($ob->event->personnel_count ?? 0) : ($ob->serviceCatalog?->max_personnel ?? 0);
+            $usedTotal += $req;
+            $spec = $ob->serviceCatalog?->specialty_type ?? 'gabungan';
+            if ($spec === 'penari') $usedPenari += $req;
+            elseif ($spec === 'pemusik') $usedPemusik += $req;
+            else {
+                $usedPenari += floor($req / 2);
+                $usedPemusik += ceil($req / 2);
+            }
+        }
+        
+        $sisaTotal = max(0, $availableTotal - $usedTotal);
+        $sisaPenari = max(0, $availablePenari - $usedPenari);
+        $sisaPemusik = max(0, $availablePemusik - $usedPemusik);
+        
+        // Kebutuhan booking saat ini
+        $reqTotal = $catalog?->max_personnel ?? 0;
+        $reqType = $catalog?->specialty_type ?? 'gabungan';
+        
+        $statusClass = 'success';
+        $message = '';
+
+        if ($otherBookings->isEmpty()) {
+            if ($sisaTotal >= $reqTotal) {
+                $statusClass = 'success';
+                $message = "Jadwal kosong. Seluruh personel aktif ({$sisaTotal} orang) siap bertugas. Sangat aman untuk dikonfirmasi.";
+            } else {
+                $statusClass = 'danger';
+                $message = "Jadwal kosong, TAPI sisa personel aktif ({$sisaTotal} orang) kurang dari kebutuhan acara ({$reqTotal} orang).";
+            }
+        } else {
+            if ($reqType === 'penari' && $sisaPenari < $reqTotal) {
+                $statusClass = 'danger';
+                $message = "Kapasitas spesifik tidak mencukupi! Pesanan ini membutuhkan {$reqTotal} Penari, namun saat ini hanya tersisa {$sisaPenari} Penari yang kosong.";
+            } elseif ($reqType === 'pemusik' && $sisaPemusik < $reqTotal) {
+                $statusClass = 'danger';
+                $message = "Kapasitas spesifik tidak mencukupi! Pesanan ini membutuhkan {$reqTotal} Pemusik, namun saat ini hanya tersisa {$sisaPemusik} Pemusik yang kosong.";
+            } elseif ($sisaTotal < $reqTotal) {
+                $statusClass = 'danger';
+                $message = "Kapasitas Tidak Mencukupi! Acara ini butuh {$reqTotal} orang, sedangkan sisa personel aktif hanya {$sisaTotal} orang. Disarankan untuk DITOLAK atau negosiasi jadwal.";
+            } elseif ($sisaTotal == $reqTotal || ($sisaTotal - $reqTotal) <= 2) {
+                $statusClass = 'warning';
+                $message = "Peringatan Kritis: Terdapat {$otherBookings->count()} acara lain. Jika pesanan ini diterima, nyaris seluruh personel akan bertugas (sisa cadangan: " . ($sisaTotal - $reqTotal) . " orang). Harap pastikan tidak ada personel yang tiba-tiba berhalangan.";
+            } else {
+                // Cek kemungkinan Double Job jika waktu tidak bentrok
+                $bentrokWaktu = false;
+                $startA = Carbon::parse($booking->event_start)->format('H:i:s');
+                $endA = Carbon::parse($booking->event_end)->format('H:i:s');
+                
+                foreach($otherBookings as $ob) {
+                    $startB = Carbon::parse($ob->event_start)->format('H:i:s');
+                    $endB = Carbon::parse($ob->event_end)->format('H:i:s');
+                    if ($startA <= $endB && $endA >= $startB) {
+                        $bentrokWaktu = true;
+                        break;
+                    }
+                }
+                
+                if (!$bentrokWaktu) {
+                    $statusClass = 'success';
+                    $message = "Terdapat {$otherBookings->count()} acara lain di tanggal ini. Namun jam tayang berbeda, personel kemungkinan bisa melakukan 'Double Job'. Sisa personel murni: {$sisaTotal} orang (butuh {$reqTotal}).";
+                } else {
+                    $statusClass = 'success';
+                    $message = "Terdapat {$otherBookings->count()} acara lain di tanggal ini. Namun sisa personel ({$sisaTotal} orang) masih mencukupi kebutuhan pesanan ini (butuh {$reqTotal} orang).";
+                }
+            }
+        }
+        
+        return (object)[
+            'class' => $statusClass,
+            'message' => $message
+        ];
     }
 
     /**

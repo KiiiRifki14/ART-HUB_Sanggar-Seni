@@ -67,6 +67,15 @@ class EventController extends Controller
             });
         }
 
+        $startDate = $request->input('start_date');
+        $endDate   = $request->input('end_date');
+        if ($startDate) {
+            $query->where('event_date', '>=', $startDate);
+        }
+        if ($endDate) {
+            $query->where('event_date', '<=', $endDate);
+        }
+
         $bookings = $query->paginate(10)->withQueryString();
 
         // Summary counts (Sekarang logis karena menggunakan base Booking)
@@ -84,7 +93,7 @@ class EventController extends Controller
         // Pass 'bookings' as 'events' to the view to maintain view structure compatibility
         $events = $bookings;
 
-        return view('admin.events.monitoring', compact('events', 'summary', 'filter'));
+        return view('admin.events.monitoring', compact('events', 'summary', 'filter', 'startDate', 'endDate'));
     }
 
     /**
@@ -150,7 +159,8 @@ class EventController extends Controller
 
         // ── Ambil data katalog (max_personnel & specialty_type) ──────────────
         $catalog      = $event->booking->serviceCatalog ?? null;
-        $maxPersonnel = $catalog?->max_personnel ?? 0;   // 0 = tidak ada batas
+        // Prioritaskan personnel_count dari deal/negosiasi admin, fallback ke katalog
+        $maxPersonnel = $event->personnel_count ?? ($catalog?->max_personnel ?? 0);
         $specialtyReq = $catalog?->specialty_type ?? 'gabungan';
 
         // ── Ambil ID personel yang BERHALANGAN di tanggal event ─────────────

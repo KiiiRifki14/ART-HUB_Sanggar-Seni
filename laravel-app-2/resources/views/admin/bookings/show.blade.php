@@ -86,8 +86,83 @@
         </div>
     </div>
 
-    {{-- KANAN: PANEL KEUANGAN --}}
+    {{-- KANAN: PANEL TINDAK LANJUT / KEUANGAN --}}
     <div class="w-full lg:w-96 flex-shrink-0">
+        
+        {{-- PANEL KONFIRMASI JADWAL (Ditampilkan jika belum dikonfirmasi) --}}
+        @if($booking->status === 'pending' && !$booking->is_admin_confirmed)
+        <div class="card-gold sticky top-24 overflow-hidden mb-6">
+            <div style="background:linear-gradient(135deg, #8B1A2A, #5C0E19); padding:16px 20px; border-bottom:1px solid rgba(197,160,40,0.3);">
+                <div class="subtitle-gold" style="color:#fcd400; display:flex; align-items:center; gap:8px;">
+                    <i data-lucide="calendar-check" class="w-4 h-4"></i> Konfirmasi Jadwal
+                </div>
+            </div>
+            <div class="p-5 space-y-4">
+                @php
+                    $warn = $booking->smart_warning ?? (object)['class'=>'secondary', 'message'=>'Pengecekan tidak tersedia.'];
+                    $warnColor = match($warn->class) {
+                        'success' => 'bg-green-500/10 border-green-500/20 text-green-700',
+                        'warning' => 'bg-orange-500/10 border-orange-500/20 text-orange-700',
+                        'danger'  => 'bg-red-500/10 border-red-500/20 text-red-700',
+                        default   => 'bg-gray-500/10 border-gray-500/20 text-gray-700',
+                    };
+                    $warnIcon = match($warn->class) {
+                        'success' => 'check-circle-2',
+                        'warning' => 'alert-triangle',
+                        'danger'  => 'x-circle',
+                        default   => 'info',
+                    };
+                @endphp
+                <div class="p-4 rounded-xl border {{ $warnColor }} mb-4 text-sm font-medium flex items-start gap-3">
+                    <i data-lucide="{{ $warnIcon }}" class="w-5 h-5 mt-0.5 flex-shrink-0"></i>
+                    <div style="line-height: 1.4;">{{ $warn->message }}</div>
+                </div>
+
+                <p class="text-xs text-on-surface-variant font-body mb-2">Tentukan apakah sanggar dapat melayani pesanan ini berdasarkan ketersediaan personel di atas.</p>
+
+                <div class="flex gap-2">
+                    <button type="button" onclick="document.getElementById('modalTolakBooking').classList.remove('hidden');document.getElementById('modalTolakBooking').classList.add('flex');" class="flex-1 py-2.5 rounded-lg border border-red-500/30 text-red-600 font-label text-xs font-bold uppercase tracking-widest hover:bg-red-50 transition-colors">
+                        Tolak
+                    </button>
+                    <form action="{{ route('admin.bookings.accept', $booking->id) }}" method="POST" class="flex-1" onsubmit="return confirm('Anda yakin ingin MENERIMA booking ini? Klien akan diizinkan membayar DP.')">
+                        @csrf
+                        <button type="submit" class="w-full py-2.5 rounded-lg bg-green-600 text-white font-label text-xs font-bold uppercase tracking-widest hover:bg-green-700 transition-colors shadow-sm">
+                            Terima
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        {{-- Modal Tolak --}}
+        <div id="modalTolakBooking" class="fixed inset-0 z-[100] hidden items-center justify-center p-4">
+            <div class="absolute inset-0 bg-black/60 backdrop-blur-md" onclick="this.parentElement.classList.add('hidden');this.parentElement.classList.remove('flex');"></div>
+            <div class="relative w-full max-w-md card-gold overflow-hidden">
+                <div class="px-6 py-5 border-b flex justify-between items-center" style="border-color:rgba(197,160,40,0.2); background:rgba(197,160,40,0.02);">
+                    <h5 class="title-gold flex items-center gap-2" style="font-size:1.2rem; color:#8B1A2A;">
+                        <i data-lucide="x-circle" class="w-5 h-5"></i> Tolak Booking
+                    </h5>
+                    <button type="button" class="text-gray-400 hover:text-gray-600" onclick="document.getElementById('modalTolakBooking').classList.add('hidden');document.getElementById('modalTolakBooking').classList.remove('flex');">
+                        <i data-lucide="x" class="w-5 h-5"></i>
+                    </button>
+                </div>
+                <form action="{{ route('admin.bookings.reject', $booking->id) }}" method="POST">
+                    @csrf
+                    <div class="p-6">
+                        <label class="block subtitle-gold mb-1.5 ml-1">Alasan Penolakan</label>
+                        <textarea name="admin_note" rows="3" class="w-full p-3 rounded-xl border border-outline-variant/30 bg-surface-container-lowest font-body text-sm focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all" placeholder="Contoh: Personel tidak mencukupi di tanggal tersebut..." required></textarea>
+                    </div>
+                    <div class="px-6 py-4 border-t flex justify-end gap-3" style="border-color:rgba(197,160,40,0.2); background:rgba(197,160,40,0.02);">
+                        <button type="button" class="arh-btn-secondary py-2" onclick="document.getElementById('modalTolakBooking').classList.add('hidden');document.getElementById('modalTolakBooking').classList.remove('flex');">Batal</button>
+                        <button type="submit" class="px-5 py-2.5 rounded-xl bg-red-600 text-white font-label text-xs font-bold uppercase tracking-widest hover:bg-red-700 transition-all shadow-sm">Konfirmasi Tolak</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+        @endif
+
+        {{-- PANEL KALKULASI LABA (Ditampilkan jika SUDAH dikonfirmasi, ATAU status bukan pending) --}}
+        @if($booking->is_admin_confirmed || $booking->status !== 'pending')
         <div class="card-gold sticky top-24 overflow-hidden">
             <div style="background:linear-gradient(135deg, #8B1A2A, #5C0E19); padding:16px 20px; border-bottom:1px solid rgba(197,160,40,0.3);">
                 <div class="subtitle-gold" style="color:#fcd400; display:flex; align-items:center; gap:8px;">
@@ -160,7 +235,7 @@
             <div class="p-5 border-t" style="border-color:rgba(197,160,40,0.2); background:rgba(197,160,40,0.02);">
                 @if($booking->status === 'pending')
                 <a href="{{ route('admin.bookings.dp_verification') }}" class="arh-btn-primary w-full flex justify-center py-3" style="background:linear-gradient(135deg, #fcd400, #C5A028); color:#1A1817; border:none; text-align:center;">
-                    <i data-lucide="shield-check" class="w-4 h-4 mr-2 inline-block"></i> Lanjut → Konfirmasi DP
+                    <i data-lucide="shield-check" class="w-4 h-4 mr-2 inline-block"></i> Lanjut → Cek Bukti DP
                 </a>
                 @elseif(in_array($booking->status, ['dp_paid','confirmed','paid_full','completed']))
                 <div class="p-4 text-center rounded-xl mb-4" style="background:rgba(22,163,74,0.05); border:1px solid rgba(22,163,74,0.2); color:#16a34a;">
@@ -206,6 +281,7 @@
                 @endif
             </div>
         </div>
+        @endif
     </div>
 </div>
 
