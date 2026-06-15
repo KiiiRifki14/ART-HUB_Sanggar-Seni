@@ -204,12 +204,52 @@ class BookingController extends Controller
             'admin_note' => $request->admin_note,
         ]);
 
+        // Tambahkan ke tabel cancellations agar tercatat di history pembatalan
+        \App\Models\Cancellation::create([
+            'booking_id'              => $booking->id,
+            'cancellation_date'       => \Carbon\Carbon::now()->format('Y-m-d'),
+            'days_before_event'       => max(0, (int) ceil(\Carbon\Carbon::now()->diffInHours(\Carbon\Carbon::parse($booking->event_date), false) / 24)),
+            'penalty_percentage'      => 0,
+            'penalty_amount'          => 0,
+            'refund_amount'           => 0,
+            'status'                  => 'processed',
+            'reason'                  => 'Ditolak Admin: ' . $request->admin_note,
+            'digital_acknowledgement' => true,
+            'acknowledged_ip'         => $request->ip(),
+            'acknowledged_at'         => now(),
+            'acknowledged_ua'         => $request->userAgent(),
+        ]);
+
         $user = \App\Models\User::find($booking->client_id);
         if ($user) {
-            $user->notify(new BookingStatusChanged($booking, 'DITOLAK oleh Admin. Alasan: ' . $request->admin_note));
+            $user->notify(new \App\Notifications\BookingStatusChanged($booking, 'DITOLAK oleh Admin. Alasan: ' . $request->admin_note));
         }
 
-        return redirect()->back()->with('warning', 'Booking berhasil ditolak dan statusnya telah diubah menjadi Cancelled.');
+        return redirect()->back()->with('warning', 'Booking berhasil ditolak dan tercatat di histori pembatalan.');
+    }
+
+    /**
+     * UPDATE JADWAL BOOKING (Nego Jadwal)
+     */
+    public function updateSchedule(Request $request, Booking $booking)
+    {
+        if ($booking->status !== 'pending') {
+            return redirect()->back()->with('error', 'Jadwal hanya bisa diubah saat status pemesanan masih Menunggu Konfirmasi (Pending).');
+        }
+
+        $request->validate([
+            'event_date'  => 'required|date|after_or_equal:today',
+            'event_start' => 'required',
+            'event_end'   => 'required|after:event_start',
+        ]);
+
+        $booking->update([
+            'event_date'  => $request->event_date,
+            'event_start' => $request->event_start,
+            'event_end'   => $request->event_end,
+        ]);
+
+        return redirect()->back()->with('success', 'Jadwal pementasan berhasil diperbarui. Silakan cek kembali ketersediaan personel pada tanggal baru.');
     }
 
     /**

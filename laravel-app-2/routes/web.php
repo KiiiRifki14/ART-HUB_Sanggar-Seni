@@ -136,6 +136,7 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
     Route::post('/bookings/{booking}/confirm', [BookingController::class, 'confirmPayment'])->name('bookings.confirm');
     Route::patch('/bookings/{booking}/price', [BookingController::class, 'updatePrice'])->name('bookings.update_price');
     Route::patch('/bookings/{booking}/update-price', [BookingController::class, 'updatePrice']);
+    Route::patch('/bookings/{booking}/schedule', [BookingController::class, 'updateSchedule'])->name('bookings.update_schedule');
 
     // EVENTS
     Route::get('/events', [EventController::class, 'index'])->name('events.index');

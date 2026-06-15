@@ -24,6 +24,11 @@
                 <h3 class="title-gold flex items-center gap-2" style="font-size:1.3rem;">
                     <i data-lucide="receipt" class="w-5 h-5 text-yellow-600"></i> Detail Pesanan
                 </h3>
+                @if($booking->status === 'pending')
+                <button type="button" onclick="document.getElementById('modalEditJadwal').classList.remove('hidden');document.getElementById('modalEditJadwal').classList.add('flex');" class="arh-btn-secondary py-1 px-3 flex items-center gap-1 text-xs">
+                    <i data-lucide="calendar-clock" class="w-3 h-3"></i> Nego Jadwal
+                </button>
+                @endif
             </div>
             
             <div class="p-6 grid grid-cols-1 md:grid-cols-2 gap-y-6 gap-x-8">
@@ -320,6 +325,50 @@
 </div>
 @endif
 
+
+{{-- Modal Edit Jadwal --}}
+@if($booking->status === 'pending')
+<div id="modalEditJadwal" class="fixed inset-0 z-[100] hidden items-center justify-center p-4">
+    <div class="absolute inset-0 bg-black/60 backdrop-blur-md" onclick="this.parentElement.classList.add('hidden');this.parentElement.classList.remove('flex');"></div>
+    <div class="relative w-full max-w-md card-gold overflow-hidden">
+        <div class="px-6 py-5 border-b flex justify-between items-center" style="border-color:rgba(197,160,40,0.2); background:rgba(197,160,40,0.02);">
+            <h5 class="title-gold flex items-center gap-2" style="font-size:1.2rem;">
+                <i data-lucide="calendar-clock" class="w-5 h-5 text-yellow-600"></i> Ubah Jadwal
+            </h5>
+            <button type="button" class="text-gray-400 hover:text-gray-600 transition-colors"
+                onclick="document.getElementById('modalEditJadwal').classList.add('hidden');document.getElementById('modalEditJadwal').classList.remove('flex');">
+                <i data-lucide="x" class="w-5 h-5"></i>
+            </button>
+        </div>
+        <form action="{{ route('admin.bookings.update_schedule', $booking->id) }}" method="POST">
+            @csrf
+            @method('PATCH')
+            <div class="p-6 space-y-4">
+                <p class="subtitle-gold" style="text-transform:none; letter-spacing:normal;">Sesuaikan jadwal pementasan berdasarkan kesepakatan dengan klien, agar personel dapat dialokasikan dengan tepat.</p>
+                <div>
+                    <label class="block subtitle-gold mb-1.5 ml-1">Tanggal Pementasan</label>
+                    <input type="date" name="event_date" class="input-gold" value="{{ \Carbon\Carbon::parse($booking->event_date)->format('Y-m-d') }}" required>
+                </div>
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block subtitle-gold mb-1.5 ml-1">Waktu Mulai</label>
+                        <input type="time" name="event_start" class="input-gold" value="{{ \Carbon\Carbon::parse($booking->event_start)->format('H:i') }}" required>
+                    </div>
+                    <div>
+                        <label class="block subtitle-gold mb-1.5 ml-1">Waktu Selesai</label>
+                        <input type="time" name="event_end" class="input-gold" value="{{ \Carbon\Carbon::parse($booking->event_end)->format('H:i') }}" required>
+                    </div>
+                </div>
+            </div>
+            <div class="px-6 py-4 border-t flex justify-end gap-3" style="border-color:rgba(197,160,40,0.2); background:rgba(197,160,40,0.02);">
+                <button type="button" class="arh-btn-secondary py-2"
+                    onclick="document.getElementById('modalEditJadwal').classList.add('hidden');document.getElementById('modalEditJadwal').classList.remove('flex');">Batal</button>
+                <button type="submit" class="arh-btn-primary py-2">Simpan Perubahan</button>
+            </div>
+        </form>
+    </div>
+</div>
+@endif
 
 @endsection
 

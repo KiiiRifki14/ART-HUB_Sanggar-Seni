@@ -72,29 +72,29 @@
 {{-- Header + Filter --}}
 <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 mb-5">
     <h2 class="title-gold" style="font-size:1.6rem;">Semua Permintaan</h2>
-    <a href="{{ route('admin.bookings.create') }}" class="arh-btn-primary self-start">
-        <i data-lucide="plus-circle" class="w-4 h-4"></i> Pesanan Baru
+    <a href="{{ route('admin.bookings.create') }}" class="arh-btn-primary self-start px-5 py-2.5 flex items-center gap-2 shadow-lg shadow-maroon-900/10">
+        <i data-lucide="plus-circle" class="w-5 h-5"></i> Pesanan Baru
     </a>
 </div>
 
 {{-- Search Bar --}}
-<form action="{{ route('admin.bookings.index') }}" method="GET" class="mb-5 flex flex-col sm:flex-row gap-3">
+<form action="{{ route('admin.bookings.index') }}" method="GET" class="mb-6 flex flex-col sm:flex-row gap-3 items-stretch">
     <input type="hidden" name="status" value="{{ request('status', 'all') }}">
     <div class="relative flex-1">
-        <span class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-            <i data-lucide="search" class="w-4 h-4 text-outline"></i>
+        <span class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+            <i data-lucide="search" class="w-5 h-5 text-outline"></i>
         </span>
         <input type="text" name="search" value="{{ request('search') }}" 
                placeholder="Cari booking berdasarkan nama klien..." 
-               class="input-gold pl-10" style="padding:12px 14px 12px 40px;">
+               class="input-gold" style="padding: 12px 14px 12px 44px; height: 48px;">
     </div>
     <div class="flex gap-2">
-        <button type="submit" class="arh-btn-primary py-3">
-            Cari
+        <button type="submit" class="arh-btn-primary px-6 h-12 flex items-center gap-2">
+            <i data-lucide="search" class="w-4 h-4"></i> Cari
         </button>
         @if(request('search'))
-        <a href="{{ route('admin.bookings.index', ['status' => request('status', 'all')]) }}" class="subtitle-gold" style="display:flex;align-items:center;padding:0 16px;text-decoration:underline;">
-            Reset
+        <a href="{{ route('admin.bookings.index', ['status' => request('status', 'all')]) }}" class="arh-btn-secondary px-5 h-12 flex items-center gap-2">
+            <i data-lucide="rotate-ccw" class="w-4 h-4"></i> Reset
         </a>
         @endif
     </div>
@@ -108,7 +108,7 @@
     @endphp
     @foreach($tabs as $key => $label)
     <a href="{{ route('admin.bookings.index', ['status' => $key, 'search' => request('search')]) }}"
-       class="flex-shrink-0 px-4 py-2 rounded-xl font-label text-xs font-bold uppercase tracking-widest transition-all border filter-tab {{ $statusActive === $key ? 'bg-maroon-900 text-gold-light border-gold-light shadow-sm' : 'bg-white text-gray-500 border-gray-200 hover:border-gold-light hover:text-maroon-800' }}" style="{{ $statusActive === $key ? 'background:#8B1A2A; color:#fcd400; border-color:#8B1A2A;' : '' }}">
+       class="tab-filter {{ $statusActive === $key ? 'active' : '' }}">
         {{ $label }}
     </a>
     @endforeach
@@ -126,7 +126,7 @@
                     <th class="text-right">Kontrak</th>
                     <th class="text-right">DP</th>
                     <th class="text-center">Status</th>
-                    <th class="text-right">Aksi</th>
+                    <th class="text-center">Aksi</th>
                 </tr>
             </thead>
             <tbody id="booking-tbody">
@@ -138,7 +138,7 @@
                         'dp_paid'   => ['DP PAID',   'badge-maroon'],
                         'confirmed' => ['CONFIRMED', 'badge-maroon'],
                         'completed' => ['SELESAI',   'badge-green'],
-                        'cancelled' => ['BATAL',     'badge-gold border-red-500 text-red-600'],
+                        'cancelled' => ['BATAL',     'bg-red-50 text-red-600 border border-red-200 px-2 py-1 rounded-full text-xs font-bold uppercase'],
                     ];
                     [$stLabel, $stClass] = $sm[$booking->status] ?? [strtoupper($booking->status), 'badge-gold'];
                     $daysLeft = (int) now()->startOfDay()->diffInDays(\Carbon\Carbon::parse($booking->event_date)->startOfDay(), false);
@@ -154,9 +154,13 @@
                         <div style="font-weight:700; color:#1A1817;">{{ $booking->client_name ?? ($booking->client->name ?? 'Klien Manual') }}</div>
                         <div class="font-label text-xs text-outline">{{ $booking->client_phone ?? '—' }}</div>
                     </td>
+                    <td>
+                        <div style="font-weight:700; color:#8B1A2A; font-size:0.9rem;">{{ \Carbon\Carbon::parse($booking->event_date)->format('d M Y') }}</div>
+                        <div class="subtitle-gold mt-1 capitalize" style="font-size:0.7rem;">{{ str_replace('_', ' ', $booking->event_type) }}</div>
+                    </td>
                     <td class="text-right">
                         <div style="font-weight:700; color:#1A1817; font-size:0.9rem;">Rp {{ number_format($booking->total_price, 0, ',', '.') }}</div>
-                        <div class="subtitle-gold mt-1" style="color:#C5A028; font-weight:700;">Laba (30%): Rp {{ number_format($booking->total_price * 0.30, 0, ',', '.') }}</div>
+                        <div class="subtitle-gold mt-1" style="color:#C5A028; font-weight:700; font-size:0.65rem;">Laba (est): Rp {{ number_format($booking->total_price * 0.30, 0, ',', '.') }}</div>
                     </td>
                     <td class="text-right">
                         <div style="font-weight:700; color:#1A1817; font-size:0.9rem;">Rp {{ number_format($booking->dp_amount, 0, ',', '.') }}</div>
@@ -165,7 +169,7 @@
                         @elseif(!in_array($booking->status, ['pending', 'cancelled']))
                         <div class="subtitle-gold mt-1" style="font-size:0.65rem; color:#8B1A2A; font-weight:700;">{{ \Carbon\Carbon::parse($booking->updated_at)->format('d M Y') }}</div>
                         @else
-                        <div class="subtitle-gold mt-1" style="font-size:0.65rem; color:#ea580c; font-weight:700;">Belum bayar</div>
+                        <div class="subtitle-gold mt-1" style="font-size:0.65rem; color:#ea580c; font-weight:700;">BELUM BAYAR</div>
                         @endif
                     </td>
                     <td class="text-center">
@@ -175,14 +179,14 @@
                         @endif
                     </td>
                     <td>
-                        <div class="flex items-center justify-end gap-2">
-                            <a href="{{ route('admin.bookings.show', $booking->id) }}" class="arh-btn-secondary" style="padding:6px 10px;" title="Detail"><i data-lucide="eye" class="w-4 h-4"></i></a>
+                        <div class="flex items-center justify-center gap-2">
+                            <a href="{{ route('admin.bookings.show', $booking->id) }}" class="btn-action btn-action-view" title="Detail"><i data-lucide="eye" class="w-4 h-4"></i></a>
                             @if($booking->status === 'pending')
                                 @if(!$booking->is_admin_confirmed)
-                                    <button type="button" onclick="openAcceptModal({{ $booking->id }}, '{{ addslashes($booking->client_name) }}', '{{ $booking->smart_warning->class ?? 'info' }}', '{{ addslashes($booking->smart_warning->message ?? '') }}')" class="arh-btn-primary" style="padding:6px 10px; background-color:#16a34a; border:none; color:white;" title="Terima Booking"><i data-lucide="check" class="w-4 h-4"></i></button>
-                                    <button type="button" onclick="openRejectModal({{ $booking->id }}, '{{ addslashes($booking->client_name) }}')" class="arh-btn-primary" style="padding:6px 10px; background-color:#dc2626; border:none; color:white;" title="Tolak Booking"><i data-lucide="x" class="w-4 h-4"></i></button>
+                                    <button type="button" onclick="openAcceptModal({{ $booking->id }}, '{{ addslashes($booking->client_name) }}', '{{ $booking->smart_warning->class ?? 'info' }}', '{{ addslashes($booking->smart_warning->message ?? '') }}')" class="btn-action btn-action-accept" title="Terima Booking"><i data-lucide="check" class="w-4 h-4"></i></button>
+                                    <button type="button" onclick="openRejectModal({{ $booking->id }}, '{{ addslashes($booking->client_name) }}')" class="btn-action btn-action-reject" title="Tolak Booking"><i data-lucide="x" class="w-4 h-4"></i></button>
                                 @else
-                                    <button type="button" onclick="openKunciModal({{ $booking->id }}, '{{ addslashes($booking->client_name) }}', {{ $booking->total_price }}, {{ $booking->dp_amount }})" class="arh-btn-primary" style="padding:6px 10px; background:linear-gradient(135deg, #fcd400, #C5A028); color:#1A1817; border:none;" title="Kunci Laba & Konfirmasi DP"><i data-lucide="lock" class="w-4 h-4"></i></button>
+                                    <button type="button" onclick="openKunciModal({{ $booking->id }}, '{{ addslashes($booking->client_name) }}', {{ $booking->total_price }}, {{ $booking->dp_amount }})" class="btn-action btn-action-lock" title="Kunci Laba & Konfirmasi DP"><i data-lucide="lock" class="w-4 h-4"></i></button>
                                 @endif
                             @endif
                         </div>
@@ -209,7 +213,7 @@
             'dp_paid'   => ['DP PAID',   'badge-maroon'],
             'confirmed' => ['CONFIRMED', 'badge-maroon'],
             'completed' => ['SELESAI',   'badge-green'],
-            'cancelled' => ['BATAL',     'badge-gold border-red-500 text-red-600'],
+            'cancelled' => ['BATAL',     'bg-red-50 text-red-600 border border-red-200 px-2 py-1 rounded-full text-xs font-bold uppercase'],
         ];
         [$stLabel, $stClass] = $sm[$booking->status] ?? [strtoupper($booking->status), 'badge-gold'];
         $daysLeft = (int) now()->startOfDay()->diffInDays(\Carbon\Carbon::parse($booking->event_date)->startOfDay(), false);
@@ -261,15 +265,15 @@
         </div>
         {{-- Card Footer --}}
         <div class="px-4 py-3 border-t flex gap-2" style="border-color:rgba(197,160,40,0.15); background:rgba(197,160,40,0.02);">
-            <a href="{{ route('admin.bookings.show', $booking->id) }}" class="arh-btn-secondary flex-1 py-2" style="text-align:center;">
+            <a href="{{ route('admin.bookings.show', $booking->id) }}" class="arh-btn-secondary flex-1 py-2 flex items-center justify-center gap-1.5" style="text-align:center;">
                 <i data-lucide="eye" class="w-4 h-4"></i> Detail
             </a>
             @if($booking->status === 'pending')
                 @if(!$booking->is_admin_confirmed)
-                    <button type="button" onclick="openAcceptModal({{ $booking->id }}, '{{ addslashes($booking->client_name) }}', '{{ $booking->smart_warning->class ?? 'info' }}', '{{ addslashes($booking->smart_warning->message ?? '') }}')" class="arh-btn-primary flex-1 py-2" style="background-color:#16a34a; border:none; color:white; text-align:center;"><i data-lucide="check" class="w-4 h-4"></i> Terima</button>
-                    <button type="button" onclick="openRejectModal({{ $booking->id }}, '{{ addslashes($booking->client_name) }}')" class="arh-btn-primary flex-1 py-2" style="background-color:#dc2626; border:none; color:white; text-align:center;"><i data-lucide="x" class="w-4 h-4"></i> Tolak</button>
+                    <button type="button" onclick="openAcceptModal({{ $booking->id }}, '{{ addslashes($booking->client_name) }}', '{{ $booking->smart_warning->class ?? 'info' }}', '{{ addslashes($booking->smart_warning->message ?? '') }}')" class="flex-1 py-2 rounded-xl text-white font-bold text-xs uppercase tracking-widest flex items-center justify-center gap-1.5 transition-all bg-green-600 hover:bg-green-700 active:scale-95 shadow-sm"><i data-lucide="check" class="w-4 h-4"></i> Terima</button>
+                    <button type="button" onclick="openRejectModal({{ $booking->id }}, '{{ addslashes($booking->client_name) }}')" class="flex-1 py-2 rounded-xl text-white font-bold text-xs uppercase tracking-widest flex items-center justify-center gap-1.5 transition-all bg-red-600 hover:bg-red-700 active:scale-95 shadow-sm"><i data-lucide="x" class="w-4 h-4"></i> Tolak</button>
                 @else
-                    <button type="button" onclick="openKunciModal({{ $booking->id }}, '{{ addslashes($booking->client_name) }}', {{ $booking->total_price }}, {{ $booking->dp_amount }})" class="arh-btn-primary flex-1 py-2" style="background:linear-gradient(135deg, #fcd400, #C5A028); color:#1A1817; border:none; text-align:center;">
+                    <button type="button" onclick="openKunciModal({{ $booking->id }}, '{{ addslashes($booking->client_name) }}', {{ $booking->total_price }}, {{ $booking->dp_amount }})" class="flex-1 py-2 rounded-xl text-primary font-bold text-xs uppercase tracking-widest flex items-center justify-center gap-1.5 transition-all bg-gradient-to-r from-secondary-container to-secondary-fixed-dim hover:brightness-95 active:scale-95 border-none shadow-sm">
                         <i data-lucide="lock" class="w-4 h-4"></i> Kunci DP
                     </button>
                 @endif
@@ -339,9 +343,9 @@
             </div>
 
             <div class="flex gap-2 pt-4 border-t" style="border-color:rgba(197,160,40,0.2);">
-                <button type="button" onclick="closeKunciModal()" class="arh-btn-secondary flex-1 py-3 text-center" style="display:block;">Batal</button>
-                <button type="submit" class="arh-btn-primary flex-1 py-3 text-center" style="display:block;">
-                    <i data-lucide="lock" class="w-4 h-4 inline-block -mt-1"></i> Kunci Laba
+                <button type="button" onclick="closeKunciModal()" class="arh-btn-secondary flex-1 h-12 flex items-center justify-center">Batal</button>
+                <button type="submit" class="arh-btn-primary flex-1 h-12 flex items-center justify-center gap-2">
+                    <i data-lucide="lock" class="w-4 h-4"></i> Kunci Laba
                 </button>
             </div>
         </form>
@@ -373,9 +377,9 @@
                 </div>
             </div>
             <div class="flex gap-2 pt-4 border-t" style="border-color:rgba(197,160,40,0.2);">
-                <button type="button" onclick="closeAcceptModal()" class="arh-btn-secondary flex-1 py-3 text-center" style="display:block;">Batal</button>
-                <button type="submit" class="arh-btn-primary flex-1 py-3 text-center" style="display:block; background-color:#16a34a; color:white; border:none;">
-                    Terima Booking
+                <button type="button" onclick="closeAcceptModal()" class="arh-btn-secondary flex-1 h-12 flex items-center justify-center">Batal</button>
+                <button type="submit" class="flex-1 h-12 flex items-center justify-center gap-2 rounded-xl text-white font-bold text-xs uppercase tracking-widest transition-all bg-green-600 hover:bg-green-700 active:scale-95 shadow-md shadow-green-600/10 border-none">
+                    <i data-lucide="check" class="w-4 h-4"></i> Terima Booking
                 </button>
             </div>
         </form>
@@ -402,9 +406,9 @@
                 </div>
             </div>
             <div class="flex gap-2 pt-4 border-t" style="border-color:rgba(197,160,40,0.2);">
-                <button type="button" onclick="closeRejectModal()" class="arh-btn-secondary flex-1 py-3 text-center" style="display:block;">Batal</button>
-                <button type="submit" class="arh-btn-primary flex-1 py-3 text-center" style="display:block; background-color:#dc2626; color:white; border:none;">
-                    Tolak Booking
+                <button type="button" onclick="closeRejectModal()" class="arh-btn-secondary flex-1 h-12 flex items-center justify-center">Batal</button>
+                <button type="submit" class="flex-1 h-12 flex items-center justify-center gap-2 rounded-xl text-white font-bold text-xs uppercase tracking-widest transition-all bg-red-600 hover:bg-red-700 active:scale-95 shadow-md shadow-red-600/10 border-none">
+                    <i data-lucide="x" class="w-4 h-4"></i> Tolak Booking
                 </button>
             </div>
         </form>

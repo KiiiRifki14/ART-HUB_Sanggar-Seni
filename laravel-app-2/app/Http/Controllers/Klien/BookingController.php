@@ -253,11 +253,16 @@ class BookingController extends Controller
                     $daysBefore = 0;
                 }
 
-                $tiers = $this->getPenaltyTiers();
-                $penaltyAmount = $this->calculatePenalty($daysBefore, (float) $booking->total_price, $tiers);
-
-                $penaltyPct   = ($booking->total_price > 0) ? ($penaltyAmount / $booking->total_price) * 100 : 0;
-                $refundAmount = max(0, $booking->dp_amount - $penaltyAmount);
+                if ($booking->status === 'pending') {
+                    $penaltyAmount = 0;
+                    $penaltyPct    = 0;
+                    $refundAmount  = 0;
+                } else {
+                    $tiers = $this->getPenaltyTiers();
+                    $penaltyAmount = $this->calculatePenalty($daysBefore, (float) $booking->total_price, $tiers);
+                    $penaltyPct   = ($booking->total_price > 0) ? ($penaltyAmount / $booking->total_price) * 100 : 0;
+                    $refundAmount = max(0, $booking->dp_amount - $penaltyAmount);
+                }
 
                 \App\Models\Cancellation::create([
                     'booking_id'              => $booking->id,

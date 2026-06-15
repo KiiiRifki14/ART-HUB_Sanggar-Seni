@@ -301,6 +301,19 @@
                     </div>
                 @else
                     {{-- JIKA BELUM MENGAJUKAN PEMBATALAN --}}
+                    @if($booking->status === 'pending')
+                    <div class="grid grid-cols-1 gap-6 mb-6">
+                        <div class="p-5 rounded-2xl bg-green-500/10 border border-green-500/20 text-green-800 flex items-start gap-3">
+                            <i class="bi bi-info-circle-fill text-2xl mt-0.5 text-green-600"></i>
+                            <div>
+                                <div class="font-headline font-bold text-base mb-1">Bebas Penalti</div>
+                                <div class="font-body text-sm leading-relaxed opacity-90">
+                                    Karena Anda belum melakukan pembayaran DP, pesanan ini dapat dibatalkan kapan saja tanpa dikenakan denda potongan apapun.
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    @else
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
                         <div>
                             <div class="font-body text-xs sm:text-sm text-on-surface-variant leading-relaxed mb-4">
@@ -346,6 +359,7 @@
                             </div>
                         </div>
                     </div>
+                    @endif
                     
                     <form action="{{ route('klien.bookings.cancel', $booking->id) }}" method="POST" onsubmit="return confirm('Apakah Anda benar-benar yakin ingin mengirimkan permohonan pembatalan pementasan ini?')">
                         @csrf
