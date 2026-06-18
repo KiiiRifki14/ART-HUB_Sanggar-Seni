@@ -117,6 +117,8 @@
                 </td>
             </tr>
             @endforelse
+        </tbody>
+    </table>
 
     {{-- Mobile Cards View --}}
     <div class="block md:hidden" style="border-top:1px solid rgba(197,160,40,0.2);" id="dpvMobileCards">

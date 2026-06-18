@@ -25,7 +25,7 @@ class UserSeeder extends Seeder
         // ═══ PERSONEL: 11 Inti + 1 Cadangan ═══
         $personnel = [
             // Penari (6 orang)
-            ['name' => 'Siti Nurhaliza',   'email' => 'siti@arthub.local',    'specialty' => 'penari',   'has_day_job' => false, 'is_backup' => false],
+            ['name' => 'Sinta Nurhaliza',  'email' => 'sinta_nurhaliza@arthub.local', 'specialty' => 'penari',   'has_day_job' => false, 'is_backup' => false],
             ['name' => 'Dewi Anggraeni',   'email' => 'dewi@arthub.local',    'specialty' => 'penari',   'has_day_job' => false, 'is_backup' => false],
             ['name' => 'Rina Marlina',     'email' => 'rina@arthub.local',    'specialty' => 'penari',   'has_day_job' => false, 'is_backup' => false],
             ['name' => 'Yuni Kartika',     'email' => 'yuni@arthub.local',    'specialty' => 'penari',   'has_day_job' => false, 'is_backup' => false],
@@ -47,7 +47,7 @@ class UserSeeder extends Seeder
             $userId = DB::table('users')->insertGetId([
                 'name'       => $p['name'],
                 'email'      => $p['email'],
-                'password'   => Hash::make('personel123'),
+                'password'   => Hash::make('Asdf1234'),
                 'role'       => 'personel',
                 'phone'      => '08' . rand(1000000000, 9999999999),
                 'address'    => 'Tangerang, Banten',
@@ -73,8 +73,8 @@ class UserSeeder extends Seeder
         DB::table('users')->insert([
             [
                 'name'       => 'Hj. Sari Mulyani',
-                'email'      => 'faklove140605@email.com',
-                'password'   => Hash::make('password'),
+                'email'      => 'bloodssky1406@gmail.com',
+                'password'   => Hash::make('Qwer1234'),
                 'role'       => 'klien',
                 'phone'      => '081298765432',
                 'address'    => 'Jl. Melati No. 10, Karawaci, Tangerang',
@@ -84,7 +84,7 @@ class UserSeeder extends Seeder
             [
                 'name'       => 'Bapak Hendra Wijaya',
                 'email'      => 'genin2202@email.com',
-                'password'   => Hash::make('password'),
+                'password'   => Hash::make('Qwer1234'),
                 'role'       => 'klien',
                 'phone'      => '081387654321',
                 'address'    => 'Jl. Cendana Raya No. 5, BSD, Tangerang Selatan',
