@@ -91,12 +91,12 @@ html { scroll-behavior: smooth; }
     <div class="absolute inset-0 bg-gradient-to-r from-primary/85 via-primary/50 to-transparent"></div>
   </div>
   <div class="relative z-10 max-w-7xl mx-auto px-6 lg:px-10 pt-24 pb-16">
-    <span class="inline-block mb-6 px-4 py-1.5 border border-secondary/40 rounded-full text-secondary text-xs font-label tracking-widest uppercase">
-      <i class="bi bi-stars me-1"></i> Warisan Budaya Nusantara
+    <span class="inline-flex items-center gap-1.5 mb-6 px-4 py-1.5 border border-amber-400/30 bg-amber-950/30 rounded-full text-amber-300 text-xs font-label tracking-widest uppercase">
+      <i class="bi bi-stars text-amber-400 animate-pulse"></i> Warisan Budaya Nusantara
     </span>
     <h1 class="font-headline text-4xl sm:text-5xl md:text-6xl lg:text-7xl text-white font-semibold leading-tight mb-6 max-w-3xl">
       {{ $contents["sanggar_name"] ?? "Cahaya Gumilang" }}<br>
-      <em class="text-secondary-container/90">{{ $contents["hero_tagline"] ?? "Melestarikan Warisan Melalui Seni." }}</em>
+      <em class="text-amber-400">{{ $contents["hero_tagline"] ?? "Melestarikan Warisan Melalui Seni." }}</em>
     </h1>
     <p class="text-white/75 text-base md:text-lg font-body leading-relaxed mb-10 max-w-xl">
       {{ $contents["hero_description"] ?? "Menghadirkan keindahan abadi seni tradisi Indonesia melalui dedikasi lintas generasi." }}
@@ -283,8 +283,13 @@ html { scroll-behavior: smooth; }
 </section>
 
 {{-- ═══════ FOOTER ═══════ --}}
-<footer class="bg-surface py-16 px-6 lg:px-10 border-t border-outline-variant/20">
-  <div class="max-w-7xl mx-auto">
+<footer class="relative py-16 px-6 lg:px-10 border-t border-outline-variant/20 bg-surface overflow-hidden">
+  @if(!empty($contents['footer_bg']))
+    <div class="absolute inset-0 z-0 opacity-25 pointer-events-none">
+      <img src="{{ asset('storage/'.$contents['footer_bg']) }}" alt="Footer Background" class="w-full h-full object-cover">
+    </div>
+  @endif
+  <div class="relative z-10 max-w-7xl mx-auto">
     <div class="grid sm:grid-cols-2 md:grid-cols-4 gap-10 pb-12 border-b border-outline-variant/20">
         <div class="md:col-span-2">
           <div class="flex items-center gap-3 mb-3">
